@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velosiped - Examples</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 64px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: -2px;
+    }
+
+    .subtitle {
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 60px;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 60px;
+    }
+
+    .example-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 30px;
+      text-decoration: none;
+      color: white;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .example-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .example-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .example-card:hover::before {
+      opacity: 1;
+    }
+
+    .example-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      display: block;
+    }
+
+    .example-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .example-description {
+      font-size: 14px;
+      opacity: 0.8;
+      line-height: 1.6;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 12px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .status-ready {
+      background: rgba(67, 233, 123, 0.3);
+    }
+
+    .status-wip {
+      background: rgba(255, 193, 7, 0.3);
+    }
+
+    .info-box {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 30px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .info-box h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .info-box p {
+      font-size: 16px;
+      opacity: 0.9;
+      line-height: 1.8;
+    }
+
+    .info-box code {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 14px;
+    }
+
+    .footer {
+      margin-top: 60px;
+      text-align: center;
+      opacity: 0.7;
+      font-size: 14px;
+    }
+
+    .footer a {
+      color: white;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+      transition: border-color 0.2s;
+    }
+
+    .footer a:hover {
+      border-color: white;
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 48px;
+      }
+
+      .subtitle {
+        font-size: 18px;
+      }
+
+      .examples-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚲 Velosiped</h1>
+    <p class="subtitle">Модульный и легковесный слайдер для современного веба</p>
+
+    <div class="examples-grid">
+      <a href="basic.html" class="example-card">
+        <span class="example-icon">📱</span>
+        <h3 class="example-title">Basic</h3>
+        <p class="example-description">
+          Базовый пример с основными функциями: навигация, события, API
+        </p>
+        <span class="status-badge status-ready">✓ Готов</span>
+      </a>
+
+      <a href="#" class="example-card" style="opacity: 0.5; pointer-events: none;">
+        <span class="example-icon">🎯</span>
+        <h3 class="example-title">Multiple Slides</h3>
+        <p class="example-description">
+          Показ нескольких слайдов одновременно с настройкой gap и perPage
+        </p>
+        <span class="status-badge status-wip">🔨 В разработке</span>
+      </a>
+
+      <a href="#" class="example-card" style="opacity: 0.5; pointer-events: none;">
+        <span class="example-icon">🔄</span>
+        <h3 class="example-title">Loop Mode</h3>
+        <p class="example-description">
+          Бесконечная прокрутка с плавными переходами
+        </p>
+        <span class="status-badge status-wip">🔨 В разработке</span>
+      </a>
+
+      <a href="#" class="example-card" style="opacity: 0.5; pointer-events: none;">
+        <span class="example-icon">👆</span>
+        <h3 class="example-title">Drag & Touch</h3>
+        <p class="example-description">
+          Поддержка touch-событий и drag'n'drop
+        </p>
+        <span class="status-badge status-wip">🔨 В разработке</span>
+      </a>
+
+      <a href="#" class="example-card" style="opacity: 0.5; pointer-events: none;">
+        <span class="example-icon">⚡</span>
+        <h3 class="example-title">Autoplay</h3>
+        <p class="example-description">
+          Автоматическая прокрутка с настройкой интервалов
+        </p>
+        <span class="status-badge status-wip">🔨 В разработке</span>
+      </a>
+
+      <a href="#" class="example-card" style="opacity: 0.5; pointer-events: none;">
+        <span class="example-icon">📐</span>
+        <h3 class="example-title">Responsive</h3>
+        <p class="example-description">
+          Адаптивные настройки для разных разрешений
+        </p>
+        <span class="status-badge status-wip">🔨 В разработке</span>
+      </a>
+    </div>
+
+    <div class="info-box">
+      <h2>🛠️ Режим разработки</h2>
+      <p>
+        Вы работаете в dev режиме с HMR.<br>
+        Изменения в <code>src/</code> применятся автоматически.<br>
+        Откройте DevTools для отладки.
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>
+        MIT License © 2025 |
+        <a href="https://github.com/yourusername/velosiped" target="_blank">GitHub</a> |
+        <a href="../README.md">Документация</a>
+      </p>
+    </div>
+  </div>
+
+  <script type="module">
+    // Проверка, что Vite работает
+    console.log('🚲 Velosiped Examples loaded!');
+    console.log('Dev server is running on http://localhost:3000');
+    
+    // Добавляем индикатор HMR
+    if (import.meta.hot) {
+      console.log('✨ Hot Module Replacement is active');
+      
+      import.meta.hot.on('vite:beforeUpdate', () => {
+        console.log('🔄 Updating modules...');
+      });
+    }
+  </script>
+</body>
+</html>
+

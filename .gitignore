@@ -28,6 +28,7 @@ coverage/
 *.swo
 *~
 .DS_Store
+.cursor
 
 # Logs
 logs/

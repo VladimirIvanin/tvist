@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Velosiped - Basic Example</title>
-  <link rel="stylesheet" href="../dist/velosiped.css">
+  <!-- Стили загружаются автоматически через src/index.ts -->
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -167,7 +167,7 @@ slider.on('slideChanged', (index) => {
 
   <!-- Velosiped -->
   <script type="module">
-    import Velosiped from '../dist/velosiped.esm.js'
+    import Velosiped from '../src/index.ts'
 
     // Инициализация
     const slider = new Velosiped('#slider', {

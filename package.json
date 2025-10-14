@@ -22,7 +22,10 @@
   ],
   "scripts": {
     "dev": "vite",
+    "dev:watch": "concurrently \"npm run dev\" \"npm run typecheck -- --watch\"",
     "build": "tsc && vite build",
+    "build:watch": "tsc --watch",
+    "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",

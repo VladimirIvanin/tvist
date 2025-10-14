@@ -2,9 +2,9 @@
  * Velosiped - главный файл стилей
  */
 
-// Core
-@import 'core/variables';
-@import 'core/base';
+// Core (используем @use вместо устаревшего @import)
+@use 'core/variables';
+@use 'core/base';
 
 // Сброс box-sizing для корректных расчётов
 * {

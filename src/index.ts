@@ -2,6 +2,8 @@
  * Velosiped - главная точка входа
  */
 
+import './styles/velosiped.scss'
+
 // Core
 export { Velosiped } from './core/Velosiped'
 export { Engine } from './core/Engine'
