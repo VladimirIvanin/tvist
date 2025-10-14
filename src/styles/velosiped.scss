@@ -1,27 +1,12 @@
 /**
- * Velosiped Styles
+ * Velosiped - главный файл стилей
  */
 
-:root {
-  --velosiped-speed: 300ms;
-  --velosiped-gap: 0px;
-}
+// Core
+@import 'core/variables';
+@import 'core/base';
 
-.velosiped {
-  position: relative;
-  overflow: hidden;
-  
-  &__container {
-    display: flex;
-    transition: transform var(--velosiped-speed) ease-out;
-    will-change: transform;
-  }
-  
-  &__slide {
-    flex-shrink: 0;
-    width: 100%;
-    position: relative;
-    content-visibility: auto;
-  }
+// Сброс box-sizing для корректных расчётов
+* {
+  box-sizing: border-box;
 }
-

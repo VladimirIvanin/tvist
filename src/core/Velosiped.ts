@@ -1,64 +1,306 @@
-import type { VelosipedOptions } from './types';
-
 /**
- * Главный класс Velosiped
+ * Velosiped - главный класс слайдера
+ * Точка входа для пользователя
  */
+
+import { Engine } from './Engine'
+import { EventEmitter } from './EventEmitter'
+import { getElement, children } from '../utils/dom'
+import type { VelosipedOptions, Module, ModuleConstructor } from './types'
+import { throttle } from './Animator'
+
 export class Velosiped {
-  static readonly VERSION = '0.0.1';
-  
-  private root: HTMLElement;
-  private options: Required<VelosipedOptions>;
-  
-  constructor(target: string | HTMLElement, options: VelosipedOptions = {}) {
-    // Находим root элемент
-    this.root = typeof target === 'string' 
-      ? document.querySelector(target) as HTMLElement
-      : target;
-      
-    if (!this.root) {
-      throw new Error(`[Velosiped] Element not found: ${target}`);
+  static readonly VERSION = '1.0.0'
+
+  // Реестр модулей (статический)
+  static readonly MODULES: Map<string, ModuleConstructor> = new Map()
+
+  // DOM элементы
+  readonly root: HTMLElement
+  readonly container: HTMLElement
+  readonly slides: HTMLElement[]
+
+  // Опции
+  readonly options: VelosipedOptions
+
+  // Ядро
+  readonly engine: Engine
+
+  // События
+  private events: EventEmitter
+
+  // Активные модули
+  private modules: Map<string, Module> = new Map()
+
+  // Обработчик resize (для отписки)
+  private resizeHandler?: () => void
+
+  /**
+   * Создать экземпляр Velosiped
+   * @param target - селектор или HTMLElement
+   * @param options - опции слайдера
+   */
+  constructor(
+    target: string | HTMLElement,
+    options: VelosipedOptions = {}
+  ) {
+    // Парсинг DOM
+    this.root = getElement(target)
+
+    // Находим контейнер
+    const containerSelector = '.velosiped__container'
+    const containerElement = this.root.querySelector<HTMLElement>(
+      containerSelector
+    )
+
+    if (!containerElement) {
+      throw new Error(
+        `Velosiped: container "${containerSelector}" not found inside root element`
+      )
     }
-    
-    // Опции по умолчанию
+
+    this.container = containerElement
+
+    // Получаем слайды
+    this.slides = children(this.container, '.velosiped__slide')
+
+    if (this.slides.length === 0) {
+      console.warn('Velosiped: no slides found')
+    }
+
+    // Мёрджим опции с дефолтными
     this.options = {
       perPage: 1,
       gap: 0,
-      drag: true,
-      dragSpeed: 1,
-      arrows: false,
-      pagination: false,
-      autoplay: false,
-      loop: false,
-      breakpoints: {},
-      startIndex: 0,
       speed: 300,
+      direction: 'horizontal',
+      drag: true,
+      start: 0,
+      loop: false,
       ...options,
-    };
-    
-    this.init();
+    }
+
+    // Инициализация системы событий
+    this.events = new EventEmitter()
+
+    // Регистрируем обработчики из опций
+    if (this.options.on) {
+      Object.entries(this.options.on).forEach(([event, handler]) => {
+        if (handler) {
+          this.events.on(event, handler)
+        }
+      })
+    }
+
+    // Создаём Engine
+    this.engine = new Engine(this, this.options)
+
+    // Инициализируем модули
+    this.initModules()
+
+    // Слушаем resize
+    this.setupResizeListener()
+
+    // Первый рендер
+    this.update()
+
+    // События created
+    this.emit('created', this)
   }
-  
-  private init(): void {
-    console.log('[Velosiped] Initialized', this.options);
+
+  /**
+   * Инициализация всех зарегистрированных модулей
+   */
+  private initModules(): void {
+    Velosiped.MODULES.forEach((ModuleClass, name) => {
+      try {
+        const module = new ModuleClass(this, this.options)
+        this.modules.set(name, module)
+        module.init()
+      } catch (error) {
+        console.error(`Velosiped: Failed to initialize module "${name}":`, error)
+      }
+    })
   }
-  
-  public destroy(): void {
-    console.log('[Velosiped] Destroyed');
+
+  /**
+   * Настройка обработчика resize
+   */
+  private setupResizeListener(): void {
+    this.resizeHandler = throttle(() => {
+      this.update()
+      this.emit('resize')
+    }, 100)
+
+    window.addEventListener('resize', this.resizeHandler)
   }
-  
-  public next(): this {
-    console.log('[Velosiped] Next');
-    return this;
+
+  // ==================== ПУБЛИЧНОЕ API ====================
+
+  /**
+   * Следующий слайд
+   */
+  next(): this {
+    if (this.engine.canScrollNext()) {
+      this.engine.scrollBy(1)
+    }
+    return this
   }
-  
-  public prev(): this {
-    console.log('[Velosiped] Prev');
-    return this;
+
+  /**
+   * Предыдущий слайд
+   */
+  prev(): this {
+    if (this.engine.canScrollPrev()) {
+      this.engine.scrollBy(-1)
+    }
+    return this
   }
-  
-  public scrollTo(index: number): this {
-    console.log('[Velosiped] ScrollTo', index);
-    return this;
+
+  /**
+   * Переход к слайду по индексу
+   * @param index - индекс слайда (0-based)
+   * @param instant - мгновенный переход без анимации
+   */
+  scrollTo(index: number, instant: boolean = false): this {
+    this.engine.scrollTo(index, instant)
+    return this
+  }
+
+  /**
+   * Обновить размеры и пересчитать позиции
+   */
+  update(): this {
+    this.engine.update()
+
+    // Вызываем onUpdate на модулях
+    this.modules.forEach((module) => {
+      module.onUpdate?.()
+    })
+
+    return this
+  }
+
+  /**
+   * Уничтожить экземпляр и очистить ресурсы
+   */
+  destroy(): this {
+    // События destroyed (ДО очистки событий!)
+    this.emit('destroyed', this)
+
+    // Уничтожаем модули
+    this.modules.forEach((module) => {
+      try {
+        module.destroy()
+      } catch (error) {
+        console.error(`Velosiped: Error destroying module:`, error)
+      }
+    })
+    this.modules.clear()
+
+    // Останавливаем анимации
+    this.engine.destroy()
+
+    // Удаляем обработчик resize
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler)
+    }
+
+    // Очищаем события
+    this.events.clear()
+
+    return this
+  }
+
+  /**
+   * Получить модуль по имени
+   */
+  getModule<T extends Module>(name: string): T | undefined {
+    return this.modules.get(name) as T | undefined
+  }
+
+  /**
+   * Получить текущий индекс активного слайда
+   */
+  get activeIndex(): number {
+    return this.engine.activeIndex
+  }
+
+  /**
+   * Проверить, можно ли листать вперёд
+   */
+  get canScrollNext(): boolean {
+    return this.engine.canScrollNext()
+  }
+
+  /**
+   * Проверить, можно ли листать назад
+   */
+  get canScrollPrev(): boolean {
+    return this.engine.canScrollPrev()
+  }
+
+  // ==================== СОБЫТИЯ ====================
+
+  /**
+   * Подписаться на событие
+   */
+  on(event: string, handler: (...args: any[]) => void): this {
+    this.events.on(event, handler)
+    return this
+  }
+
+  /**
+   * Отписаться от события
+   */
+  off(event: string, handler?: (...args: any[]) => void): this {
+    this.events.off(event, handler)
+    return this
+  }
+
+  /**
+   * Вызвать событие
+   */
+  emit(event: string, ...args: any[]): this {
+    this.events.emit(event, ...args)
+    return this
+  }
+
+  /**
+   * Подписаться на событие один раз
+   */
+  once(event: string, handler: (...args: any[]) => void): this {
+    this.events.once(event, handler)
+    return this
+  }
+
+  // ==================== СТАТИЧЕСКИЕ МЕТОДЫ ====================
+
+  /**
+   * Зарегистрировать модуль
+   */
+  static registerModule(name: string, ModuleClass: ModuleConstructor): void {
+    if (Velosiped.MODULES.has(name)) {
+      console.warn(`Velosiped: Module "${name}" is already registered`)
+      return
+    }
+    Velosiped.MODULES.set(name, ModuleClass)
+  }
+
+  /**
+   * Удалить модуль из реестра
+   */
+  static unregisterModule(name: string): void {
+    Velosiped.MODULES.delete(name)
+  }
+
+  /**
+   * Получить список зарегистрированных модулей
+   */
+  static getRegisteredModules(): string[] {
+    return Array.from(Velosiped.MODULES.keys())
   }
 }
 
+// Экспорт по умолчанию
+export default Velosiped

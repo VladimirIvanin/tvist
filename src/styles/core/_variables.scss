@@ -1,0 +1,30 @@
+/**
+ * CSS переменные
+ */
+
+:root {
+  // Анимация
+  --velosiped-speed: 300ms;
+  --velosiped-easing: ease-out;
+  
+  // Отступы
+  --velosiped-gap: 0px;
+  
+  // Стрелки навигации
+  --velosiped-arrow-size: 40px;
+  --velosiped-arrow-color: #000;
+  --velosiped-arrow-bg: rgba(255, 255, 255, 0.9);
+  --velosiped-arrow-hover-bg: rgba(255, 255, 255, 1);
+  --velosiped-arrow-disabled-opacity: 0.3;
+  
+  // Пагинация
+  --velosiped-pagination-color: #000;
+  --velosiped-pagination-color-active: #007aff;
+  --velosiped-bullet-size: 8px;
+  --velosiped-bullet-spacing: 6px;
+  
+  // Z-indexes
+  --velosiped-z-arrows: 10;
+  --velosiped-z-pagination: 10;
+}
+

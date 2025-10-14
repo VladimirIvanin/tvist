@@ -1,62 +1,158 @@
 /**
- * Основные типы для Velosiped
+ * Базовые типы для Velosiped
  */
 
+import type { Velosiped } from './Velosiped'
+
 /**
- * Опции для инициализации слайдера
+ * Основные опции слайдера
  */
 export interface VelosipedOptions {
-  /** Количество слайдов на странице */
-  perPage?: number;
+  // Базовые настройки
+  perPage?: number
+  gap?: number
+  speed?: number
+  direction?: 'horizontal' | 'vertical'
   
-  /** Отступ между слайдами в пикселях */
-  gap?: number;
+  // Начальные значения
+  start?: number
   
-  /** Включить drag */
-  drag?: boolean | 'free';
+  // Drag
+  drag?: boolean | 'free'
+  dragSpeed?: number
+  rubberband?: boolean
   
-  /** Скорость драга */
-  dragSpeed?: number;
+  // Navigation
+  arrows?: boolean | {
+    prev?: string | HTMLElement
+    next?: string | HTMLElement
+    disabledClass?: string
+    hiddenClass?: string
+  }
   
-  /** Включить стрелки навигации */
-  arrows?: boolean;
+  // Pagination
+  pagination?: boolean | {
+    container?: string | HTMLElement
+    type?: 'bullets' | 'fraction' | 'progress' | 'custom'
+    clickable?: boolean
+    bulletClass?: string
+    bulletActiveClass?: string
+    renderBullet?: (index: number, className: string) => string
+    renderFraction?: (current: number, total: number) => string
+    renderCustom?: (current: number, total: number) => string
+  }
   
-  /** Включить пагинацию */
-  pagination?: boolean;
+  // Autoplay
+  autoplay?: number | boolean
+  pauseOnHover?: boolean
+  pauseOnInteraction?: boolean
+  disableOnInteraction?: boolean
   
-  /** Автопрокрутка (задержка в ms) */
-  autoplay?: number | boolean;
+  // Loop
+  loop?: boolean | 'auto'
   
-  /** Бесконечная прокрутка */
-  loop?: boolean;
+  // Lazy loading
+  lazy?: boolean | {
+    preloadPrevNext?: number
+  }
   
-  /** Брейкпоинты для адаптивности */
-  breakpoints?: Record<number, Partial<VelosipedOptions>>;
+  // Effects
+  effect?: 'slide' | 'fade' | 'cube' | 'card'
+  crossFade?: boolean
   
-  /** Начальный индекс */
-  startIndex?: number;
+  // Thumbs
+  thumbs?: {
+    slider: Velosiped
+  }
   
-  /** Скорость анимации в ms */
-  speed?: number;
+  // Virtual
+  virtual?: boolean | {
+    addSlidesBefore?: number
+    addSlidesAfter?: number
+    renderSlide?: (data: any, index: number) => string
+  }
+  
+  // Marquee
+  marquee?: boolean | {
+    speed?: number
+    direction?: 'left' | 'right'
+    pauseOnHover?: boolean
+  }
+  
+  // Keyboard
+  keyboard?: boolean | {
+    enabled?: boolean
+    onlyInViewport?: boolean
+  }
+  
+  // Wheel
+  wheel?: boolean | {
+    sensitivity?: number
+    releaseOnEdges?: boolean
+  }
+  
+  // Responsive
+  breakpoints?: Record<number, Partial<VelosipedOptions>>
+  breakpointsBase?: 'window' | 'container'
+  
+  // Обработчики событий
+  on?: {
+    created?: (velosiped: Velosiped) => void
+    destroyed?: (velosiped: Velosiped) => void
+    beforeSlideChange?: (index: number) => void
+    slideChange?: (index: number) => void
+    slideChanged?: (index: number) => void
+    dragStart?: () => void
+    drag?: () => void
+    dragEnd?: () => void
+    scroll?: () => void
+    resize?: () => void
+    breakpoint?: (breakpoint: number | null) => void
+    [key: string]: ((...args: any[]) => void) | undefined
+  }
 }
 
 /**
- * События слайдера
+ * Базовый класс для модулей
  */
-export interface VelosipedEvents {
-  init: [];
-  destroy: [];
-  slideChanged: [index: number];
-  slideClick: [index: number];
-  dragStart: [];
-  drag: [];
-  dragEnd: [];
-  autoplayStart: [];
-  autoplayStop: [];
+export abstract class Module {
+  abstract readonly name: string
+
+  constructor(
+    protected velosiped: Velosiped,
+    protected options: VelosipedOptions
+  ) {}
+
+  /**
+   * Инициализация модуля
+   * Модуль сам решает, нужно ли ему инициализироваться
+   */
+  abstract init(): void
+
+  /**
+   * Очистка ресурсов модуля
+   */
+  abstract destroy(): void
+
+  /**
+   * Вызывается при обновлении размеров
+   */
+  onUpdate?(): void
+
+  /**
+   * Вызывается при прокрутке
+   */
+  onScroll?(): void
+
+  /**
+   * Вызывается при изменении размера окна
+   */
+  onResize?(): void
 }
 
 /**
- * Тип для обработчика событий
+ * Конструктор модуля
  */
-export type EventHandler<T extends any[] = any[]> = (...args: T) => void;
-
+export interface ModuleConstructor {
+  new (velosiped: Velosiped, options: VelosipedOptions): Module
+}

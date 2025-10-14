@@ -1,0 +1,57 @@
+/**
+ * Базовые стили слайдера
+ */
+
+.velosiped {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  
+  &__container {
+    display: flex;
+    will-change: transform;
+    
+    // Плавный переход для анимаций
+    transition: transform var(--velosiped-speed, 300ms) var(--velosiped-easing, ease-out);
+    
+    // GPU acceleration
+    transform: translate3d(0, 0, 0);
+  }
+  
+  &__slide {
+    flex-shrink: 0;
+    position: relative;
+    width: 100%;
+    
+    // Performance optimization: рендерим только видимые слайды
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+  
+  // Вертикальная ориентация
+  &--vertical {
+    .velosiped__container {
+      flex-direction: column;
+    }
+  }
+  
+  // Состояние dragging
+  &--dragging {
+    .velosiped__container {
+      transition: none;
+      cursor: grabbing;
+      user-select: none;
+    }
+    
+    .velosiped__slide {
+      pointer-events: none;
+    }
+  }
+  
+  // Состояние disabled
+  &--disabled {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+}
+

@@ -1,11 +1,24 @@
 /**
- * Velosiped - Модульный и легковесный слайдер
- * @packageDocumentation
+ * Velosiped - главная точка входа
  */
 
-export { Velosiped } from './core/Velosiped';
-export type { VelosipedOptions } from './core/types';
+// Core
+export { Velosiped } from './core/Velosiped'
+export { Engine } from './core/Engine'
+export { Vector1D } from './core/Vector1D'
+export { Counter } from './core/Counter'
+export { EventEmitter } from './core/EventEmitter'
+export { Animator, easings, throttle } from './core/Animator'
 
-// Version
-export const VERSION = '0.0.1';
+// Types
+export type {
+  VelosipedOptions,
+  Module,
+  ModuleConstructor,
+} from './core/types'
 
+// Utils (опционально для расширенного использования)
+export * from './utils'
+
+// Дефолтный экспорт
+export { Velosiped as default } from './core/Velosiped'
