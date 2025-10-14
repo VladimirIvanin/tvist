@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velosiped - Basic Example</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      padding: 40px 20px;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      margin-bottom: 30px;
+      color: #333;
+    }
+    
+    .velosiped {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .velosiped__slide {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 80px 40px;
+      text-align: center;
+      font-size: 24px;
+      border-radius: 4px;
+    }
+    
+    .controls {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    
+    button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+    
+    button:hover {
+      background: #5568d3;
+    }
+    
+    button:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚲 Velosiped - Basic Example</h1>
+    
+    <div class="velosiped" id="slider">
+      <div class="velosiped__container">
+        <div class="velosiped__slide">Slide 1</div>
+        <div class="velosiped__slide">Slide 2</div>
+        <div class="velosiped__slide">Slide 3</div>
+        <div class="velosiped__slide">Slide 4</div>
+        <div class="velosiped__slide">Slide 5</div>
+      </div>
+    </div>
+    
+    <div class="controls">
+      <button id="prev">← Prev</button>
+      <button id="next">Next →</button>
+    </div>
+  </div>
+  
+  <script type="module">
+    import { Velosiped } from '../dist/velosiped.esm.js';
+    
+    const slider = new Velosiped('#slider', {
+      perPage: 3,
+      gap: 20,
+      drag: true
+    });
+    
+    document.getElementById('prev').addEventListener('click', () => {
+      slider.prev();
+    });
+    
+    document.getElementById('next').addEventListener('click', () => {
+      slider.next();
+    });
+    
+    console.log('Velosiped initialized:', slider);
+  </script>
+</body>
+</html>
+
