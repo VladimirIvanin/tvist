@@ -6,6 +6,10 @@
 @use 'core/variables';
 @use 'core/base';
 
+// Modules
+@use 'modules/navigation';
+@use 'modules/pagination';
+
 // Сброс box-sizing для корректных расчётов
 * {
   box-sizing: border-box;

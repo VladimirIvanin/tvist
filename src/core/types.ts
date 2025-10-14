@@ -21,6 +21,7 @@ export interface VelosipedOptions {
   drag?: boolean | 'free'
   dragSpeed?: number
   rubberband?: boolean
+  focusableElements?: string
   
   // Navigation
   arrows?: boolean | {
@@ -112,47 +113,3 @@ export interface VelosipedOptions {
   }
 }
 
-/**
- * Базовый класс для модулей
- */
-export abstract class Module {
-  abstract readonly name: string
-
-  constructor(
-    protected velosiped: Velosiped,
-    protected options: VelosipedOptions
-  ) {}
-
-  /**
-   * Инициализация модуля
-   * Модуль сам решает, нужно ли ему инициализироваться
-   */
-  abstract init(): void
-
-  /**
-   * Очистка ресурсов модуля
-   */
-  abstract destroy(): void
-
-  /**
-   * Вызывается при обновлении размеров
-   */
-  onUpdate?(): void
-
-  /**
-   * Вызывается при прокрутке
-   */
-  onScroll?(): void
-
-  /**
-   * Вызывается при изменении размера окна
-   */
-  onResize?(): void
-}
-
-/**
- * Конструктор модуля
- */
-export interface ModuleConstructor {
-  new (velosiped: Velosiped, options: VelosipedOptions): Module
-}

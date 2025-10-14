@@ -1,0 +1,77 @@
+/**
+ * Pagination Styles
+ */
+
+.velosiped__pagination {
+  position: absolute;
+  bottom: var(--velosiped-pagination-bottom, 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--velosiped-pagination-gap, 8px);
+
+  // Bullets
+  .velosiped__bullet {
+    width: var(--velosiped-bullet-size, 8px);
+    height: var(--velosiped-bullet-size, 8px);
+    border-radius: 50%;
+    background: var(--velosiped-bullet-color, rgba(0, 0, 0, 0.3));
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--velosiped-bullet-hover-color, rgba(0, 0, 0, 0.5));
+      transform: scale(1.2);
+    }
+
+    &.active {
+      background: var(--velosiped-bullet-active-color, #000);
+      width: var(--velosiped-bullet-active-width, 20px);
+      border-radius: var(--velosiped-bullet-active-radius, 4px);
+    }
+  }
+
+  // Fraction
+  &-current,
+  &-separator,
+  &-total {
+    font-size: var(--velosiped-fraction-size, 14px);
+    color: var(--velosiped-fraction-color, #000);
+  }
+
+  &-current {
+    font-weight: bold;
+  }
+
+  // Progress bar
+  &-progress {
+    width: var(--velosiped-progress-width, 200px);
+    height: var(--velosiped-progress-height, 4px);
+    background: var(--velosiped-progress-bg, rgba(0, 0, 0, 0.1));
+    border-radius: var(--velosiped-progress-radius, 2px);
+    overflow: hidden;
+
+    &-bar {
+      height: 100%;
+      background: var(--velosiped-progress-active-color, #000);
+      transition: width 0.3s ease;
+    }
+  }
+}
+
+// Адаптивность
+@media (max-width: 768px) {
+  .velosiped__pagination {
+    --velosiped-pagination-bottom: 5px;
+    --velosiped-pagination-gap: 6px;
+    --velosiped-bullet-size: 6px;
+    --velosiped-bullet-active-width: 16px;
+    --velosiped-fraction-size: 12px;
+    --velosiped-progress-width: 150px;
+  }
+}
+

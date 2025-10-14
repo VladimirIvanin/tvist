@@ -6,7 +6,8 @@
 import { Engine } from './Engine'
 import { EventEmitter } from './EventEmitter'
 import { getElement, children } from '../utils/dom'
-import type { VelosipedOptions, Module, ModuleConstructor } from './types'
+import type { VelosipedOptions } from './types'
+import type { Module, ModuleConstructor } from '../modules/Module'
 import { throttle } from './Animator'
 
 export class Velosiped {

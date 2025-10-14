@@ -1,0 +1,67 @@
+/**
+ * Navigation (Arrows) Styles
+ */
+
+.velosiped__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+
+  // Размеры
+  width: var(--velosiped-arrow-size, 40px);
+  height: var(--velosiped-arrow-size, 40px);
+
+  // Стили кнопки
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--velosiped-arrow-bg, rgba(0, 0, 0, 0.5));
+  color: var(--velosiped-arrow-color, #fff);
+  border: none;
+  border-radius: var(--velosiped-arrow-radius, 50%);
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  // Hover эффект
+  &:hover:not(:disabled) {
+    background: var(--velosiped-arrow-hover-bg, rgba(0, 0, 0, 0.7));
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  // Активное состояние
+  &:active:not(:disabled) {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  // Disabled состояние
+  &:disabled,
+  &.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // Hidden состояние
+  &.hidden {
+    display: none;
+  }
+
+  // Позиционирование
+  &--prev {
+    left: var(--velosiped-arrow-offset, 10px);
+  }
+
+  &--next {
+    right: var(--velosiped-arrow-offset, 10px);
+  }
+}
+
+// Адаптивность
+@media (max-width: 768px) {
+  .velosiped__arrow {
+    --velosiped-arrow-size: 32px;
+    --velosiped-arrow-offset: 5px;
+  }
+}
+
