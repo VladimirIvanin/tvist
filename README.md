@@ -6,23 +6,36 @@
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/velosiped)](https://bundlephobia.com/package/velosiped)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## 🚧 В разработке
+## ✅ Статус разработки
 
-Velosiped находится в активной разработке. Следите за обновлениями!
+### Завершено
+
+- [x] **ЭТАП 1: MVP Core** - Engine, Animator, Vector1D, Counter, EventEmitter
+- [x] **ЭТАП 2: Essential Modules** - Drag, Navigation, Pagination, Autoplay, Breakpoints
 
 ### Roadmap
 
-- [x] Настройка проекта
-- [ ] Core Engine (в процессе)
-- [ ] Базовые модули
-- [ ] Продвинутые фичи
-- [ ] Документация и примеры
+- [ ] **ЭТАП 3: Advanced Features** - Loop, LazyLoad, Effects, Thumbs
+- [ ] **ЭТАП 4: Polish & Production** - Документация, тесты, оптимизация
 
 ## 📦 Установка
 
 ```bash
 npm install velosiped
 ```
+
+## ✨ Возможности
+
+- ⚡ **Легковесный** - всего 6.3kb gzip (с модулями!)
+- 🎯 **Модульный** - Engine + Modules архитектура
+- 🖱️ **Drag & Drop** - touch/mouse с rubberband эффектом
+- 🎨 **Navigation** - стрелки с disabled состояниями
+- 📊 **Pagination** - bullets, fraction, progress
+- ⏰ **Autoplay** - с паузами и остановками
+- 📱 **Responsive** - breakpoints для адаптивности
+- 🚀 **60 FPS** - производительность на первом месте
+- 💎 **TypeScript** - strict mode, полные типы
+- 0️⃣ **Zero deps** - нет внешних зависимостей
 
 ## 🚀 Быстрый старт
 
@@ -34,7 +47,13 @@ const slider = new Velosiped('#slider', {
   perPage: 3,
   gap: 20,
   drag: true,
-  arrows: true
+  arrows: true,
+  pagination: { type: 'bullets' },
+  autoplay: 3000,
+  breakpoints: {
+    768: { perPage: 2 },
+    480: { perPage: 1 }
+  }
 });
 ```
 
