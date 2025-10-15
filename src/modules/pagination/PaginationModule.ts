@@ -17,7 +17,7 @@ export class PaginationModule extends Module {
 
   private container: HTMLElement | null = null
   private bullets: HTMLElement[] = []
-  private clickHandlers: Map<HTMLElement, () => void> = new Map()
+  private clickHandlers = new Map<HTMLElement, () => void>()
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
@@ -131,7 +131,7 @@ export class PaginationModule extends Module {
       let bulletHTML: string
 
       // Кастомный рендер
-      if (typeof pagination === 'object' && pagination !== null && pagination.renderBullet) {
+      if (typeof pagination === 'object' && pagination?.renderBullet) {
         bulletHTML = pagination.renderBullet(index, bulletClass)
       } else {
         bulletHTML = `<span class="${bulletClass}" data-index="${index}"></span>`
@@ -160,7 +160,7 @@ export class PaginationModule extends Module {
     const pagination = this.options.pagination
     let html: string
 
-    if (typeof pagination === 'object' && pagination !== null && pagination.renderFraction) {
+    if (typeof pagination === 'object' && pagination?.renderFraction) {
       html = pagination.renderFraction(
         this.tvist.activeIndex + 1,
         this.tvist.slides.length
@@ -199,7 +199,7 @@ export class PaginationModule extends Module {
 
     const pagination = this.options.pagination
 
-    if (typeof pagination === 'object' && pagination !== null && pagination.renderCustom) {
+    if (typeof pagination === 'object' && pagination?.renderCustom) {
       const html = pagination.renderCustom(
         this.tvist.activeIndex + 1,
         this.tvist.slides.length

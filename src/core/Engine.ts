@@ -22,8 +22,8 @@ export class Engine {
   private animator: Animator
 
   // Кэш размеров
-  private containerWidth: number = 0
-  private slideWidth: number = 0
+  private containerWidth = 0
+  private slideWidth = 0
   private slidePositions: number[] = []
 
   // Ссылки
@@ -116,7 +116,7 @@ export class Engine {
    * @param index - индекс целевого слайда
    * @param instant - мгновенный переход без анимации
    */
-  scrollTo(index: number, instant: boolean = false): void {
+  scrollTo(index: number, instant = false): void {
     // Нормализуем индекс через Counter
     const normalizedIndex = this.index.set(index) ?? 0
 

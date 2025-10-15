@@ -15,7 +15,7 @@ import type { TvistOptions } from '../../core/types'
 export class BreakpointsModule extends Module {
   readonly name = 'breakpoints'
 
-  private mediaQueries: Map<number, MediaQueryList> = new Map()
+  private mediaQueries = new Map<number, MediaQueryList>()
   private currentBreakpoint: number | null = null
   private originalOptions: TvistOptions
 

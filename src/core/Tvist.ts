@@ -14,7 +14,7 @@ export class Tvist {
   static readonly VERSION = '1.0.0'
 
   // Реестр модулей (статический)
-  static readonly MODULES: Map<string, ModuleConstructor> = new Map()
+  static readonly MODULES = new Map<string, ModuleConstructor>()
 
   // DOM элементы
   readonly root: HTMLElement
@@ -31,7 +31,7 @@ export class Tvist {
   private events: EventEmitter
 
   // Активные модули
-  private modules: Map<string, Module> = new Map()
+  private modules = new Map<string, Module>()
 
   // Обработчик resize (для отписки)
   private resizeHandler?: () => void
@@ -163,7 +163,7 @@ export class Tvist {
    * @param index - индекс слайда (0-based)
    * @param instant - мгновенный переход без анимации
    */
-  scrollTo(index: number, instant: boolean = false): this {
+  scrollTo(index: number, instant = false): this {
     this.engine.scrollTo(index, instant)
     return this
   }

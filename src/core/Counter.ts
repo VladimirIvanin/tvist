@@ -12,7 +12,7 @@ export class Counter {
    * @param start - начальный индекс
    * @param loop - включить циклические индексы
    */
-  constructor(max: number, start: number = 0, loop: boolean = false) {
+  constructor(max: number, start = 0, loop = false) {
     this.max = max
     this.loop = loop
     this.value = this.constrain(start)

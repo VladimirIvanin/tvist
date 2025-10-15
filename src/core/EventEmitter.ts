@@ -6,8 +6,8 @@
 type EventHandler = (...args: any[]) => void
 
 export class EventEmitter {
-  private listeners: Map<string, Set<EventHandler>> = new Map()
-  private anyListeners: Set<(event: string, ...args: any[]) => void> = new Set()
+  private listeners = new Map<string, Set<EventHandler>>()
+  private anyListeners = new Set<(event: string, ...args: any[]) => void>()
 
   /**
    * Подписаться на событие

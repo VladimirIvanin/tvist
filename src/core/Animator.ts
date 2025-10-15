@@ -19,8 +19,8 @@ export const easings = {
 
 export class Animator {
   private animationId: number | null = null
-  private startTime: number = 0
-  private isRunning: boolean = false
+  private startTime = 0
+  private isRunning = false
 
   /**
    * Запустить анимацию

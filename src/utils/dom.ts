@@ -78,7 +78,7 @@ export function setTransform(element: HTMLElement, value: string): void {
 /**
  * Устанавливает translate3d для GPU acceleration
  */
-export function setTranslate(element: HTMLElement, x: number, y: number = 0): void {
+export function setTranslate(element: HTMLElement, x: number, y = 0): void {
   element.style.transform = `translate3d(${x}px, ${y}px, 0)`
 }
 
