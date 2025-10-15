@@ -28,7 +28,8 @@ export class DragModule extends Module {
   private startX = 0
   private startY = 0
   private startPosition = 0
-  private lastDragDistance = 0 // Оригинальное расстояние drag (до rubberband)
+  private currentX = 0 // Текущая позиция курсора
+  private currentY = 0
   private history: DragPoint[] = []
 
   // RAF для momentum
@@ -136,6 +137,8 @@ export class DragModule extends Module {
     this.isDragging = true
     this.startX = point.x
     this.startY = point.y
+    this.currentX = point.x
+    this.currentY = point.y
     this.startPosition = this.tvist.engine.location.get()
     this.history = []
 
@@ -161,6 +164,10 @@ export class DragModule extends Module {
     const point = this.getPointerPosition(e)
     if (!point) return
 
+    // Сохраняем текущую позицию курсора
+    this.currentX = point.x
+    this.currentY = point.y
+
     // Направление (horizontal/vertical)
     const isHorizontal = this.options.direction !== 'vertical'
     const delta = isHorizontal ? point.x - this.startX : point.y - this.startY
@@ -168,11 +175,8 @@ export class DragModule extends Module {
     // Применяем dragSpeed
     const dragSpeed = this.options.dragSpeed ?? 1
     let distance = delta * dragSpeed
-    
-    // Сохраняем оригинальное расстояние drag (для snap логики)
-    this.lastDragDistance = distance
 
-    // Применяем rubberband на границах
+    // Применяем rubberband на границах (только если включен)
     if (this.options.rubberband !== false) {
       distance = this.applyRubberband(distance)
     }
@@ -295,28 +299,33 @@ export class DragModule extends Module {
   }
 
   /**
-   * Rubberband эффект (из Keen Slider)
-   * Параболическое торможение при выходе за границы
+   * Rubberband эффект - более мягкий вариант
+   * Позволяет перетягивать за границы с плавным сопротивлением
    */
   private applyRubberband(distance: number): number {
     const position = this.startPosition + distance
     const { container } = this.tvist
     const containerWidth = container.clientWidth
 
-    // Внутри границ - нормальное движение
-    if (position <= this.maxPosition && position >= this.minPosition) {
+    // Внутри границ - полное движение БЕЗ сопротивления
+    // maxPosition отрицательный (например -1200), minPosition = 0
+    // Поэтому: -1200 <= position <= 0
+    if (position >= this.maxPosition && position <= this.minPosition) {
       return distance
     }
 
-    // За границей - вычисляем сопротивление
-    const overflow = position < this.minPosition 
-      ? this.minPosition - position 
-      : position - this.maxPosition
+    // За границей - применяем мягкое сопротивление
+    const overflow = position > this.minPosition 
+      ? position - this.minPosition 
+      : this.maxPosition - position
 
-    // Параболическое торможение: resistance = (1 - overflow/width * 2)²
-    const resistance = Math.max(0, 1 - (overflow / containerWidth) * 2)
+    // ИСПРАВЛЕННАЯ формула: более мягкое сопротивление
+    // Было: resistance = (1 - overflow/width * 2)² - слишком агрессивно
+    // Стало: resistance = 1 / (1 + overflow/width * 3) - более плавно
+    const friction = 3 // коэффициент трения (чем больше, тем сильнее сопротивление)
+    const resistance = 1 / (1 + (overflow / containerWidth) * friction)
     
-    return distance * resistance * resistance
+    return distance * resistance
   }
 
   /**
@@ -394,8 +403,11 @@ export class DragModule extends Module {
       return
     }
     
-    // Используем оригинальное расстояние drag (до rubberband)
-    const dragDistance = this.lastDragDistance
+    // Вычисляем ЧИСТОЕ расстояние drag (без модификаторов)
+    const isHorizontal = this.options.direction !== 'vertical'
+    const dragDistance = isHorizontal 
+      ? this.currentX - this.startX 
+      : this.currentY - this.startY
     
     // Threshold = 20% от ширины слайда (как в Embla)
     // Или минимум 80px (как swipeThreshold в Glide)
