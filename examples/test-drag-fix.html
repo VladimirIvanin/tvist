@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Тест Drag - Следование за мышью</title>
+  <link rel="stylesheet" href="../dist/tvist.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f5f5f5;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .info {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .info p {
+      margin: 8px 0;
+    }
+
+    .tvist {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .tvist__slide {
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: bold;
+      color: white;
+      user-select: none;
+    }
+
+    .tvist__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .tvist__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .tvist__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .tvist__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    .tvist__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+
+    .status {
+      background: #333;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+    }
+
+    .status div {
+      margin: 4px 0;
+    }
+
+    .test-description {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .test-description h3 {
+      margin-top: 0;
+      color: #856404;
+    }
+
+    .test-description ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 Тест Drag Module - Следование за мышью</h1>
+
+    <div class="test-description">
+      <h3>Что тестируем:</h3>
+      <ul>
+        <li><strong>Плавное следование</strong> - слайд должен двигаться вместе с мышью БЕЗ блокировок</li>
+        <li><strong>Движение туда-сюда</strong> - можно тянуть в разные стороны</li>
+        <li><strong>Snap после отпускания</strong> - решение принимается только после mouseup</li>
+        <li><strong>Threshold</strong> - если тянули меньше порога, возвращается к текущему слайду</li>
+      </ul>
+      <p><strong>Инструкция:</strong> Зажмите мышь на слайде и двигайте влево-вправо. Слайд должен следовать за курсором плавно.</p>
+    </div>
+
+    <div class="tvist" id="slider">
+      <div class="tvist__container">
+        <div class="tvist__slide">1</div>
+        <div class="tvist__slide">2</div>
+        <div class="tvist__slide">3</div>
+        <div class="tvist__slide">4</div>
+        <div class="tvist__slide">5</div>
+      </div>
+    </div>
+
+    <div class="status" id="status">
+      <div>🎯 Активный слайд: <span id="activeIndex">0</span></div>
+      <div>📍 Позиция: <span id="position">0</span>px</div>
+      <div>🖱️ Состояние: <span id="dragState">Ожидание</span></div>
+      <div>📏 Последнее смещение: <span id="lastDistance">0</span>px</div>
+      <div>⚡ События: <span id="eventLog">-</span></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { Tvist } from '../dist/tvist.esm.js';
+
+    const slider = new Tvist('#slider', {
+      perPage: 1,
+      gap: 0,
+      speed: 300,
+      drag: true,
+      loop: false,
+    });
+
+    // Элементы статуса
+    const activeIndexEl = document.getElementById('activeIndex');
+    const positionEl = document.getElementById('position');
+    const dragStateEl = document.getElementById('dragState');
+    const lastDistanceEl = document.getElementById('lastDistance');
+    const eventLogEl = document.getElementById('eventLog');
+
+    let lastEventTime = 0;
+    let eventCount = 0;
+
+    // Обновление статуса
+    function updateStatus() {
+      activeIndexEl.textContent = slider.activeIndex;
+      positionEl.textContent = Math.round(slider.engine.location.get());
+    }
+
+    // События
+    slider.on('dragStart', () => {
+      dragStateEl.textContent = '🟢 Драг начался';
+      dragStateEl.style.color = '#4caf50';
+      eventCount = 0;
+      lastEventTime = Date.now();
+      eventLogEl.textContent = 'dragStart';
+    });
+
+    slider.on('drag', () => {
+      eventCount++;
+      const now = Date.now();
+      const fps = Math.round(1000 / (now - lastEventTime));
+      lastEventTime = now;
+      
+      dragStateEl.textContent = `🔵 Драг (${eventCount} событий, ~${fps} FPS)`;
+      dragStateEl.style.color = '#2196f3';
+      updateStatus();
+      
+      // Показываем как часто обновляется
+      eventLogEl.textContent = `drag × ${eventCount}`;
+    });
+
+    slider.on('dragEnd', () => {
+      dragStateEl.textContent = '🔴 Драг закончился';
+      dragStateEl.style.color = '#f44336';
+      eventLogEl.textContent = `dragEnd (всего ${eventCount} событий drag)`;
+    });
+
+    slider.on('slideChanged', (index) => {
+      updateStatus();
+      setTimeout(() => {
+        dragStateEl.textContent = '⏸️ Ожидание';
+        dragStateEl.style.color = '#999';
+      }, 1000);
+    });
+
+    // Начальное обновление
+    updateStatus();
+    setInterval(updateStatus, 100); // Обновляем позицию часто
+  </script>
+</body>
+</html>
+

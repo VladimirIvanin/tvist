@@ -1,53 +1,32 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { Tvist } from '../../../src/core/Tvist'
+import { createSliderFixture, createInvalidSliderFixture, createEmptySliderFixture } from '../../fixtures'
+import type { SliderFixture } from '../../fixtures'
 
 describe('Tvist', () => {
-  let root: HTMLElement
+  let fixture: SliderFixture
 
   beforeEach(() => {
-    root = document.createElement('div')
-    root.className = 'tvist'
-    root.style.width = '1000px'
-
-    const container = document.createElement('div')
-    container.className = 'tvist__container'
-
-    for (let i = 0; i < 5; i++) {
-      const slide = document.createElement('div')
-      slide.className = 'tvist__slide'
-      slide.textContent = `Slide ${i + 1}`
-      container.appendChild(slide)
-    }
-
-    root.appendChild(container)
-    document.body.appendChild(root)
-
-    // Мокируем offsetWidth для JSDOM
-    Object.defineProperty(root, 'offsetWidth', {
-      configurable: true,
-      value: 1000
-    })
+    fixture = createSliderFixture({ slidesCount: 5, width: 1000 })
   })
 
   afterEach(() => {
-    if (root && root.parentNode) {
-      document.body.removeChild(root)
-    }
+    fixture.cleanup()
   })
 
   describe('initialization', () => {
     it('should initialize with selector', () => {
-      root.id = 'test-slider'
+      fixture.root.id = 'test-slider'
       const slider = new Tvist('#test-slider')
 
-      expect(slider.root).toBe(root)
+      expect(slider.root).toBe(fixture.root)
       expect(slider.slides).toHaveLength(5)
     })
 
     it('should initialize with element', () => {
-      const slider = new Tvist(root)
+      const slider = new Tvist(fixture.root)
 
-      expect(slider.root).toBe(root)
+      expect(slider.root).toBe(fixture.root)
       expect(slider.slides).toHaveLength(5)
     })
 
@@ -58,23 +37,17 @@ describe('Tvist', () => {
     })
 
     it('should throw error if container not found', () => {
-      const invalidRoot = document.createElement('div')
-      document.body.appendChild(invalidRoot)
+      const { root: invalidRoot, cleanup } = createInvalidSliderFixture()
 
       expect(() => {
         new Tvist(invalidRoot)
       }).toThrow('container ".tvist__container" not found')
 
-      document.body.removeChild(invalidRoot)
+      cleanup()
     })
 
     it('should warn if no slides found', () => {
-      const emptyRoot = document.createElement('div')
-      const emptyContainer = document.createElement('div')
-      emptyContainer.className = 'tvist__container'
-      emptyRoot.appendChild(emptyContainer)
-      document.body.appendChild(emptyRoot)
-
+      const { root: emptyRoot, cleanup } = createEmptySliderFixture()
       const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
       new Tvist(emptyRoot)
@@ -82,11 +55,11 @@ describe('Tvist', () => {
       expect(consoleWarn).toHaveBeenCalledWith('Tvist: no slides found')
 
       consoleWarn.mockRestore()
-      document.body.removeChild(emptyRoot)
+      cleanup()
     })
 
     it('should merge options with defaults', () => {
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         perPage: 3,
         gap: 20,
       })
@@ -103,7 +76,7 @@ describe('Tvist', () => {
 
   describe('navigation', () => {
     it('should navigate to next slide', () => {
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         perPage: 1,
         speed: 0,
       })
@@ -115,7 +88,7 @@ describe('Tvist', () => {
     })
 
     it('should navigate to previous slide', () => {
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         perPage: 1,
         speed: 0,
       })
@@ -127,7 +100,7 @@ describe('Tvist', () => {
     })
 
     it('should support method chaining', () => {
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         perPage: 1,
         speed: 0,
       })
@@ -139,7 +112,7 @@ describe('Tvist', () => {
     })
 
     it('should not go beyond limits without loop', () => {
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         perPage: 1,
         loop: false,
         speed: 0,
@@ -152,7 +125,7 @@ describe('Tvist', () => {
     })
 
     it('should wrap around with loop', () => {
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         perPage: 1,
         loop: true,
         speed: 0,
@@ -169,7 +142,7 @@ describe('Tvist', () => {
     it('should emit created event', () => {
       const handler = vi.fn()
 
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         on: {
           created: handler,
         },
@@ -179,7 +152,7 @@ describe('Tvist', () => {
     })
 
     it('should support on/off/emit', () => {
-      const slider = new Tvist(root)
+      const slider = new Tvist(fixture.root)
       const handler = vi.fn()
 
       slider.on('custom', handler)
@@ -194,7 +167,7 @@ describe('Tvist', () => {
     })
 
     it('should support once', () => {
-      const slider = new Tvist(root)
+      const slider = new Tvist(fixture.root)
       const handler = vi.fn()
 
       slider.once('custom', handler)
@@ -207,7 +180,7 @@ describe('Tvist', () => {
     it('should emit destroyed event', () => {
       const handler = vi.fn()
 
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         on: {
           destroyed: handler,
         },
@@ -221,14 +194,14 @@ describe('Tvist', () => {
 
   describe('update and destroy', () => {
     it('should update sizes', () => {
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         perPage: 2,
       })
 
       const initialWidth = slider.engine.slideWidthValue
 
-      root.style.width = '1200px'
-      Object.defineProperty(root, 'offsetWidth', {
+      fixture.root.style.width = '1200px'
+      Object.defineProperty(fixture.root, 'offsetWidth', {
         configurable: true,
         value: 1200
       })
@@ -241,7 +214,7 @@ describe('Tvist', () => {
     })
 
     it('should cleanup on destroy', () => {
-      const slider = new Tvist(root)
+      const slider = new Tvist(fixture.root)
 
       slider.destroy()
 
@@ -250,7 +223,7 @@ describe('Tvist', () => {
     })
 
     it('should be safe to call destroy multiple times', () => {
-      const slider = new Tvist(root)
+      const slider = new Tvist(fixture.root)
 
       expect(() => {
         slider.destroy()
@@ -261,7 +234,7 @@ describe('Tvist', () => {
 
   describe('getters', () => {
     it('should return active index', () => {
-      const slider = new Tvist(root)
+      const slider = new Tvist(fixture.root)
 
       slider.scrollTo(2, true)
 
@@ -269,7 +242,7 @@ describe('Tvist', () => {
     })
 
     it('should return canScrollNext', () => {
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         loop: false,
       })
 
@@ -281,7 +254,7 @@ describe('Tvist', () => {
     })
 
     it('should return canScrollPrev', () => {
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         loop: false,
       })
 
@@ -347,7 +320,7 @@ describe('Tvist', () => {
     it('should listen to window resize', async () => {
       const onResize = vi.fn()
 
-      const slider = new Tvist(root, {
+      const slider = new Tvist(fixture.root, {
         on: {
           resize: onResize,
         },
@@ -365,7 +338,7 @@ describe('Tvist', () => {
     })
 
     it('should remove resize listener on destroy', () => {
-      const slider = new Tvist(root)
+      const slider = new Tvist(fixture.root)
       
       slider.destroy()
 

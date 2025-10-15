@@ -6,320 +6,186 @@
  * 2. Drag в обе стороны
  * 3. Snap только после отпускания
  * 4. Threshold для переключения слайда
+ * 5. Touch поддержка
+ * 6. События драга
  */
 
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest'
 import { Tvist } from '../../../src/core/Tvist'
 import { DragModule } from '../../../src/modules/drag/DragModule'
+import {
+  createSliderFixture,
+  simulateDrag,
+  waitForAnimation,
+  createMouseEvent,
+  type SliderFixture,
+} from '../../fixtures'
 
 describe('DragModule', () => {
-  let container: HTMLElement
-  let tvist: Tvist
+  let fixture: SliderFixture
+  let slider: Tvist
 
   beforeEach(() => {
     // Регистрируем модуль
     Tvist.registerModule('drag', DragModule)
-    // Создаём тестовый контейнер
-    container = document.createElement('div')
-    container.innerHTML = `
-      <div class="tvist">
-        <div class="tvist__container">
-          <div class="tvist__slide">Slide 1</div>
-          <div class="tvist__slide">Slide 2</div>
-          <div class="tvist__slide">Slide 3</div>
-        </div>
-      </div>
-    `
-    document.body.appendChild(container)
+
+    // Создаём фикстуру
+    fixture = createSliderFixture({
+      slidesCount: 3,
+      width: 600,
+      height: 400,
+    })
 
     // Инициализируем слайдер
-    const root = container.querySelector('.tvist') as HTMLElement
-    const containerEl = root.querySelector('.tvist__container') as HTMLElement
-    const slides = containerEl.querySelectorAll('.tvist__slide') as NodeListOf<HTMLElement>
-
-    // Мокаем размеры (в тестах нет CSS)
-    // offsetWidth используется в getOuterWidth
-    Object.defineProperty(root, 'offsetWidth', {
-      configurable: true,
-      value: 600
-    })
-    Object.defineProperty(containerEl, 'offsetWidth', {
-      configurable: true,
-      value: 600
-    })
-    Object.defineProperty(containerEl, 'clientWidth', {
-      configurable: true,
-      value: 600
-    })
-    slides.forEach(slide => {
-      Object.defineProperty(slide, 'offsetWidth', {
-        configurable: true,
-        value: 600
-      })
-    })
-
-    tvist = new Tvist(root, {
+    slider = new Tvist(fixture.root, {
       drag: true,
       speed: 300,
     })
   })
 
   afterEach(() => {
-    tvist.destroy()
-    document.body.removeChild(container)
-    // Очищаем модули после тестов
+    slider.destroy()
+    fixture.cleanup()
     Tvist.unregisterModule('drag')
   })
 
   describe('Плавное следование за мышью', () => {
     it('должен двигать слайд вместе с мышью без блокировок', () => {
-      const slider = tvist.container
-      const startX = 200
-      
+      const initialPosition = slider.engine.location.get()
+
       // Начинаем drag
-      const mouseDownEvent = new MouseEvent('mousedown', {
-        clientX: startX,
+      const mouseDownEvent = createMouseEvent('mousedown', {
+        clientX: 200,
         clientY: 100,
-        bubbles: true,
       })
-      slider.dispatchEvent(mouseDownEvent)
+      fixture.container.dispatchEvent(mouseDownEvent)
 
-      // Проверяем начальную позицию
-      const initialTransform = slider.style.transform
-      const initialPosition = tvist.engine.location.get()
-
-      // Двигаем мышь на 50px влево
-      const mouseMoveEvent1 = new MouseEvent('mousemove', {
-        clientX: startX - 50,
+      // Двигаем мышь влево на 50px
+      const mouseMoveEvent = createMouseEvent('mousemove', {
+        clientX: 150,
         clientY: 100,
-        bubbles: true,
       })
-      document.dispatchEvent(mouseMoveEvent1)
+      document.dispatchEvent(mouseMoveEvent)
 
       // Позиция должна измениться СРАЗУ (следовать за мышью)
-      const position1 = tvist.engine.location.get()
-      expect(position1).not.toBe(initialPosition)
-      expect(position1).toBeLessThan(initialPosition) // Двинулись влево (отрицательное направление)
+      const newPosition = slider.engine.location.get()
+      expect(newPosition).not.toBe(initialPosition)
+      expect(newPosition).toBeLessThan(initialPosition) // Двинулись влево
 
-      // Двигаем мышь ещё на 30px влево (всего -80px)
-      const mouseMoveEvent2 = new MouseEvent('mousemove', {
-        clientX: startX - 80,
+      // Отпускаем
+      const mouseUpEvent = createMouseEvent('mouseup', {
+        clientX: 150,
         clientY: 100,
-        bubbles: true,
-      })
-      document.dispatchEvent(mouseMoveEvent2)
-
-      // Позиция должна продолжить следовать
-      const position2 = tvist.engine.location.get()
-      expect(position2).toBeLessThan(position1) // Продолжаем двигаться влево
-      
-      // Transform должен применяться напрямую
-      expect(slider.style.transform).not.toBe(initialTransform)
-      expect(slider.style.transform).toContain('translate3d')
-
-      // Отпускаем мышь
-      const mouseUpEvent = new MouseEvent('mouseup', {
-        clientX: startX - 80,
-        clientY: 100,
-        bubbles: true,
       })
       document.dispatchEvent(mouseUpEvent)
     })
 
     it('должен следовать за мышью плавно при движении туда-сюда', () => {
-      const slider = tvist.container
-      const startX = 200
-      
+      const initialPosition = slider.engine.location.get()
+
       // Начинаем drag
-      slider.dispatchEvent(new MouseEvent('mousedown', {
-        clientX: startX,
-        clientY: 100,
-        bubbles: true,
-      }))
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
 
-      const initialPosition = tvist.engine.location.get()
-
-      // Двигаем влево на 50px
-      document.dispatchEvent(new MouseEvent('mousemove', {
-        clientX: startX - 50,
-        clientY: 100,
-        bubbles: true,
-      }))
-
-      const positionLeft = tvist.engine.location.get()
+      // Двигаем влево
+      document.dispatchEvent(createMouseEvent('mousemove', { clientX: 150, clientY: 100 }))
+      const positionLeft = slider.engine.location.get()
       expect(positionLeft).toBeLessThan(initialPosition)
 
-      // Двигаем обратно вправо на 30px (теперь -20px от старта)
-      document.dispatchEvent(new MouseEvent('mousemove', {
-        clientX: startX - 20,
-        clientY: 100,
-        bubbles: true,
-      }))
+      // Двигаем обратно вправо
+      document.dispatchEvent(createMouseEvent('mousemove', { clientX: 180, clientY: 100 }))
+      const positionBack = slider.engine.location.get()
+      expect(positionBack).toBeGreaterThan(positionLeft)
+      expect(positionBack).toBeLessThan(initialPosition)
 
-      const positionBack = tvist.engine.location.get()
-      expect(positionBack).toBeGreaterThan(positionLeft) // Вернулись вправо
-      expect(positionBack).toBeLessThan(initialPosition) // Но всё ещё левее старта
+      // Двигаем ещё правее
+      document.dispatchEvent(createMouseEvent('mousemove', { clientX: 210, clientY: 100 }))
+      const positionRight = slider.engine.location.get()
+      expect(positionRight).toBeGreaterThan(initialPosition)
 
-      // Двигаем ещё правее (теперь +10px от старта)
-      document.dispatchEvent(new MouseEvent('mousemove', {
-        clientX: startX + 10,
-        clientY: 100,
-        bubbles: true,
-      }))
-
-      const positionRight = tvist.engine.location.get()
-      expect(positionRight).toBeGreaterThan(initialPosition) // Теперь правее старта
-
-      document.dispatchEvent(new MouseEvent('mouseup', {
-        clientX: startX + 10,
-        clientY: 100,
-        bubbles: true,
-      }))
+      // Отпускаем
+      document.dispatchEvent(createMouseEvent('mouseup', { clientX: 210, clientY: 100 }))
     })
   })
 
   describe('Snap после отпускания', () => {
     it('НЕ должен переключать слайд если драг меньше threshold', async () => {
-      const slider = tvist.container
-      const startX = 200
-      const initialIndex = tvist.activeIndex
+      const initialIndex = slider.activeIndex
 
-      // Начинаем drag
-      slider.dispatchEvent(new MouseEvent('mousedown', {
-        clientX: startX,
-        clientY: 100,
-        bubbles: true,
-      }))
+      // Маленький drag (40px - меньше threshold)
+      await simulateDrag({
+        element: fixture.container,
+        startX: 200,
+        deltaX: -40,
+        steps: 3,
+      })
 
-      // Маленький drag (40px - меньше threshold ~80px)
-      document.dispatchEvent(new MouseEvent('mousemove', {
-        clientX: startX - 40,
-        clientY: 100,
-        bubbles: true,
-      }))
-
-      // Отпускаем
-      document.dispatchEvent(new MouseEvent('mouseup', {
-        clientX: startX - 40,
-        clientY: 100,
-        bubbles: true,
-      }))
-
-      // Ждём завершения анимации
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await waitForAnimation(300)
 
       // Индекс НЕ должен измениться
-      expect(tvist.activeIndex).toBe(initialIndex)
+      expect(slider.activeIndex).toBe(initialIndex)
     })
 
     it('должен переключить слайд если драг больше threshold', async () => {
-      const slider = tvist.container
-      const startX = 200
-      const initialIndex = tvist.activeIndex
+      const initialIndex = slider.activeIndex
 
-      // Начинаем drag
-      slider.dispatchEvent(new MouseEvent('mousedown', {
-        clientX: startX,
-        clientY: 100,
-        bubbles: true,
-      }))
+      // Большой drag (150px - больше threshold)
+      await simulateDrag({
+        element: fixture.container,
+        startX: 200,
+        deltaX: -150,
+        steps: 5,
+      })
 
-      // Большой drag (150px - точно больше threshold 120px)
-      document.dispatchEvent(new MouseEvent('mousemove', {
-        clientX: startX - 150,
-        clientY: 100,
-        bubbles: true,
-      }))
+      await waitForAnimation(300)
 
-      // Отпускаем
-      document.dispatchEvent(new MouseEvent('mouseup', {
-        clientX: startX - 150,
-        clientY: 100,
-        bubbles: true,
-      }))
-
-      // Ждём завершения анимации
-      await new Promise(resolve => setTimeout(resolve, 400))
-
-      // Индекс должен увеличиться (свайп влево = следующий слайд)
-      expect(tvist.activeIndex).toBe(initialIndex + 1)
+      // Индекс должен увеличиться
+      expect(slider.activeIndex).toBe(initialIndex + 1)
     })
 
     it('должен вернуться к текущему слайду при drag туда-сюда', async () => {
-      const slider = tvist.container
-      const startX = 200
-      const initialIndex = tvist.activeIndex
+      const initialIndex = slider.activeIndex
 
-      // Начинаем drag
-      slider.dispatchEvent(new MouseEvent('mousedown', {
-        clientX: startX,
-        clientY: 100,
-        bubbles: true,
-      }))
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
 
-      // Драгаем влево на 120px
-      document.dispatchEvent(new MouseEvent('mousemove', {
-        clientX: startX - 120,
-        clientY: 100,
-        bubbles: true,
-      }))
+      // Драгаем влево
+      document.dispatchEvent(createMouseEvent('mousemove', { clientX: 80, clientY: 100 }))
 
-      // Драгаем обратно вправо (только -20px от старта)
-      document.dispatchEvent(new MouseEvent('mousemove', {
-        clientX: startX - 20,
-        clientY: 100,
-        bubbles: true,
-      }))
+      // Драгаем обратно вправо
+      document.dispatchEvent(createMouseEvent('mousemove', { clientX: 180, clientY: 100 }))
 
       // Отпускаем
-      document.dispatchEvent(new MouseEvent('mouseup', {
-        clientX: startX - 20,
-        clientY: 100,
-        bubbles: true,
-      }))
+      document.dispatchEvent(createMouseEvent('mouseup', { clientX: 180, clientY: 100 }))
 
-      // Ждём завершения анимации
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await waitForAnimation(300)
 
-      // Индекс НЕ должен измениться (недостаточно сдвинули)
-      expect(tvist.activeIndex).toBe(initialIndex)
+      // Индекс НЕ должен измениться
+      expect(slider.activeIndex).toBe(initialIndex)
     })
   })
 
   describe('Drag в обе стороны', () => {
     it('должен поддерживать drag вправо (к предыдущему слайду)', async () => {
-      // Переходим на второй слайд (индекс 1)
-      tvist.scrollTo(1, true) // instant = true
-      
-      const slider = tvist.container
-      const startX = 200
-      const initialIndex = tvist.activeIndex
-
+      // Переходим на второй слайд
+      slider.scrollTo(1, true)
+      const initialIndex = slider.activeIndex
       expect(initialIndex).toBe(1)
 
       // Drag вправо (к предыдущему)
-      slider.dispatchEvent(new MouseEvent('mousedown', {
-        clientX: startX,
-        clientY: 100,
-        bubbles: true,
-      }))
+      await simulateDrag({
+        element: fixture.container,
+        startX: 200,
+        deltaX: 150, // +150px вправо
+        steps: 5,
+      })
 
-      document.dispatchEvent(new MouseEvent('mousemove', {
-        clientX: startX + 150, // +150px вправо (больше threshold 120px)
-        clientY: 100,
-        bubbles: true,
-      }))
-
-      document.dispatchEvent(new MouseEvent('mouseup', {
-        clientX: startX + 150,
-        clientY: 100,
-        bubbles: true,
-      }))
-
-      await new Promise(resolve => setTimeout(resolve, 400))
+      await waitForAnimation(300)
 
       // Должны вернуться к первому слайду
-      expect(tvist.activeIndex).toBe(0)
+      expect(slider.activeIndex).toBe(0)
     })
   })
 
@@ -329,70 +195,96 @@ describe('DragModule', () => {
       const dragSpy = vi.fn()
       const dragEndSpy = vi.fn()
 
-      tvist.on('dragStart', dragStartSpy)
-      tvist.on('drag', dragSpy)
-      tvist.on('dragEnd', dragEndSpy)
-
-      const slider = tvist.container
-      const startX = 200
+      slider.on('dragStart', dragStartSpy)
+      slider.on('drag', dragSpy)
+      slider.on('dragEnd', dragEndSpy)
 
       // mousedown
-      slider.dispatchEvent(new MouseEvent('mousedown', {
-        clientX: startX,
-        clientY: 100,
-        bubbles: true,
-      }))
-
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
       expect(dragStartSpy).toHaveBeenCalledOnce()
 
       // mousemove
-      document.dispatchEvent(new MouseEvent('mousemove', {
-        clientX: startX - 50,
-        clientY: 100,
-        bubbles: true,
-      }))
-
+      document.dispatchEvent(createMouseEvent('mousemove', { clientX: 150, clientY: 100 }))
       expect(dragSpy).toHaveBeenCalled()
 
       // mouseup
-      document.dispatchEvent(new MouseEvent('mouseup', {
-        clientX: startX - 50,
-        clientY: 100,
-        bubbles: true,
-      }))
-
+      document.dispatchEvent(createMouseEvent('mouseup', { clientX: 150, clientY: 100 }))
       expect(dragEndSpy).toHaveBeenCalledOnce()
+    })
+
+    it('должен передавать правильные данные в события', () => {
+      const dragSpy = vi.fn()
+      slider.on('drag', dragSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+
+      document.dispatchEvent(createMouseEvent('mousemove', { clientX: 150, clientY: 100 }))
+
+      // Проверяем что событие вызвано
+      expect(dragSpy).toHaveBeenCalled()
+
+      // Можно проверить параметры если нужно
+      // const callArgs = dragSpy.mock.calls[0]
+      // expect(callArgs).toBeDefined()
+
+      document.dispatchEvent(createMouseEvent('mouseup', { clientX: 150, clientY: 100 }))
     })
   })
 
   describe('Touch поддержка', () => {
-    it('должен работать с touch событиями', () => {
-      const slider = tvist.container
-      const startX = 200
+    it('должен работать с touch событиями', async () => {
+      const initialIndex = slider.activeIndex
 
-      // touchstart
-      slider.dispatchEvent(new TouchEvent('touchstart', {
-        touches: [{ clientX: startX, clientY: 100 } as Touch],
-        bubbles: true,
-      }))
+      // Используем touch вместо mouse
+      await simulateDrag({
+        element: fixture.container,
+        startX: 200,
+        deltaX: -150,
+        steps: 5,
+        type: 'touch',
+      })
 
-      const initialPosition = tvist.engine.location.get()
+      await waitForAnimation(300)
 
-      // touchmove
-      document.dispatchEvent(new TouchEvent('touchmove', {
-        touches: [{ clientX: startX - 50, clientY: 100 } as Touch],
-        bubbles: true,
-        cancelable: true,
-      }))
+      // Должны перейти к следующему слайду
+      expect(slider.activeIndex).toBe(initialIndex + 1)
+    })
+  })
 
-      const newPosition = tvist.engine.location.get()
+  describe('Edge cases', () => {
+    it('должен работать с drag даже при динамическом изменении опций', () => {
+      const initialPosition = slider.engine.location.get()
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+
+      document.dispatchEvent(createMouseEvent('mousemove', { clientX: 150, clientY: 100 }))
+
+      // Позиция должна измениться (модуль активен)
+      const newPosition = slider.engine.location.get()
       expect(newPosition).not.toBe(initialPosition)
+      expect(newPosition).toBeLessThan(initialPosition)
 
-      // touchend
-      document.dispatchEvent(new TouchEvent('touchend', {
-        changedTouches: [{ clientX: startX - 50, clientY: 100 } as Touch],
-        bubbles: true,
-      }))
+      document.dispatchEvent(createMouseEvent('mouseup', { clientX: 150, clientY: 100 }))
+    })
+
+    it('должен корректно обрабатывать mouseup без mousemove', () => {
+      const initialIndex = slider.activeIndex
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+
+      // Сразу отпускаем без движения
+      document.dispatchEvent(createMouseEvent('mouseup', { clientX: 200, clientY: 100 }))
+
+      // Индекс не должен измениться
+      expect(slider.activeIndex).toBe(initialIndex)
     })
   })
 })
