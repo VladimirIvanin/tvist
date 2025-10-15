@@ -3,11 +3,11 @@
  * Auto-registration при импорте
  */
 
-import { Velosiped } from '../../core/Velosiped'
+import { Tvist } from '../../core/Tvist'
 import { NavigationModule } from './NavigationModule'
 
 // Автоматическая регистрация модуля
-Velosiped.MODULES.set('navigation', NavigationModule)
+Tvist.MODULES.set('navigation', NavigationModule)
 
 export { NavigationModule }
 

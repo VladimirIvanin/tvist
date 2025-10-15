@@ -3,11 +3,11 @@
  * Auto-registration при импорте
  */
 
-import { Velosiped } from '../../core/Velosiped'
+import { Tvist } from '../../core/Tvist'
 import { BreakpointsModule } from './BreakpointsModule'
 
 // Автоматическая регистрация модуля
-Velosiped.MODULES.set('breakpoints', BreakpointsModule)
+Tvist.MODULES.set('breakpoints', BreakpointsModule)
 
 export { BreakpointsModule }
 

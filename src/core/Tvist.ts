@@ -1,16 +1,16 @@
 /**
- * Velosiped - главный класс слайдера
+ * Tvist - главный класс слайдера
  * Точка входа для пользователя
  */
 
 import { Engine } from './Engine'
 import { EventEmitter } from './EventEmitter'
 import { getElement, children } from '../utils/dom'
-import type { VelosipedOptions } from './types'
+import type { TvistOptions } from './types'
 import type { Module, ModuleConstructor } from '../modules/Module'
 import { throttle } from './Animator'
 
-export class Velosiped {
+export class Tvist {
   static readonly VERSION = '1.0.0'
 
   // Реестр модулей (статический)
@@ -22,7 +22,7 @@ export class Velosiped {
   readonly slides: HTMLElement[]
 
   // Опции
-  readonly options: VelosipedOptions
+  readonly options: TvistOptions
 
   // Ядро
   readonly engine: Engine
@@ -37,36 +37,36 @@ export class Velosiped {
   private resizeHandler?: () => void
 
   /**
-   * Создать экземпляр Velosiped
+   * Создать экземпляр Tvist
    * @param target - селектор или HTMLElement
    * @param options - опции слайдера
    */
   constructor(
     target: string | HTMLElement,
-    options: VelosipedOptions = {}
+    options: TvistOptions = {}
   ) {
     // Парсинг DOM
     this.root = getElement(target)
 
     // Находим контейнер
-    const containerSelector = '.velosiped__container'
+    const containerSelector = '.tvist__container'
     const containerElement = this.root.querySelector<HTMLElement>(
       containerSelector
     )
 
     if (!containerElement) {
       throw new Error(
-        `Velosiped: container "${containerSelector}" not found inside root element`
+        `Tvist: container "${containerSelector}" not found inside root element`
       )
     }
 
     this.container = containerElement
 
     // Получаем слайды
-    this.slides = children(this.container, '.velosiped__slide')
+    this.slides = children(this.container, '.tvist__slide')
 
     if (this.slides.length === 0) {
-      console.warn('Velosiped: no slides found')
+      console.warn('Tvist: no slides found')
     }
 
     // Мёрджим опции с дефолтными
@@ -113,13 +113,13 @@ export class Velosiped {
    * Инициализация всех зарегистрированных модулей
    */
   private initModules(): void {
-    Velosiped.MODULES.forEach((ModuleClass, name) => {
+    Tvist.MODULES.forEach((ModuleClass, name) => {
       try {
         const module = new ModuleClass(this, this.options)
         this.modules.set(name, module)
         module.init()
       } catch (error) {
-        console.error(`Velosiped: Failed to initialize module "${name}":`, error)
+        console.error(`Tvist: Failed to initialize module "${name}":`, error)
       }
     })
   }
@@ -194,7 +194,7 @@ export class Velosiped {
       try {
         module.destroy()
       } catch (error) {
-        console.error(`Velosiped: Error destroying module:`, error)
+        console.error(`Tvist: Error destroying module:`, error)
       }
     })
     this.modules.clear()
@@ -281,27 +281,27 @@ export class Velosiped {
    * Зарегистрировать модуль
    */
   static registerModule(name: string, ModuleClass: ModuleConstructor): void {
-    if (Velosiped.MODULES.has(name)) {
-      console.warn(`Velosiped: Module "${name}" is already registered`)
+    if (Tvist.MODULES.has(name)) {
+      console.warn(`Tvist: Module "${name}" is already registered`)
       return
     }
-    Velosiped.MODULES.set(name, ModuleClass)
+    Tvist.MODULES.set(name, ModuleClass)
   }
 
   /**
    * Удалить модуль из реестра
    */
   static unregisterModule(name: string): void {
-    Velosiped.MODULES.delete(name)
+    Tvist.MODULES.delete(name)
   }
 
   /**
    * Получить список зарегистрированных модулей
    */
   static getRegisteredModules(): string[] {
-    return Array.from(Velosiped.MODULES.keys())
+    return Array.from(Tvist.MODULES.keys())
   }
 }
 
 // Экспорт по умолчанию
-export default Velosiped
+export default Tvist

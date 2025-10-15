@@ -1,9 +1,9 @@
-# 🚲 Velosiped
+# 🚲 Tvist
 
 > Модульный и легковесный слайдер для современного веба
 
-[![npm version](https://img.shields.io/npm/v/velosiped.svg)](https://www.npmjs.com/package/velosiped)
-[![Bundle Size](https://img.shields.io/bundlephobia/minzip/velosiped)](https://bundlephobia.com/package/velosiped)
+[![npm version](https://img.shields.io/npm/v/tvist.svg)](https://www.npmjs.com/package/tvist)
+[![Bundle Size](https://img.shields.io/bundlephobia/minzip/tvist)](https://bundlephobia.com/package/tvist)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## ✅ Статус разработки
@@ -21,7 +21,7 @@
 ## 📦 Установка
 
 ```bash
-npm install velosiped
+npm install tvist
 ```
 
 ## ✨ Возможности
@@ -40,10 +40,10 @@ npm install velosiped
 ## 🚀 Быстрый старт
 
 ```typescript
-import Velosiped from 'velosiped';
-import 'velosiped/dist/velosiped.css';
+import Tvist from 'tvist';
+import 'tvist/dist/tvist.css';
 
-const slider = new Velosiped('#slider', {
+const slider = new Tvist('#slider', {
   perPage: 3,
   gap: 20,
   drag: true,
@@ -67,8 +67,8 @@ const slider = new Velosiped('#slider', {
 
 ```bash
 # Клонировать репозиторий
-git clone https://github.com/yourusername/velosiped.git
-cd velosiped
+git clone https://github.com/VladimirIvanin/tvist.git
+cd tvist
 
 # Установить зависимости
 npm install
@@ -96,7 +96,7 @@ npm run typecheck       # Проверка типов
 ### Структура проекта
 
 ```
-velosiped/
+tvist/
 ├── src/               # Исходники
 │   ├── core/         # Ядро библиотеки
 │   ├── modules/      # Модули (в разработке)
@@ -113,5 +113,5 @@ velosiped/
 
 ## 📄 Лицензия
 
-MIT © [Velosiped Contributors](LICENSE)
+MIT © [Tvist Contributors](LICENSE)
 

@@ -2,9 +2,9 @@
  * Pagination Styles
  */
 
-.velosiped__pagination {
+.tvist__pagination {
   position: absolute;
-  bottom: var(--velosiped-pagination-bottom, 10px);
+  bottom: var(--tvist-pagination-bottom, 10px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -12,26 +12,26 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--velosiped-pagination-gap, 8px);
+  gap: var(--tvist-pagination-gap, 8px);
 
   // Bullets
-  .velosiped__bullet {
-    width: var(--velosiped-bullet-size, 8px);
-    height: var(--velosiped-bullet-size, 8px);
+  .tvist__bullet {
+    width: var(--tvist-bullet-size, 8px);
+    height: var(--tvist-bullet-size, 8px);
     border-radius: 50%;
-    background: var(--velosiped-bullet-color, rgba(0, 0, 0, 0.3));
+    background: var(--tvist-bullet-color, rgba(0, 0, 0, 0.3));
     transition: all 0.3s ease;
     cursor: pointer;
 
     &:hover {
-      background: var(--velosiped-bullet-hover-color, rgba(0, 0, 0, 0.5));
+      background: var(--tvist-bullet-hover-color, rgba(0, 0, 0, 0.5));
       transform: scale(1.2);
     }
 
     &.active {
-      background: var(--velosiped-bullet-active-color, #000);
-      width: var(--velosiped-bullet-active-width, 20px);
-      border-radius: var(--velosiped-bullet-active-radius, 4px);
+      background: var(--tvist-bullet-active-color, #000);
+      width: var(--tvist-bullet-active-width, 20px);
+      border-radius: var(--tvist-bullet-active-radius, 4px);
     }
   }
 
@@ -39,8 +39,8 @@
   &-current,
   &-separator,
   &-total {
-    font-size: var(--velosiped-fraction-size, 14px);
-    color: var(--velosiped-fraction-color, #000);
+    font-size: var(--tvist-fraction-size, 14px);
+    color: var(--tvist-fraction-color, #000);
   }
 
   &-current {
@@ -49,15 +49,15 @@
 
   // Progress bar
   &-progress {
-    width: var(--velosiped-progress-width, 200px);
-    height: var(--velosiped-progress-height, 4px);
-    background: var(--velosiped-progress-bg, rgba(0, 0, 0, 0.1));
-    border-radius: var(--velosiped-progress-radius, 2px);
+    width: var(--tvist-progress-width, 200px);
+    height: var(--tvist-progress-height, 4px);
+    background: var(--tvist-progress-bg, rgba(0, 0, 0, 0.1));
+    border-radius: var(--tvist-progress-radius, 2px);
     overflow: hidden;
 
     &-bar {
       height: 100%;
-      background: var(--velosiped-progress-active-color, #000);
+      background: var(--tvist-progress-active-color, #000);
       transition: width 0.3s ease;
     }
   }
@@ -65,13 +65,13 @@
 
 // Адаптивность
 @media (max-width: 768px) {
-  .velosiped__pagination {
-    --velosiped-pagination-bottom: 5px;
-    --velosiped-pagination-gap: 6px;
-    --velosiped-bullet-size: 6px;
-    --velosiped-bullet-active-width: 16px;
-    --velosiped-fraction-size: 12px;
-    --velosiped-progress-width: 150px;
+  .tvist__pagination {
+    --tvist-pagination-bottom: 5px;
+    --tvist-pagination-gap: 6px;
+    --tvist-bullet-size: 6px;
+    --tvist-bullet-active-width: 16px;
+    --tvist-fraction-size: 12px;
+    --tvist-progress-width: 150px;
   }
 }
 

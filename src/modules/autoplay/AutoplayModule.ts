@@ -10,8 +10,8 @@
  */
 
 import { Module } from '../Module'
-import type { Velosiped } from '../../core/Velosiped'
-import type { VelosipedOptions } from '../../core/types'
+import type { Tvist } from '../../core/Tvist'
+import type { TvistOptions } from '../../core/types'
 
 export class AutoplayModule extends Module {
   readonly name = 'autoplay'
@@ -24,8 +24,8 @@ export class AutoplayModule extends Module {
   private mouseEnterHandler?: () => void
   private mouseLeaveHandler?: () => void
 
-  constructor(velosiped: Velosiped, options: VelosipedOptions) {
-    super(velosiped, options)
+  constructor(tvist: Tvist, options: TvistOptions) {
+    super(tvist, options)
 
     // Определяем delay
     const autoplay = this.options.autoplay
@@ -83,8 +83,8 @@ export class AutoplayModule extends Module {
     this.mouseEnterHandler = () => this.pause()
     this.mouseLeaveHandler = () => this.resume()
 
-    this.velosiped.root.addEventListener('mouseenter', this.mouseEnterHandler)
-    this.velosiped.root.addEventListener('mouseleave', this.mouseLeaveHandler)
+    this.tvist.root.addEventListener('mouseenter', this.mouseEnterHandler)
+    this.tvist.root.addEventListener('mouseleave', this.mouseLeaveHandler)
   }
 
   /**
@@ -92,10 +92,10 @@ export class AutoplayModule extends Module {
    */
   private detachHoverEvents(): void {
     if (this.mouseEnterHandler) {
-      this.velosiped.root.removeEventListener('mouseenter', this.mouseEnterHandler)
+      this.tvist.root.removeEventListener('mouseenter', this.mouseEnterHandler)
     }
     if (this.mouseLeaveHandler) {
-      this.velosiped.root.removeEventListener('mouseleave', this.mouseLeaveHandler)
+      this.tvist.root.removeEventListener('mouseleave', this.mouseLeaveHandler)
     }
   }
 
@@ -110,7 +110,7 @@ export class AutoplayModule extends Module {
 
     this.timer = window.setInterval(() => {
       if (!this.paused && !this.stopped) {
-        this.velosiped.next()
+        this.tvist.next()
       }
     }, this.delay)
 

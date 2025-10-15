@@ -44,7 +44,7 @@ describe('dom utils', () => {
 
     it('should throw error if element not found', () => {
       expect(() => getElement('#nonexistent')).toThrow(
-        'Velosiped: element "#nonexistent" not found'
+        'Tvist: element "#nonexistent" not found'
       )
     })
   })

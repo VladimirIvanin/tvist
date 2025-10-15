@@ -10,8 +10,8 @@
  */
 
 import { Module } from '../Module'
-import type { Velosiped } from '../../core/Velosiped'
-import type { VelosipedOptions } from '../../core/types'
+import type { Tvist } from '../../core/Tvist'
+import type { TvistOptions } from '../../core/types'
 
 export class NavigationModule extends Module {
   readonly name = 'navigation'
@@ -22,8 +22,8 @@ export class NavigationModule extends Module {
   private prevClickHandler?: () => void
   private nextClickHandler?: () => void
 
-  constructor(velosiped: Velosiped, options: VelosipedOptions) {
-    super(velosiped, options)
+  constructor(tvist: Tvist, options: TvistOptions) {
+    super(tvist, options)
   }
 
   override init(): void {
@@ -32,7 +32,7 @@ export class NavigationModule extends Module {
     this.findOrCreateArrows()
 
     if (!this.prevButton || !this.nextButton) {
-      console.warn('Velosiped Navigation: arrows not found')
+      console.warn('Tvist Navigation: arrows not found')
       return
     }
 
@@ -75,10 +75,10 @@ export class NavigationModule extends Module {
 
     // Если не найдены - ищем по дефолтным классам
     if (!this.prevButton) {
-      this.prevButton = this.velosiped.root.querySelector('.velosiped__arrow--prev')
+      this.prevButton = this.tvist.root.querySelector('.tvist__arrow--prev')
     }
     if (!this.nextButton) {
-      this.nextButton = this.velosiped.root.querySelector('.velosiped__arrow--next')
+      this.nextButton = this.tvist.root.querySelector('.tvist__arrow--next')
     }
   }
 
@@ -112,7 +112,7 @@ export class NavigationModule extends Module {
    */
   private onPrevClick(): void {
     if (!this.prevButton?.hasAttribute('disabled')) {
-      this.velosiped.prev()
+      this.tvist.prev()
     }
   }
 
@@ -121,7 +121,7 @@ export class NavigationModule extends Module {
    */
   private onNextClick(): void {
     if (!this.nextButton?.hasAttribute('disabled')) {
-      this.velosiped.next()
+      this.tvist.next()
     }
   }
 
@@ -131,7 +131,7 @@ export class NavigationModule extends Module {
   private updateArrowsState(): void {
     if (!this.prevButton || !this.nextButton) return
 
-    const { canScrollPrev, canScrollNext } = this.velosiped
+    const { canScrollPrev, canScrollNext } = this.tvist
     const arrows = this.options.arrows
     const disabledClass = typeof arrows === 'object' && arrows !== null
       ? arrows.disabledClass ?? 'disabled'
@@ -165,7 +165,7 @@ export class NavigationModule extends Module {
     }
 
     // Скрываем если слайдов мало
-    const { slides, options } = this.velosiped
+    const { slides, options } = this.tvist
     const perPage = options.perPage ?? 1
     if (slides.length <= perPage) {
       this.hideArrow(this.prevButton, hiddenClass)

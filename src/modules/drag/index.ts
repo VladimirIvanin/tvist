@@ -3,11 +3,11 @@
  * Auto-registration при импорте
  */
 
-import { Velosiped } from '../../core/Velosiped'
+import { Tvist } from '../../core/Tvist'
 import { DragModule } from './DragModule'
 
 // Автоматическая регистрация модуля
-Velosiped.MODULES.set('drag', DragModule)
+Tvist.MODULES.set('drag', DragModule)
 
 export { DragModule }
 

@@ -1,20 +1,20 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { Velosiped } from '../../../src/core/Velosiped'
+import { Tvist } from '../../../src/core/Tvist'
 
-describe('Velosiped', () => {
+describe('Tvist', () => {
   let root: HTMLElement
 
   beforeEach(() => {
     root = document.createElement('div')
-    root.className = 'velosiped'
+    root.className = 'tvist'
     root.style.width = '1000px'
 
     const container = document.createElement('div')
-    container.className = 'velosiped__container'
+    container.className = 'tvist__container'
 
     for (let i = 0; i < 5; i++) {
       const slide = document.createElement('div')
-      slide.className = 'velosiped__slide'
+      slide.className = 'tvist__slide'
       slide.textContent = `Slide ${i + 1}`
       container.appendChild(slide)
     }
@@ -38,14 +38,14 @@ describe('Velosiped', () => {
   describe('initialization', () => {
     it('should initialize with selector', () => {
       root.id = 'test-slider'
-      const slider = new Velosiped('#test-slider')
+      const slider = new Tvist('#test-slider')
 
       expect(slider.root).toBe(root)
       expect(slider.slides).toHaveLength(5)
     })
 
     it('should initialize with element', () => {
-      const slider = new Velosiped(root)
+      const slider = new Tvist(root)
 
       expect(slider.root).toBe(root)
       expect(slider.slides).toHaveLength(5)
@@ -53,8 +53,8 @@ describe('Velosiped', () => {
 
     it('should throw error if element not found', () => {
       expect(() => {
-        new Velosiped('#nonexistent')
-      }).toThrow('Velosiped: element "#nonexistent" not found')
+        new Tvist('#nonexistent')
+      }).toThrow('Tvist: element "#nonexistent" not found')
     })
 
     it('should throw error if container not found', () => {
@@ -62,8 +62,8 @@ describe('Velosiped', () => {
       document.body.appendChild(invalidRoot)
 
       expect(() => {
-        new Velosiped(invalidRoot)
-      }).toThrow('container ".velosiped__container" not found')
+        new Tvist(invalidRoot)
+      }).toThrow('container ".tvist__container" not found')
 
       document.body.removeChild(invalidRoot)
     })
@@ -71,22 +71,22 @@ describe('Velosiped', () => {
     it('should warn if no slides found', () => {
       const emptyRoot = document.createElement('div')
       const emptyContainer = document.createElement('div')
-      emptyContainer.className = 'velosiped__container'
+      emptyContainer.className = 'tvist__container'
       emptyRoot.appendChild(emptyContainer)
       document.body.appendChild(emptyRoot)
 
       const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
-      new Velosiped(emptyRoot)
+      new Tvist(emptyRoot)
 
-      expect(consoleWarn).toHaveBeenCalledWith('Velosiped: no slides found')
+      expect(consoleWarn).toHaveBeenCalledWith('Tvist: no slides found')
 
       consoleWarn.mockRestore()
       document.body.removeChild(emptyRoot)
     })
 
     it('should merge options with defaults', () => {
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         perPage: 3,
         gap: 20,
       })
@@ -97,13 +97,13 @@ describe('Velosiped', () => {
     })
 
     it('should have version', () => {
-      expect(Velosiped.VERSION).toBe('1.0.0')
+      expect(Tvist.VERSION).toBe('1.0.0')
     })
   })
 
   describe('navigation', () => {
     it('should navigate to next slide', () => {
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         perPage: 1,
         speed: 0,
       })
@@ -115,7 +115,7 @@ describe('Velosiped', () => {
     })
 
     it('should navigate to previous slide', () => {
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         perPage: 1,
         speed: 0,
       })
@@ -127,7 +127,7 @@ describe('Velosiped', () => {
     })
 
     it('should support method chaining', () => {
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         perPage: 1,
         speed: 0,
       })
@@ -139,7 +139,7 @@ describe('Velosiped', () => {
     })
 
     it('should not go beyond limits without loop', () => {
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         perPage: 1,
         loop: false,
         speed: 0,
@@ -152,7 +152,7 @@ describe('Velosiped', () => {
     })
 
     it('should wrap around with loop', () => {
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         perPage: 1,
         loop: true,
         speed: 0,
@@ -169,7 +169,7 @@ describe('Velosiped', () => {
     it('should emit created event', () => {
       const handler = vi.fn()
 
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         on: {
           created: handler,
         },
@@ -179,7 +179,7 @@ describe('Velosiped', () => {
     })
 
     it('should support on/off/emit', () => {
-      const slider = new Velosiped(root)
+      const slider = new Tvist(root)
       const handler = vi.fn()
 
       slider.on('custom', handler)
@@ -194,7 +194,7 @@ describe('Velosiped', () => {
     })
 
     it('should support once', () => {
-      const slider = new Velosiped(root)
+      const slider = new Tvist(root)
       const handler = vi.fn()
 
       slider.once('custom', handler)
@@ -207,7 +207,7 @@ describe('Velosiped', () => {
     it('should emit destroyed event', () => {
       const handler = vi.fn()
 
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         on: {
           destroyed: handler,
         },
@@ -221,7 +221,7 @@ describe('Velosiped', () => {
 
   describe('update and destroy', () => {
     it('should update sizes', () => {
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         perPage: 2,
       })
 
@@ -241,7 +241,7 @@ describe('Velosiped', () => {
     })
 
     it('should cleanup on destroy', () => {
-      const slider = new Velosiped(root)
+      const slider = new Tvist(root)
 
       slider.destroy()
 
@@ -250,7 +250,7 @@ describe('Velosiped', () => {
     })
 
     it('should be safe to call destroy multiple times', () => {
-      const slider = new Velosiped(root)
+      const slider = new Tvist(root)
 
       expect(() => {
         slider.destroy()
@@ -261,7 +261,7 @@ describe('Velosiped', () => {
 
   describe('getters', () => {
     it('should return active index', () => {
-      const slider = new Velosiped(root)
+      const slider = new Tvist(root)
 
       slider.scrollTo(2, true)
 
@@ -269,7 +269,7 @@ describe('Velosiped', () => {
     })
 
     it('should return canScrollNext', () => {
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         loop: false,
       })
 
@@ -281,7 +281,7 @@ describe('Velosiped', () => {
     })
 
     it('should return canScrollPrev', () => {
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         loop: false,
       })
 
@@ -301,11 +301,11 @@ describe('Velosiped', () => {
         destroy() {}
       }
 
-      Velosiped.registerModule('test', TestModule as any)
+      Tvist.registerModule('test', TestModule as any)
 
-      expect(Velosiped.getRegisteredModules()).toContain('test')
+      expect(Tvist.getRegisteredModules()).toContain('test')
 
-      Velosiped.unregisterModule('test')
+      Tvist.unregisterModule('test')
     })
 
     it('should warn on duplicate registration', () => {
@@ -317,15 +317,15 @@ describe('Velosiped', () => {
 
       const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
-      Velosiped.registerModule('duplicate', TestModule as any)
-      Velosiped.registerModule('duplicate', TestModule as any)
+      Tvist.registerModule('duplicate', TestModule as any)
+      Tvist.registerModule('duplicate', TestModule as any)
 
       expect(consoleWarn).toHaveBeenCalledWith(
-        'Velosiped: Module "duplicate" is already registered'
+        'Tvist: Module "duplicate" is already registered'
       )
 
       consoleWarn.mockRestore()
-      Velosiped.unregisterModule('duplicate')
+      Tvist.unregisterModule('duplicate')
     })
 
     it('should unregister module', () => {
@@ -335,11 +335,11 @@ describe('Velosiped', () => {
         destroy() {}
       }
 
-      Velosiped.registerModule('temp', TestModule as any)
-      expect(Velosiped.getRegisteredModules()).toContain('temp')
+      Tvist.registerModule('temp', TestModule as any)
+      expect(Tvist.getRegisteredModules()).toContain('temp')
 
-      Velosiped.unregisterModule('temp')
-      expect(Velosiped.getRegisteredModules()).not.toContain('temp')
+      Tvist.unregisterModule('temp')
+      expect(Tvist.getRegisteredModules()).not.toContain('temp')
     })
   })
 
@@ -347,7 +347,7 @@ describe('Velosiped', () => {
     it('should listen to window resize', async () => {
       const onResize = vi.fn()
 
-      const slider = new Velosiped(root, {
+      const slider = new Tvist(root, {
         on: {
           resize: onResize,
         },
@@ -365,7 +365,7 @@ describe('Velosiped', () => {
     })
 
     it('should remove resize listener on destroy', () => {
-      const slider = new Velosiped(root)
+      const slider = new Tvist(root)
       
       slider.destroy()
 

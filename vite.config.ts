@@ -22,19 +22,19 @@ export default defineConfig(({ command }) => {
       emptyOutDir: false, // Не удалять dist перед сборкой (для сохранения типов)
       lib: {
         entry: resolve(__dirname, 'src/index.ts'),
-        name: 'Velosiped',
+        name: 'Tvist',
         formats: ['es', 'cjs', 'umd'],
         fileName: (format) => {
-          if (format === 'es') return 'velosiped.esm.js';
-          if (format === 'cjs') return 'velosiped.cjs.js';
-          if (format === 'umd') return 'velosiped.umd.js';
-          return `velosiped.${format}.js`;
+          if (format === 'es') return 'tvist.esm.js';
+          if (format === 'cjs') return 'tvist.cjs.js';
+          if (format === 'umd') return 'tvist.umd.js';
+          return `tvist.${format}.js`;
         },
       },
       rollupOptions: {
         output: {
           assetFileNames: (assetInfo) => {
-            if (assetInfo.name === 'style.css') return 'velosiped.css';
+            if (assetInfo.name === 'style.css') return 'tvist.css';
             return assetInfo.name || '';
           },
           exports: 'named',
@@ -64,8 +64,8 @@ export default defineConfig(({ command }) => {
         '@core': resolve(__dirname, './src/core'),
         '@modules': resolve(__dirname, './src/modules'),
         '@utils': resolve(__dirname, './src/utils'),
-        // Алиас для импорта velosiped в dev режиме
-        'velosiped': resolve(__dirname, './src/index.ts'),
+        // Алиас для импорта tvist в dev режиме
+        'tvist': resolve(__dirname, './src/index.ts'),
       },
     },
     

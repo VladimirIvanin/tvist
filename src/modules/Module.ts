@@ -3,8 +3,8 @@
  * Определяет интерфейс и lifecycle методы
  */
 
-import type { Velosiped } from '../core/Velosiped'
-import type { VelosipedOptions } from '../core/types'
+import type { Tvist } from '../core/Tvist'
+import type { TvistOptions } from '../core/types'
 
 export abstract class Module {
   /**
@@ -14,12 +14,12 @@ export abstract class Module {
 
   /**
    * Конструктор модуля
-   * @param velosiped - Instance главного класса
+   * @param tvist - Instance главного класса
    * @param options - Опции слайдера
    */
   constructor(
-    protected velosiped: Velosiped,
-    protected options: VelosipedOptions
+    protected tvist: Tvist,
+    protected options: TvistOptions
   ) {}
 
   /**
@@ -66,21 +66,21 @@ export abstract class Module {
    * Emit события через главный event emitter
    */
   protected emit(event: string, ...args: any[]): void {
-    this.velosiped.emit(event, ...args)
+    this.tvist.emit(event, ...args)
   }
 
   /**
    * Подписка на события
    */
   protected on(event: string, handler: (...args: any[]) => void): void {
-    this.velosiped.on(event, handler)
+    this.tvist.on(event, handler)
   }
 
   /**
    * Отписка от событий
    */
   protected off(event: string, handler?: (...args: any[]) => void): void {
-    this.velosiped.off(event, handler)
+    this.tvist.off(event, handler)
   }
 }
 
@@ -88,7 +88,7 @@ export abstract class Module {
  * Тип конструктора модуля для регистрации
  */
 export type ModuleConstructor = new (
-  velosiped: Velosiped,
-  options: VelosipedOptions
+  tvist: Tvist,
+  options: TvistOptions
 ) => Module
 

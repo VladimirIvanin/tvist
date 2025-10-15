@@ -1,13 +1,13 @@
 /**
- * Базовые типы для Velosiped
+ * Базовые типы для Tvist
  */
 
-import type { Velosiped } from './Velosiped'
+import type { Tvist } from './Tvist'
 
 /**
  * Основные опции слайдера
  */
-export interface VelosipedOptions {
+export interface TvistOptions {
   // Базовые настройки
   perPage?: number
   gap?: number
@@ -63,7 +63,7 @@ export interface VelosipedOptions {
   
   // Thumbs
   thumbs?: {
-    slider: Velosiped
+    slider: Tvist
   }
   
   // Virtual
@@ -93,13 +93,13 @@ export interface VelosipedOptions {
   }
   
   // Responsive
-  breakpoints?: Record<number, Partial<VelosipedOptions>>
+  breakpoints?: Record<number, Partial<TvistOptions>>
   breakpointsBase?: 'window' | 'container'
   
   // Обработчики событий
   on?: {
-    created?: (velosiped: Velosiped) => void
-    destroyed?: (velosiped: Velosiped) => void
+    created?: (tvist: Tvist) => void
+    destroyed?: (tvist: Tvist) => void
     beforeSlideChange?: (index: number) => void
     slideChange?: (index: number) => void
     slideChanged?: (index: number) => void

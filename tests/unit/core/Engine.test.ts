@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { Engine } from '../../../src/core/Engine'
-import { Velosiped } from '../../../src/core/Velosiped'
+import { Tvist } from '../../../src/core/Tvist'
 
 describe('Engine', () => {
   let container: HTMLElement
@@ -9,15 +9,15 @@ describe('Engine', () => {
   beforeEach(() => {
     // Создаём DOM структуру
     root = document.createElement('div')
-    root.className = 'velosiped'
+    root.className = 'tvist'
     root.style.width = '1000px'
 
     const sliderContainer = document.createElement('div')
-    sliderContainer.className = 'velosiped__container'
+    sliderContainer.className = 'tvist__container'
 
     for (let i = 0; i < 5; i++) {
       const slide = document.createElement('div')
-      slide.className = 'velosiped__slide'
+      slide.className = 'tvist__slide'
       slide.textContent = `Slide ${i + 1}`
       sliderContainer.appendChild(slide)
     }
@@ -40,7 +40,7 @@ describe('Engine', () => {
   })
 
   it('should calculate slide width correctly', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 3,
       gap: 20,
     })
@@ -52,7 +52,7 @@ describe('Engine', () => {
   })
 
   it('should calculate positions correctly', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 1,
       gap: 10,
     })
@@ -62,7 +62,7 @@ describe('Engine', () => {
   })
 
   it('should scroll to specific index', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 1,
       gap: 0,
       speed: 0, // Мгновенный переход для тестов
@@ -78,7 +78,7 @@ describe('Engine', () => {
     const change = vi.fn()
     const changed = vi.fn()
 
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 1,
       on: {
         beforeSlideChange: beforeChange,
@@ -94,7 +94,7 @@ describe('Engine', () => {
   })
 
   it('should respect loop option in Counter', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 1,
       loop: true,
     })
@@ -105,7 +105,7 @@ describe('Engine', () => {
   })
 
   it('should clamp index without loop', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 1,
       loop: false,
     })
@@ -115,7 +115,7 @@ describe('Engine', () => {
   })
 
   it('should update on resize', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 2,
       gap: 10,
     })
@@ -137,7 +137,7 @@ describe('Engine', () => {
   })
 
   it('should check if can scroll next', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 1,
       loop: false,
     })
@@ -150,7 +150,7 @@ describe('Engine', () => {
   })
 
   it('should check if can scroll prev', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 1,
       loop: false,
     })
@@ -163,7 +163,7 @@ describe('Engine', () => {
   })
 
   it('should always allow scroll with loop', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 1,
       loop: true,
     })
@@ -178,7 +178,7 @@ describe('Engine', () => {
   })
 
   it('should handle scrollBy', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 1,
       speed: 0
     })
@@ -193,7 +193,7 @@ describe('Engine', () => {
   })
 
   it('should apply transform to container', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 1,
       speed: 0,
     })
@@ -205,7 +205,7 @@ describe('Engine', () => {
   })
 
   it('should handle vertical direction', () => {
-    const slider = new Velosiped(root, {
+    const slider = new Tvist(root, {
       perPage: 1,
       direction: 'vertical',
     })

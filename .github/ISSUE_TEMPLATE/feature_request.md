@@ -26,7 +26,7 @@ assignees: ''
 
 ```typescript
 // Пример кода, как бы это использовалось
-const slider = new Velosiped('#slider', {
+const slider = new Tvist('#slider', {
   newFeature: true
 });
 ```

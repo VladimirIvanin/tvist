@@ -2,7 +2,7 @@
  * Базовые стили слайдера
  */
 
-.velosiped {
+.tvist {
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -12,7 +12,7 @@
     will-change: transform;
     
     // Плавный переход для анимаций
-    transition: transform var(--velosiped-speed, 300ms) var(--velosiped-easing, ease-out);
+    transition: transform var(--tvist-speed, 300ms) var(--tvist-easing, ease-out);
     
     // GPU acceleration
     transform: translate3d(0, 0, 0);
@@ -30,20 +30,20 @@
   
   // Вертикальная ориентация
   &--vertical {
-    .velosiped__container {
+    .tvist__container {
       flex-direction: column;
     }
   }
   
   // Состояние dragging
   &--dragging {
-    .velosiped__container {
+    .tvist__container {
       transition: none;
       cursor: grabbing;
       user-select: none;
     }
     
-    .velosiped__slide {
+    .tvist__slide {
       pointer-events: none;
     }
   }

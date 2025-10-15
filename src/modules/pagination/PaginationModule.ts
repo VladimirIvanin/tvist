@@ -9,8 +9,8 @@
  */
 
 import { Module } from '../Module'
-import type { Velosiped } from '../../core/Velosiped'
-import type { VelosipedOptions } from '../../core/types'
+import type { Tvist } from '../../core/Tvist'
+import type { TvistOptions } from '../../core/types'
 
 export class PaginationModule extends Module {
   readonly name = 'pagination'
@@ -19,8 +19,8 @@ export class PaginationModule extends Module {
   private bullets: HTMLElement[] = []
   private clickHandlers: Map<HTMLElement, () => void> = new Map()
 
-  constructor(velosiped: Velosiped, options: VelosipedOptions) {
-    super(velosiped, options)
+  constructor(tvist: Tvist, options: TvistOptions) {
+    super(tvist, options)
   }
 
   override init(): void {
@@ -29,7 +29,7 @@ export class PaginationModule extends Module {
     this.findOrCreateContainer()
 
     if (!this.container) {
-      console.warn('Velosiped Pagination: container not found')
+      console.warn('Tvist Pagination: container not found')
       return
     }
 
@@ -69,7 +69,7 @@ export class PaginationModule extends Module {
 
     // Если не найден - ищем по дефолтному классу
     if (!this.container) {
-      this.container = this.velosiped.root.querySelector('.velosiped__pagination')
+      this.container = this.tvist.root.querySelector('.tvist__pagination')
     }
   }
 
@@ -114,14 +114,14 @@ export class PaginationModule extends Module {
   private renderBullets(): void {
     if (!this.container) return
 
-    const { slides } = this.velosiped
+    const { slides } = this.tvist
     const pagination = this.options.pagination
     const clickable = typeof pagination === 'object' && pagination !== null
       ? pagination.clickable ?? true
       : true
     const bulletClass = typeof pagination === 'object' && pagination !== null
-      ? pagination.bulletClass ?? 'velosiped__bullet'
-      : 'velosiped__bullet'
+      ? pagination.bulletClass ?? 'tvist__bullet'
+      : 'tvist__bullet'
 
     this.container.innerHTML = ''
     this.bullets = []
@@ -143,7 +143,7 @@ export class PaginationModule extends Module {
 
       // Clickable
       if (clickable) {
-        const handler = () => this.velosiped.scrollTo(index)
+        const handler = () => this.tvist.scrollTo(index)
         this.clickHandlers.set(bullet, handler)
         bullet.addEventListener('click', handler)
         bullet.style.cursor = 'pointer'
@@ -162,14 +162,14 @@ export class PaginationModule extends Module {
 
     if (typeof pagination === 'object' && pagination !== null && pagination.renderFraction) {
       html = pagination.renderFraction(
-        this.velosiped.activeIndex + 1,
-        this.velosiped.slides.length
+        this.tvist.activeIndex + 1,
+        this.tvist.slides.length
       )
     } else {
       html = `
-        <span class="velosiped__pagination-current">${this.velosiped.activeIndex + 1}</span>
-        <span class="velosiped__pagination-separator"> / </span>
-        <span class="velosiped__pagination-total">${this.velosiped.slides.length}</span>
+        <span class="tvist__pagination-current">${this.tvist.activeIndex + 1}</span>
+        <span class="tvist__pagination-separator"> / </span>
+        <span class="tvist__pagination-total">${this.tvist.slides.length}</span>
       `
     }
 
@@ -182,11 +182,11 @@ export class PaginationModule extends Module {
   private renderProgress(): void {
     if (!this.container) return
 
-    const progress = ((this.velosiped.activeIndex + 1) / this.velosiped.slides.length) * 100
+    const progress = ((this.tvist.activeIndex + 1) / this.tvist.slides.length) * 100
 
     this.container.innerHTML = `
-      <div class="velosiped__pagination-progress">
-        <div class="velosiped__pagination-progress-bar" style="width: ${progress}%"></div>
+      <div class="tvist__pagination-progress">
+        <div class="tvist__pagination-progress-bar" style="width: ${progress}%"></div>
       </div>
     `
   }
@@ -201,8 +201,8 @@ export class PaginationModule extends Module {
 
     if (typeof pagination === 'object' && pagination !== null && pagination.renderCustom) {
       const html = pagination.renderCustom(
-        this.velosiped.activeIndex + 1,
-        this.velosiped.slides.length
+        this.tvist.activeIndex + 1,
+        this.tvist.slides.length
       )
       this.container.innerHTML = html
     }
@@ -242,7 +242,7 @@ export class PaginationModule extends Module {
       : 'active'
 
     this.bullets.forEach((bullet, index) => {
-      if (index === this.velosiped.activeIndex) {
+      if (index === this.tvist.activeIndex) {
         bullet.classList.add(activeClass)
         bullet.setAttribute('aria-current', 'true')
       } else {
@@ -256,9 +256,9 @@ export class PaginationModule extends Module {
    * Обновление progress bar
    */
   private updateProgressActive(): void {
-    const progressBar = this.container?.querySelector<HTMLElement>('.velosiped__pagination-progress-bar')
+    const progressBar = this.container?.querySelector<HTMLElement>('.tvist__pagination-progress-bar')
     if (progressBar) {
-      const progress = ((this.velosiped.activeIndex + 1) / this.velosiped.slides.length) * 100
+      const progress = ((this.tvist.activeIndex + 1) / this.tvist.slides.length) * 100
       progressBar.style.width = `${progress}%`
     }
   }

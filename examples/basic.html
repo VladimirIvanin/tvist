@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Velosiped - Basic Example</title>
+  <title>Tvist - Basic Example</title>
   <!-- Стили загружаются автоматически через src/index.ts -->
   <style>
     body {
@@ -30,14 +30,14 @@
       margin-bottom: 40px;
     }
 
-    .velosiped {
+    .tvist {
       background: white;
       border-radius: 12px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       margin-bottom: 30px;
     }
 
-    .velosiped__slide {
+    .tvist__slide {
       padding: 60px 20px;
       text-align: center;
       font-size: 24px;
@@ -49,11 +49,11 @@
       justify-content: center;
     }
 
-    .velosiped__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    .velosiped__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-    .velosiped__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-    .velosiped__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-    .velosiped__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .tvist__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .tvist__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .tvist__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .tvist__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    .tvist__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
 
     .controls {
       text-align: center;
@@ -113,17 +113,17 @@
 </head>
 <body>
   <div class="container">
-    <h1>🚲 Velosiped</h1>
+    <h1>🚲 Tvist</h1>
     <p class="subtitle">Lightweight, modular slider with zero dependencies</p>
 
     <!-- Slider -->
-    <div id="slider" class="velosiped">
-      <div class="velosiped__container">
-        <div class="velosiped__slide">Slide 1</div>
-        <div class="velosiped__slide">Slide 2</div>
-        <div class="velosiped__slide">Slide 3</div>
-        <div class="velosiped__slide">Slide 4</div>
-        <div class="velosiped__slide">Slide 5</div>
+    <div id="slider" class="tvist">
+      <div class="tvist__container">
+        <div class="tvist__slide">Slide 1</div>
+        <div class="tvist__slide">Slide 2</div>
+        <div class="tvist__slide">Slide 3</div>
+        <div class="tvist__slide">Slide 4</div>
+        <div class="tvist__slide">Slide 5</div>
       </div>
     </div>
 
@@ -143,10 +143,10 @@
     <!-- Code Example -->
     <div class="code">
       <pre><code>// Базовая инициализация
-import Velosiped from 'velosiped'
-import 'velosiped/css'
+import Tvist from 'tvist'
+import 'tvist/css'
 
-const slider = new Velosiped('#slider', {
+const slider = new Tvist('#slider', {
   perPage: 1,
   gap: 0,
   speed: 300,
@@ -165,12 +165,12 @@ slider.on('slideChanged', (index) => {
     </div>
   </div>
 
-  <!-- Velosiped -->
+  <!-- Tvist -->
   <script type="module">
-    import Velosiped from '../src/index.ts'
+    import Tvist from '../src/index.ts'
 
     // Инициализация
-    const slider = new Velosiped('#slider', {
+    const slider = new Tvist('#slider', {
       perPage: 1,
       gap: 0,
       speed: 300,
@@ -205,8 +205,8 @@ slider.on('slideChanged', (index) => {
     // Начальное состояние
     updateInfo(0)
 
-    console.log('🚲 Velosiped initialized!', slider)
-    console.log('Version:', Velosiped.VERSION)
+    console.log('🚲 Tvist initialized!', slider)
+    console.log('Version:', Tvist.VERSION)
   </script>
 </body>
 </html>

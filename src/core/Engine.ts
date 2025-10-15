@@ -6,8 +6,8 @@
 import { Vector1D } from './Vector1D'
 import { Counter } from './Counter'
 import { Animator } from './Animator'
-import type { Velosiped } from './Velosiped'
-import type { VelosipedOptions } from './types'
+import type { Tvist } from './Tvist'
+import type { TvistOptions } from './types'
 import { getOuterWidth } from '../utils/dom'
 
 export class Engine {
@@ -27,14 +27,14 @@ export class Engine {
   private slidePositions: number[] = []
 
   // Ссылки
-  private velosiped: Velosiped
-  private options: VelosipedOptions
+  private tvist: Tvist
+  private options: TvistOptions
 
-  constructor(velosiped: Velosiped, options: VelosipedOptions) {
-    this.velosiped = velosiped
+  constructor(tvist: Tvist, options: TvistOptions) {
+    this.tvist = tvist
     this.options = options
 
-    const slideCount = velosiped.slides.length
+    const slideCount = tvist.slides.length
     const startIndex = options.start || 0
 
     this.location = new Vector1D(0)
@@ -51,7 +51,7 @@ export class Engine {
    * Рассчитывает размеры контейнера и слайдов
    */
   private calculateSizes(): void {
-    const slides = this.velosiped.slides
+    const slides = this.tvist.slides
 
     if (slides.length === 0) {
       this.containerWidth = 0
@@ -60,7 +60,7 @@ export class Engine {
     }
 
     // Размер контейнера
-    this.containerWidth = getOuterWidth(this.velosiped.root)
+    this.containerWidth = getOuterWidth(this.tvist.root)
 
     // Размер одного слайда с учётом perPage и gap
     const perPage = this.options.perPage || 1
@@ -89,7 +89,7 @@ export class Engine {
    * Рассчитывает позиции всех слайдов
    */
   private calculatePositions(): void {
-    const slides = this.velosiped.slides
+    const slides = this.tvist.slides
     const gap = this.options.gap || 0
 
     this.slidePositions = []
@@ -124,7 +124,7 @@ export class Engine {
     const targetPosition = -this.getSlidePosition(normalizedIndex)
 
     // События
-    this.velosiped.emit('beforeSlideChange', normalizedIndex)
+    this.tvist.emit('beforeSlideChange', normalizedIndex)
     this.options.on?.beforeSlideChange?.(normalizedIndex)
 
     if (instant) {
@@ -134,7 +134,7 @@ export class Engine {
       this.applyTransform()
       
       // События после изменения
-      this.velosiped.emit('slideChanged', normalizedIndex)
+      this.tvist.emit('slideChanged', normalizedIndex)
       this.options.on?.slideChanged?.(normalizedIndex)
     } else {
       // Анимированный переход
@@ -150,18 +150,18 @@ export class Engine {
           this.applyTransform()
           
           // Событие во время прокрутки
-          this.velosiped.emit('scroll')
+          this.tvist.emit('scroll')
           this.options.on?.scroll?.()
         },
         () => {
           // Событие после завершения
-          this.velosiped.emit('slideChanged', normalizedIndex)
+          this.tvist.emit('slideChanged', normalizedIndex)
           this.options.on?.slideChanged?.(normalizedIndex)
         }
       )
       
       // Событие начала изменения
-      this.velosiped.emit('slideChange', normalizedIndex)
+      this.tvist.emit('slideChange', normalizedIndex)
       this.options.on?.slideChange?.(normalizedIndex)
     }
   }
@@ -179,7 +179,7 @@ export class Engine {
    * Применяет transform к контейнеру
    */
   private applyTransform(): void {
-    const container = this.velosiped.container
+    const container = this.tvist.container
     const x = this.location.get()
 
     if (this.options.direction === 'vertical') {
@@ -187,6 +187,14 @@ export class Engine {
     } else {
       container.style.transform = `translate3d(${x}px, 0, 0)`
     }
+  }
+
+  /**
+   * Применяет transform к контейнеру (публичный метод для модулей)
+   * Используется в DragModule для real-time обновления позиции
+   */
+  applyTransformPublic(): void {
+    this.applyTransform()
   }
 
   /**
@@ -230,7 +238,7 @@ export class Engine {
    * Получить количество слайдов
    */
   get slideCount(): number {
-    return this.velosiped.slides.length
+    return this.tvist.slides.length
   }
 
   /**

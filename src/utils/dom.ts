@@ -10,7 +10,7 @@ export function getElement(target: string | HTMLElement): HTMLElement {
   if (typeof target === 'string') {
     const element = document.querySelector<HTMLElement>(target)
     if (!element) {
-      throw new Error(`Velosiped: element "${target}" not found`)
+      throw new Error(`Tvist: element "${target}" not found`)
     }
     return element
   }

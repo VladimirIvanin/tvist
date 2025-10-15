@@ -1,18 +1,18 @@
 {
-  "name": "velosiped",
+  "name": "tvist",
   "version": "0.0.1",
   "description": "Модульный и легковесный слайдер для современного веба",
   "type": "module",
-  "main": "./dist/velosiped.cjs.js",
-  "module": "./dist/velosiped.esm.js",
+  "main": "./dist/tvist.cjs.js",
+  "module": "./dist/tvist.esm.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
-      "import": "./dist/velosiped.esm.js",
-      "require": "./dist/velosiped.cjs.js"
+      "import": "./dist/tvist.esm.js",
+      "require": "./dist/tvist.cjs.js"
     },
-    "./dist/velosiped.css": "./dist/velosiped.css"
+    "./dist/tvist.css": "./dist/tvist.css"
   },
   "files": [
     "dist",
@@ -50,12 +50,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/velosiped.git"
+    "url": "https://github.com/VladimirIvanin/tvist.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/velosiped/issues"
+    "url": "https://github.com/VladimirIvanin/tvist/issues"
   },
-  "homepage": "https://github.com/yourusername/velosiped#readme",
+  "homepage": "https://github.com/VladimirIvanin/tvist#readme",
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
     "@types/node": "^24.7.2",

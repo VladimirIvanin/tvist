@@ -12,8 +12,8 @@
  */
 
 import { Module } from '../Module'
-import type { Velosiped } from '../../core/Velosiped'
-import type { VelosipedOptions } from '../../core/types'
+import type { Tvist } from '../../core/Tvist'
+import type { TvistOptions } from '../../core/types'
 
 interface DragPoint {
   x: number
@@ -28,6 +28,7 @@ export class DragModule extends Module {
   private startX = 0
   private startY = 0
   private startPosition = 0
+  private lastDragDistance = 0 // Оригинальное расстояние drag (до rubberband)
   private history: DragPoint[] = []
 
   // RAF для momentum
@@ -42,8 +43,8 @@ export class DragModule extends Module {
   private readonly HISTORY_LENGTH = 5
   private readonly MIN_VELOCITY = 0.1
 
-  constructor(velosiped: Velosiped, options: VelosipedOptions) {
-    super(velosiped, options)
+  constructor(tvist: Tvist, options: TvistOptions) {
+    super(tvist, options)
   }
 
   override init(): void {
@@ -66,14 +67,15 @@ export class DragModule extends Module {
   }
 
   /**
-   * Обновление границ для rubberband
+   * Обновление границ для rubberband (в пикселях)
    */
   private updateBounds(): void {
-    const { slides } = this.velosiped
+    const { slides, engine } = this.tvist
     const perPage = this.options.perPage ?? 1
 
+    // Границы в пикселях (позиции первого и последнего слайда)
     this.minPosition = 0
-    this.maxPosition = -(slides.length - perPage)
+    this.maxPosition = -engine.getSlidePosition(slides.length - perPage)
 
     // С loop границ нет
     if (this.options.loop) {
@@ -86,7 +88,7 @@ export class DragModule extends Module {
    * Подключение event listeners
    */
   private attachEvents(): void {
-    const { container } = this.velosiped
+    const { container } = this.tvist
 
     // Passive для touchstart (не блокируем скролл)
     container.addEventListener('touchstart', this.onPointerDown, { passive: true })
@@ -102,7 +104,7 @@ export class DragModule extends Module {
    * Отключение event listeners
    */
   private detachEvents(): void {
-    const { container } = this.velosiped
+    const { container } = this.tvist
 
     container.removeEventListener('touchstart', this.onPointerDown)
     container.removeEventListener('mousedown', this.onPointerDown)
@@ -134,7 +136,7 @@ export class DragModule extends Module {
     this.isDragging = true
     this.startX = point.x
     this.startY = point.y
-    this.startPosition = this.velosiped.engine.location.get()
+    this.startPosition = this.tvist.engine.location.get()
     this.history = []
 
     // Останавливаем momentum если был
@@ -147,7 +149,7 @@ export class DragModule extends Module {
     this.emit('dragStart', e)
 
     // Убираем transition для плавного драга
-    this.velosiped.container.style.transition = 'none'
+    this.tvist.container.style.transition = 'none'
   }
 
   /**
@@ -166,6 +168,9 @@ export class DragModule extends Module {
     // Применяем dragSpeed
     const dragSpeed = this.options.dragSpeed ?? 1
     let distance = delta * dragSpeed
+    
+    // Сохраняем оригинальное расстояние drag (для snap логики)
+    this.lastDragDistance = distance
 
     // Применяем rubberband на границах
     if (this.options.rubberband !== false) {
@@ -174,8 +179,10 @@ export class DragModule extends Module {
 
     // Устанавливаем позицию
     const newPosition = this.startPosition + distance
-    this.velosiped.engine.location.set(newPosition)
-    this.velosiped.engine.update()
+    this.tvist.engine.location.set(newPosition)
+    
+    // Применяем transform напрямую (без пересчёта размеров)
+    this.tvist.engine.applyTransformPublic()
 
     // Сохраняем в историю для velocity tracking
     this.history.push({
@@ -210,7 +217,7 @@ export class DragModule extends Module {
     this.removeDocumentEvents()
 
     // Восстанавливаем transition
-    this.velosiped.container.style.transition = ''
+    this.tvist.container.style.transition = ''
 
     // Вычисляем velocity
     const velocity = this.calculateVelocity()
@@ -293,7 +300,7 @@ export class DragModule extends Module {
    */
   private applyRubberband(distance: number): number {
     const position = this.startPosition + distance
-    const { container } = this.velosiped
+    const { container } = this.tvist
     const containerWidth = container.clientWidth
 
     // Внутри границ - нормальное движение
@@ -346,11 +353,13 @@ export class DragModule extends Module {
       velocity *= this.FRICTION
 
       // Обновляем позицию
-      const currentPosition = this.velosiped.engine.location.get()
+      const currentPosition = this.tvist.engine.location.get()
       const newPosition = currentPosition + velocity
 
-      this.velosiped.engine.location.set(newPosition)
-      this.velosiped.engine.update()
+      this.tvist.engine.location.set(newPosition)
+      
+      // Применяем transform напрямую (без пересчёта размеров)
+      this.tvist.engine.applyTransformPublic()
 
       // Продолжаем если velocity достаточная
       if (Math.abs(velocity) > this.MIN_VELOCITY) {
@@ -369,18 +378,48 @@ export class DragModule extends Module {
 
   /**
    * Snap к ближайшему слайду
+   * Логика из Glide + Embla: сравниваем пройденное расстояние с threshold
    */
-  private snapToNearest(velocity: number): void {
-    const currentPosition = this.velosiped.engine.location.get()
+  private snapToNearest(_velocity: number): void {
+    const { engine } = this.tvist
+    const startIndex = engine.activeIndex
     
-    // Экстраполируем позицию с учётом velocity
-    const extrapolatedPosition = currentPosition + velocity * 0.5
-
-    // Находим ближайший индекс
-    const nearestIndex = Math.round(-extrapolatedPosition)
+    // Размер слайда с gap
+    const slideWidth = engine.slideWidthValue
+    const gap = this.options.gap || 0
+    const slideWithGap = slideWidth + gap
+    
+    if (slideWithGap === 0) {
+      this.tvist.scrollTo(startIndex)
+      return
+    }
+    
+    // Используем оригинальное расстояние drag (до rubberband)
+    const dragDistance = this.lastDragDistance
+    
+    // Threshold = 20% от ширины слайда (как в Embla)
+    // Или минимум 80px (как swipeThreshold в Glide)
+    const threshold = Math.max(slideWidth * 0.2, 80)
+    
+    // Определяем целевой индекс
+    let targetIndex: number
+    
+    if (Math.abs(dragDistance) < threshold) {
+      // Недостаточно сдвинули - возвращаемся к текущему
+      targetIndex = startIndex
+    } else {
+      // Достаточно сдвинули - переходим в направлении свайпа
+      if (dragDistance > 0) {
+        // Свайп вправо = предыдущий слайд
+        targetIndex = startIndex - 1
+      } else {
+        // Свайп влево = следующий слайд
+        targetIndex = startIndex + 1
+      }
+    }
     
     // Snap через scrollTo
-    this.velosiped.scrollTo(nearestIndex)
+    this.tvist.scrollTo(targetIndex)
   }
 
   /**

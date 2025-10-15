@@ -9,18 +9,18 @@
  */
 
 import { Module } from '../Module'
-import type { Velosiped } from '../../core/Velosiped'
-import type { VelosipedOptions } from '../../core/types'
+import type { Tvist } from '../../core/Tvist'
+import type { TvistOptions } from '../../core/types'
 
 export class BreakpointsModule extends Module {
   readonly name = 'breakpoints'
 
   private mediaQueries: Map<number, MediaQueryList> = new Map()
   private currentBreakpoint: number | null = null
-  private originalOptions: VelosipedOptions
+  private originalOptions: TvistOptions
 
-  constructor(velosiped: Velosiped, options: VelosipedOptions) {
-    super(velosiped, options)
+  constructor(tvist: Tvist, options: TvistOptions) {
+    super(tvist, options)
     
     // Сохраняем оригинальные опции
     this.originalOptions = { ...options }
@@ -106,7 +106,7 @@ export class BreakpointsModule extends Module {
    */
   private applyBreakpoint(bp: number | null): void {
     // Начинаем с оригинальных опций
-    const newOptions: VelosipedOptions = { ...this.originalOptions }
+    const newOptions: TvistOptions = { ...this.originalOptions }
 
     // Если есть breakpoint - мёрджим его опции
     if (bp !== null && this.options.breakpoints?.[bp]) {
@@ -114,10 +114,10 @@ export class BreakpointsModule extends Module {
     }
 
     // Применяем новые опции к слайдеру
-    Object.assign(this.velosiped.options, newOptions)
+    Object.assign(this.tvist.options, newOptions)
 
     // Обновляем слайдер
-    this.velosiped.update()
+    this.tvist.update()
   }
 
   /**
