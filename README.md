@@ -112,6 +112,4 @@ tvist/
 Мы приветствуем ваш вклад! См. [CONTRIBUTING.md](CONTRIBUTING.md) для деталей.
 
 ## 📄 Лицензия
-
 MIT © [Tvist Contributors](LICENSE)
-
