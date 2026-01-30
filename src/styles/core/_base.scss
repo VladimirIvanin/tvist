@@ -38,7 +38,7 @@
   // Состояние dragging
   &--dragging {
     .tvist__container {
-      transition: none;
+      transition: none !important;
       cursor: grabbing;
       user-select: none;
     }

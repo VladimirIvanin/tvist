@@ -5,7 +5,7 @@
 export class Counter {
   private value: number
   public max: number
-  private loop: boolean
+  public loop: boolean
 
   /**
    * @param max - максимальный индекс (длина массива)

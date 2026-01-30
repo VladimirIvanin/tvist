@@ -19,7 +19,7 @@ export class Engine {
   readonly index: Counter // Текущий индекс слайда
 
   // Анимация
-  private animator: Animator
+  readonly animator: Animator
 
   // Кэш размеров
   private containerWidth = 0

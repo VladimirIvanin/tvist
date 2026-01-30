@@ -18,6 +18,7 @@ import './modules/navigation'
 import './modules/pagination'
 import './modules/autoplay'
 import './modules/breakpoints'
+import './modules/loop'
 
 // Types
 export type { TvistOptions } from './core/types'

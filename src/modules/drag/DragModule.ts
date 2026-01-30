@@ -44,6 +44,9 @@ export class DragModule extends Module {
   private readonly HISTORY_LENGTH = 5
   private readonly MIN_VELOCITY = 0.1
 
+  private readonly MIN_DRAG_DISTANCE = 5
+  private isPotentialDrag = false
+
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
   }
@@ -56,11 +59,27 @@ export class DragModule extends Module {
 
     // Обновляем границы при resize
     this.on('resize', () => this.updateBounds())
+
+    // Слушаем сдвиг позиций (от LoopModule)
+    this.on('positionShifted', this.onPositionShifted)
   }
 
   override destroy(): void {
     this.detachEvents()
     this.stopMomentum()
+    this.off('positionShifted', this.onPositionShifted)
+  }
+
+  private onPositionShifted = (delta: number): void => {
+    if (this.isDragging) {
+      this.startPosition += delta
+      
+      // Обновляем историю для корректного расчета скорости
+      // (хотя скорость зависит от относительного смещения, координаты в истории абсолютные?)
+      // В history мы храним clientX/clientY (экранные координаты), они не меняются при сдвиге слайдов.
+      // calculateVelocity использует (x - prevX). Это не зависит от slide position.
+      // Так что history обновлять не нужно.
+    }
   }
 
   protected override shouldBeActive(): boolean {
@@ -80,8 +99,8 @@ export class DragModule extends Module {
 
     // С loop границ нет
     if (this.options.loop) {
-      this.minPosition = -Infinity
-      this.maxPosition = Infinity
+      this.minPosition = Infinity
+      this.maxPosition = -Infinity
     }
   }
 
@@ -134,7 +153,8 @@ export class DragModule extends Module {
     const point = this.getPointerPosition(e)
     if (!point) return
 
-    this.isDragging = true
+    // Только подготавливаемся, но не начинаем драг сразу (ждем threshold)
+    this.isPotentialDrag = true
     this.startX = point.x
     this.startY = point.y
     this.currentX = point.x
@@ -142,24 +162,19 @@ export class DragModule extends Module {
     this.startPosition = this.tvist.engine.location.get()
     this.history = []
 
-    // Останавливаем momentum если был
+    // Останавливаем активную анимацию если была
     this.stopMomentum()
+    this.tvist.engine.animator.stop()
 
     // Добавляем move/up listeners
     this.addDocumentEvents()
-
-    // Emit события
-    this.emit('dragStart', e)
-
-    // Убираем transition для плавного драга
-    this.tvist.container.style.transition = 'none'
   }
 
   /**
    * Движение при драге
    */
   private onPointerMove = (e: TouchEvent | MouseEvent | PointerEvent): void => {
-    if (!this.isDragging) return
+    if (!this.isPotentialDrag && !this.isDragging) return
 
     const point = this.getPointerPosition(e)
     if (!point) return
@@ -170,7 +185,24 @@ export class DragModule extends Module {
 
     // Направление (horizontal/vertical)
     const isHorizontal = this.options.direction !== 'vertical'
-    const delta = isHorizontal ? point.x - this.startX : point.y - this.startY
+    const deltaX = point.x - this.startX
+    const deltaY = point.y - this.startY
+    const absDelta = isHorizontal ? Math.abs(deltaX) : Math.abs(deltaY)
+
+    // Если еще не начали драг, проверяем threshold
+    if (!this.isDragging) {
+      if (absDelta > this.MIN_DRAG_DISTANCE) {
+        this.isDragging = true
+        // Emit события
+        this.emit('dragStart', e)
+        // Добавляем класс dragging (отключает transition)
+        this.tvist.root.classList.add('tvist--dragging')
+      } else {
+        return // Ждем превышения порога
+      }
+    }
+
+    const delta = isHorizontal ? deltaX : deltaY
 
     // Применяем dragSpeed
     const dragSpeed = this.options.dragSpeed ?? 1
@@ -183,6 +215,7 @@ export class DragModule extends Module {
 
     // Устанавливаем позицию
     const newPosition = this.startPosition + distance
+    // console.log('Updating location to', newPosition)
     this.tvist.engine.location.set(newPosition)
     
     // Применяем transform напрямую (без пересчёта размеров)
@@ -213,28 +246,33 @@ export class DragModule extends Module {
    * Окончание драга
    */
   private onPointerUp = (e: TouchEvent | MouseEvent | PointerEvent): void => {
-    if (!this.isDragging) return
+    if (!this.isPotentialDrag && !this.isDragging) return
 
-    this.isDragging = false
+    this.isPotentialDrag = false
 
-    // Удаляем listeners
-    this.removeDocumentEvents()
+    // Если был драг
+    if (this.isDragging) {
+      this.isDragging = false
 
-    // Восстанавливаем transition
-    this.tvist.container.style.transition = ''
+      // Восстанавливаем transition (удаляем класс)
+      this.tvist.root.classList.remove('tvist--dragging')
 
-    // Вычисляем velocity
-    const velocity = this.calculateVelocity()
+      // Вычисляем velocity
+      const velocity = this.calculateVelocity()
 
-    // Emit события
-    this.emit('dragEnd', e)
+      // Emit события
+      this.emit('dragEnd', e)
 
-    // Применяем инерцию или snap
-    if (this.options.drag === 'free') {
-      this.startMomentum(velocity)
-    } else {
-      this.snapToNearest(velocity)
+      // Применяем инерцию или snap
+      if (this.options.drag === 'free') {
+        this.startMomentum(velocity)
+      } else {
+        this.snapToNearest(velocity)
+      }
     }
+    
+    // Удаляем listeners в любом случае
+    this.removeDocumentEvents()
   }
 
   /**
@@ -370,6 +408,9 @@ export class DragModule extends Module {
       // Применяем transform напрямую (без пересчёта размеров)
       this.tvist.engine.applyTransformPublic()
 
+      // Сообщаем о скролле для LoopModule
+      this.emit('scroll')
+
       // Продолжаем если velocity достаточная
       if (Math.abs(velocity) > this.MIN_VELOCITY) {
         this.animationId = requestAnimationFrame(animate)
@@ -399,7 +440,7 @@ export class DragModule extends Module {
     const slideWithGap = slideWidth + gap
     
     if (slideWithGap === 0) {
-      this.tvist.scrollTo(startIndex)
+      this.tvist.engine.scrollTo(startIndex)
       return
     }
     
@@ -431,7 +472,7 @@ export class DragModule extends Module {
     }
     
     // Snap через scrollTo
-    this.tvist.scrollTo(targetIndex)
+    this.tvist.engine.scrollTo(targetIndex)
   }
 
   /**

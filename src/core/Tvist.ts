@@ -19,7 +19,7 @@ export class Tvist {
   // DOM элементы
   readonly root: HTMLElement
   readonly container: HTMLElement
-  readonly slides: HTMLElement[]
+  private _slides: HTMLElement[]
 
   // Опции
   readonly options: TvistOptions
@@ -35,6 +35,9 @@ export class Tvist {
 
   // Обработчик resize (для отписки)
   private resizeHandler?: () => void
+
+  // Опциональный резолвер индекса (для модулей типа Loop)
+  public indexResolver?: (index: number) => number
 
   /**
    * Создать экземпляр Tvist
@@ -63,7 +66,7 @@ export class Tvist {
     this.container = containerElement
 
     // Получаем слайды
-    this.slides = children(this.container, '.tvist__slide')
+    this._slides = children(this.container, '.tvist__slide')
 
     if (this.slides.length === 0) {
       console.warn('Tvist: no slides found')
@@ -164,7 +167,8 @@ export class Tvist {
    * @param instant - мгновенный переход без анимации
    */
   scrollTo(index: number, instant = false): this {
-    this.engine.scrollTo(index, instant)
+    const targetIndex = this.indexResolver ? this.indexResolver(index) : index
+    this.engine.scrollTo(targetIndex, instant)
     return this
   }
 
@@ -218,6 +222,21 @@ export class Tvist {
    */
   getModule<T extends Module>(name: string): T | undefined {
     return this.modules.get(name) as T | undefined
+  }
+
+  /**
+   * Получить список слайдов
+   */
+  get slides(): HTMLElement[] {
+    return this._slides
+  }
+
+  /**
+   * Обновить внутренний список слайдов из DOM
+   * Используется LoopModule после перемещения слайдов
+   */
+  updateSlidesList(): void {
+    this._slides = children(this.container, '.tvist__slide')
   }
 
   /**

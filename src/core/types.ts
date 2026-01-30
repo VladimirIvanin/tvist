@@ -5,6 +5,16 @@
 import type { Tvist } from './Tvist'
 
 /**
+ * Расширение типа Tvist для модулей
+ */
+declare module './Tvist' {
+  interface Tvist {
+    /** Логический индекс текущего слайда (для loop режима) */
+    realIndex?: number
+  }
+}
+
+/**
  * Основные опции слайдера
  */
 export interface TvistOptions {
