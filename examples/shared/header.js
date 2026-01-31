@@ -5,8 +5,15 @@
 
 class AppHeader extends HTMLElement {
   connectedCallback() {
+    const baseUrl = import.meta.env.BASE_URL;
     const currentPath = window.location.pathname;
-    const isHomePage = currentPath.endsWith('/') || currentPath.endsWith('index.html');
+    // Удаляем trailing slash для сравнения, если это не корень
+    const normalizedPath = currentPath.endsWith('/') && currentPath.length > 1 ? currentPath.slice(0, -1) : currentPath;
+    const normalizedBase = baseUrl.endsWith('/') && baseUrl.length > 1 ? baseUrl.slice(0, -1) : baseUrl;
+    
+    const isHomePage = currentPath === baseUrl || 
+                      currentPath === `${baseUrl}index.html` || 
+                      normalizedPath === normalizedBase;
     
     // Применяем стили к самому элементу
     this.style.cssText = `
@@ -101,9 +108,9 @@ class AppHeader extends HTMLElement {
       </style>
       
       <div class="header-content">
-        <a href="/" class="logo">Tvist</a>
+        <a href="${baseUrl}" class="logo">Tvist</a>
         <nav>
-          <a href="/" class="${isHomePage ? 'active' : ''}">Примеры</a>
+          <a href="${baseUrl}" class="${isHomePage ? 'active' : ''}">Примеры</a>
           <a href="https://github.com/VladimirIvanin/tvist" target="_blank">GitHub</a>
           <a href="../README.md">Документация</a>
         </nav>
