@@ -133,9 +133,12 @@ export class PaginationModule extends Module {
     
     // Вычисляем endIndex (последний допустимый индекс)
     const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
-    const pageCount = Math.ceil(slideCount / perPage)
+    
+    // Используем количество возможных позиций (snap points) вместо страниц
+    // Если слайдов нет, то 0 страниц
+    const pageCount = slideCount === 0 ? 0 : endIndex + 1
 
-    // Создаем точки для страниц, а не для слайдов
+    // Создаем точки для каждой возможной позиции
     for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
       let bulletHTML: string
 
@@ -150,11 +153,9 @@ export class PaginationModule extends Module {
       container.appendChild(bullet)
       this.bullets.push(bullet)
 
-      // Clickable - переходим к первому слайду страницы с учетом endIndex
+      // Clickable - переходим к соответствующему индексу
       if (clickable) {
-        let slideIndex = pageIndex * perPage
-        // Ограничиваем индекс до endIndex
-        slideIndex = Math.min(slideIndex, endIndex)
+        const slideIndex = pageIndex
         
         const handler = () => this.tvist.scrollTo(slideIndex)
         this.clickHandlers.set(bullet, handler)
@@ -171,9 +172,14 @@ export class PaginationModule extends Module {
     if (!this.container) return
 
     const pagination = this.options.pagination
+    const { slides } = this.tvist
     const perPage = this.options.perPage ?? 1
-    const currentPage = Math.floor(this.tvist.activeIndex / perPage) + 1
-    const totalPages = Math.ceil(this.tvist.slides.length / perPage)
+    const slideCount = slides.length
+    const isLoop = this.options.loop === true
+    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
+    
+    const currentPage = this.tvist.activeIndex + 1
+    const totalPages = slideCount === 0 ? 0 : endIndex + 1
     
     let html: string
 
@@ -196,10 +202,15 @@ export class PaginationModule extends Module {
   private renderProgress(): void {
     if (!this.container) return
 
+    const { slides } = this.tvist
     const perPage = this.options.perPage ?? 1
-    const currentPage = Math.floor(this.tvist.activeIndex / perPage) + 1
-    const totalPages = Math.ceil(this.tvist.slides.length / perPage)
-    const progress = (currentPage / totalPages) * 100
+    const slideCount = slides.length
+    const isLoop = this.options.loop === true
+    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
+
+    const currentPage = this.tvist.activeIndex + 1
+    const totalPages = slideCount === 0 ? 0 : endIndex + 1
+    const progress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0
 
     this.container.innerHTML = `
       <div class="tvist__pagination-progress">
@@ -258,9 +269,8 @@ export class PaginationModule extends Module {
       ? pagination.bulletActiveClass ?? 'active'
       : 'active'
 
-    // Вычисляем текущую страницу
-    const perPage = this.options.perPage ?? 1
-    const currentPage = Math.floor(this.tvist.activeIndex / perPage)
+    // Текущая страница соответствует индексу
+    const currentPage = this.tvist.activeIndex
 
     this.bullets.forEach((bullet, pageIndex) => {
       if (pageIndex === currentPage) {
@@ -279,10 +289,15 @@ export class PaginationModule extends Module {
   private updateProgressActive(): void {
     const progressBar = this.container?.querySelector<HTMLElement>('.tvist__pagination-progress-bar')
     if (progressBar) {
+      const { slides } = this.tvist
       const perPage = this.options.perPage ?? 1
-      const currentPage = Math.floor(this.tvist.activeIndex / perPage) + 1
-      const totalPages = Math.ceil(this.tvist.slides.length / perPage)
-      const progress = (currentPage / totalPages) * 100
+      const slideCount = slides.length
+      const isLoop = this.options.loop === true
+      const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
+
+      const currentPage = this.tvist.activeIndex + 1
+      const totalPages = slideCount === 0 ? 0 : endIndex + 1
+      const progress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0
       progressBar.style.width = `${progress}%`
     }
   }

@@ -21,7 +21,7 @@ describe('PaginationModule', () => {
 
   describe('Bullets pagination', () => {
     it('should create correct number of bullets when perPage > 1', () => {
-      // 6 слайдов, perPage: 4 → должно быть 2 точки (Math.ceil(6/4) = 2)
+      // 6 слайдов, perPage: 4 → должно быть 3 точки (6 - 4 + 1 = 3)
       container.innerHTML = `
         <div class="tvist">
           <div class="tvist__container">
@@ -45,7 +45,7 @@ describe('PaginationModule', () => {
       })
 
       const bullets = container.querySelectorAll('.tvist__bullet')
-      expect(bullets.length).toBe(2)
+      expect(bullets.length).toBe(3)
     })
 
     it('should create correct number of bullets when perPage = 1', () => {
@@ -77,10 +77,10 @@ describe('PaginationModule', () => {
 
     it('should create correct number of bullets for various perPage values', () => {
       const testCases = [
-        { slides: 10, perPage: 3, expected: 4 }, // ceil(10/3) = 4
-        { slides: 6, perPage: 2, expected: 3 },  // ceil(6/2) = 3
-        { slides: 7, perPage: 3, expected: 3 },  // ceil(7/3) = 3
-        { slides: 8, perPage: 4, expected: 2 },  // ceil(8/4) = 2
+        { slides: 10, perPage: 3, expected: 8 }, // 10 - 3 + 1 = 8
+        { slides: 6, perPage: 2, expected: 5 },  // 6 - 2 + 1 = 5
+        { slides: 7, perPage: 3, expected: 5 },  // 7 - 3 + 1 = 5
+        { slides: 8, perPage: 4, expected: 5 },  // 8 - 4 + 1 = 5
       ]
 
       testCases.forEach(({ slides, perPage, expected }) => {
@@ -132,14 +132,14 @@ describe('PaginationModule', () => {
 
       const bullets = container.querySelectorAll('.tvist__bullet')
       
-      // Изначально активна первая точка (слайды 0-2)
+      // Изначально активна первая точка (index 0)
       expect(bullets[0].classList.contains('active')).toBe(true)
       expect(bullets[1].classList.contains('active')).toBe(false)
 
-      // Переходим к слайду 3 (вторая страница, слайды 3-5)
+      // Переходим к слайду 1 (вторая позиция)
       await new Promise<void>(resolve => {
         slider.on('slideChanged', () => resolve())
-        slider.scrollTo(3)
+        slider.scrollTo(1)
       })
       
       expect(bullets[0].classList.contains('active')).toBe(false)
@@ -172,9 +172,9 @@ describe('PaginationModule', () => {
 
       const bullets = container.querySelectorAll<HTMLElement>('.tvist__bullet')
       
-      // Клик по второй точке должен перейти к endIndex (2), а не к слайду 4
+      // Клик по последней точке должен перейти к endIndex (2)
       // endIndex = 6 - 4 = 2
-      bullets[1].click()
+      bullets[2].click()
       expect(slider.activeIndex).toBe(2)
 
       // Клик по первой точке должен вернуть к слайду 0
@@ -210,12 +210,12 @@ describe('PaginationModule', () => {
       const total = container.querySelector('.tvist__pagination-total')
 
       expect(current?.textContent).toBe('1')
-      expect(total?.textContent).toBe('2') // Math.ceil(6/4) = 2 страницы
+      expect(total?.textContent).toBe('3') // 6 - 4 + 1 = 3 позиции
     })
   })
 
   describe('Progress pagination', () => {
-    it('should calculate progress based on pages, not slides', async () => {
+    it('should calculate progress based on valid positions', async () => {
       container.innerHTML = `
         <div class="tvist">
           <div class="tvist__container">
@@ -240,10 +240,10 @@ describe('PaginationModule', () => {
 
       let progressBar = container.querySelector<HTMLElement>('.tvist__pagination-progress-bar')
 
-      // Первая страница (1/2) = 50%
-      expect(progressBar?.style.width).toBe('50%')
+      // Первая позиция (1/4) = 25% (6-3+1=4 позиции: 0,1,2,3)
+      expect(progressBar?.style.width).toBe('25%')
 
-      // Переходим к слайду 3 (вторая страница, 2/2) = 100%
+      // Переходим к слайду 3 (последняя позиция, 4/4) = 100%
       await new Promise<void>(resolve => {
         slider.on('slideChanged', () => resolve())
         slider.scrollTo(3)
@@ -315,19 +315,19 @@ describe('PaginationModule', () => {
 
       const bullets = container.querySelectorAll<HTMLElement>('.tvist__bullet')
       
-      // Должно быть 2 точки (Math.ceil(6/4) = 2)
-      expect(bullets.length).toBe(2)
+      // Должно быть 3 точки (6 - 4 + 1 = 3)
+      expect(bullets.length).toBe(3)
 
-      // Клик по последней точке должен перейти к endIndex (2), а не к слайду 4
-      bullets[1].click()
+      // Клик по последней точке должен перейти к endIndex (2)
+      bullets[bullets.length - 1].click()
       expect(slider.activeIndex).toBe(2) // endIndex = 6 - 4 = 2
     })
 
     it('should show correct number of bullets for edge cases', () => {
       const testCases = [
-        { slides: 5, perPage: 3, expectedBullets: 2, endIndex: 2 }, // ceil(5/3) = 2, endIndex = 5-3 = 2
-        { slides: 7, perPage: 4, expectedBullets: 2, endIndex: 3 }, // ceil(7/4) = 2, endIndex = 7-4 = 3
-        { slides: 10, perPage: 3, expectedBullets: 4, endIndex: 7 }, // ceil(10/3) = 4, endIndex = 10-3 = 7
+        { slides: 5, perPage: 3, expectedBullets: 3, endIndex: 2 }, // 5-3+1=3
+        { slides: 7, perPage: 4, expectedBullets: 4, endIndex: 3 }, // 7-4+1=4
+        { slides: 10, perPage: 3, expectedBullets: 8, endIndex: 7 }, // 10-3+1=8
       ]
 
       testCases.forEach(({ slides, perPage, expectedBullets, endIndex }) => {
