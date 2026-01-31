@@ -203,10 +203,13 @@ describe('DragModule', () => {
       fixture.container.dispatchEvent(
         createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
       )
-      expect(dragStartSpy).toHaveBeenCalledOnce()
+      // dragStart не должен вызываться сразу после mousedown (ждем threshold)
+      expect(dragStartSpy).not.toHaveBeenCalled()
 
-      // mousemove
+      // mousemove (достаточно далеко для начала драга)
       document.dispatchEvent(createMouseEvent('mousemove', { clientX: 150, clientY: 100 }))
+      
+      expect(dragStartSpy).toHaveBeenCalledOnce()
       expect(dragSpy).toHaveBeenCalled()
 
       // mouseup
