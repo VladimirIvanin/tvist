@@ -69,7 +69,15 @@ export interface TvistOptions {
   
   // Effects
   effect?: 'slide' | 'fade' | 'cube' | 'card'
-  crossFade?: boolean
+  fadeEffect?: {
+    crossFade?: boolean
+  }
+  cubeEffect?: {
+    slideShadows?: boolean
+    shadow?: boolean
+    shadowOffset?: number
+    shadowScale?: number
+  }
   
   // Thumbs
   thumbs?: {

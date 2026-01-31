@@ -219,6 +219,8 @@ export class Engine {
     } else {
       container.style.transform = `translate3d(${x}px, 0, 0)`
     }
+    
+    this.tvist.emit('setTranslate', this.tvist, x)
   }
 
   /**

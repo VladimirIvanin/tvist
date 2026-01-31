@@ -108,15 +108,15 @@ export class DragModule extends Module {
    * Подключение event listeners
    */
   private attachEvents(): void {
-    const { container } = this.tvist
+    const { root } = this.tvist
 
     // Passive для touchstart (не блокируем скролл)
-    container.addEventListener('touchstart', this.onPointerDown, { passive: true })
-    container.addEventListener('mousedown', this.onPointerDown)
+    root.addEventListener('touchstart', this.onPointerDown, { passive: true })
+    root.addEventListener('mousedown', this.onPointerDown)
 
     // PointerEvents для универсальности (если поддерживается)
     if ('PointerEvent' in window) {
-      container.addEventListener('pointerdown', this.onPointerDown)
+      root.addEventListener('pointerdown', this.onPointerDown)
     }
   }
 
@@ -124,13 +124,13 @@ export class DragModule extends Module {
    * Отключение event listeners
    */
   private detachEvents(): void {
-    const { container } = this.tvist
+    const { root } = this.tvist
 
-    container.removeEventListener('touchstart', this.onPointerDown)
-    container.removeEventListener('mousedown', this.onPointerDown)
+    root.removeEventListener('touchstart', this.onPointerDown)
+    root.removeEventListener('mousedown', this.onPointerDown)
 
     if ('PointerEvent' in window) {
-      container.removeEventListener('pointerdown', this.onPointerDown)
+      root.removeEventListener('pointerdown', this.onPointerDown)
     }
 
     this.removeDocumentEvents()
