@@ -50,10 +50,12 @@ export function setCubeEffect(
     
     // Origin is deeper in Z (center of the cube)
     const zOffset = slideWidth / 2
-    container.style.transformOrigin = `50% 50% -${zOffset}px`
+    // Fix: Rotate around the center of the cube (which is at 0,0,0 in local space because slides are pushed out)
+    container.style.transformOrigin = `50% 50%`
     
     // Override engine's translate with rotate
-    container.style.transform = `translate3d(0,0,0) rotateY(${wrapperRotate}deg)`
+    // Move the whole cube back by zOffset so the front face aligns with the screen plane (Z=0)
+    container.style.transform = `translate3d(0,0,-${zOffset}px) rotateY(${wrapperRotate}deg)`
     
     // Process only original slides for cube faces
     originalSlides.forEach((slide, i) => {
