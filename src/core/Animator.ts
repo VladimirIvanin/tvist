@@ -102,11 +102,14 @@ export class Animator {
  * Throttle функция для ограничения частоты вызовов
  * Полезна для производительности при частых событиях
  */
-export function throttle(fn: Function, delay: number): (...args: any[]) => void {
+export function throttle<Args extends unknown[]>(
+  fn: (...args: Args) => unknown,
+  delay: number
+): (...args: Args) => void {
   let lastCall = 0
   let timeout: number | null = null
 
-  return function throttled(...args: any[]) {
+  return function throttled(...args: Args) {
     const now = Date.now()
     const timeSinceLastCall = now - lastCall
 

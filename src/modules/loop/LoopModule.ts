@@ -111,7 +111,7 @@ export class LoopModule extends Module {
     const totalPhysical = this.originalSlidesCount + this.cloneCount * 2
     
     // Выбираем ближайший валидный индекс
-    let bestPhysical = candidates[0]
+    let bestPhysical = candidates[0] ?? 0
     let minDiff = Math.abs(currentPhysical - bestPhysical)
     
     for (const candidate of candidates) {
@@ -133,7 +133,7 @@ export class LoopModule extends Module {
    * cloneCount = perPage для гарантированного покрытия viewport
    */
   private computeCloneCount(): number {
-    const perPage = this.options.perPage || 1
+    const perPage = this.options.perPage ?? 1
     // Достаточно perPage клонов с каждой стороны
     return Math.min(perPage, this.originalSlidesCount)
   }
@@ -162,6 +162,11 @@ export class LoopModule extends Module {
     for (let i = count - 1; i >= 0; i--) {
       const originalIndex = N - count + i // для count=2: i=1 → N-1, i=0 → N-2
       const sourceSlide = originalSlides[originalIndex]
+
+      if (!sourceSlide) {
+        continue
+      }
+
       const clone = this.cloneSlide(sourceSlide, originalIndex, 'prepend')
       container.prepend(clone)
       this.clones.push(clone)
@@ -170,6 +175,11 @@ export class LoopModule extends Module {
     // Append клоны: первые N слайдов [0, 1, ..., count-1]
     for (let i = 0; i < count; i++) {
       const sourceSlide = originalSlides[i]
+
+      if (!sourceSlide) {
+        continue
+      }
+
       const clone = this.cloneSlide(sourceSlide, i, 'append')
       container.appendChild(clone)
       this.clones.push(clone)
@@ -184,6 +194,7 @@ export class LoopModule extends Module {
     
     // Маркируем как клон
     clone.setAttribute('data-tvist-clone', 'true')
+    clone.setAttribute('data-tvist-clone-position', position)
     clone.setAttribute('data-tvist-slide-index', String(originalIndex))
     clone.classList.add('tvist__slide--clone')
     
@@ -206,16 +217,6 @@ export class LoopModule extends Module {
   }
 
   /**
-   * Конвертирует логический индекс (0..N-1) в физический (с учётом клонов)
-   */
-  private logicalToPhysical(logicalIndex: number): number {
-    // Нормализуем индекс
-    const normalized = ((logicalIndex % this.originalSlidesCount) + this.originalSlidesCount) % this.originalSlidesCount
-    // Добавляем offset для prepend клонов
-    return normalized + this.cloneCount
-  }
-
-  /**
    * Конвертирует физический индекс в логический (realIndex)
    */
   private physicalToLogical(physicalIndex: number): number {
@@ -232,15 +233,13 @@ export class LoopModule extends Module {
   private checkClonePosition(): void {
     const position = this.tvist.engine.location.get()
     const slideWidth = this.tvist.engine.slideWidthValue
-    const gap = this.options.gap || 0
+    const gap = this.options.gap ?? 0
     const slideWithGap = slideWidth + gap
 
     if (slideWithGap === 0) return
 
     // Вычисляем текущий индекс по позиции (может быть дробным)
     const currentFloatIndex = -position / slideWithGap
-    const totalSlides = this.originalSlidesCount + this.cloneCount * 2
-
     // Границы для прыжка
     const prependBoundary = this.cloneCount - 0.5 // За 0.5 слайда до границы
     const appendBoundary = this.originalSlidesCount + this.cloneCount - 0.5
@@ -363,7 +362,7 @@ export class LoopModule extends Module {
 
     // Удаляем realIndex геттер
     if (Object.getOwnPropertyDescriptor(this.tvist, 'realIndex')) {
-      delete (this.tvist as any).realIndex
+      delete this.tvist.realIndex
     }
 
     // Удаляем резолвер

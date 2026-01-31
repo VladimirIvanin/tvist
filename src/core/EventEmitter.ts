@@ -15,10 +15,12 @@ export class EventEmitter {
    * @param handler - обработчик
    */
   on(event: string, handler: EventHandler): this {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, new Set())
+    let handlers = this.listeners.get(event)
+    if (!handlers) {
+      handlers = new Set()
+      this.listeners.set(event, handlers)
     }
-    this.listeners.get(event)!.add(handler)
+    handlers.add(handler)
     return this
   }
 

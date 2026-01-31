@@ -68,9 +68,7 @@ export class PaginationModule extends Module {
     }
 
     // Если не найден - ищем по дефолтному классу
-    if (!this.container) {
-      this.container = this.tvist.root.querySelector('.tvist__pagination')
-    }
+    this.container ??= this.tvist.root.querySelector('.tvist__pagination')
   }
 
   /**
@@ -113,6 +111,7 @@ export class PaginationModule extends Module {
    */
   private renderBullets(): void {
     if (!this.container) return
+    const container = this.container
 
     const { slides } = this.tvist
     const pagination = this.options.pagination
@@ -138,7 +137,7 @@ export class PaginationModule extends Module {
       }
 
       const bullet = this.createElementFromHTML(bulletHTML)
-      this.container!.appendChild(bullet)
+      container.appendChild(bullet)
       this.bullets.push(bullet)
 
       // Clickable
