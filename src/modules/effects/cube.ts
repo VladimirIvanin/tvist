@@ -99,8 +99,8 @@ export function setCubeEffect(
         
         // Fix: Hide slides that are out of bounds (preventing them from flying around screen)
         // Show only active slide and immediate neighbors (enough for a cube corner)
-        // Range 2 allows seeing the "next" face turning in.
-        const isInRange = Math.abs(slideProgress) <= 2
+        // Range 1 is enough because we only see at most 2 faces at once (or one full face).
+        const isInRange = Math.abs(slideProgress) <= 1
         
         // Chrome bug: backface-visibility: hidden can cull content layer while keeping
         // background visible. Use visible so both sides render; z-index orders faces.
