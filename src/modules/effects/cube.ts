@@ -102,11 +102,12 @@ export function setCubeEffect(
         // Range 1 is enough because we only see at most 2 faces at once (or one full face).
         const isInRange = Math.abs(slideProgress) <= 1
         
-        // Chrome bug: backface-visibility: hidden can cull content layer while keeping
-        // background visible. Use visible so both sides render; z-index orders faces.
-        slide.style.backfaceVisibility = 'visible'
+        // Chrome bug workaround: Sometimes Chrome fails to render content with hidden backface.
+        // However, for a proper cube effect, we MUST hide backfaces to avoid seeing inside the cube.
+        // We rely on z-index to handle sorting, but backface-visibility: hidden gives the cleanest look.
+        slide.style.backfaceVisibility = 'hidden'
         // @ts-ignore
-        slide.style.webkitBackfaceVisibility = 'visible'
+        slide.style.webkitBackfaceVisibility = 'hidden'
 
         // _base.scss sets content-visibility: auto. 
         slide.style.contentVisibility = 'visible'
