@@ -6,6 +6,7 @@ import { setCubeEffect } from './cube'
 
 export class EffectModule extends Module {
   name = 'effect'
+  private slideProgress = new WeakMap<HTMLElement, number>()
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
@@ -60,7 +61,7 @@ export class EffectModule extends Module {
     this.tvist.root.style.removeProperty('box-sizing')
   }
 
-  private onSetTranslate(tvist: Tvist, translate: number): void {
+  private onSetTranslate(_tvist: Tvist, translate: number): void {
     const { slides } = this.tvist
     const slideWidth = this.tvist.engine.slideWidthValue
     
@@ -69,10 +70,8 @@ export class EffectModule extends Module {
       // translate is negative location
       const offset = translate + slidePosition
       const progress = offset / slideWidth
-      
-      // Store progress
-      ;(slide as any).progress = progress
-      
+      this.slideProgress.set(slide, progress)
+
       if (this.options.effect === 'fade') {
         setFadeEffect(slide, progress, this.options)
       }

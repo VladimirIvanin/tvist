@@ -1,0 +1,107 @@
+/**
+ * Tvist Cube Effect Styles
+ * 3D куб эффект
+ */
+
+// Cube mode root container
+.tvist--cube {
+  overflow: visible;
+  
+  .tvist__container {
+    transform-style: preserve-3d;
+  }
+  
+  .tvist__slide {
+    pointer-events: none;
+    backface-visibility: hidden;
+    z-index: 1;
+    visibility: hidden;
+    transform-origin: 0 0;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    
+    // Активные слайды интерактивны
+    &.tvist__slide--active,
+    &.tvist__slide--next,
+    &.tvist__slide--prev {
+      pointer-events: auto;
+      visibility: visible;
+    }
+  }
+}
+
+// RTL поддержка
+[dir='rtl'] .tvist--cube .tvist__slide {
+  transform-origin: 100% 0;
+}
+
+// Тень под кубом
+.tvist-cube-shadow {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.6;
+  z-index: 0;
+  pointer-events: none;
+  
+  &::before {
+    content: '';
+    background: #000;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    filter: blur(50px);
+  }
+}
+
+// Тени на слайдах
+.tvist-slide-shadow-cube {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  backface-visibility: hidden;
+  
+  &.tvist-slide-shadow-left,
+  &.tvist-slide-shadow-right {
+    background-image: linear-gradient(
+      to left,
+      rgba(0, 0, 0, 0.5),
+      rgba(0, 0, 0, 0)
+    );
+  }
+  
+  &.tvist-slide-shadow-left {
+    background-image: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.5),
+      rgba(0, 0, 0, 0)
+    );
+  }
+  
+  &.tvist-slide-shadow-top,
+  &.tvist-slide-shadow-bottom {
+    background-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.5),
+      rgba(0, 0, 0, 0)
+    );
+  }
+  
+  &.tvist-slide-shadow-top {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.5),
+      rgba(0, 0, 0, 0)
+    );
+  }
+}

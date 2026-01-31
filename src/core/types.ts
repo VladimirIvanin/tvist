@@ -94,6 +94,7 @@ export interface TvistOptions {
   virtual?: boolean | {
     addSlidesBefore?: number
     addSlidesAfter?: number
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- virtual slide data is user-defined */
     renderSlide?: (data: any, index: number) => string
   }
   
@@ -133,6 +134,7 @@ export interface TvistOptions {
     scroll?: () => void
     resize?: () => void
     breakpoint?: (breakpoint: number | null) => void
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
     [key: string]: ((...args: any[]) => void) | undefined
   }
 }

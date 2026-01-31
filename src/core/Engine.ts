@@ -35,14 +35,14 @@ export class Engine {
     this.options = options
 
     const slideCount = tvist.slides.length
-    const startIndex = options.start || 0
+    const startIndex = options.start ?? 0
     const isLoop = options.loop === true
 
     this.location = new Vector1D(0)
     this.target = new Vector1D(0)
     
     // Вычисляем endIndex для Counter
-    const perPage = options.perPage || 1
+    const perPage = options.perPage ?? 1
     const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
     
     this.index = new Counter(slideCount, startIndex, isLoop, endIndex)
@@ -69,8 +69,8 @@ export class Engine {
     this.containerWidth = getOuterWidth(this.tvist.root)
 
     // Размер одного слайда с учётом perPage и gap
-    const perPage = this.options.perPage || 1
-    const gap = this.options.gap || 0
+    const perPage = this.options.perPage ?? 1
+    const gap = this.options.gap ?? 0
 
     // Формула: slideWidth = (containerWidth - gap * (perPage - 1)) / perPage
     this.slideWidth = (this.containerWidth - gap * (perPage - 1)) / perPage
@@ -96,7 +96,7 @@ export class Engine {
    */
   private calculatePositions(): void {
     const slides = this.tvist.slides
-    const gap = this.options.gap || 0
+    const gap = this.options.gap ?? 0
 
     this.slidePositions = []
 
@@ -114,7 +114,7 @@ export class Engine {
    */
   private getEndIndex(): number {
     const slideCount = this.tvist.slides.length
-    const perPage = this.options.perPage || 1
+    const perPage = this.options.perPage ?? 1
     const isLoop = this.options.loop === true
 
     if (isLoop) {
@@ -171,7 +171,7 @@ export class Engine {
     } else {
       // Анимированный переход
       this.target.set(targetPosition)
-      const speed = this.options.speed || 300
+      const speed = this.options.speed ?? 300
 
       this.animator.animate(
         this.location.get(),

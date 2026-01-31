@@ -65,6 +65,7 @@ export abstract class Module {
   /**
    * Emit события через главный event emitter
    */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event args are untyped */
   protected emit(event: string, ...args: any[]): void {
     this.tvist.emit(event, ...args)
   }
@@ -72,6 +73,7 @@ export abstract class Module {
   /**
    * Подписка на события
    */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
   protected on(event: string, handler: (...args: any[]) => void): void {
     this.tvist.on(event, handler)
   }
@@ -79,6 +81,7 @@ export abstract class Module {
   /**
    * Отписка от событий
    */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
   protected off(event: string, handler?: (...args: any[]) => void): void {
     this.tvist.off(event, handler)
   }

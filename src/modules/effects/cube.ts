@@ -7,7 +7,7 @@ export function setCubeEffect(
     options: TvistOptions
 ): void {
     const { slides, container, root } = tvist
-    const cubeOptions = options.cubeEffect || {}
+    const cubeOptions = options.cubeEffect ?? {}
     const slideWidth = tvist.engine.slideWidthValue
 
     // Container must have explicit size when slides are absolute (otherwise it collapses to 0)
@@ -25,7 +25,6 @@ export function setCubeEffect(
     // Smaller value = stronger depth (closer bigger, farther smaller).
     const perspectivePx = cubeOptions.perspective ?? 800
     root.style.perspective = `${perspectivePx}px`
-    // @ts-ignore - webkit prefix
     root.style.webkitPerspective = `${perspectivePx}px`
     // Lower perspective-origin so the join between cube faces appears lower (natural view from above)
     const perspectiveOriginY = cubeOptions.perspectiveOriginY ?? 60
@@ -38,7 +37,6 @@ export function setCubeEffect(
 
 
     container.style.transformStyle = 'preserve-3d'
-    // @ts-ignore - webkit prefix
     container.style.webkitTransformStyle = 'preserve-3d'
     
     // Separate original slides from clones
@@ -90,7 +88,6 @@ export function setCubeEffect(
         // Fix for content clipping issues:
         // Ensure 3D context is preserved for children (content + shadows)
         slide.style.transformStyle = 'preserve-3d'
-        // @ts-ignore
         slide.style.webkitTransformStyle = 'preserve-3d'
 
         // Set origin to center (standard rotation around own axis)
@@ -125,7 +122,6 @@ export function setCubeEffect(
         // However, for a proper cube effect, we MUST hide backfaces to avoid seeing inside the cube.
         // We rely on z-index to handle sorting, but backface-visibility: hidden gives the cleanest look.
         slide.style.backfaceVisibility = 'hidden'
-        // @ts-ignore
         slide.style.webkitBackfaceVisibility = 'hidden'
 
         // _base.scss sets content-visibility: auto. 
@@ -147,7 +143,7 @@ export function setCubeEffect(
 }
 
 function addSlideShadows(slide: HTMLElement, opacity: number) {
-    let shadow = slide.querySelector('.tvist-shadow') as HTMLElement
+    let shadow: HTMLElement | null = slide.querySelector<HTMLElement>('.tvist-shadow')
     if (!shadow) {
         shadow = document.createElement('div')
         shadow.className = 'tvist-shadow'

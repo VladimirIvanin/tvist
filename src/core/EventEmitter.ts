@@ -3,6 +3,7 @@
  * Основана на паттернах из Splide EventInterface
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any -- event args are intentionally untyped */
 type EventHandler = (...args: any[]) => void
 
 export class EventEmitter {
@@ -132,4 +133,5 @@ export class EventEmitter {
     return handlers ? handlers.size : 0
   }
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 

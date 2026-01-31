@@ -265,6 +265,7 @@ export class Tvist {
   /**
    * Подписаться на событие
    */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
   on(event: string, handler: (...args: any[]) => void): this {
     this.events.on(event, handler)
     return this
@@ -273,6 +274,7 @@ export class Tvist {
   /**
    * Отписаться от события
    */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
   off(event: string, handler?: (...args: any[]) => void): this {
     this.events.off(event, handler)
     return this
@@ -281,6 +283,7 @@ export class Tvist {
   /**
    * Вызвать событие
    */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event args are untyped */
   emit(event: string, ...args: any[]): this {
     this.events.emit(event, ...args)
     return this
@@ -289,6 +292,7 @@ export class Tvist {
   /**
    * Подписаться на событие один раз
    */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
   once(event: string, handler: (...args: any[]) => void): this {
     this.events.once(event, handler)
     return this

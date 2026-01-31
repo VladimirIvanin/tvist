@@ -330,7 +330,7 @@ export class DragModule extends Module {
    * Проверка на focusable элемент
    */
   private isFocusableElement(element: HTMLElement): boolean {
-    const focusableSelectors = this.options.focusableElements || 
+    const focusableSelectors = this.options.focusableElements ?? 
       'input, textarea, select, button, a[href], [tabindex]'
     
     return element.matches(focusableSelectors)
@@ -436,7 +436,7 @@ export class DragModule extends Module {
     
     // Размер слайда с gap
     const slideWidth = engine.slideWidthValue
-    const gap = this.options.gap || 0
+    const gap = this.options.gap ?? 0
     const slideWithGap = slideWidth + gap
     
     if (slideWithGap === 0) {

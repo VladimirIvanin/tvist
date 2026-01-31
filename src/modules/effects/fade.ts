@@ -3,11 +3,10 @@ import type { TvistOptions } from '../../core/types'
 export function setFadeEffect(
   slide: HTMLElement,
   progress: number,
-  options: TvistOptions
+  _options: TvistOptions
 ): void {
-  const fadeOptions = options.fadeEffect || {}
-  // const crossFade = fadeOptions.crossFade ?? false
-  
+  // _options.fadeEffect (e.g. crossFade) can be used here when implemented
+
   // Opacity
   // Visible when progress is around 0.
   // 0 -> 1 opacity

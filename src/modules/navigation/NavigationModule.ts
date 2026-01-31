@@ -74,12 +74,8 @@ export class NavigationModule extends Module {
     }
 
     // Если не найдены - ищем по дефолтным классам
-    if (!this.prevButton) {
-      this.prevButton = this.tvist.root.querySelector('.tvist__arrow--prev')
-    }
-    if (!this.nextButton) {
-      this.nextButton = this.tvist.root.querySelector('.tvist__arrow--next')
-    }
+    this.prevButton ??= this.tvist.root.querySelector<HTMLElement>('.tvist__arrow--prev')
+    this.nextButton ??= this.tvist.root.querySelector<HTMLElement>('.tvist__arrow--next')
   }
 
   /**
