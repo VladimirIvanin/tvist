@@ -63,13 +63,13 @@ const slider = new Tvist('#slider', {
 
 Интерактивные примеры и документация доступны на GitHub Pages:
 
-**[https://vladimiranin.github.io/tvist/](https://vladimiranin.github.io/tvist/)**
+**[https://vladimirivanin.github.io/tvist/](https://vladimirivanin.github.io/tvist/)**
 
 ### 📚 Примеры
 
-- **[Basic](https://vladimiranin.github.io/tvist/basic.html)** - базовый пример с основными функциями
-- **[Modules Demo](https://vladimiranin.github.io/tvist/modules-demo.html)** - демонстрация всех модулей
-- **[Loop Mode](https://vladimiranin.github.io/tvist/loop-demo.html)** - бесконечная прокрутка
+- **[Basic](https://vladimirivanin.github.io/tvist/basic.html)** - базовый пример с основными функциями
+- **[Modules Demo](https://vladimirivanin.github.io/tvist/modules-demo.html)** - демонстрация всех модулей
+- **[Loop Mode](https://vladimirivanin.github.io/tvist/loop-demo.html)** - бесконечная прокрутка
 
 ### 💻 Локальные примеры
 

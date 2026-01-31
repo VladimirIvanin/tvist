@@ -6,7 +6,7 @@
 
 Все примеры доступны онлайн на GitHub Pages:
 
-**[https://vladimiranin.github.io/tvist/](https://vladimiranin.github.io/tvist/)**
+**[https://vladimirivanin.github.io/tvist/](https://vladimirivanin.github.io/tvist/)**
 
 📖 **[Инструкция по работе с GitHub Pages](README-GITHUB-PAGES.md)**
 
