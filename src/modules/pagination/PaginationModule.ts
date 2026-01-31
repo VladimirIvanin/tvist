@@ -126,28 +126,34 @@ export class PaginationModule extends Module {
     this.bullets = []
     this.detachClickHandlers()
 
-    slides.forEach((_, index) => {
+    // Вычисляем количество страниц с учетом perPage
+    const perPage = this.options.perPage ?? 1
+    const pageCount = Math.ceil(slides.length / perPage)
+
+    // Создаем точки для страниц, а не для слайдов
+    for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
       let bulletHTML: string
 
       // Кастомный рендер
       if (typeof pagination === 'object' && pagination?.renderBullet) {
-        bulletHTML = pagination.renderBullet(index, bulletClass)
+        bulletHTML = pagination.renderBullet(pageIndex, bulletClass)
       } else {
-        bulletHTML = `<span class="${bulletClass}" data-index="${index}"></span>`
+        bulletHTML = `<span class="${bulletClass}" data-index="${pageIndex}"></span>`
       }
 
       const bullet = this.createElementFromHTML(bulletHTML)
       container.appendChild(bullet)
       this.bullets.push(bullet)
 
-      // Clickable
+      // Clickable - переходим к первому слайду страницы
       if (clickable) {
-        const handler = () => this.tvist.scrollTo(index)
+        const slideIndex = pageIndex * perPage
+        const handler = () => this.tvist.scrollTo(slideIndex)
         this.clickHandlers.set(bullet, handler)
         bullet.addEventListener('click', handler)
         bullet.style.cursor = 'pointer'
       }
-    })
+    }
   }
 
   /**
@@ -157,18 +163,19 @@ export class PaginationModule extends Module {
     if (!this.container) return
 
     const pagination = this.options.pagination
+    const perPage = this.options.perPage ?? 1
+    const currentPage = Math.floor(this.tvist.activeIndex / perPage) + 1
+    const totalPages = Math.ceil(this.tvist.slides.length / perPage)
+    
     let html: string
 
     if (typeof pagination === 'object' && pagination?.renderFraction) {
-      html = pagination.renderFraction(
-        this.tvist.activeIndex + 1,
-        this.tvist.slides.length
-      )
+      html = pagination.renderFraction(currentPage, totalPages)
     } else {
       html = `
-        <span class="tvist__pagination-current">${this.tvist.activeIndex + 1}</span>
+        <span class="tvist__pagination-current">${currentPage}</span>
         <span class="tvist__pagination-separator"> / </span>
-        <span class="tvist__pagination-total">${this.tvist.slides.length}</span>
+        <span class="tvist__pagination-total">${totalPages}</span>
       `
     }
 
@@ -181,7 +188,10 @@ export class PaginationModule extends Module {
   private renderProgress(): void {
     if (!this.container) return
 
-    const progress = ((this.tvist.activeIndex + 1) / this.tvist.slides.length) * 100
+    const perPage = this.options.perPage ?? 1
+    const currentPage = Math.floor(this.tvist.activeIndex / perPage) + 1
+    const totalPages = Math.ceil(this.tvist.slides.length / perPage)
+    const progress = (currentPage / totalPages) * 100
 
     this.container.innerHTML = `
       <div class="tvist__pagination-progress">
@@ -240,8 +250,12 @@ export class PaginationModule extends Module {
       ? pagination.bulletActiveClass ?? 'active'
       : 'active'
 
-    this.bullets.forEach((bullet, index) => {
-      if (index === this.tvist.activeIndex) {
+    // Вычисляем текущую страницу
+    const perPage = this.options.perPage ?? 1
+    const currentPage = Math.floor(this.tvist.activeIndex / perPage)
+
+    this.bullets.forEach((bullet, pageIndex) => {
+      if (pageIndex === currentPage) {
         bullet.classList.add(activeClass)
         bullet.setAttribute('aria-current', 'true')
       } else {
@@ -257,7 +271,10 @@ export class PaginationModule extends Module {
   private updateProgressActive(): void {
     const progressBar = this.container?.querySelector<HTMLElement>('.tvist__pagination-progress-bar')
     if (progressBar) {
-      const progress = ((this.tvist.activeIndex + 1) / this.tvist.slides.length) * 100
+      const perPage = this.options.perPage ?? 1
+      const currentPage = Math.floor(this.tvist.activeIndex / perPage) + 1
+      const totalPages = Math.ceil(this.tvist.slides.length / perPage)
+      const progress = (currentPage / totalPages) * 100
       progressBar.style.width = `${progress}%`
     }
   }
