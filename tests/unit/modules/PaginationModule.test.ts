@@ -163,6 +163,7 @@ describe('PaginationModule', () => {
 
       const slider = new Tvist(container.querySelector('.tvist')!, {
         perPage: 4,
+        speed: 0,
         pagination: {
           type: 'bullets',
           clickable: true
@@ -171,9 +172,10 @@ describe('PaginationModule', () => {
 
       const bullets = container.querySelectorAll<HTMLElement>('.tvist__bullet')
       
-      // Клик по второй точке должен перейти к слайду 4 (4 = 1 * 4)
+      // Клик по второй точке должен перейти к endIndex (2), а не к слайду 4
+      // endIndex = 6 - 4 = 2
       bullets[1].click()
-      expect(slider.activeIndex).toBe(4)
+      expect(slider.activeIndex).toBe(2)
 
       // Клик по первой точке должен вернуть к слайду 0
       bullets[0].click()
@@ -182,7 +184,7 @@ describe('PaginationModule', () => {
   })
 
   describe('Fraction pagination', () => {
-    it('should show correct page numbers with perPage > 1', async () => {
+    it('should show correct page numbers with perPage > 1', () => {
       container.innerHTML = `
         <div class="tvist">
           <div class="tvist__container">
@@ -199,26 +201,16 @@ describe('PaginationModule', () => {
 
       const slider = new Tvist(container.querySelector('.tvist')!, {
         perPage: 4,
-        speed: 0, // Отключаем анимацию
         pagination: {
           type: 'fraction'
         }
       })
 
-      let current = container.querySelector('.tvist__pagination-current')
-      let total = container.querySelector('.tvist__pagination-total')
+      const current = container.querySelector('.tvist__pagination-current')
+      const total = container.querySelector('.tvist__pagination-total')
 
       expect(current?.textContent).toBe('1')
       expect(total?.textContent).toBe('2') // Math.ceil(6/4) = 2 страницы
-
-      // Переходим к слайду 4 (вторая страница)
-      await new Promise<void>(resolve => {
-        slider.on('slideChanged', () => resolve())
-        slider.scrollTo(4)
-      })
-      
-      current = container.querySelector('.tvist__pagination-current')
-      expect(current?.textContent).toBe('2')
     })
   })
 
@@ -259,6 +251,111 @@ describe('PaginationModule', () => {
       
       progressBar = container.querySelector<HTMLElement>('.tvist__pagination-progress-bar')
       expect(progressBar?.style.width).toBe('100%')
+    })
+  })
+
+  describe('EndIndex logic', () => {
+    it('should not allow scrolling beyond endIndex when perPage > 1', async () => {
+      container.innerHTML = `
+        <div class="tvist">
+          <div class="tvist__container">
+            <div class="tvist__slide">1</div>
+            <div class="tvist__slide">2</div>
+            <div class="tvist__slide">3</div>
+            <div class="tvist__slide">4</div>
+            <div class="tvist__slide">5</div>
+            <div class="tvist__slide">6</div>
+          </div>
+          <div class="tvist__pagination"></div>
+        </div>
+      `
+
+      const slider = new Tvist(container.querySelector('.tvist')!, {
+        perPage: 4,
+        speed: 0,
+        pagination: {
+          type: 'bullets',
+          clickable: true
+        }
+      })
+
+      // endIndex должен быть 2 (6 - 4 = 2)
+      // Попытка перейти к индексу 5 должна ограничиться до 2
+      await new Promise<void>(resolve => {
+        slider.on('slideChanged', () => resolve())
+        slider.scrollTo(5)
+      })
+
+      expect(slider.activeIndex).toBe(2)
+    })
+
+    it('should navigate to endIndex when clicking last pagination bullet', () => {
+      container.innerHTML = `
+        <div class="tvist">
+          <div class="tvist__container">
+            <div class="tvist__slide">1</div>
+            <div class="tvist__slide">2</div>
+            <div class="tvist__slide">3</div>
+            <div class="tvist__slide">4</div>
+            <div class="tvist__slide">5</div>
+            <div class="tvist__slide">6</div>
+          </div>
+          <div class="tvist__pagination"></div>
+        </div>
+      `
+
+      const slider = new Tvist(container.querySelector('.tvist')!, {
+        perPage: 4,
+        speed: 0,
+        pagination: {
+          type: 'bullets',
+          clickable: true
+        }
+      })
+
+      const bullets = container.querySelectorAll<HTMLElement>('.tvist__bullet')
+      
+      // Должно быть 2 точки (Math.ceil(6/4) = 2)
+      expect(bullets.length).toBe(2)
+
+      // Клик по последней точке должен перейти к endIndex (2), а не к слайду 4
+      bullets[1].click()
+      expect(slider.activeIndex).toBe(2) // endIndex = 6 - 4 = 2
+    })
+
+    it('should show correct number of bullets for edge cases', () => {
+      const testCases = [
+        { slides: 5, perPage: 3, expectedBullets: 2, endIndex: 2 }, // ceil(5/3) = 2, endIndex = 5-3 = 2
+        { slides: 7, perPage: 4, expectedBullets: 2, endIndex: 3 }, // ceil(7/4) = 2, endIndex = 7-4 = 3
+        { slides: 10, perPage: 3, expectedBullets: 4, endIndex: 7 }, // ceil(10/3) = 4, endIndex = 10-3 = 7
+      ]
+
+      testCases.forEach(({ slides, perPage, expectedBullets, endIndex }) => {
+        container.innerHTML = `
+          <div class="tvist">
+            <div class="tvist__container">
+              ${Array.from({ length: slides }, (_, i) => `<div class="tvist__slide">${i + 1}</div>`).join('')}
+            </div>
+            <div class="tvist__pagination"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector('.tvist')!, {
+          perPage,
+          speed: 0,
+          pagination: {
+            type: 'bullets',
+            clickable: true
+          }
+        })
+
+        const bullets = container.querySelectorAll('.tvist__bullet')
+        expect(bullets.length).toBe(expectedBullets)
+
+        // Проверяем что нельзя перейти дальше endIndex
+        slider.scrollTo(slides - 1)
+        expect(slider.activeIndex).toBe(endIndex)
+      })
     })
   })
 })

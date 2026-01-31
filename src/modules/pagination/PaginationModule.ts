@@ -128,7 +128,12 @@ export class PaginationModule extends Module {
 
     // Вычисляем количество страниц с учетом perPage
     const perPage = this.options.perPage ?? 1
-    const pageCount = Math.ceil(slides.length / perPage)
+    const slideCount = slides.length
+    const isLoop = this.options.loop === true
+    
+    // Вычисляем endIndex (последний допустимый индекс)
+    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
+    const pageCount = Math.ceil(slideCount / perPage)
 
     // Создаем точки для страниц, а не для слайдов
     for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
@@ -145,9 +150,12 @@ export class PaginationModule extends Module {
       container.appendChild(bullet)
       this.bullets.push(bullet)
 
-      // Clickable - переходим к первому слайду страницы
+      // Clickable - переходим к первому слайду страницы с учетом endIndex
       if (clickable) {
-        const slideIndex = pageIndex * perPage
+        let slideIndex = pageIndex * perPage
+        // Ограничиваем индекс до endIndex
+        slideIndex = Math.min(slideIndex, endIndex)
+        
         const handler = () => this.tvist.scrollTo(slideIndex)
         this.clickHandlers.set(bullet, handler)
         bullet.addEventListener('click', handler)

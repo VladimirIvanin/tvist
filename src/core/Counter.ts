@@ -6,15 +6,18 @@ export class Counter {
   private value: number
   public max: number
   public loop: boolean
+  public endIndex: number
 
   /**
    * @param max - максимальный индекс (длина массива)
    * @param start - начальный индекс
    * @param loop - включить циклические индексы
+   * @param endIndex - максимальный допустимый индекс (для perPage > 1)
    */
-  constructor(max: number, start = 0, loop = false) {
+  constructor(max: number, start = 0, loop = false, endIndex?: number) {
     this.max = max
     this.loop = loop
+    this.endIndex = endIndex ?? max - 1
     this.value = this.constrain(start)
   }
 
@@ -48,7 +51,7 @@ export class Counter {
    * Создаёт копию счётчика
    */
   clone(): Counter {
-    return new Counter(this.max, this.value, this.loop)
+    return new Counter(this.max, this.value, this.loop, this.endIndex)
   }
 
   /**
@@ -65,8 +68,8 @@ export class Counter {
       }
       return index % this.max
     } else {
-      // Обычный режим: ограничиваем [0, max-1]
-      return Math.max(0, Math.min(index, this.max - 1))
+      // Обычный режим: ограничиваем [0, endIndex]
+      return Math.max(0, Math.min(index, this.endIndex))
     }
   }
 }

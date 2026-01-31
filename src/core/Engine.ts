@@ -36,10 +36,16 @@ export class Engine {
 
     const slideCount = tvist.slides.length
     const startIndex = options.start || 0
+    const isLoop = options.loop === true
 
     this.location = new Vector1D(0)
     this.target = new Vector1D(0)
-    this.index = new Counter(slideCount, startIndex, options.loop === true)
+    
+    // Вычисляем endIndex для Counter
+    const perPage = options.perPage || 1
+    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
+    
+    this.index = new Counter(slideCount, startIndex, isLoop, endIndex)
     this.animator = new Animator()
 
     // Первичный расчёт размеров
@@ -102,6 +108,26 @@ export class Engine {
   }
 
   /**
+   * Вычисляет последний допустимый индекс для скролла
+   * Логика из Splide: endIndex = slideCount - perPage
+   * Это гарантирует, что всегда показывается perPage слайдов
+   */
+  private getEndIndex(): number {
+    const slideCount = this.tvist.slides.length
+    const perPage = this.options.perPage || 1
+    const isLoop = this.options.loop === true
+
+    if (isLoop) {
+      // В режиме loop можно скроллить к любому слайду
+      return slideCount - 1
+    }
+
+    // Логика Splide: endIndex = slideCount - perPage
+    const end = slideCount - perPage
+    return Math.max(0, Math.min(end, slideCount - 1))
+  }
+
+  /**
    * Получить позицию слайда по индексу
    */
   getSlidePosition(index: number): number {
@@ -117,8 +143,14 @@ export class Engine {
    * @param instant - мгновенный переход без анимации
    */
   scrollTo(index: number, instant = false): void {
+    // Ограничиваем индекс до endIndex (если не loop)
+    const endIndex = this.getEndIndex()
+    const clampedIndex = this.options.loop 
+      ? index 
+      : Math.max(0, Math.min(index, endIndex))
+
     // Нормализуем индекс через Counter
-    const normalizedIndex = this.index.set(index) ?? 0
+    const normalizedIndex = this.index.set(clampedIndex) ?? 0
 
     // Получаем целевую позицию
     const targetPosition = -this.getSlidePosition(normalizedIndex)
@@ -246,7 +278,8 @@ export class Engine {
    */
   canScrollNext(): boolean {
     if (this.options.loop) return true
-    return this.index.get() < this.slideCount - 1
+    const endIndex = this.getEndIndex()
+    return this.index.get() < endIndex
   }
 
   /**

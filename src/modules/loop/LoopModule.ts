@@ -71,6 +71,7 @@ export class LoopModule extends Module {
     // loopFix будет сам делать прыжок когда достигаем клона
     this.tvist.engine.index.loop = false
     this.tvist.engine.index.max = this.tvist.slides.length
+    this.tvist.engine.index.endIndex = this.tvist.slides.length - 1
 
     // Стартуем с первого оригинального слайда (пропускаем prepend клоны)
     this.tvist.engine.index.set(this.cloneCount)
