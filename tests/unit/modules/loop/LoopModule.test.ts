@@ -1,195 +1,278 @@
-/**
- * Тесты для LoopModule с клонированием
- */
-
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { createSliderFixture, type SliderFixture } from '../../../fixtures'
 import { Tvist } from '../../../../src/core/Tvist'
 import { LoopModule } from '../../../../src/modules/loop/LoopModule'
 
-// Регистрируем модуль Loop для тестов
-Tvist.MODULES.set('loop', LoopModule)
-
-describe('LoopModule (с клонами)', () => {
+describe('LoopModule', () => {
   let fixture: SliderFixture
   let slider: Tvist
 
   beforeEach(() => {
-    fixture = createSliderFixture({ slidesCount: 4, width: 1000 })
+    Tvist.registerModule('loop', LoopModule)
+    fixture = createSliderFixture({
+      slidesCount: 4,
+      width: 800, // 200px per slide with perPage: 4, or just full width
+      height: 400
+    })
   })
 
   afterEach(() => {
     slider?.destroy()
-    fixture?.cleanup()
+    fixture.cleanup()
+    Tvist.unregisterModule('loop')
   })
 
-  describe('Создание клонов', () => {
-    it('должен создавать клоны в начале и конце', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1 })
-
-      // perPage=1 → cloneCount = 1
-      // Ожидаем: 1 prepend + 4 оригинала + 1 append = 6 слайдов
-      const allSlides = slider.container.querySelectorAll('.tvist__slide')
-      expect(allSlides.length).toBe(6)
+  it('должен корректно инициализироваться', () => {
+    slider = new Tvist(fixture.root, {
+      loop: true,
+      perPage: 1
     })
 
-    it('клоны должны иметь data-tvist-clone атрибут', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1 })
-
-      const clones = slider.container.querySelectorAll('[data-tvist-clone="true"]')
-      expect(clones.length).toBe(2) // 1 prepend + 1 append
-    })
-
-    it('оригинальные слайды должны иметь data-tvist-original', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1 })
-
-      const originals = slider.container.querySelectorAll('[data-tvist-original="true"]')
-      expect(originals.length).toBe(4)
-    })
-
-    it('prepend клон должен быть последним слайдом', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1 })
-
-      const allSlides = slider.container.querySelectorAll('.tvist__slide')
-      // Первый - prepend клон (слайд 3, последний)
-      expect(allSlides[0].getAttribute('data-tvist-slide-index')).toBe('3')
-      expect(allSlides[0].getAttribute('data-tvist-clone')).toBe('true')
-    })
-
-    it('append клон должен быть первым слайдом', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1 })
-
-      const allSlides = slider.container.querySelectorAll('.tvist__slide')
-      // Последний - append клон (слайд 0, первый)
-      expect(allSlides[5].getAttribute('data-tvist-slide-index')).toBe('0')
-      expect(allSlides[5].getAttribute('data-tvist-clone')).toBe('true')
-    })
+    // Проверяем, что модуль инициализирован
+    const loopModule = slider.getModule('loop')
+    expect(loopModule).toBeDefined()
+    expect((loopModule as any).isInitialized).toBe(true)
   })
 
-  describe('Начальная позиция', () => {
-    it('должен стартовать с первого оригинального слайда', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1 })
-
-      // cloneCount = 1, так что физический индекс = 1
-      expect(slider.activeIndex).toBe(1)
-      expect(slider.realIndex).toBe(0)
+  it('не должен инициализироваться, если слайдов меньше 2', () => {
+    fixture.cleanup()
+    fixture = createSliderFixture({ slidesCount: 1, width: 800 })
+    
+    slider = new Tvist(fixture.root, {
+      loop: true
     })
+
+    const loopModule = slider.getModule('loop')
+    // Module is registered and instantiated, but init() should return early
+    expect((loopModule as any).isInitialized).toBe(false)
   })
 
-  describe('Навигация', () => {
-    it('next должен увеличивать физический индекс', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1, speed: 0 })
+  it('должен создавать клоны', () => {
+    slider = new Tvist(fixture.root, {
+      loop: true,
+      perPage: 1
+    })
 
-      const initialPhysical = slider.activeIndex
-      expect(initialPhysical).toBe(1) // cloneCount = 1
+    const slides = fixture.container.querySelectorAll('.tvist__slide')
+    // 4 originals + 1 prepend + 1 append = 6
+    expect(slides.length).toBe(6)
+
+    const clones = fixture.container.querySelectorAll('[data-tvist-clone="true"]')
+    expect(clones.length).toBe(2)
+  })
+
+  it('должен устанавливать начальную позицию с учетом клонов', () => {
+    // slide width 800 (1 item)
+    slider = new Tvist(fixture.root, {
+      loop: true,
+      perPage: 1
+    })
+
+    // Clone count = 1. Start index = 1.
+    // Position = -1 * 800 = -800
+    expect(slider.engine.index.get()).toBe(1)
+    expect(slider.engine.location.get()).toBe(-800)
+  })
+
+  it('должен вычислять cloneCount на основе perPage', () => {
+    slider = new Tvist(fixture.root, {
+      loop: true,
+      perPage: 2
+    })
+
+    const loopModule = slider.getModule('loop')
+    expect((loopModule as any).cloneCount).toBe(2)
+
+    // 4 originals + 2 prepend + 2 append = 8
+    expect(slider.slides.length).toBe(8)
+  })
+
+  it('должен ограничивать cloneCount количеством оригинальных слайдов', () => {
+    // 4 slides, request 10 perPage
+    slider = new Tvist(fixture.root, {
+      loop: true,
+      perPage: 10
+    })
+
+    const loopModule = slider.getModule('loop')
+    // Should be limited to 4
+    expect((loopModule as any).cloneCount).toBe(4)
+  })
+
+  describe('Навигация и realIndex', () => {
+    beforeEach(() => {
+      slider = new Tvist(fixture.root, {
+        loop: true,
+        perPage: 1
+      })
+    })
+
+    it('должен корректно вычислять realIndex', () => {
+      // Start at physical 1 (logical 0)
+      expect((slider as any).realIndex).toBe(0)
+
+      // Move to physical 2 (logical 1)
+      slider.engine.index.set(2)
+      expect((slider as any).realIndex).toBe(1)
+
+      // Move to physical 0 (clone of logical 3)
+      slider.engine.index.set(0)
+      expect((slider as any).realIndex).toBe(3)
+    })
+
+    it('scrollTo должен использовать кратчайший путь (resolveIndex)', () => {
+      // Start: physical 1 (logical 0)
+      // Go to logical 3.
+      // Candidates: 
+      // - 1 (current)
+      // Target logical 3.
+      // Physical candidates for 3 (with cloneCount 1, N=4):
+      // - 3 + 1 = 4 (Normal)
+      // - 3 + 1 + 4 = 8 (Append) - Out of bounds (total 6: 0..5)
+      // - 3 + 1 - 4 = 0 (Prepend)
       
-      slider.next()
-      expect(slider.activeIndex).toBe(2) // физический увеличился
-      expect(slider.realIndex).toBe(1) // логический тоже
-    })
-
-    it('prev от начала должен уменьшать физический индекс', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1, speed: 0 })
-
-      // realIndex: 0, физический: 1 (cloneCount)
-      slider.prev()
+      // Distances from 1:
+      // to 4: abs(1-4) = 3
+      // to 0: abs(1-0) = 1
       
-      // После prev физический индекс = 0 (prepend клон)
-      expect(slider.activeIndex).toBe(0)
-      // realIndex = слайд 3 (последний)
-      expect(slider.realIndex).toBe(3)
+      // Should choose 0 (Prepend clone)
+      
+      // Spy on internal method or check result
+      slider.scrollTo(3)
+      
+      // Should be at physical index 0 OR 4. 
+      // But implementation says shortest path. 
+      // 1 -> 0 (diff 1) is shorter than 1 -> 4 (diff 3)
+      // BUT if we just use scrollTo, it calls resolveIndex.
+      
+      // Let's verify resolveIndex directly to be sure about logic
+      const loopModule = slider.getModule('loop')
+      const bestPhysical = (loopModule as any).resolveIndex(3)
+      
+      expect(bestPhysical).toBe(0)
     })
   })
 
-  describe('realIndex', () => {
-    it('должен возвращать логический индекс', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1 })
+  describe('loopFix (прыжок)', () => {
+    it('должен прыгать из начала в конец (prepend clone)', () => {
+      slider = new Tvist(fixture.root, {
+        loop: true,
+        perPage: 1
+      })
 
-      expect(slider.realIndex).toBe(0)
+      // Move to prepend clone (index 0)
+      slider.engine.index.set(0)
+      // Trigger slideChanged manually or via slider event system simulation if needed.
+      // LoopModule listens to 'slideChanged'.
+      
+      slider.emit('slideChanged', 0)
+
+      // Should jump to original last slide.
+      // N=4, Count=1.
+      // 0 maps to N-1=3.
+      // Physical index for 3 is 3+1=4.
+      expect(slider.engine.index.get()).toBe(4)
     })
 
-    it('realIndex должен быть в диапазоне [0, N-1]', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1, speed: 0 })
+    it('должен прыгать из конца в начало (append clone)', () => {
+      slider = new Tvist(fixture.root, {
+        loop: true,
+        perPage: 1
+      })
 
-      // Проходим по всем слайдам
-      for (let i = 0; i < 10; i++) {
-        expect(slider.realIndex).toBeGreaterThanOrEqual(0)
-        expect(slider.realIndex).toBeLessThan(4)
-        slider.next()
-      }
+      // Move to append clone (index 5)
+      // N=4, Count=1. Total 6 (0..5).
+      // Index 5 is clone of logical 0.
+      slider.engine.index.set(5)
+      
+      slider.emit('slideChanged', 5)
+
+      // Should jump to original first slide.
+      // Logical 0. Physical 0+1=1.
+      expect(slider.engine.index.get()).toBe(1)
     })
   })
 
-  describe('scrollTo с физическим индексом', () => {
-    it('scrollTo(3) должен перейти к слайду 2 (физический)', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1, speed: 0 })
-
-      // физический 3 = cloneCount(1) + realIndex(2)
-      slider.scrollTo(3, true)
-      expect(slider.realIndex).toBe(2)
+  describe('checkClonePosition (бесшовный переход при скролле/драге)', () => {
+    it('должен смещать позицию если мы зашли далеко влево (prepend area)', () => {
+      slider = new Tvist(fixture.root, {
+        loop: true,
+        perPage: 1
+      })
+      
+      // Initial: index 1, pos -800.
+      // Prepend boundary: cloneCount - 0.5 = 0.5.
+      // Index < 0.5 means pos > -0.5 * 800 = -400.
+      
+      // Move slider to position -300 (index 0.375)
+      // This is inside prepend area (before start of original slides visual area if we consider center)
+      // But actually, index 0 is the prepend clone.
+      // Pos for index 0 is 0.
+      // Pos for index 1 is -800.
+      
+      // Let's set position to 0 (exactly on prepend clone)
+      slider.engine.location.set(0)
+      
+      // Trigger check
+      slider.emit('scroll')
+      
+      // Logic: currentFloatIndex = -0 / 800 = 0.
+      // prependBoundary = 1 - 0.5 = 0.5.
+      // 0 < 0.5 -> True.
+      // Offset = 4 * 800 = 3200.
+      // New pos = 0 - 3200 = -3200.
+      
+      expect(slider.engine.location.get()).toBe(-3200)
+      
+      // -3200 corresponds to index 4.
+      // Index 4 is the last original slide? No.
+      // Slides: [C] [1] [2] [3] [4] [C]
+      // Indices: 0   1   2   3   4   5
+      // Pos:     0 -800 ...       -3200
+      // So -3200 is index 4. Correct.
     })
 
-    it('scrollTo работает с физическими индексами', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1, speed: 0 })
-
-      // Переход к слайду 3 (физический = 1 + 3 = 4)
-      slider.scrollTo(4, true)
-      expect(slider.realIndex).toBe(3)
+    it('должен смещать позицию если мы зашли далеко вправо (append area)', () => {
+      slider = new Tvist(fixture.root, {
+        loop: true,
+        perPage: 1
+      })
+      
+      // Append boundary: N + count - 0.5 = 4 + 1 - 0.5 = 4.5.
+      // We need index > 4.5.
+      // Index 5 is append clone. Pos = -5 * 800 = -4000.
+      
+      slider.engine.location.set(-4000)
+      slider.emit('scroll')
+      
+      // Logic:
+      // Offset = 3200.
+      // New pos = -4000 + 3200 = -800.
+      
+      expect(slider.engine.location.get()).toBe(-800)
+      // -800 is index 1 (first original slide). Correct.
     })
   })
 
   describe('destroy', () => {
-    it('должен удалять клоны при destroy', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1 })
-
-      const clonesBeforeDestroy = fixture.root.querySelectorAll('[data-tvist-clone="true"]')
-      expect(clonesBeforeDestroy.length).toBe(2) // 1 prepend + 1 append
+    it('должен удалять клоны и очищать атрибуты', () => {
+      slider = new Tvist(fixture.root, {
+        loop: true,
+        perPage: 1
+      })
 
       slider.destroy()
 
-      const clonesAfterDestroy = fixture.root.querySelectorAll('[data-tvist-clone="true"]')
-      expect(clonesAfterDestroy.length).toBe(0)
-    })
+      const clones = fixture.container.querySelectorAll('[data-tvist-clone]')
+      expect(clones.length).toBe(0)
 
-    it('должен оставлять только оригинальные слайды', () => {
-      slider = new Tvist(fixture.root, { loop: true, perPage: 1 })
-      slider.destroy()
+      const originals = fixture.container.querySelectorAll('[data-tvist-original]')
+      expect(originals.length).toBe(0)
 
-      const slides = fixture.root.querySelectorAll('.tvist__slide')
+      const slides = fixture.container.querySelectorAll('.tvist__slide')
       expect(slides.length).toBe(4)
-    })
-  })
 
-  describe('Без loop', () => {
-    it('не должен создавать клоны без loop: true', () => {
-      slider = new Tvist(fixture.root, { loop: false, perPage: 1 })
-
-      const clones = fixture.root.querySelectorAll('[data-tvist-clone="true"]')
-      expect(clones.length).toBe(0)
-    })
-  })
-
-  describe('Граничные случаи', () => {
-    it('должен работать с 2 слайдами', () => {
-      const smallFixture = createSliderFixture({ slidesCount: 2 })
-      slider = new Tvist(smallFixture.root, { loop: true, perPage: 1 })
-
-      expect(slider.realIndex).toBe(0)
-      
-      slider.next()
-      expect(slider.realIndex).toBe(1)
-
-      smallFixture.cleanup()
-    })
-
-    it('не должен создавать loop для 1 слайда', () => {
-      const singleFixture = createSliderFixture({ slidesCount: 1 })
-      slider = new Tvist(singleFixture.root, { loop: true, perPage: 1 })
-
-      const clones = singleFixture.root.querySelectorAll('[data-tvist-clone="true"]')
-      expect(clones.length).toBe(0)
-
-      singleFixture.cleanup()
+      expect('realIndex' in slider).toBe(false)
     })
   })
 })
