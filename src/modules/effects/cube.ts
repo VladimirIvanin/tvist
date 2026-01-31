@@ -9,15 +9,27 @@ export function setCubeEffect(
     const { slides, container, root } = tvist
     const cubeOptions = options.cubeEffect || {}
     const slideWidth = tvist.engine.slideWidthValue
+
+    // Container must have explicit size when slides are absolute (otherwise it collapses to 0)
+    container.style.width = '100%'
+    container.style.height = '100%'
+    // Use actual rendered width for cube geometry — avoids gap when root has padding
+    const faceWidth = container.clientWidth > 0 ? container.clientWidth : slideWidth
+    const zOffset = faceWidth / 2
     
     // Options
     const slideShadows = cubeOptions.slideShadows ?? true
     
     // Container Perspective & Transform
-    // Perspective must be on the parent of the 3D transformed element
-    root.style.perspective = '1000px'
+    // Perspective must be on the parent of the 3D transformed element.
+    // Smaller value = stronger depth (closer bigger, farther smaller).
+    const perspectivePx = cubeOptions.perspective ?? 800
+    root.style.perspective = `${perspectivePx}px`
     // @ts-ignore - webkit prefix
-    root.style.webkitPerspective = '1000px'
+    root.style.webkitPerspective = `${perspectivePx}px`
+    // Lower perspective-origin so the join between cube faces appears lower (natural view from above)
+    const perspectiveOriginY = cubeOptions.perspectiveOriginY ?? 60
+    root.style.perspectiveOrigin = `50% ${perspectiveOriginY}%`
     
     // Note: We do NOT set overflow: visible on root anymore.
     // _base.scss sets overflow: hidden, which is correct to prevent page scrollbars.
@@ -52,8 +64,7 @@ export function setCubeEffect(
     const progressTotal = -translate / slideWidth
     const wrapperRotate = -(progressTotal * 90)
     
-    // Origin is deeper in Z (center of the cube)
-    const zOffset = slideWidth / 2
+    // zOffset already computed from faceWidth above (cube radius = half of actual face width)
     // Fix: Rotate around the center of the cube (which is at 0,0,0 in local space because slides are pushed out)
     container.style.transformOrigin = `50% 50%`
     
@@ -122,9 +133,6 @@ export function setCubeEffect(
 
         // Show only slides in range
         slide.style.visibility = isInRange ? 'visible' : 'hidden'
-        
-        const slideIndex = slide.dataset.tvistSlideIndex || i
-        console.log(`  Slide ${slideIndex}: angle=${netAngle.toFixed(1)}° z=${zIndex} progress=${slideProgress.toFixed(2)} inRange=${isInRange} vis=${isInRange ? 'SHOW' : 'hide'}`)
         
         // Shadows
         if (slideShadows) {

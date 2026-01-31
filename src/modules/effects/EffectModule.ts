@@ -28,7 +28,10 @@ export class EffectModule extends Module {
     // Set container styles for 3D
     if (this.options.effect === 'cube') {
         this.tvist.container.style.transformStyle = 'preserve-3d'
-        this.tvist.root.style.overflow = 'visible' // Cube might extend
+        // root keeps overflow: hidden from _base.scss — clips 3D faces to viewport
+        const padding = this.options.cubeEffect?.viewportPadding ?? 10
+        this.tvist.root.style.padding = `${padding}px`
+        this.tvist.root.style.boxSizing = 'border-box'
     }
 
     this.tvist.on('setTranslate', this.onSetTranslate.bind(this))
@@ -47,8 +50,14 @@ export class EffectModule extends Module {
         slide.style.visibility = ''
     })
     this.tvist.container.style.transformStyle = ''
-    this.tvist.container.style.perspective = ''
+    this.tvist.container.style.width = ''
+    this.tvist.container.style.height = ''
+    this.tvist.root.style.removeProperty('perspective')
+    this.tvist.root.style.removeProperty('-webkit-perspective')
+    this.tvist.root.style.removeProperty('perspective-origin')
     this.tvist.root.style.removeProperty('overflow')
+    this.tvist.root.style.removeProperty('padding')
+    this.tvist.root.style.removeProperty('box-sizing')
   }
 
   private onSetTranslate(tvist: Tvist, translate: number): void {

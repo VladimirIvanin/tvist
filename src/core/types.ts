@@ -77,6 +77,12 @@ export interface TvistOptions {
     shadow?: boolean
     shadowOffset?: number
     shadowScale?: number
+    /** Perspective distance (px). Smaller = stronger depth (closer bigger, farther smaller). Default 800. */
+    perspective?: number
+    /** Perspective origin Y (%). Default 60 — join between faces appears lower. */
+    perspectiveOriginY?: number
+    /** Padding inside root so overflow:hidden doesn't clip rotating edges (px). Default 10. */
+    viewportPadding?: number
   }
   
   // Thumbs
