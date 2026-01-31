@@ -18,8 +18,12 @@ export function setCubeEffect(
     root.style.perspective = '1000px'
     // @ts-ignore - webkit prefix
     root.style.webkitPerspective = '1000px'
-    // overflow !== visible forces transform-style: flat for descendants (spec). Use important to override _base.scss.
-    root.style.setProperty('overflow', 'visible', 'important')
+    
+    // Note: We do NOT set overflow: visible on root anymore.
+    // _base.scss sets overflow: hidden, which is correct to prevent page scrollbars.
+    // Since preserve-3d is on the container (child of root), root's overflow: hidden
+    // simply clips the 3D scene without flattening the container's 3D context.
+
 
     container.style.transformStyle = 'preserve-3d'
     // @ts-ignore - webkit prefix
