@@ -18,8 +18,9 @@ export function setCubeEffect(
     root.style.perspective = '1000px'
     // @ts-ignore - webkit prefix
     root.style.webkitPerspective = '1000px'
-    root.style.overflow = 'visible' // Allow 3D elements to overflow
-    
+    // overflow !== visible forces transform-style: flat for descendants (spec). Use important to override _base.scss.
+    root.style.setProperty('overflow', 'visible', 'important')
+
     container.style.transformStyle = 'preserve-3d'
     // @ts-ignore - webkit prefix
     container.style.webkitTransformStyle = 'preserve-3d'
@@ -81,22 +82,19 @@ export function setCubeEffect(
         // @ts-ignore
         slide.style.webkitTransformStyle = 'preserve-3d'
 
-        // Set origin to cube center
+        // Set origin to cube center (rotation happens around this point)
         slide.style.transformOrigin = `50% 50% -${zOffset}px`
         
-        // Apply transform: only rotate, no need for translate reset since we are absolute
-        const transform = `rotateY(${slideAngle}deg)`
-        
-        slide.style.transform = transform
-        
-        // Z-Index Management
-        // Calculate angle relative to viewport (normalize to 0-360 range)
+        // Z-Index and depth: angle relative to viewport (normalize to 0-360 range)
         let netAngle = (slideAngle + wrapperRotate) % 360
-        // Ensure positive angle
         if (netAngle < 0) netAngle += 360
         
-        // Cosine gives us how "facing front" the slide is. 
-        // 0deg -> 1 (Front), 180deg -> -1 (Back)
+        // Push each face outward from cube center so faces sit on cube surface.
+        // Without this, all faces share the same 3D point → Chrome z-fighting at -230°..-244°.
+        const transform = `rotateY(${slideAngle}deg) translateZ(${zOffset}px)`
+        slide.style.transform = transform
+        
+        // Cosine = how "front" the face is. 0°→1, 180°→-1. Keep z-index for stacking fallback.
         const zIndex = Math.round(Math.cos(netAngle * Math.PI / 180) * 100)
         slide.style.zIndex = `${100 + zIndex}`
         
@@ -105,15 +103,20 @@ export function setCubeEffect(
         const slideProgress = i - progressTotal
         
         // Fix: Always render all slides for proper 3D cube structure.
-        // Rely on backface-visibility and z-index to handle visual occlusion.
-        // Linear distance checks (Math.abs(slideProgress) <= 1.5) break in loops.
+        // Use z-index for visual occlusion (front faces have higher z-index).
         const isInRange = true
         
-        // Use backface-visibility: hidden to hide back sides
-        slide.style.backfaceVisibility = 'hidden'
+        // Chrome bug: backface-visibility: hidden can cull content layer while keeping
+        // background visible (face visible, content transparent). Use visible so both
+        // sides render; z-index above already orders faces correctly.
+        slide.style.backfaceVisibility = 'visible'
         // @ts-ignore
-        slide.style.webkitBackfaceVisibility = 'hidden'
-        
+        slide.style.webkitBackfaceVisibility = 'visible'
+
+        // _base.scss sets content-visibility: auto on .tvist__slide. With 3D transforms,
+        // Chrome can treat rotated faces as "off-screen" and skip painting children → content disappears.
+        slide.style.contentVisibility = 'visible'
+
         // Show only slides in range
         slide.style.visibility = isInRange ? 'visible' : 'hidden'
         

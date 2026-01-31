@@ -43,11 +43,12 @@ export class EffectModule extends Module {
         slide.style.transform = ''
         slide.style.zIndex = ''
         slide.style.backfaceVisibility = ''
+        slide.style.contentVisibility = ''
         slide.style.visibility = ''
     })
     this.tvist.container.style.transformStyle = ''
     this.tvist.container.style.perspective = ''
-    this.tvist.root.style.overflow = ''
+    this.tvist.root.style.removeProperty('overflow')
   }
 
   private onSetTranslate(tvist: Tvist, translate: number): void {
