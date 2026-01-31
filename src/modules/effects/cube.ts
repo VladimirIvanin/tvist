@@ -95,7 +95,11 @@ export function setCubeEffect(
         slide.style.zIndex = `${100 + zIndex}`
         
         // Calculate progress (distance from current position)
-        const slideProgress = i - progressTotal
+        // Fix for loop mode: normalize diff to be within half of the slide count range.
+        let slideProgress = i - progressTotal
+        if (Math.abs(slideProgress) > numOriginalSlides / 2) {
+             slideProgress -= numOriginalSlides * Math.round(slideProgress / numOriginalSlides)
+        }
         
         // Fix: Hide slides that are out of bounds (preventing them from flying around screen)
         // Show only active slide and immediate neighbors (enough for a cube corner)
