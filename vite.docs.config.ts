@@ -17,6 +17,8 @@ export default defineConfig({
         basic: resolve(__dirname, 'examples/basic/index.html'),
         modules: resolve(__dirname, 'examples/modules-demo/index.html'),
         loop: resolve(__dirname, 'examples/loop-demo/index.html'),
+        'effect-fade': resolve(__dirname, 'examples/effect-fade/index.html'),
+        'effect-cube': resolve(__dirname, 'examples/effect-cube/index.html'),
       },
     },
     sourcemap: false,
