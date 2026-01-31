@@ -295,17 +295,46 @@
       on: {
         created: () => {
           log('✅ Slider created with loop: true', 'event')
-          // updateInfo вызывается после присваивания slider
+          // Используем setTimeout, чтобы slider был уже присвоен к window
+          setTimeout(() => {
+            log(`Initial state: activeIndex=${slider.activeIndex}, realIndex=${slider.realIndex}`, 'dom')
+          }, 0)
         },
         beforeSlideChange: (index) => {
-          log(`📍 beforeSlideChange: realIndex = ${index}`, 'event')
+          const activeIndex = slider.activeIndex
+          const realIndex = slider.realIndex
+          log(`📍 beforeSlideChange: realIndex=${index}, current: activeIndex=${activeIndex}, realIndex=${realIndex}`, 'event')
         },
         slideChanged: (index) => {
-          log(`✨ slideChanged: realIndex = ${index}`, 'event')
+          const activeIndex = slider.activeIndex
+          const realIndex = slider.realIndex
+          const position = slider.engine.location.get()
+          const slides = slider.slides
+          const currentSlide = slides[activeIndex]
+          const isClone = currentSlide?.getAttribute('data-tvist-clone') === 'true'
+          const slideIndex = currentSlide?.getAttribute('data-tvist-slide-index')
+          
+          log(`✨ slideChanged: realIndex=${index}`, 'event')
+          log(`   → activeIndex=${activeIndex}, position=${position.toFixed(0)}px`, 'dom')
+          log(`   → current slide: [${activeIndex}] data-index=${slideIndex}, isClone=${isClone}`, 'dom')
           updateInfo()
         }
       }
     })
+    
+    // Перехватываем prev/next для логирования
+    const originalPrev = slider.prev.bind(slider)
+    const originalNext = slider.next.bind(slider)
+    
+    slider.prev = function() {
+      log(`⬅️ PREV called: from activeIndex=${slider.activeIndex}, realIndex=${slider.realIndex}`, 'event')
+      return originalPrev()
+    }
+    
+    slider.next = function() {
+      log(`➡️ NEXT called: from activeIndex=${slider.activeIndex}, realIndex=${slider.realIndex}`, 'event')
+      return originalNext()
+    }
 
     // Клики по пагинации
     paginationEl.addEventListener('click', (e) => {
