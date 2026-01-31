@@ -54,11 +54,11 @@ describe('LoopModule', () => {
     })
 
     const slides = fixture.container.querySelectorAll('.tvist__slide')
-    // 4 originals + 1 prepend + 1 append = 6
-    expect(slides.length).toBe(6)
+    // 4 originals + 2 prepend + 2 append = 8 (perPage * 2 rule)
+    expect(slides.length).toBe(8)
 
     const clones = fixture.container.querySelectorAll('[data-tvist-clone="true"]')
-    expect(clones.length).toBe(2)
+    expect(clones.length).toBe(4)
   })
 
   it('должен устанавливать начальную позицию с учетом клонов', () => {
@@ -68,10 +68,10 @@ describe('LoopModule', () => {
       perPage: 1
     })
 
-    // Clone count = 1. Start index = 1.
-    // Position = -1 * 800 = -800
-    expect(slider.engine.index.get()).toBe(1)
-    expect(slider.engine.location.get()).toBe(-800)
+    // Clone count = 2. Start index = 2.
+    // Position = -2 * 800 = -1600
+    expect(slider.engine.index.get()).toBe(2)
+    expect(slider.engine.location.get()).toBe(-1600)
   })
 
   it('должен вычислять cloneCount на основе perPage', () => {
@@ -81,13 +81,14 @@ describe('LoopModule', () => {
     })
 
     const loopModule = slider.getModule('loop')
-    expect((loopModule as any).cloneCount).toBe(2)
+    // perPage * 2 = 4
+    expect((loopModule as any).cloneCount).toBe(4)
 
-    // 4 originals + 2 prepend + 2 append = 8
-    expect(slider.slides.length).toBe(8)
+    // 4 originals + 4 prepend + 4 append = 12
+    expect(slider.slides.length).toBe(12)
   })
 
-  it('должен ограничивать cloneCount количеством оригинальных слайдов', () => {
+  it('должен использовать минимум perPage * 2 клонов, даже если слайдов меньше', () => {
     // 4 slides, request 10 perPage
     slider = new Tvist(fixture.root, {
       loop: true,
@@ -95,8 +96,8 @@ describe('LoopModule', () => {
     })
 
     const loopModule = slider.getModule('loop')
-    // Should be limited to 4
-    expect((loopModule as any).cloneCount).toBe(4)
+    // 10 * 2 = 20
+    expect((loopModule as any).cloneCount).toBe(20)
   })
 
   describe('Навигация и realIndex', () => {
@@ -105,51 +106,62 @@ describe('LoopModule', () => {
         loop: true,
         perPage: 1
       })
+      // N=4, C=2.
+      // 0,1 (Clones)
+      // 2,3,4,5 (Originals 0,1,2,3)
+      // 6,7 (Clones)
     })
 
     it('должен корректно вычислять realIndex', () => {
-      // Start at physical 1 (logical 0)
+      // Start at physical 2 (logical 0)
       expect((slider as any).realIndex).toBe(0)
 
-      // Move to physical 2 (logical 1)
-      slider.engine.index.set(2)
+      // Move to physical 3 (logical 1)
+      slider.engine.index.set(3)
       expect((slider as any).realIndex).toBe(1)
 
-      // Move to physical 0 (clone of logical 3)
-      slider.engine.index.set(0)
+      // Move to physical 1 (clone of logical 3)
+      // Logical: (1 - 2) % 4 = -1 -> 3.
+      slider.engine.index.set(1)
       expect((slider as any).realIndex).toBe(3)
     })
 
     it('scrollTo должен использовать кратчайший путь (resolveIndex)', () => {
-      // Start: physical 1 (logical 0)
+      // Start: physical 3 (logical 1)
+      slider.engine.index.set(3)
+      
       // Go to logical 3.
-      // Candidates: 
-      // - 1 (current)
-      // Target logical 3.
-      // Physical candidates for 3 (with cloneCount 1, N=4):
-      // - 3 + 1 = 4 (Normal)
-      // - 3 + 1 + 4 = 8 (Append) - Out of bounds (total 6: 0..5)
-      // - 3 + 1 - 4 = 0 (Prepend)
+      // Current logical 1. Target 3.
+      // Diff = 3 - 1 = 2.
+      // 2 > 4/2 (no, 2 = 4/2). If > 2 -> diff-=4.
+      // With N=4, diff=2. Boundary is N/2 = 2.
+      // Our code: if diff > N/2. 2 is not > 2. So diff stays 2.
+      // Physical = 3 + 2 = 5.
       
-      // Distances from 1:
-      // to 4: abs(1-4) = 3
-      // to 0: abs(1-0) = 1
+      // Slide 5 is Original 3.
+      // Is there a shorter path?
+      // 3 -> 5 (dist 2).
+      // 3 -> 1 (Prepend Clone of 3). Dist 2.
+      // Either is fine. Implementation picks right (positive) direction for equal distance usually?
+      // Logic:
+      // if (diff > 2) -> diff -= 4.
+      // if (diff < -2) -> diff += 4.
+      // diff=2. Result 2.
       
-      // Should choose 0 (Prepend clone)
-      
-      // Spy on internal method or check result
-      slider.scrollTo(3)
-      
-      // Should be at physical index 0 OR 4. 
-      // But implementation says shortest path. 
-      // 1 -> 0 (diff 1) is shorter than 1 -> 4 (diff 3)
-      // BUT if we just use scrollTo, it calls resolveIndex.
-      
-      // Let's verify resolveIndex directly to be sure about logic
       const loopModule = slider.getModule('loop')
       const bestPhysical = (loopModule as any).resolveIndex(3)
       
-      expect(bestPhysical).toBe(0)
+      expect(bestPhysical).toBe(5)
+      
+      // Try another one: Go from 2 (Logical 0) to 3 (Logical 3).
+      slider.engine.index.set(2)
+      // Logical 0 -> 3. Diff = 3.
+      // 3 > 2. Diff = 3 - 4 = -1.
+      // Physical = 2 - 1 = 1.
+      // Slide 1 is Prepend Clone of 3.
+      
+      const bestPhysical2 = (loopModule as any).resolveIndex(3)
+      expect(bestPhysical2).toBe(1)
     })
   })
 
@@ -159,18 +171,17 @@ describe('LoopModule', () => {
         loop: true,
         perPage: 1
       })
-
+      // C=2.
+      
       // Move to prepend clone (index 0)
       slider.engine.index.set(0)
-      // Trigger slideChanged manually or via slider event system simulation if needed.
-      // LoopModule listens to 'slideChanged'.
       
       slider.emit('slideChanged', 0)
 
-      // Should jump to original last slide.
-      // N=4, Count=1.
-      // 0 maps to N-1=3.
-      // Physical index for 3 is 3+1=4.
+      // Should jump to original slide.
+      // 0 (Physical) -> Logical 2.
+      // Target Physical = C + Logical = 2 + 2 = 4.
+      // Slide 4 is Original 2.
       expect(slider.engine.index.get()).toBe(4)
     })
 
@@ -179,17 +190,17 @@ describe('LoopModule', () => {
         loop: true,
         perPage: 1
       })
-
-      // Move to append clone (index 5)
-      // N=4, Count=1. Total 6 (0..5).
-      // Index 5 is clone of logical 0.
-      slider.engine.index.set(5)
+      // C=2. N=4. Total=8.
+      // Append Clones start at 6.
       
-      slider.emit('slideChanged', 5)
+      // Move to append clone (index 6, Logical 0)
+      slider.engine.index.set(6)
+      
+      slider.emit('slideChanged', 6)
 
       // Should jump to original first slide.
-      // Logical 0. Physical 0+1=1.
-      expect(slider.engine.index.get()).toBe(1)
+      // Logical 0. Physical 2.
+      expect(slider.engine.index.get()).toBe(2)
     })
   })
 
@@ -199,37 +210,48 @@ describe('LoopModule', () => {
         loop: true,
         perPage: 1
       })
+      // C=2.
       
-      // Initial: index 1, pos -800.
-      // Prepend boundary: cloneCount - 0.5 = 0.5.
-      // Index < 0.5 means pos > -0.5 * 800 = -400.
+      // Prepend boundary: C - 0.5 = 1.5.
+      // We need index < 1.5.
+      // Index 1 is Prepend Clone of Logical 3.
+      // Pos = -1 * 800 = -800.
       
-      // Move slider to position -300 (index 0.375)
-      // This is inside prepend area (before start of original slides visual area if we consider center)
-      // But actually, index 0 is the prepend clone.
-      // Pos for index 0 is 0.
-      // Pos for index 1 is -800.
-      
-      // Let's set position to 0 (exactly on prepend clone)
-      slider.engine.location.set(0)
+      // Set position to -800 (Index 1)
+      slider.engine.location.set(-800)
       
       // Trigger check
       slider.emit('scroll')
       
-      // Logic: currentFloatIndex = -0 / 800 = 0.
-      // prependBoundary = 1 - 0.5 = 0.5.
-      // 0 < 0.5 -> True.
-      // Offset = 4 * 800 = 3200.
-      // New pos = 0 - 3200 = -3200.
+      // Logic:
+      // 1 < 1.5 -> True.
+      // Shift by + N * width = + 4 * 800 = +3200.
+      // New pos = -800 + 3200 = 2400.
+      // Wait.
+      // -800 + 3200 = 2400.
+      // Is this right?
+      // Index 1 (Logical 3).
+      // Original 3 is at Index 5.
+      // Pos 5 = -5 * 800 = -4000.
       
-      expect(slider.engine.location.get()).toBe(-3200)
+      // Why shift logic `position - offset`?
+      // Code:
+      // if (currentFloatIndex < prependBoundary) {
+      //   const offset = this.originalSlidesCount * slideWithGap
+      //   const newPosition = position - offset
       
-      // -3200 corresponds to index 4.
-      // Index 4 is the last original slide? No.
-      // Slides: [C] [1] [2] [3] [4] [C]
-      // Indices: 0   1   2   3   4   5
-      // Pos:     0 -800 ...       -3200
-      // So -3200 is index 4. Correct.
+      // If index is small (left side), position is large (close to 0).
+      // Wait, positions are negative.
+      // Index 1 pos = -800.
+      // Index 5 pos = -4000.
+      // To go from 1 to 5, we need to SUBTRACT 3200 from -800.
+      // -800 - 3200 = -4000.
+      
+      // In code: `newPosition = position - offset`.
+      // offset = 3200.
+      // -800 - 3200 = -4000. Correct.
+      
+      expect(slider.engine.location.get()).toBe(-4000)
     })
 
     it('должен смещать позицию если мы зашли далеко вправо (append area)', () => {
@@ -237,20 +259,21 @@ describe('LoopModule', () => {
         loop: true,
         perPage: 1
       })
+      // C=2. N=4.
+      // Append boundary: N + C - 0.5 = 4 + 2 - 0.5 = 5.5.
+      // We need index > 5.5.
+      // Index 6 (Logical 0). Pos = -6 * 800 = -4800.
       
-      // Append boundary: N + count - 0.5 = 4 + 1 - 0.5 = 4.5.
-      // We need index > 4.5.
-      // Index 5 is append clone. Pos = -5 * 800 = -4000.
-      
-      slider.engine.location.set(-4000)
+      slider.engine.location.set(-4800)
       slider.emit('scroll')
       
       // Logic:
-      // Offset = 3200.
-      // New pos = -4000 + 3200 = -800.
+      // 6 > 5.5 -> True.
+      // Shift: `newPosition = position + offset`.
+      // -4800 + 3200 = -1600.
+      // -1600 is Index 2 (Original 0). Correct.
       
-      expect(slider.engine.location.get()).toBe(-800)
-      // -800 is index 1 (first original slide). Correct.
+      expect(slider.engine.location.get()).toBe(-1600)
     })
   })
 

@@ -99,51 +99,50 @@ export class LoopModule extends Module {
    */
   resolveIndex(index: number): number {
     const currentPhysical = this.tvist.engine.index.get()
-    const targetLogical = ((index % this.originalSlidesCount) + this.originalSlidesCount) % this.originalSlidesCount
+    const N = this.originalSlidesCount
+    const targetLogical = ((index % N) + N) % N
     
-    // Возможные целевые физические индексы
-    const candidates = [
-      targetLogical + this.cloneCount, // Основной оригинал
-      targetLogical + this.cloneCount + this.originalSlidesCount, // Append клон
-      targetLogical + this.cloneCount - this.originalSlidesCount // Prepend клон
-    ]
+    // Находим ближайшего соседа
+    const currentLogical = this.physicalToLogical(currentPhysical)
+    let diff = targetLogical - currentLogical
     
-    const totalPhysical = this.originalSlidesCount + this.cloneCount * 2
+    // Приводим diff к диапазону [-N/2, N/2] для кратчайшего пути
+    if (diff > N / 2) diff -= N
+    if (diff < -N / 2) diff += N
     
-    // Выбираем ближайший валидный индекс
-    let bestPhysical = candidates[0] ?? 0
-    let minDiff = Math.abs(currentPhysical - bestPhysical)
+    let targetPhysical = currentPhysical + diff
+    const totalPhysical = N + this.cloneCount * 2
     
-    for (const candidate of candidates) {
-      // Проверяем валидность индекса (должен быть в пределах массива слайдов)
-      if (candidate >= 0 && candidate < totalPhysical) {
-        const diff = Math.abs(currentPhysical - candidate)
-        if (diff < minDiff) {
-          minDiff = diff
-          bestPhysical = candidate
-        }
-      }
+    // Если вышли за границы - сдвигаем на N внутрь
+    if (targetPhysical < 0) {
+      targetPhysical += N
+    } else if (targetPhysical >= totalPhysical) {
+      targetPhysical -= N
     }
     
-    return bestPhysical
+    // Фоллбэк на оригинал, если все равно вне границ
+    if (targetPhysical < 0 || targetPhysical >= totalPhysical) {
+      return this.cloneCount + targetLogical
+    }
+    
+    return targetPhysical
   }
 
   /**
    * Вычисляет количество клонов
-   * cloneCount = perPage для гарантированного покрытия viewport
+   * cloneCount = perPage * 2 для гарантированного покрытия viewport
    */
   private computeCloneCount(): number {
     const perPage = this.options.perPage ?? 1
-    // Достаточно perPage клонов с каждой стороны
-    return Math.min(perPage, this.originalSlidesCount)
+    // Как в Splide: умножаем на 2 для гарантии плавности
+    return perPage * 2
   }
 
   /**
    * Создаёт клоны слайдов
    * 
-   * DOM структура для 4 слайдов, count=2:
-   * [C3, C4] [1, 2, 3, 4] [C1, C2]
-   * prepend   оригиналы    append
+   * DOM структура:
+   * [prepend clones] [originals] [append clones]
    */
   private createClones(): void {
     const container = this.tvist.container
@@ -158,9 +157,11 @@ export class LoopModule extends Module {
     })
 
     // Prepend клоны: последние N слайдов [N-count, ..., N-1]
-    // Добавляем в обратном порядке через prepend: сначала N-1, потом N-2
     for (let i = count - 1; i >= 0; i--) {
-      const originalIndex = N - count + i // для count=2: i=1 → N-1, i=0 → N-2
+      // Используем модуль для циклического выбора слайдов, если клонов больше чем оригиналов
+      let originalIndex = (N - count + i) % N
+      if (originalIndex < 0) originalIndex += N
+      
       const sourceSlide = originalSlides[originalIndex]
 
       if (!sourceSlide) {
@@ -174,13 +175,14 @@ export class LoopModule extends Module {
 
     // Append клоны: первые N слайдов [0, 1, ..., count-1]
     for (let i = 0; i < count; i++) {
-      const sourceSlide = originalSlides[i]
+      const originalIndex = i % N
+      const sourceSlide = originalSlides[originalIndex]
 
       if (!sourceSlide) {
         continue
       }
 
-      const clone = this.cloneSlide(sourceSlide, i, 'append')
+      const clone = this.cloneSlide(sourceSlide, originalIndex, 'append')
       container.appendChild(clone)
       this.clones.push(clone)
     }
@@ -287,19 +289,18 @@ export class LoopModule extends Module {
    */
   private loopFix(): void {
     const currentIndex = this.tvist.engine.index.get()
+    const C = this.cloneCount
+    const N = this.originalSlidesCount
 
-    // На prepend клоне (index < cloneCount)
-    if (currentIndex < this.cloneCount) {
-      const targetIndex = this.originalSlidesCount + currentIndex
-      this.jumpTo(targetIndex)
-      return
-    }
-
-    // На append клоне (index >= originalSlidesCount + cloneCount)
-    if (currentIndex >= this.originalSlidesCount + this.cloneCount) {
-      const targetIndex = currentIndex - this.originalSlidesCount
-      this.jumpTo(targetIndex)
-      return
+    // Если мы вышли за пределы оригинального набора [C, C + N - 1]
+    if (currentIndex < C || currentIndex >= C + N) {
+      const realIndex = this.getRealIndex()
+      const targetPhysical = C + realIndex
+      
+      // Прыгаем сразу на оригинал
+      if (currentIndex !== targetPhysical) {
+        this.jumpTo(targetPhysical)
+      }
     }
   }
 
