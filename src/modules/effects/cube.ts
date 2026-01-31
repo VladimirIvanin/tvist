@@ -55,12 +55,6 @@ export function setCubeEffect(
     // Override engine's translate with rotate
     container.style.transform = `translate3d(0,0,0) rotateY(${wrapperRotate}deg)`
     
-    console.log('🔵 CUBE:', {
-        translate: translate.toFixed(1),
-        progressTotal: progressTotal.toFixed(2),
-        wrapperRotate: wrapperRotate.toFixed(1)
-    })
-    
     // Process only original slides for cube faces
     originalSlides.forEach((slide, i) => {
         const slideAngle = i * 90
@@ -82,15 +76,15 @@ export function setCubeEffect(
         // @ts-ignore
         slide.style.webkitTransformStyle = 'preserve-3d'
 
-        // Set origin to cube center (rotation happens around this point)
-        slide.style.transformOrigin = `50% 50% -${zOffset}px`
+        // Set origin to center (standard rotation around own axis)
+        // Previous logic using -zOffset caused gaps between faces
+        slide.style.transformOrigin = '50% 50%'
         
         // Z-Index and depth: angle relative to viewport (normalize to 0-360 range)
         let netAngle = (slideAngle + wrapperRotate) % 360
         if (netAngle < 0) netAngle += 360
         
-        // Push each face outward from cube center so faces sit on cube surface.
-        // Without this, all faces share the same 3D point → Chrome z-fighting at -230°..-244°.
+        // Standard Cube Logic: Rotate around center, then push out by radius (zOffset)
         const transform = `rotateY(${slideAngle}deg) translateZ(${zOffset}px)`
         slide.style.transform = transform
         
@@ -99,22 +93,20 @@ export function setCubeEffect(
         slide.style.zIndex = `${100 + zIndex}`
         
         // Calculate progress (distance from current position)
-        // Similar to Swiper's slideEl.progress
         const slideProgress = i - progressTotal
         
-        // Fix: Always render all slides for proper 3D cube structure.
-        // Use z-index for visual occlusion (front faces have higher z-index).
-        const isInRange = true
+        // Fix: Hide slides that are out of bounds (preventing them from flying around screen)
+        // Show only active slide and immediate neighbors (enough for a cube corner)
+        // Range 2 allows seeing the "next" face turning in.
+        const isInRange = Math.abs(slideProgress) <= 2
         
         // Chrome bug: backface-visibility: hidden can cull content layer while keeping
-        // background visible (face visible, content transparent). Use visible so both
-        // sides render; z-index above already orders faces correctly.
+        // background visible. Use visible so both sides render; z-index orders faces.
         slide.style.backfaceVisibility = 'visible'
         // @ts-ignore
         slide.style.webkitBackfaceVisibility = 'visible'
 
-        // _base.scss sets content-visibility: auto on .tvist__slide. With 3D transforms,
-        // Chrome can treat rotated faces as "off-screen" and skip painting children → content disappears.
+        // _base.scss sets content-visibility: auto. 
         slide.style.contentVisibility = 'visible'
 
         // Show only slides in range
