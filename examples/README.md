@@ -2,6 +2,14 @@
 
 Эта папка содержит примеры использования библиотеки Tvist.
 
+## 🌐 Онлайн документация
+
+Все примеры доступны онлайн на GitHub Pages:
+
+**[https://vladimiranin.github.io/tvist/](https://vladimiranin.github.io/tvist/)**
+
+📖 **[Инструкция по работе с GitHub Pages](README-GITHUB-PAGES.md)**
+
 ## 🛠️ Режим разработки
 
 ### Быстрый старт
@@ -29,26 +37,55 @@ Dev-сервер автоматически откроет браузер на `
 
 ## 📝 Доступные примеры
 
+### Структура примеров
+
+Каждый пример находится в отдельной папке с собственными файлами:
+
+```
+examples/
+├── index.html              # Главная страница
+├── style.css               # Стили главной страницы
+├── script.js               # Скрипт главной страницы
+├── basic/                  # Базовый пример
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+├── modules-demo/           # Демо модулей
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+├── loop-demo/              # Loop режим
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+└── shared/                 # Общие компоненты
+    └── header.js           # Навигационная шапка
+```
+
 ### `index.html` - Главная страница ✨
 Навигация по всем примерам с красивым интерфейсом:
 - Карточки со всеми примерами
 - Статусы готовности (✓ Готов / 🔨 Этап 3)
 - Открывается по умолчанию при `npm run dev`
 
-### `basic.html` - Базовый пример
+### `basic/` - Базовый пример
 Простой слайдер с основными функциями:
 - Инициализация слайдера
 - Навигация (prev/next)
 - Переход к конкретному слайду
 - Отслеживание событий
+- **Фиксированная высота слайдов (300px)**
 
-### `modules-demo.html` - Демо всех модулей ⭐ НОВОЕ!
+### `modules-demo/` - Демо всех модулей ⭐
 Полная демонстрация всех возможностей ЭТАП 2:
 - **Drag Module** - перетаскивание с rubberband эффектом
 - **Navigation Module** - стрелки с disabled состояниями
 - **Pagination Module** - bullets, fraction, progress типы
 - **Autoplay Module** - автопрокрутка с управлением
 - **Breakpoints Module** - адаптивность (4→3→2→1 слайдов)
+
+### `loop-demo/` - Loop режим
+Бесконечная прокрутка с клонированием слайдов
 
 ## 🔧 Дополнительные команды
 
@@ -84,8 +121,13 @@ npm run preview
 
 ## 📚 Создание нового примера
 
-1. Создайте новый `.html` файл в папке `examples/`
-2. Импортируйте Tvist из исходников:
+1. Создайте папку для примера:
+
+```bash
+mkdir examples/my-example
+```
+
+2. Создайте `examples/my-example/index.html`:
 
 ```html
 <!DOCTYPE html>
@@ -93,38 +135,59 @@ npm run preview
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Мой пример</title>
-  <!-- Стили загружаются автоматически через src/index.ts -->
-  <style>
-    /* Ваши кастомные стили */
-  </style>
+  <title>Мой пример - Tvist</title>
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <div id="slider" class="tvist">
-    <div class="tvist__container">
-      <div class="tvist__slide">Slide 1</div>
-      <div class="tvist__slide">Slide 2</div>
+  <div class="container">
+    <h1>Мой пример</h1>
+    <div id="slider" class="tvist">
+      <div class="tvist__container">
+        <div class="tvist__slide">Slide 1</div>
+        <div class="tvist__slide">Slide 2</div>
+      </div>
     </div>
   </div>
-
-  <script type="module">
-    // Подключаем общую шапку
-    import './shared/header.js'
-    // Стили импортируются автоматически!
-    import Tvist from '../src/index.ts'
-
-    const slider = new Tvist('#slider', {
-      perPage: 1,
-      gap: 20
-    })
-
-    console.log('Slider ready!', slider)
-  </script>
+  <script type="module" src="./script.js"></script>
 </body>
 </html>
 ```
 
-3. Откройте в браузере: `http://localhost:3000/your-example.html`
+3. Создайте `examples/my-example/style.css`:
+
+```css
+body {
+  font-family: sans-serif;
+  padding: 40px;
+  background: #f5f5f5;
+}
+
+.tvist__slide {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 24px;
+}
+```
+
+4. Создайте `examples/my-example/script.js`:
+
+```javascript
+import '../shared/header.js'
+import Tvist from '../../src/index.ts'
+
+const slider = new Tvist('#slider', {
+  perPage: 1,
+  gap: 20
+})
+
+console.log('Slider ready!', slider)
+```
+
+5. Откройте в браузере: `http://localhost:3000/my-example/`
 
 ### 💡 Важно про стили
 
