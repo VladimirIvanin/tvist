@@ -11,8 +11,8 @@
     display: flex;
     will-change: transform;
     
-    // Плавный переход для анимаций
-    transition: transform var(--tvist-speed, 300ms) var(--tvist-easing, ease-out);
+    transition-duration: 0ms;
+    transition-delay: 0ms;
     
     // GPU acceleration
     transform: translate3d(0, 0, 0);
