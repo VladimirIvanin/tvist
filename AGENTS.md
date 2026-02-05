@@ -6,15 +6,17 @@
 - `src/modules/` - модули (Arrows, Pagination, Autoplay, Drag, etc.)
 - `src/utils/` - утилиты (dom, math)
 - `src/styles/` - SCSS стили
-- `examples/` - примеры использования
+- `sandbox/` - песочница для экспериментов
+- `docs/` - документация и примеры
 - `tests/` - тесты (unit, integration)
 - `dist/` - собранная библиотека
 
 ## Команды разработки
 
 ```bash
-npm run dev              # Dev-сервер с HMR на порту 3000
-npm run build           # Production сборка
+npm run dev              # Запуск Sandbox (порт 3000)
+npm run docs:dev         # Запуск документации и примеров
+npm run build           # Production сборка библиотеки
 npm run test            # Запуск тестов
 npm run lint            # Проверка кода
 npm run typecheck       # Проверка типов

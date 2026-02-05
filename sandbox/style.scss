@@ -1,0 +1,44 @@
+/* Sandbox Styles */
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  padding: 2rem;
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.sandbox-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.tvist {
+  overflow: hidden;
+  border-radius: 8px;
+  background: #2a2a2a;
+}
+
+.tvist__container {
+  display: flex;
+}
+
+.tvist__slide {
+  flex-shrink: 0;
+  width: 100%;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  
+  &:nth-child(1) { background: #ff5f5f; }
+  &:nth-child(2) { background: #5fafff; }
+  &:nth-child(3) { background: #5fff8f; }
+  &:nth-child(4) { background: #ffff5f; }
+  &:nth-child(5) { background: #af5fff; }
+}
