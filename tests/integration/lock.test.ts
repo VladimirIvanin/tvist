@@ -191,20 +191,11 @@ describe('Lock functionality', () => {
   it('should handle Grid lock correctly', () => {
     // Grid 2x2. 4 слайда.
     // Если они влезают в экран - lock.
+    // ВАЖНО: При fixed grid (rows + cols) создается 1 wrapper-слайд (страница)
     fixture = createSliderFixture({
       slidesCount: 4,
       width: 1000,
       height: 500
-    })
-
-    // В GridModule мы читаем offsetWidth у слайдов.
-    // Нам нужно их замокать.
-    // При Grid 2 колонки и width 1000, ширина слайда будет ~500.
-    fixture.slides.forEach(slide => {
-      Object.defineProperty(slide, 'offsetWidth', {
-        configurable: true,
-        value: 500
-      })
     })
 
     const slider = new Tvist(fixture.root, {
@@ -214,49 +205,30 @@ describe('Lock functionality', () => {
       }
     })
 
-    // Проверяем, что Grid модуль отработал
-    expect(fixture.container.classList.contains('tvist__container--grid')).toBe(true)
+    // Проверяем, что Grid модуль отработал (для fixed grid используется flexbox)
+    expect(fixture.container.style.display).toBe('flex')
     
-    // В Grid режиме slideSize выставляется из DOM
-    expect(slider.engine.slideSizeValue).toBe(500)
-
-    // minScrollPosition = 0
-    // maxScrollPosition:
-    // lastIndex = 3. 
-    // row 1: 0, 1. row 2: 2, 3.
-    // Engine считает линейно: index * size.
-    // Но GridModule хакает slidePositions через setSlidePositions.
-    // Слайды 0 и 2 будут иметь offsetLeft = 0.
-    // Слайды 1 и 3 будут иметь offsetLeft = 500.
+    // При fixed grid создается 1 wrapper-слайд для 4 оригинальных слайдов
+    // Теперь нужно мокать wrapper-слайд
+    const wrapperSlides = slider.slides
+    expect(wrapperSlides.length).toBe(1) // 1 страница для 4 слайдов (2x2)
     
-    // Но нам нужно замокать и offsetLeft!
-    // Grid:
-    // [0] [1]
-    // [2] [3]
-    // offsetLeft:
-    // 0: 0
-    // 1: 500
-    // 2: 0
-    // 3: 500
+    // Мокаем wrapper-слайд
+    Object.defineProperty(wrapperSlides[0], 'offsetWidth', {
+      configurable: true,
+      value: 1000
+    })
     
-    // Mock offsetLeft
-    Object.defineProperty(fixture.slides[0], 'offsetLeft', { configurable: true, value: 0 })
-    Object.defineProperty(fixture.slides[1], 'offsetLeft', { configurable: true, value: 500 })
-    Object.defineProperty(fixture.slides[2], 'offsetLeft', { configurable: true, value: 0 })
-    Object.defineProperty(fixture.slides[3], 'offsetLeft', { configurable: true, value: 500 })
+    Object.defineProperty(wrapperSlides[0], 'offsetLeft', {
+      configurable: true,
+      value: 0
+    })
 
     // Обновляем слайдер чтобы он перечитал позиции (после наших моков)
     slider.update()
 
     // Проверяем блокировку
-    // maxScrollPosition считается как: rootSize - peekStart - lastPageRight
-    // lastPageRight = slidePosition[lastIndex] + slideSize
-    // lastIndex = 3. position = 500. size = 500. -> 1000.
-    // rootSize = 1000.
-    // maxScroll = 1000 - 0 - 1000 = 0.
-    // minScroll = 0.
-    // max >= min -> Locked.
-    
+    // 1 страница, которая занимает всю ширину контейнера -> Locked
     expect(slider.engine.isLocked).toBe(true)
   })
 
@@ -497,5 +469,157 @@ describe('Lock functionality', () => {
     expect(slider.engine.isLocked).toBe(false)
     expect(slider.canScrollNext).toBe(true)
     expect(slider.canScrollPrev).toBe(true)
+  })
+
+  it('should lock Grid 2x2 when all 4 slides visible and prevent drag', () => {
+    // Grid 2x2 с 4 слайдами - все должны быть видны и драг заблокирован
+    fixture = createSliderFixture({
+      slidesCount: 4,
+      width: 1000,
+      height: 500
+    })
+
+    // Mock offsetWidth для всех слайдов (500px каждый)
+    fixture.slides.forEach(slide => {
+      Object.defineProperty(slide, 'offsetWidth', {
+        configurable: true,
+        value: 500
+      })
+    })
+
+    // Mock offsetLeft:
+    // [0] [1]  <- row 1
+    // [2] [3]  <- row 2
+    // Col 1: offsetLeft = 0
+    // Col 2: offsetLeft = 500
+    Object.defineProperty(fixture.slides[0], 'offsetLeft', { configurable: true, value: 0 })
+    Object.defineProperty(fixture.slides[1], 'offsetLeft', { configurable: true, value: 500 })
+    Object.defineProperty(fixture.slides[2], 'offsetLeft', { configurable: true, value: 0 })
+    Object.defineProperty(fixture.slides[3], 'offsetLeft', { configurable: true, value: 500 })
+
+    const slider = new Tvist(fixture.root, {
+      grid: {
+        rows: 2,
+        cols: 2
+      },
+      gap: 10
+    })
+
+    slider.update()
+
+    // Все слайды влезают - должен быть locked
+    expect(slider.engine.isLocked).toBe(true)
+
+    // Пытаемся драгнуть
+    const mouseDown = new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 100,
+      clientY: 100
+    })
+    fixture.root.dispatchEvent(mouseDown)
+
+    // Двигаем мышь на 100px
+    const mouseMove = new MouseEvent('mousemove', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 200,
+      clientY: 100
+    })
+    document.dispatchEvent(mouseMove)
+
+    // Отпускаем
+    const mouseUp = new MouseEvent('mouseup', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 200,
+      clientY: 100
+    })
+    document.dispatchEvent(mouseUp)
+
+    // Позиция не должна измениться (может быть -0 или 0)
+    expect(Math.abs(slider.engine.location.get())).toBe(0)
+  })
+
+  it('should NOT lock Grid 2x2 when 8 slides (2 pages) and allow drag', () => {
+    // Grid 2x2 с 8 слайдами - 2 страницы, драг должен работать
+    fixture = createSliderFixture({
+      slidesCount: 8,
+      width: 1000,
+      height: 500
+    })
+
+    // Mock offsetWidth для всех слайдов (500px каждый)
+    fixture.slides.forEach(slide => {
+      Object.defineProperty(slide, 'offsetWidth', {
+        configurable: true,
+        value: 500
+      })
+    })
+
+    // Page 1 (slides 0-3): offsetLeft 0, 500, 0, 500
+    Object.defineProperty(fixture.slides[0], 'offsetLeft', { configurable: true, value: 0 })
+    Object.defineProperty(fixture.slides[1], 'offsetLeft', { configurable: true, value: 500 })
+    Object.defineProperty(fixture.slides[2], 'offsetLeft', { configurable: true, value: 0 })
+    Object.defineProperty(fixture.slides[3], 'offsetLeft', { configurable: true, value: 500 })
+
+    // Page 2 (slides 4-7): offsetLeft 1000, 1500, 1000, 1500
+    Object.defineProperty(fixture.slides[4], 'offsetLeft', { configurable: true, value: 1000 })
+    Object.defineProperty(fixture.slides[5], 'offsetLeft', { configurable: true, value: 1500 })
+    Object.defineProperty(fixture.slides[6], 'offsetLeft', { configurable: true, value: 1000 })
+    Object.defineProperty(fixture.slides[7], 'offsetLeft', { configurable: true, value: 1500 })
+
+    const slider = new Tvist(fixture.root, {
+      grid: {
+        rows: 2,
+        cols: 2
+      },
+      gap: 10
+    })
+
+    slider.update()
+
+    // Не все слайды влезают - НЕ должен быть locked
+    expect(slider.engine.isLocked).toBe(false)
+
+    // Запоминаем начальную позицию
+    const initialPosition = slider.engine.location.get()
+
+    // Пытаемся драгнуть
+    const mouseDown = new MouseEvent('mousedown', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 500,
+      clientY: 100
+    })
+    fixture.root.dispatchEvent(mouseDown)
+
+    // Двигаем мышь влево на 200px (должны сдвинуть контент вправо)
+    const mouseMove = new MouseEvent('mousemove', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 300,
+      clientY: 100
+    })
+    document.dispatchEvent(mouseMove)
+
+    // Во время драга позиция должна измениться
+    const duringDragPosition = slider.engine.location.get()
+    expect(duringDragPosition).not.toBe(initialPosition)
+
+    // Отпускаем
+    const mouseUp = new MouseEvent('mouseup', {
+      bubbles: true,
+      cancelable: true,
+      clientX: 300,
+      clientY: 100
+    })
+    document.dispatchEvent(mouseUp)
+
+    // После snap позиция должна быть другой (перешли к следующему слайду)
+    // Даем время на анимацию
+    setTimeout(() => {
+      expect(slider.engine.location.get()).not.toBe(initialPosition)
+    }, 400)
   })
 })

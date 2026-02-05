@@ -34,8 +34,8 @@ onMounted(() => {
     slider.value = new Tvist(sliderEl.value, {
       perPage: 1, // Важно для сетки (один экран с сеткой)
       grid: {
-        rows: 2,
-        cols: 2,
+        rows: 2, // 2 ряда
+        cols: 2, // 2 колонки - создает страницы 2x2
         gap: {
           row: 10,
           col: 10

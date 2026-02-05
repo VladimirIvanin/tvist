@@ -1,11 +1,23 @@
-.tvist__container--grid {
-  display: grid;
-  grid-auto-flow: column;
-  box-sizing: border-box;
+// Grid модуль использует flexbox структуру с вложенными элементами
+// Все стили задаются inline в GridModule.ts
 
-  // Сбрасываем марджины, которые ставит Engine, так как используем gap сетки
-  .tvist__slide {
-    margin-right: 0 !important;
-    margin-bottom: 0 !important;
-  }
+.tvist__slide--grid-page {
+  // Страница сетки - содержит ряды и колонки
+  flex-shrink: 0;
+}
+
+.tvist__grid-row {
+  // Ряд в сетке
+  box-sizing: border-box;
+}
+
+.tvist__grid-col {
+  // Колонка в сетке
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.tvist__grid-item {
+  // Оригинальный слайд внутри колонки
+  box-sizing: border-box;
 }

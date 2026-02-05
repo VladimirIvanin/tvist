@@ -1,44 +1,53 @@
 /* Sandbox Styles */
+@import '../src/styles/tvist.scss';
+
 body {
   font-family: system-ui, -apple-system, sans-serif;
   padding: 2rem;
-  background: #1a1a1a;
-  color: #fff;
+  background: #f5f5f5;
+  color: #333;
 }
 
 .sandbox-container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 2rem;
+h1, h2 {
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  margin-top: 2rem;
 }
 
 .tvist {
   overflow: hidden;
   border-radius: 8px;
-  background: #2a2a2a;
-}
-
-.tvist__container {
-  display: flex;
+  background: white;
+  border: 2px solid #ddd;
+  height: 400px;
 }
 
 .tvist__slide {
-  flex-shrink: 0;
-  width: 100%;
-  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 2rem;
   font-weight: bold;
+  color: white;
   
-  &:nth-child(1) { background: #ff5f5f; }
-  &:nth-child(2) { background: #5fafff; }
-  &:nth-child(3) { background: #5fff8f; }
-  &:nth-child(4) { background: #ffff5f; }
-  &:nth-child(5) { background: #af5fff; }
+  &:nth-child(1) { background: #667eea; }
+  &:nth-child(2) { background: #764ba2; }
+  &:nth-child(3) { background: #f093fb; }
+  &:nth-child(4) { background: #f5576c; }
+  &:nth-child(5) { background: #4facfe; }
+  &:nth-child(6) { background: #00f2fe; }
+  &:nth-child(7) { background: #43e97b; }
+  &:nth-child(8) { background: #38f9d7; }
+}
+
+.info {
+  font-family: monospace;
 }

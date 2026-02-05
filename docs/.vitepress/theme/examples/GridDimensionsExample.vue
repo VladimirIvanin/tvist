@@ -1,15 +1,25 @@
 <template>
-  <ExampleCard title="Grid Dimensions" description="Разные размеры ячеек в сетке" :detailsLink="detailsLink">
+  <ExampleCard title="Grid Dimensions" description="Разные размеры страниц в сетке" :detailsLink="detailsLink">
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist">
         <div class="tvist__container">
-          <div class="tvist__slide">1 (2x2)</div>
-          <div class="tvist__slide">2 (1x1)</div>
-          <div class="tvist__slide">3 (1x1)</div>
-          <div class="tvist__slide">4 (1x2)</div>
-          <div class="tvist__slide">5 (1x1)</div>
-          <div class="tvist__slide">6 (1x1)</div>
+          <div class="tvist__slide">1</div>
+          <div class="tvist__slide">2</div>
+          <div class="tvist__slide">3</div>
+          <div class="tvist__slide">4</div>
+          <div class="tvist__slide">5</div>
+          <div class="tvist__slide">6</div>
+          <div class="tvist__slide">7</div>
+          <div class="tvist__slide">8</div>
+          <div class="tvist__slide">9</div>
+          <div class="tvist__slide">10</div>
         </div>
+      </div>
+      
+      <div class="info">
+        <p><strong>Страница 1:</strong> 2×2 (4 слайда)</p>
+        <p><strong>Страница 2:</strong> 1×2 (2 слайда)</p>
+        <p><strong>Страница 3:</strong> 2×2 (4 слайда)</p>
       </div>
     </div>
   </ExampleCard>
@@ -32,16 +42,15 @@ onMounted(() => {
     slider.value = new Tvist(sliderEl.value, {
       perPage: 1,
       grid: {
-        rows: 2,
-        cols: 2, // Обязательно указывать cols для корректной работы Dimensions
-        gap: 10,
+        gap: {
+          row: 10,
+          col: 10
+        },
         dimensions: [
-          [2, 2], // 1й слайд занимает 2x2
-          [1, 1], // 2й слайд
-          [1, 1], // 3й слайд
-          [1, 2], // 4й слайд занимает 1 колонку и 2 ряда
-          [1, 1], // 5й слайд
-          [1, 1]  // 6й слайд
+          [2, 2], // 1-я страница: 2 ряда × 2 колонки = 4 слайда
+          [1, 2], // 2-я страница: 1 ряд × 2 колонки = 2 слайда
+          [2, 2], // 3-я страница: 2 ряда × 2 колонки = 4 слайда
+          // Цикл повторяется, если слайдов больше
         ]
       }
     })
@@ -74,16 +83,35 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 24px;
   font-weight: bold;
   color: white;
   border-radius: 8px;
 }
 
-.tvist__slide:nth-child(1) { background: #667eea; }
-.tvist__slide:nth-child(2) { background: #764ba2; }
-.tvist__slide:nth-child(3) { background: #f093fb; }
-.tvist__slide:nth-child(4) { background: #f5576c; }
-.tvist__slide:nth-child(5) { background: #4facfe; }
-.tvist__slide:nth-child(6) { background: #00f2fe; }
+.tvist__slide:nth-child(1) .tvist__grid-item { background: #667eea; }
+.tvist__slide:nth-child(2) .tvist__grid-item { background: #764ba2; }
+.tvist__slide:nth-child(3) .tvist__grid-item { background: #f093fb; }
+.tvist__slide:nth-child(4) .tvist__grid-item { background: #f5576c; }
+.tvist__slide:nth-child(5) .tvist__grid-item { background: #4facfe; }
+.tvist__slide:nth-child(6) .tvist__grid-item { background: #00f2fe; }
+.tvist__slide:nth-child(7) .tvist__grid-item { background: #43e97b; }
+.tvist__slide:nth-child(8) .tvist__grid-item { background: #fa709a; }
+.tvist__slide:nth-child(9) .tvist__grid-item { background: #fee140; }
+.tvist__slide:nth-child(10) .tvist__grid-item { background: #30cfd0; }
+
+.info {
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.info p {
+  margin: 8px 0;
+}
+
+.info strong {
+  color: #667eea;
+}
 </style>

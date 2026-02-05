@@ -4,10 +4,18 @@ import type { TvistOptions } from '../../core/types'
 
 /**
  * Grid Module
- * Позволяет располагать слайды в несколько рядов (grid layout)
+ * Позволяет располагать слайды в виде сетки (grid layout)
+ * 
+ * В режиме dimensions каждый элемент массива [rows, cols] определяет
+ * количество рядов и колонок для одной страницы (wrapper slide).
+ * Оригинальные слайды последовательно распределяются по этим страницам.
  */
 export class GridModule extends Module {
   readonly name = 'grid'
+  
+  private isActive = false
+  private originalSlides: HTMLElement[] = []
+  private wrapperSlides: HTMLElement[] = []
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
@@ -16,7 +24,7 @@ export class GridModule extends Module {
   override init(): void {
     if (this.shouldBeActive()) {
       this.isActive = true
-      this.applyGrid()
+      this.buildGrid()
       this.fixEnginePositions()
     }
   }
@@ -25,14 +33,19 @@ export class GridModule extends Module {
     this.removeGrid()
   }
 
-  private isActive = false
-
   override onUpdate(): void {
+    const wasActive = this.isActive
+    
     if (this.shouldBeActive()) {
+      if (wasActive) {
+        // Пересоздаем grid
+        this.removeGrid()
+      }
+      
       this.isActive = true
-      this.applyGrid()
+      this.buildGrid()
       this.fixEnginePositions()
-    } else if (this.isActive) {
+    } else if (wasActive) {
       this.isActive = false
       this.removeGrid()
       // Форсим обновление Engine, чтобы он вернул свои стили
@@ -43,127 +56,249 @@ export class GridModule extends Module {
   protected override shouldBeActive(): boolean {
     const { grid } = this.options
     // Активен если есть grid опции и заданы rows/cols или dimensions
-    return !!grid && (!!grid.rows || !!grid.cols || !!grid.dimensions)
-  }
-
-  private applyGrid(): void {
-    const { grid, gap: globalGap = 0 } = this.options
-    if (!grid) return
-
-    const rows = grid.rows ?? 1
-    const cols = grid.cols ?? 1
-    const dimensions = grid.dimensions
-    
-    // Gap handling
-    let rowGap: string | number = globalGap
-    let colGap: string | number = globalGap
-
-    if (grid.gap) {
-      if (typeof grid.gap === 'object') {
-        rowGap = grid.gap.row ?? globalGap
-        colGap = grid.gap.col ?? globalGap
-      } else {
-        rowGap = grid.gap
-        colGap = grid.gap
-      }
-    }
-    
-    // Нормализация единиц измерения для gap
-    const toCssValue = (val: string | number) => typeof val === 'number' ? `${val}px` : val
-    
-    // Получаем базовый размер слайда (ширину колонки) из Engine
-    // При cols > 1, Engine.slideSize может быть не тем, что нам нужно, если мы хотим фиксированное число колонок
-    // Но пока полагаемся на то, что CSS Grid сам распределит
-    const slideSize = this.tvist.engine.slideSizeValue
-
-    // Добавляем класс
-    this.tvist.container.classList.add('tvist__container--grid')
-    
-    // Применяем стили к контейнеру
-    const styles: Partial<CSSStyleDeclaration> = {
-      rowGap: toCssValue(rowGap),
-      columnGap: toCssValue(colGap)
-    }
-
-    if (grid.rows) {
-      styles.gridTemplateRows = `repeat(${rows}, 1fr)`
-    }
-    
-    if (grid.cols) {
-       styles.gridTemplateColumns = `repeat(${cols}, 1fr)`
-    } else {
-       // Если колонок нет, авто-колонки по размеру слайда
-       styles.gridAutoColumns = `${slideSize}px`
-    }
-
-    Object.assign(this.tvist.container.style, styles)
-
-    // Применяем стили к слайдам
-    this.tvist.slides.forEach((slide, index) => {
-      // Сбрасываем стили Engine
-      slide.style.marginRight = ''
-      slide.style.marginBottom = ''
-      slide.style.width = '100%'
-      slide.style.height = '100%'
-      
-      // Dimensions
-      if (dimensions && dimensions.length > 0) {
-        // Безопасное получение dimensions с повторением
-        const dimension = dimensions[index % dimensions.length]
-        if (dimension) {
-            const [colSpan, rowSpan] = dimension
-            slide.style.gridColumn = `span ${colSpan}`
-            slide.style.gridRow = `span ${rowSpan}`
-        }
-      } else {
-        slide.style.gridColumn = ''
-        slide.style.gridRow = ''
-      }
-    })
-  }
-
-  private removeGrid(): void {
-    this.tvist.container.classList.remove('tvist__container--grid')
-    Object.assign(this.tvist.container.style, {
-      gridTemplateRows: '',
-      gridTemplateColumns: '',
-      gridAutoColumns: '',
-      rowGap: '',
-      columnGap: ''
-    })
-    
-    this.tvist.slides.forEach(slide => {
-      slide.style.gridColumn = ''
-      slide.style.gridRow = ''
-      slide.style.width = ''
-      slide.style.height = ''
-    })
+    return !!grid && (!!grid.rows || !!grid.cols || (!!grid.dimensions && grid.dimensions.length > 0))
   }
 
   /**
-   * Пересчитываем позиции слайдов для сетки и обновляем состояние Engine
+   * Проверяет, используется ли режим dimensions
+   */
+  private hasDimensions(): boolean {
+    const { grid } = this.options
+    return !!(grid?.dimensions && grid.dimensions.length > 0)
+  }
+
+  /**
+   * Создает grid структуру с вложенными элементами (как Splide Grid)
+   * Поддерживает как фиксированную сетку (rows + cols), так и dimensions
+   */
+  private buildGrid(): void {
+    const { grid } = this.options
+    if (!grid) return
+
+    // Сохраняем оригинальные слайды только если ещё не сохранены
+    if (this.originalSlides.length === 0) {
+      this.originalSlides = Array.from(this.tvist.slides)
+    }
+    
+    // Очищаем контейнер
+    const container = this.tvist.container
+    container.innerHTML = ''
+    
+    // Для grid используем flexbox
+    container.style.display = 'flex'
+    
+    // Создаем wrapper-слайды (страницы)
+    this.wrapperSlides = []
+    
+    if (this.hasDimensions()) {
+      // Режим dimensions: каждый элемент [rows, cols] = одна страница
+      this.buildDimensionsGrid()
+    } else {
+      // Фиксированная сетка: все страницы одинаковые rows × cols
+      this.buildFixedGrid()
+    }
+    
+    // Обновляем список слайдов в Tvist
+    this.tvist.updateSlidesList()
+  }
+
+  /**
+   * Создает grid с фиксированными размерами (все страницы rows × cols)
+   */
+  private buildFixedGrid(): void {
+    const { grid } = this.options
+    if (!grid?.rows || !grid?.cols) return
+
+    const rows = grid.rows
+    const cols = grid.cols
+    const slidesPerPage = rows * cols
+    const pagesCount = Math.ceil(this.originalSlides.length / slidesPerPage)
+    
+    let slideIndex = 0
+    
+    for (let pageIndex = 0; pageIndex < pagesCount; pageIndex++) {
+      const outerSlide = this.createOuterSlide()
+      
+      for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
+        const rowEl = this.createRowElement(rowIndex, rows)
+        
+        for (let colIndex = 0; colIndex < cols; colIndex++) {
+          if (slideIndex < this.originalSlides.length) {
+            const originalSlide = this.originalSlides[slideIndex]
+            if (originalSlide) {
+              const colWrapper = this.createColWrapper(colIndex, cols)
+              this.wrapSlide(originalSlide, colWrapper)
+              rowEl.appendChild(colWrapper)
+            }
+            slideIndex++
+          }
+        }
+        
+        outerSlide.appendChild(rowEl)
+      }
+      
+      this.wrapperSlides.push(outerSlide)
+      this.tvist.container.appendChild(outerSlide)
+    }
+  }
+
+  /**
+   * Создает grid с переменными размерами страниц (dimensions)
+   * dimensions = [ [rows1, cols1], [rows2, cols2], ... ]
+   * Каждый элемент определяет размер одной страницы
+   */
+  private buildDimensionsGrid(): void {
+    const { grid } = this.options
+    if (!grid?.dimensions) return
+
+    const dimensions = grid.dimensions
+    let slideIndex = 0
+    let dimensionIndex = 0
+    
+    // Создаем страницы пока есть слайды
+    while (slideIndex < this.originalSlides.length) {
+      // Получаем размеры текущей страницы (циклически)
+      const [rows, cols] = dimensions[dimensionIndex % dimensions.length] ?? [1, 1]
+      const slidesPerPage = rows * cols
+      
+      const outerSlide = this.createOuterSlide()
+      
+      for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
+        const rowEl = this.createRowElement(rowIndex, rows)
+        
+        for (let colIndex = 0; colIndex < cols; colIndex++) {
+          if (slideIndex < this.originalSlides.length) {
+            const originalSlide = this.originalSlides[slideIndex]
+            if (originalSlide) {
+              const colWrapper = this.createColWrapper(colIndex, cols)
+              this.wrapSlide(originalSlide, colWrapper)
+              rowEl.appendChild(colWrapper)
+            }
+            slideIndex++
+          }
+        }
+        
+        outerSlide.appendChild(rowEl)
+      }
+      
+      this.wrapperSlides.push(outerSlide)
+      this.tvist.container.appendChild(outerSlide)
+      dimensionIndex++
+    }
+  }
+
+  /**
+   * Создает внешний слайд (страницу)
+   */
+  private createOuterSlide(): HTMLElement {
+    const outerSlide = document.createElement('div')
+    outerSlide.className = 'tvist__slide tvist__slide--grid-page'
+    outerSlide.style.cssText = 'display: flex; flex-direction: column; width: 100%; height: 100%;'
+    return outerSlide
+  }
+
+  /**
+   * Создает элемент ряда
+   */
+  private createRowElement(rowIndex: number, totalRows: number): HTMLElement {
+    const rowEl = document.createElement('div')
+    rowEl.className = 'tvist__grid-row'
+    rowEl.style.cssText = `
+      display: flex;
+      flex: 1;
+      ${rowIndex < totalRows - 1 ? `margin-bottom: ${this.getGapValue('row')}px;` : ''}
+    `
+    return rowEl
+  }
+
+  /**
+   * Создает обертку для колонки
+   */
+  private createColWrapper(colIndex: number, totalCols: number): HTMLElement {
+    const colWrapper = document.createElement('div')
+    colWrapper.className = 'tvist__grid-col'
+    colWrapper.style.cssText = `
+      flex: 1;
+      ${colIndex < totalCols - 1 ? `margin-right: ${this.getGapValue('col')}px;` : ''}
+    `
+    return colWrapper
+  }
+
+  /**
+   * Оборачивает оригинальный слайд в колонку
+   */
+  private wrapSlide(originalSlide: HTMLElement, colWrapper: HTMLElement): void {
+    // Убираем класс tvist__slide, чтобы updateSlidesList не находил его
+    originalSlide.classList.remove('tvist__slide')
+    originalSlide.classList.add('tvist__grid-item')
+    originalSlide.style.width = '100%'
+    originalSlide.style.height = '100%'
+    colWrapper.appendChild(originalSlide)
+  }
+
+  /**
+   * Получает значение gap для строк или колонок
+   */
+  private getGapValue(type: 'row' | 'col'): number {
+    const { grid, gap: globalGap = 0 } = this.options
+    if (!grid) return 0
+    
+    const toNumber = (val: string | number): number => {
+      return typeof val === 'number' ? val : parseInt(val, 10) || 0
+    }
+    
+    if (grid.gap) {
+      if (typeof grid.gap === 'object') {
+        const value = grid.gap[type] ?? globalGap
+        return toNumber(value)
+      }
+      return toNumber(grid.gap)
+    }
+    
+    return toNumber(globalGap)
+  }
+
+  /**
+   * Удаляет grid структуру и восстанавливает оригинальные слайды
+   */
+  private removeGrid(): void {
+    if (this.originalSlides.length > 0) {
+      // Восстанавливаем оригинальные слайды
+      const container = this.tvist.container
+      container.style.display = ''
+      container.innerHTML = ''
+      
+      this.originalSlides.forEach(slide => {
+        // Восстанавливаем класс tvist__slide
+        slide.classList.remove('tvist__grid-item')
+        slide.classList.add('tvist__slide')
+        slide.style.width = ''
+        slide.style.height = ''
+        container.appendChild(slide)
+      })
+      
+      // Обновляем список слайдов
+      this.tvist.updateSlidesList()
+      
+      this.originalSlides = []
+      this.wrapperSlides = []
+    }
+  }
+
+  /**
+   * Пересчитываем позиции слайдов для grid и обновляем состояние Engine
    */
   private fixEnginePositions(): void {
     const engine = this.tvist.engine
     const slides = this.tvist.slides
 
-    // Считываем реальные позиции из DOM
-    // offsetLeft дает позицию относительно контейнера
-    // В случае grid, слайды могут быть "в куче" или распределены по колонкам
-    // Для корректной навигации нам нужно знать "страницу" каждого слайда
-    // Но Engine ожидает slidePositions как массив координат для каждого слайда.
-    // Если слайды идут друг под другом (rows > 1), у них будет одинаковый offsetLeft.
-    // Это нормально для Engine, он просто будет скроллить к этому offsetLeft.
-    
+    // Для grid с wrapper-слайдами позиции простые: каждая страница - это один слайд
+    // offsetLeft уже правильный для каждой страницы
     const newPositions = slides.map(slide => slide.offsetLeft)
-
-    // Перезаписываем позиции в Engine
     engine.setSlidePositions(newPositions)
-
-    // Обновляем размер слайда в Engine
-    // Берем ширину первого слайда, так как в Grid все ячейки обычно равны (или кратны)
+    
+    // Размер слайда = ширина страницы
     if (slides.length > 0) {
-      // Используем offsetWidth для получения реальной ширины элемента с учетом Grid
       const firstSlide = slides[0]
       if (firstSlide) {
         const realSlideSize = firstSlide.offsetWidth
