@@ -6,6 +6,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { Tvist } from '../../../src/core/Tvist'
 import { createSliderFixture } from '../../fixtures'
 import type { SliderFixture } from '../../fixtures'
+import '../../../src/modules/autoplay' // Регистрация модуля autoplay
 
 describe('Tvist.updateOptions()', () => {
   let fixture: SliderFixture
@@ -161,5 +162,62 @@ describe('Tvist.updateOptions()', () => {
     slider.updateOptions({ center: true })
 
     expect(slider.options.center).toBe(true)
+  })
+
+  it('должен запускать autoplay при включении через updateOptions', async () => {
+    const slider = new Tvist(fixture.root, { autoplay: false })
+
+    expect(slider.options.autoplay).toBe(false)
+    expect(slider.activeIndex).toBe(0)
+
+    // Включаем autoplay
+    slider.updateOptions({ autoplay: 500 })
+
+    expect(slider.options.autoplay).toBe(500)
+
+    // Ждём, чтобы autoplay сработал
+    await new Promise(resolve => setTimeout(resolve, 600))
+
+    // Должен перейти на следующий слайд
+    expect(slider.activeIndex).toBe(1)
+
+    slider.destroy()
+  })
+
+  it('должен останавливать autoplay при отключении через updateOptions', async () => {
+    const slider = new Tvist(fixture.root, { autoplay: 500 })
+
+    // Ждём, чтобы autoplay сработал один раз
+    await new Promise(resolve => setTimeout(resolve, 600))
+    expect(slider.activeIndex).toBe(1)
+
+    // Отключаем autoplay сразу после перехода
+    slider.updateOptions({ autoplay: false })
+    expect(slider.options.autoplay).toBe(false)
+
+    const currentIndex = slider.activeIndex
+
+    // Ждём достаточно времени для двух потенциальных тиков
+    await new Promise(resolve => setTimeout(resolve, 1100))
+
+    // Не должен перейти дальше
+    expect(slider.activeIndex).toBe(currentIndex)
+
+    slider.destroy()
+  })
+
+  it('должен обновлять задержку autoplay через updateOptions', async () => {
+    const slider = new Tvist(fixture.root, { autoplay: 1000 })
+
+    // Изменяем задержку на более короткую
+    slider.updateOptions({ autoplay: 300 })
+
+    // Ждём короткую задержку
+    await new Promise(resolve => setTimeout(resolve, 400))
+
+    // Должен успеть перейти с новой задержкой
+    expect(slider.activeIndex).toBe(1)
+
+    slider.destroy()
   })
 })

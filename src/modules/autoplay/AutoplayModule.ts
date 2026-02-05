@@ -49,6 +49,53 @@ export class AutoplayModule extends Module {
   }
 
   /**
+   * Обработка обновления опций
+   */
+  override onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
+    // Если autoplay изменился
+    if (newOptions.autoplay !== undefined) {
+      // Определяем, был ли autoplay активен ДО обновления
+      // К этому моменту this.options уже содержит новые значения,
+      // но мы можем определить старое состояние по наличию таймера
+      const wasActive = this.timer !== null
+      
+      // Обновляем delay
+      const autoplay = newOptions.autoplay
+      if (typeof autoplay === 'number') {
+        this.delay = autoplay
+      }
+
+      const isNowActive = newOptions.autoplay !== false && newOptions.autoplay !== undefined
+
+      // Если autoplay был выключен, а теперь включен
+      if (!wasActive && isNowActive) {
+        this.stopped = false
+        this.setupEvents()
+        this.start()
+      }
+      // Если autoplay был включен, а теперь выключен
+      else if (wasActive && !isNowActive) {
+        this.stop()
+        this.detachHoverEvents()
+        this.stopped = true
+      }
+      // Если autoplay был включен и остается включен (но изменилась задержка)
+      else if (wasActive && isNowActive) {
+        this.start() // Перезапускаем с новой задержкой
+      }
+    }
+
+    // Если изменились pauseOnHover или pauseOnInteraction
+    if (newOptions.pauseOnHover !== undefined || newOptions.pauseOnInteraction !== undefined) {
+      // Переинициализируем события
+      if (this.shouldBeActive()) {
+        this.detachHoverEvents()
+        this.setupEvents()
+      }
+    }
+  }
+
+  /**
    * Настройка событий
    */
   private setupEvents(): void {
