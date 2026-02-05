@@ -38,20 +38,16 @@ export class LoopModule extends Module {
   }
 
   init(): void {
-    console.log('DEBUG: LoopModule init called. options:', JSON.stringify(this.options))
     if (!this.options.loop) {
-      console.log('DEBUG: Loop disabled')
       return
     }
 
     // Защита от повторной инициализации
     if (this.isInitialized) {
-      console.log('DEBUG: Already initialized')
       return
     }
 
     this.originalSlidesCount = this.tvist.slides.length
-    console.log('DEBUG: originalSlidesCount:', this.originalSlidesCount)
 
 
     if (this.originalSlidesCount < 2) {
@@ -62,7 +58,6 @@ export class LoopModule extends Module {
 
     // Вычисляем количество клонов
     this.cloneCount = this.computeCloneCount()
-    console.log('DEBUG: cloneCount:', this.cloneCount)
 
     // Создаём клоны
     this.createClones()
@@ -244,11 +239,15 @@ export class LoopModule extends Module {
     const slideSize = this.tvist.engine.slideSizeValue
     const gap = this.options.gap ?? 0
     const slideWithGap = slideSize + gap
+    const centerOffset = this.tvist.engine.getCenterOffset(0)
 
     if (slideWithGap === 0) return
 
     // Вычисляем текущий индекс по позиции (может быть дробным)
-    const currentFloatIndex = -position / slideWithGap
+    // Учитываем centerOffset: position = -index * slideWithGap + centerOffset
+    // index = (centerOffset - position) / slideWithGap
+    const currentFloatIndex = (centerOffset - position) / slideWithGap
+    
     // Границы для прыжка
     const prependBoundary = this.cloneCount - 0.5 // За 0.5 слайда до границы
     const appendBoundary = this.originalSlidesCount + this.cloneCount - 0.5
@@ -262,7 +261,7 @@ export class LoopModule extends Module {
       this.tvist.engine.applyTransformPublic()
       
       // Обновляем индекс
-      const newIndex = Math.round(-newPosition / slideWithGap)
+      const newIndex = Math.round((centerOffset - newPosition) / slideWithGap)
       this.tvist.engine.index.set(newIndex)
 
       // Сообщаем о смещении координат (для DragModule)
@@ -280,7 +279,7 @@ export class LoopModule extends Module {
       this.tvist.engine.applyTransformPublic()
       
       // Обновляем индекс
-      const newIndex = Math.round(-newPosition / slideWithGap)
+      const newIndex = Math.round((centerOffset - newPosition) / slideWithGap)
       this.tvist.engine.index.set(newIndex)
 
       // Сообщаем о смещении координат (для DragModule)
@@ -322,8 +321,8 @@ export class LoopModule extends Module {
     // Устанавливаем индекс
     this.tvist.engine.index.set(physicalIndex)
     
-    // Вычисляем новую позицию
-    const position = -this.tvist.engine.getSlidePosition(physicalIndex)
+    // Вычисляем новую позицию (используем метод Engine для учета centerOffset)
+    const position = this.tvist.engine.getScrollPositionForIndex(physicalIndex)
     
     // Устанавливаем позицию напрямую
     this.tvist.engine.location.set(position)
@@ -338,9 +337,7 @@ export class LoopModule extends Module {
    */
   getRealIndex(): number {
     const physicalIndex = this.tvist.engine.index.get()
-    const logical = this.physicalToLogical(physicalIndex)
-    console.log(`DEBUG: getRealIndex. physical: ${physicalIndex}, logical: ${logical}`)
-    return logical
+    return this.physicalToLogical(physicalIndex)
   }
 
   /**

@@ -72,7 +72,7 @@ export class Engine {
   /**
    * Вычисляет offset для центрирования (аналог Splide offset и Swiper centeredSlides)
    */
-  private getCenterOffset(_index: number): number {
+  public getCenterOffset(_index: number): number {
     if (!this.options.center) return 0
     
     const isVertical = this.options.direction === 'vertical'
@@ -88,7 +88,7 @@ export class Engine {
   /**
    * Позиция скролла для индекса. При loop peekTrim не применяется.
    */
-  private getScrollPositionForIndex(index: number): number {
+  public getScrollPositionForIndex(index: number): number {
     const basePosition = -this.getSlidePosition(index)
     const centerOffset = this.getCenterOffset(index)
     

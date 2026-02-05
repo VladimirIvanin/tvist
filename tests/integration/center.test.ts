@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { Tvist } from '@core/Tvist'
+import { Tvist } from '../../src/index'
 import { createSliderFixture } from '../fixtures'
 
 describe('Center Mode Integration', () => {
@@ -217,16 +217,17 @@ describe('Center Mode Integration', () => {
         speed: 0,
       })
 
-      expect(tvist.activeIndex).toBe(0)
+      // В режиме loop используем realIndex, так как activeIndex указывает на физический слайд (с учетом клонов)
+      expect((tvist as any).realIndex).toBe(0)
 
       // Можем идти в обе стороны бесконечно
       tvist.prev()
       await new Promise(resolve => setTimeout(resolve, 50))
-      expect(tvist.activeIndex).toBe(6)
+      expect((tvist as any).realIndex).toBe(6)
 
       tvist.next()
       await new Promise(resolve => setTimeout(resolve, 50))
-      expect(tvist.activeIndex).toBe(0)
+      expect((tvist as any).realIndex).toBe(0)
     })
   })
 
