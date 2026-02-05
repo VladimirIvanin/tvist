@@ -55,6 +55,11 @@ export abstract class Module {
   onSlideChange?(index: number): void
 
   /**
+   * Хук: вызывается при динамическом обновлении опций
+   */
+  onOptionsUpdate?(newOptions: Partial<TvistOptions>): void
+
+  /**
    * Проверка, должен ли модуль быть активен
    * Используется для условной активации модулей
    */

@@ -124,6 +124,14 @@ export class Engine {
   }
 
   /**
+   * Применяет peek к контейнеру слайдов (публичный метод)
+   * Используется при динамическом обновлении опций
+   */
+  public applyPeekPublic(): void {
+    this.applyPeek()
+  }
+
+  /**
    * Рассчитывает размеры контейнера и слайдов
    */
   private calculateSizes(): void {

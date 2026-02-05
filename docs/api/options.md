@@ -181,19 +181,170 @@ const slider = new Tvist('.slider', {
 })
 ```
 
-## Динамическое изменение
+## Динамическое изменение опций
 
-Большинство опций нельзя изменить после инициализации. Для изменения настроек нужно пересоздать слайдер:
+Tvist поддерживает динамическое изменение большинства опций без пересоздания слайдера. Используйте метод `updateOptions()` для обновления настроек на лету.
+
+### Метод updateOptions()
 
 ```javascript
-// Уничтожаем старый
+// Изменить одну опцию
+slider.updateOptions({ perPage: 3 })
+
+// Изменить несколько опций
+slider.updateOptions({
+  perPage: 2,
+  gap: 30,
+  speed: 500
+})
+
+// Цепочка вызовов
+slider
+  .updateOptions({ perPage: 3 })
+  .scrollTo(0)
+```
+
+### Поддерживаемые опции
+
+Метод `updateOptions()` поддерживает изменение следующих опций:
+
+#### Базовые настройки
+- `perPage` - количество слайдов на странице
+- `slideMinSize` - минимальный размер слайда
+- `gap` - расстояние между слайдами
+- `peek` - отступы слайдера
+- `peekTrim` - обрезка peek на краях
+- `speed` - скорость анимации
+- `direction` - направление прокрутки (`horizontal` / `vertical`)
+- `center` - центрирование активного слайда
+
+#### Drag
+- `drag` - включение/отключение перетаскивания
+- `dragSpeed` - скорость перетаскивания
+- `rubberband` - эффект резинки
+
+#### Autoplay
+- `autoplay` - автопрокрутка
+- `pauseOnHover` - пауза при наведении
+- `pauseOnInteraction` - пауза при взаимодействии
+- `disableOnInteraction` - отключение после взаимодействия
+
+#### События
+- `on` - обработчики событий (заменяют предыдущие)
+
+### Примеры использования
+
+#### Адаптация под размер экрана
+
+```javascript
+const updateSliderForScreen = () => {
+  const width = window.innerWidth
+  
+  if (width < 768) {
+    slider.updateOptions({ perPage: 1, gap: 10 })
+  } else if (width < 1024) {
+    slider.updateOptions({ perPage: 2, gap: 20 })
+  } else {
+    slider.updateOptions({ perPage: 3, gap: 30 })
+  }
+}
+
+window.addEventListener('resize', updateSliderForScreen)
+updateSliderForScreen()
+```
+
+#### Переключение направления
+
+```javascript
+const toggleDirection = () => {
+  const current = slider.options.direction
+  slider.updateOptions({
+    direction: current === 'horizontal' ? 'vertical' : 'horizontal'
+  })
+}
+
+document.querySelector('.toggle-btn').addEventListener('click', toggleDirection)
+```
+
+#### Управление автопрокруткой
+
+```javascript
+// Включить автопрокрутку
+slider.updateOptions({ autoplay: 3000 })
+
+// Отключить автопрокрутку
+slider.updateOptions({ autoplay: false })
+
+// Изменить скорость
+slider.updateOptions({ autoplay: 5000 })
+```
+
+#### Динамическое изменение gap и peek
+
+```javascript
+// Изменить отступы
+slider.updateOptions({
+  gap: 40,
+  peek: { left: 20, right: 20 }
+})
+
+// Убрать peek
+slider.updateOptions({ peek: 0 })
+```
+
+#### Обновление обработчиков событий
+
+```javascript
+slider.updateOptions({
+  on: {
+    slideChange: (index) => {
+      console.log('Новый обработчик:', index)
+      // Новая логика
+    }
+  }
+})
+```
+
+### Событие optionsUpdated
+
+При вызове `updateOptions()` генерируется событие `optionsUpdated`:
+
+```javascript
+slider.on('optionsUpdated', (tvist, newOptions) => {
+  console.log('Обновлены опции:', newOptions)
+  
+  // Выполнить дополнительную логику
+  if (newOptions.perPage) {
+    updatePaginationUI()
+  }
+})
+```
+
+### Пересоздание слайдера (legacy подход)
+
+Если вам нужно изменить опции, которые не поддерживают динамическое обновление (например, регистрация новых модулей), используйте старый подход с пересозданием:
+
+```javascript
+// Сохраняем текущее состояние
+const currentIndex = slider.activeIndex
+
+// Уничтожаем старый экземпляр
 slider.destroy()
 
 // Создаём новый с другими опциями
 const newSlider = new Tvist('.slider', {
   perPage: 4,
-  gap: 30
+  gap: 30,
+  start: currentIndex // Восстанавливаем позицию
 })
 ```
 
-Для динамических изменений без пересоздания используйте события и методы API.
+### Ограничения
+
+Некоторые опции не могут быть изменены динамически, так как они влияют на инициализацию модулей:
+
+- Регистрация новых модулей требует пересоздания слайдера
+- Изменение `loop` может работать некорректно (требуется пересоздание)
+- Опции, связанные с DOM-структурой модулей
+
+Для таких случаев используйте подход с `destroy()` и созданием нового экземпляра.

@@ -387,6 +387,8 @@ export interface TvistOptions {
     lock?: () => void
     /** Вызывается при разблокировке слайдера */
     unlock?: () => void
+    /** Вызывается при динамическом обновлении опций */
+    optionsUpdated?: (tvist: Tvist, newOptions: Partial<TvistOptions>) => void
     /** Дополнительные кастомные обработчики */
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
     [key: string]: ((...args: any[]) => void) | undefined

@@ -209,6 +209,74 @@ export class Tvist {
   }
 
   /**
+   * Обновить опции слайдера динамически (без пересоздания)
+   * Аналог swiper.updateParams()
+   * @param newOptions - новые опции для применения
+   */
+  updateOptions(newOptions: Partial<TvistOptions>): this {
+    // Мёрджим новые опции с текущими
+    const oldOptions = { ...this.options }
+    Object.assign(this.options, newOptions)
+
+    // Обработка изменения direction
+    if (newOptions.direction !== undefined && newOptions.direction !== oldOptions.direction) {
+      if (this.options.direction === 'vertical') {
+        this.root.classList.add('tvist--vertical')
+      } else {
+        this.root.classList.remove('tvist--vertical')
+      }
+    }
+
+    // Обработка изменения on (обработчики событий)
+    if (newOptions.on) {
+      // Удаляем старые обработчики если они были
+      if (oldOptions.on) {
+        Object.entries(oldOptions.on).forEach(([event, handler]) => {
+          if (handler) {
+            this.events.off(event, handler)
+          }
+        })
+      }
+      // Добавляем новые обработчики
+      Object.entries(newOptions.on).forEach(([event, handler]) => {
+        if (handler) {
+          this.events.on(event, handler)
+        }
+      })
+    }
+
+    // Обработка изменения peek
+    if (newOptions.peek !== undefined || newOptions.peekTrim !== undefined) {
+      // Применяем новые значения peek к контейнеру
+      this.engine.applyPeekPublic()
+    }
+
+    // Пересчитываем размеры и позиции при изменении ключевых опций
+    const needsRecalculation = 
+      newOptions.perPage !== undefined ||
+      newOptions.slideMinSize !== undefined ||
+      newOptions.gap !== undefined ||
+      newOptions.peek !== undefined ||
+      newOptions.peekTrim !== undefined ||
+      newOptions.direction !== undefined ||
+      newOptions.center !== undefined
+
+    if (needsRecalculation) {
+      this.update()
+    }
+
+    // Уведомляем модули об изменении опций
+    this.modules.forEach((module) => {
+      module.onOptionsUpdate?.(newOptions)
+    })
+
+    // Событие обновления опций
+    this.emit('optionsUpdated', this, newOptions)
+
+    return this
+  }
+
+  /**
    * Уничтожить экземпляр и очистить ресурсы
    */
   destroy(): this {
