@@ -79,7 +79,7 @@ onUnmounted(() => {
   height: 400px;
 }
 
-.tvist__slide {
+.tvist__grid-item {
   display: flex;
   align-items: center;
   justify-content: center;

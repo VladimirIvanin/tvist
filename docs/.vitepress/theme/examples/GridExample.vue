@@ -67,7 +67,7 @@ onUnmounted(() => {
   height: 300px;
 }
 
-.tvist__slide {
+.tvist__grid-item {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,12 +77,12 @@ onUnmounted(() => {
   border-radius: 8px;
 }
 
-.tvist__slide:nth-child(1) { background: #667eea; }
-.tvist__slide:nth-child(2) { background: #764ba2; }
-.tvist__slide:nth-child(3) { background: #f093fb; }
-.tvist__slide:nth-child(4) { background: #f5576c; }
-.tvist__slide:nth-child(5) { background: #4facfe; }
-.tvist__slide:nth-child(6) { background: #00f2fe; }
-.tvist__slide:nth-child(7) { background: #43e97b; }
-.tvist__slide:nth-child(8) { background: #38f9d7; }
+.tvist__slide:nth-child(1) .tvist__grid-item { background: #667eea; }
+.tvist__slide:nth-child(2) .tvist__grid-item { background: #764ba2; }
+.tvist__slide:nth-child(3) .tvist__grid-item { background: #f093fb; }
+.tvist__slide:nth-child(4) .tvist__grid-item { background: #f5576c; }
+.tvist__slide:nth-child(5) .tvist__grid-item { background: #4facfe; }
+.tvist__slide:nth-child(6) .tvist__grid-item { background: #00f2fe; }
+.tvist__slide:nth-child(7) .tvist__grid-item { background: #43e97b; }
+.tvist__slide:nth-child(8) .tvist__grid-item { background: #38f9d7; }
 </style>
