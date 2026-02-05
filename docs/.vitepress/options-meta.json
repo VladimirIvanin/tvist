@@ -1,0 +1,401 @@
+{
+  "options": [
+    {
+      "name": "perPage",
+      "type": "number",
+      "default": "1",
+      "description": "Количество слайдов на странице"
+    },
+    {
+      "name": "slideMinSize",
+      "type": "number",
+      "default": "undefined",
+      "description": "Минимальный размер слайда (ширина или высота) для автоматического расчета perPage"
+    },
+    {
+      "name": "gap",
+      "type": "number",
+      "default": "0",
+      "description": "Расстояние между слайдами в пикселях"
+    },
+    {
+      "name": "speed",
+      "type": "number",
+      "default": "300",
+      "description": "Скорость анимации перехода в миллисекундах"
+    },
+    {
+      "name": "direction",
+      "type": "'horizontal' | 'vertical'",
+      "default": "'horizontal'",
+      "description": "Направление прокрутки слайдера"
+    },
+    {
+      "name": "start",
+      "type": "number",
+      "default": "0",
+      "description": "Индекс начального слайда"
+    },
+    {
+      "name": "drag",
+      "type": "boolean | 'free'",
+      "default": "true",
+      "description": "Включить перетаскивание слайдов. 'free' - свободная прокрутка без привязки к слайдам"
+    },
+    {
+      "name": "dragSpeed",
+      "type": "number",
+      "default": "1",
+      "description": "Множитель скорости перетаскивания"
+    },
+    {
+      "name": "rubberband",
+      "type": "boolean",
+      "default": "true",
+      "description": "Эффект \"резинки\" при перетаскивании за границы"
+    },
+    {
+      "name": "focusableElements",
+      "type": "string",
+      "default": "'button, a, input, select, textarea'",
+      "description": "CSS селектор для элементов, которые должны сохранять фокус при перетаскивании"
+    },
+    {
+      "name": "arrows",
+      "type": "boolean | object",
+      "default": "false",
+      "description": "Навигационные стрелки. true - автоматическое создание, объект - кастомная настройка",
+      "nested": [
+        {
+          "name": "prev",
+          "type": "string | HTMLElement",
+          "description": "Селектор или элемент для кнопки \"назад\""
+        },
+        {
+          "name": "next",
+          "type": "string | HTMLElement",
+          "description": "Селектор или элемент для кнопки \"вперёд\""
+        },
+        {
+          "name": "disabledClass",
+          "type": "string",
+          "description": "CSS класс для неактивных стрелок"
+        },
+        {
+          "name": "hiddenClass",
+          "type": "string",
+          "description": "CSS класс для скрытых стрелок"
+        }
+      ]
+    },
+    {
+      "name": "pagination",
+      "type": "boolean | object",
+      "default": "false",
+      "description": "Пагинация. true - автоматическое создание буллетов, объект - кастомная настройка",
+      "nested": [
+        {
+          "name": "container",
+          "type": "string | HTMLElement",
+          "description": "Селектор или элемент контейнера для пагинации"
+        },
+        {
+          "name": "type",
+          "type": "'bullets' | 'fraction' | 'progress' | 'custom'",
+          "description": "Тип пагинации"
+        },
+        {
+          "name": "clickable",
+          "type": "boolean",
+          "description": "Включить клики по буллетам для навигации"
+        },
+        {
+          "name": "bulletClass",
+          "type": "string",
+          "description": "CSS класс для буллета"
+        },
+        {
+          "name": "bulletActiveClass",
+          "type": "string",
+          "description": "CSS класс для активного буллета"
+        },
+        {
+          "name": "renderBullet",
+          "type": "function",
+          "description": "Функция рендеринга буллета"
+        },
+        {
+          "name": "renderFraction",
+          "type": "function",
+          "description": "Функция рендеринга дробной пагинации"
+        },
+        {
+          "name": "renderCustom",
+          "type": "function",
+          "description": "Функция рендеринга кастомной пагинации"
+        }
+      ]
+    },
+    {
+      "name": "autoplay",
+      "type": "number | boolean",
+      "default": "false",
+      "description": "Автопрокрутка. Число - задержка в миллисекундах между переходами, true - использовать дефолтную задержку 3000мс"
+    },
+    {
+      "name": "pauseOnHover",
+      "type": "boolean",
+      "default": "true",
+      "description": "Ставить автопрокрутку на паузу при наведении курсора"
+    },
+    {
+      "name": "pauseOnInteraction",
+      "type": "boolean",
+      "default": "true",
+      "description": "Ставить автопрокрутку на паузу при любом взаимодействии (drag, click)"
+    },
+    {
+      "name": "disableOnInteraction",
+      "type": "boolean",
+      "default": "false",
+      "description": "Отключить автопрокрутку после первого взаимодействия пользователя"
+    },
+    {
+      "name": "loop",
+      "type": "boolean | 'auto'",
+      "default": "false",
+      "description": "Бесконечная прокрутка. 'auto' - определяется автоматически на основе количества слайдов"
+    },
+    {
+      "name": "lazy",
+      "type": "boolean | object",
+      "default": "false",
+      "description": "Ленивая загрузка изображений",
+      "nested": [
+        {
+          "name": "preloadPrevNext",
+          "type": "number",
+          "description": "Количество соседних слайдов для предзагрузки с каждой стороны"
+        }
+      ]
+    },
+    {
+      "name": "effect",
+      "type": "'slide' | 'fade' | 'cube' | 'card'",
+      "default": "'slide'",
+      "description": "Эффект перехода между слайдами"
+    },
+    {
+      "name": "fadeEffect",
+      "type": "object",
+      "default": "undefined",
+      "description": "Настройки fade эффекта",
+      "nested": [
+        {
+          "name": "crossFade",
+          "type": "boolean",
+          "description": "Включить кросс-фейд (плавное наложение слайдов)"
+        }
+      ]
+    },
+    {
+      "name": "cubeEffect",
+      "type": "object",
+      "default": "undefined",
+      "description": "Настройки cube эффекта",
+      "nested": [
+        {
+          "name": "slideShadows",
+          "type": "boolean",
+          "description": "Тени на гранях куба"
+        },
+        {
+          "name": "shadow",
+          "type": "boolean",
+          "description": "Общая тень куба"
+        },
+        {
+          "name": "shadowOffset",
+          "type": "number",
+          "description": "Смещение тени"
+        },
+        {
+          "name": "shadowScale",
+          "type": "number",
+          "description": "Масштаб тени"
+        },
+        {
+          "name": "perspective",
+          "type": "number",
+          "default": "800",
+          "description": "Расстояние перспективы (px). Меньше = сильнее эффект глубины"
+        },
+        {
+          "name": "perspectiveOriginY",
+          "type": "number",
+          "default": "60",
+          "description": "Точка перспективы по Y (%)"
+        },
+        {
+          "name": "viewportPadding",
+          "type": "number",
+          "default": "10",
+          "description": "Внутренний отступ для предотвращения обрезки вращающихся граней (px)"
+        }
+      ]
+    },
+    {
+      "name": "thumbs",
+      "type": "object",
+      "default": "undefined",
+      "description": "Связь с thumbnail-слайдером",
+      "nested": [
+        {
+          "name": "slider",
+          "type": "Tvist",
+          "description": "Экземпляр слайдера-миниатюр"
+        }
+      ]
+    },
+    {
+      "name": "isNavigation",
+      "type": "boolean",
+      "default": "false",
+      "description": "Если true, слайдер будет вести себя как навигация (клики по слайдам делают их активными). Используется для создания thumbnail-слайдеров"
+    },
+    {
+      "name": "virtual",
+      "type": "boolean | object",
+      "default": "false",
+      "description": "Виртуальные слайды для работы с большими списками",
+      "nested": [
+        {
+          "name": "addSlidesBefore",
+          "type": "number",
+          "description": "Количество дополнительных слайдов до видимой области"
+        },
+        {
+          "name": "addSlidesAfter",
+          "type": "number",
+          "description": "Количество дополнительных слайдов после видимой области"
+        },
+        {
+          "name": "renderSlide",
+          "type": "function",
+          "description": "Функция рендеринга виртуального слайда"
+        }
+      ]
+    },
+    {
+      "name": "keyboard",
+      "type": "boolean | object",
+      "default": "false",
+      "description": "Управление с клавиатуры (стрелки)",
+      "nested": [
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "description": "Включить управление с клавиатуры"
+        },
+        {
+          "name": "onlyInViewport",
+          "type": "boolean",
+          "description": "Реагировать только когда слайдер в видимой области"
+        }
+      ]
+    },
+    {
+      "name": "wheel",
+      "type": "boolean | object",
+      "default": "false",
+      "description": "Управление колёсиком мыши",
+      "nested": [
+        {
+          "name": "sensitivity",
+          "type": "number",
+          "description": "Чувствительность (количество пикселей на тик колёсика)"
+        },
+        {
+          "name": "releaseOnEdges",
+          "type": "boolean",
+          "description": "Разрешить прокрутку страницы на краях слайдера"
+        }
+      ]
+    },
+    {
+      "name": "breakpoints",
+      "type": "object",
+      "default": "undefined",
+      "description": "Адаптивные настройки по breakpoints. Ключ - ширина экрана в пикселях"
+    },
+    {
+      "name": "breakpointsBase",
+      "type": "'window' | 'container'",
+      "default": "'window'",
+      "description": "База для расчёта breakpoints"
+    },
+    {
+      "name": "on",
+      "type": "object",
+      "default": "undefined",
+      "description": "Обработчики событий слайдера",
+      "nested": [
+        {
+          "name": "created",
+          "type": "(tvist: Tvist) => void",
+          "description": "Вызывается после создания слайдера"
+        },
+        {
+          "name": "destroyed",
+          "type": "(tvist: Tvist) => void",
+          "description": "Вызывается перед уничтожением слайдера"
+        },
+        {
+          "name": "beforeSlideChange",
+          "type": "(index: number) => void",
+          "description": "Вызывается перед началом смены слайда"
+        },
+        {
+          "name": "slideChange",
+          "type": "(index: number) => void",
+          "description": "Вызывается при начале смены слайда"
+        },
+        {
+          "name": "slideChanged",
+          "type": "(index: number) => void",
+          "description": "Вызывается после завершения смены слайда"
+        },
+        {
+          "name": "dragStart",
+          "type": "() => void",
+          "description": "Вызывается при начале перетаскивания"
+        },
+        {
+          "name": "drag",
+          "type": "() => void",
+          "description": "Вызывается во время перетаскивания"
+        },
+        {
+          "name": "dragEnd",
+          "type": "() => void",
+          "description": "Вызывается при завершении перетаскивания"
+        },
+        {
+          "name": "scroll",
+          "type": "() => void",
+          "description": "Вызывается при прокрутке"
+        },
+        {
+          "name": "resize",
+          "type": "() => void",
+          "description": "Вызывается при изменении размера"
+        },
+        {
+          "name": "breakpoint",
+          "type": "(breakpoint: number | null) => void",
+          "description": "Вызывается при смене breakpoint"
+        }
+      ]
+    }
+  ]
+}

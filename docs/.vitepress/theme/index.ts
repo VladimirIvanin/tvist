@@ -4,6 +4,7 @@ import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import './style.css'
 import ExampleCard from './ExampleCard.vue'
+import OptionsTable from './OptionsTable.vue'
 
 export default {
   extends: DefaultTheme,
@@ -13,7 +14,8 @@ export default {
     })
   },
   enhanceApp({ app, router, siteData }) {
-    // Регистрируем глобальный компонент для примеров
+    // Регистрируем глобальные компоненты
     app.component('ExampleCard', ExampleCard)
+    app.component('OptionsTable', OptionsTable)
   }
 } satisfies Theme

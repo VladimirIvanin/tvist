@@ -34,6 +34,13 @@ export default defineConfig({
         ]
       },
       {
+        text: 'API',
+        items: [
+          { text: 'Обзор API', link: '/api/' },
+          { text: 'Опции', link: '/api/options' }
+        ]
+      },
+      {
         text: 'Примеры',
         items: [
           { text: 'Все примеры', link: '/examples-list' },
