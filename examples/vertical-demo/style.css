@@ -65,6 +65,7 @@ h2 {
 }
 
 .tvist__slide {
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,9 +96,13 @@ h2 {
   height: 400px; /* Высота всей галереи */
 }
 
+.tvist__container {
+  height: 100%;
+}
+
 /* Вертикальные миниатюры */
 .tvist-thumbs {
-  width: 120px; /* Фиксированная ширина */
+  width: 120px !important; /* Фиксированная ширина */
   height: 100%; /* На всю высоту враппера */
 }
 
