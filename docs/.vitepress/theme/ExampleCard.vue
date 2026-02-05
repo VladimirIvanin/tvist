@@ -1,7 +1,12 @@
 <template>
   <div class="example-card">
     <div class="example-card__header">
-      <h3 class="example-card__title">{{ title }}</h3>
+      <div class="example-card__title-row">
+        <h3 class="example-card__title">{{ title }}</h3>
+        <a v-if="detailsLink" :href="detailsLink" class="example-card__link">
+          Смотреть код →
+        </a>
+      </div>
       <p class="example-card__description">{{ description }}</p>
     </div>
     <div class="example-card__content">
@@ -17,6 +22,10 @@ defineProps({
     required: true
   },
   description: {
+    type: String,
+    default: ''
+  },
+  detailsLink: {
     type: String,
     default: ''
   }
@@ -38,11 +47,32 @@ defineProps({
   background: var(--vp-c-bg-soft);
 }
 
+.example-card__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
 .example-card__title {
-  margin: 0 0 8px 0;
+  margin: 0;
   font-size: 20px;
   font-weight: 600;
   color: #667eea;
+}
+
+.example-card__link {
+  font-size: 14px;
+  color: #667eea;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.example-card__link:hover {
+  color: #5568d3;
+  text-decoration: underline;
 }
 
 .example-card__description {

@@ -20,47 +20,47 @@ import ThumbsExample from './.vitepress/theme/examples/ThumbsExample.vue'
 
 ## 1. Базовый слайдер
 
-<BasicExample />
+<BasicExample detailsLink="./examples/basic" />
 
 ## 2. PerPage: несколько слайдов на экран
 
-<PerPageExample />
+<PerPageExample detailsLink="./examples/perpage" />
 
 ## 3. Адаптивный слайдер (Responsive)
 
-<ResponsiveExample />
+<ResponsiveExample detailsLink="./examples/responsive" />
 
 ## 4. Loop Mode
 
-<LoopExample />
+<LoopExample detailsLink="./examples/loop" />
 
 ## 5. Fade Effect
 
-<FadeExample />
+<FadeExample detailsLink="./examples/effect-fade" />
 
 ## 6. Cube Effect
 
-<CubeExample />
+<CubeExample detailsLink="./examples/effect-cube" />
 
 ## 7. Вертикальный
 
-<VerticalExample />
+<VerticalExample detailsLink="./examples/vertical" />
 
 ## 8. Вертикальные миниатюры (Gallery)
 
-<VerticalThumbsExample />
+<VerticalThumbsExample detailsLink="./examples/vertical" />
 
 ## 9. Drag + Navigation
 
-<DragNavigationExample />
+<DragNavigationExample detailsLink="./examples/modules" />
 
 ## 10. Autoplay + Pagination
 
-<AutoplayExample />
+<AutoplayExample detailsLink="./examples/modules" />
 
 ## 11. Thumbs Sync
 
-<ThumbsExample />
+<ThumbsExample detailsLink="./examples/thumbs" />
 
 </div>
 

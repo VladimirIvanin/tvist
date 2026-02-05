@@ -1,5 +1,5 @@
 <template>
-  <ExampleCard title="Basic Slider" description="Простой слайдер с навигацией и информацией о текущем слайде">
+  <ExampleCard title="Basic Slider" description="Простой слайдер с навигацией и информацией о текущем слайде" :detailsLink="detailsLink">
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist">
         <div class="tvist__container">
@@ -28,6 +28,10 @@ import { ref, onMounted, onUnmounted, reactive } from 'vue'
 import { Tvist } from '../../../../src/index.ts'
 import '../../../../src/styles/tvist.scss'
 import ExampleCard from '../ExampleCard.vue'
+
+defineProps({
+  detailsLink: { type: String, default: '' }
+})
 
 const sliderEl = ref(null)
 const slider = ref(null)
