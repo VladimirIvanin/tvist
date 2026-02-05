@@ -1,18 +1,28 @@
 import '../shared/header.js'
 import Tvist from '../../src/index.ts'
 
+// Функция для отображения конфига
+function displayConfig(id, config) {
+  const el = document.getElementById(id)
+  if (el) {
+    el.textContent = JSON.stringify(config, null, 2)
+  }
+}
+
 // Слайдер 1: Drag + Navigation
-const slider1 = new Tvist('#slider1', {
+const config1 = {
   perPage: 1,
   gap: 0,
   drag: true,
   arrows: true,
   rubberband: true,
   speed: 300
-})
+}
+const slider1 = new Tvist('#slider1', config1)
+displayConfig('config1', config1)
 
 // Слайдер 2: Autoplay + Pagination
-const slider2 = new Tvist('#slider2', {
+const config2 = {
   perPage: 1,
   gap: 0,
   drag: false,
@@ -22,7 +32,9 @@ const slider2 = new Tvist('#slider2', {
     type: 'bullets',
     clickable: true
   }
-})
+}
+const slider2 = new Tvist('#slider2', config2)
+displayConfig('config2', config2)
 
 // Управление autoplay
 const autoplayModule = slider2.getModule('autoplay')
@@ -38,7 +50,7 @@ document.getElementById('stop-autoplay').addEventListener('click', () => {
 })
 
 // Слайдер 3: Breakpoints (Container First + Auto Width)
-const slider3 = new Tvist('#slider3', {
+const config3 = {
   // Вместо фиксированного perPage указываем минимальную ширину слайда
   slideMinWidth: 200, 
   perPage: 1, // Fallback
@@ -67,7 +79,9 @@ const slider3 = new Tvist('#slider3', {
       perPage: 1        // Принудительно 1 слайд
     }
   }
-})
+}
+const slider3 = new Tvist('#slider3', config3)
+displayConfig('config3', config3)
 
 // Отслеживаем breakpoints
 slider3.on('breakpoint', (bp) => {
@@ -85,7 +99,7 @@ slider3.on('resize', () => {
 })
 
 // Слайдер 4: Fraction
-const slider4 = new Tvist('#slider4', {
+const config4 = {
   perPage: 1,
   gap: 0,
   drag: true,
@@ -94,7 +108,9 @@ const slider4 = new Tvist('#slider4', {
     type: 'fraction',
     clickable: false
   }
-})
+}
+const slider4 = new Tvist('#slider4', config4)
+displayConfig('config4', config4)
 
 // Логируем события
 [slider1, slider2, slider3, slider4].forEach((slider, i) => {

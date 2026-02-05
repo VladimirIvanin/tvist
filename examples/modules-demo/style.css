@@ -155,3 +155,16 @@ h2 {
 .info strong {
   color: #667eea;
 }
+
+.config-display {
+  background: #2d2d2d;
+  color: #ccc;
+  padding: 15px;
+  border-radius: 8px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  overflow-x: auto;
+  margin-top: 15px;
+  border: 1px solid #444;
+  white-space: pre-wrap;
+}
