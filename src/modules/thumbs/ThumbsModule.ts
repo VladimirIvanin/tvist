@@ -25,7 +25,7 @@ export class ThumbsModule extends Module {
     this.tvist.root.classList.add('tvist--nav')
 
     const slides = this.tvist.slides
-    const listeners: Array<() => void> = []
+    const listeners: (() => void)[] = []
     const activeClass = 'tvist__slide--nav-active'
     const legacyActiveClass = 'is-active' // Как в Splide
 

@@ -88,7 +88,7 @@ export class BreakpointsModule extends Module {
   private checkBreakpoints(): void {
     let newBreakpoint: number | null = null
 
-    const breakpoints = Object.keys(this.options.breakpoints || {})
+    const breakpoints = Object.keys(this.options.breakpoints ?? {})
       .map(Number)
       .sort((a, b) => b - a)
 
