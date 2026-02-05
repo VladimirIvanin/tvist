@@ -58,14 +58,15 @@ export default defineConfig({
           { text: 'Базовый', link: '/examples/basic' },
           { text: 'PerPage', link: '/examples/perpage' },
           { text: 'Peek', link: '/examples/peek' },
-          { text: 'Center (Центрирование)', link: '/examples/center' },
+          { text: 'Center', link: '/examples/center' },
           { text: 'Responsive', link: '/examples/responsive' },
           { text: 'Loop', link: '/examples/loop' },
           { text: 'Fade Effect', link: '/examples/effect-fade' },
           { text: 'Cube Effect', link: '/examples/effect-cube' },
           { text: 'Vertical', link: '/examples/vertical' },
           { text: 'Modules', link: '/examples/modules' },
-          { text: 'Thumbs', link: '/examples/thumbs' }
+          { text: 'Thumbs', link: '/examples/thumbs' },
+          { text: 'Grid', link: '/examples/grid' }
         ]
       }
     ],
