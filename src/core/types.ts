@@ -383,6 +383,10 @@ export interface TvistOptions {
     resize?: () => void
     /** Вызывается при смене breakpoint */
     breakpoint?: (breakpoint: number | null) => void
+    /** Вызывается при блокировке слайдера (контент помещается в контейнер) */
+    lock?: () => void
+    /** Вызывается при разблокировке слайдера */
+    unlock?: () => void
     /** Дополнительные кастомные обработчики */
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
     [key: string]: ((...args: any[]) => void) | undefined

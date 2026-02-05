@@ -29,6 +29,9 @@ export class Engine {
   private peekStart = 0 // peek слева/сверху
   private peekEnd = 0   // peek справа/снизу
 
+  // Состояние блокировки (когда контент меньше контейнера)
+  private _isLocked = false
+
   // Ссылки
   private tvist: Tvist
   private options: TvistOptions
@@ -61,6 +64,7 @@ export class Engine {
     // Первичный расчёт размеров
     this.calculateSizes()
     this.calculatePositions()
+    this.checkLock()
 
     // Начальная позиция с учётом trim (в начале — без левого peek, в конце — без правого)
     const initialPos = this.getScrollPositionForIndex(startIndex)
@@ -227,6 +231,13 @@ export class Engine {
       const position = i * (this.slideSize + gap)
       this.slidePositions.push(position)
     }
+  }
+
+  /**
+   * Установить позиции слайдов вручную (используется в GridModule)
+   */
+  public setSlidePositions(positions: number[]): void {
+    this.slidePositions = positions
   }
 
   /**
@@ -414,6 +425,36 @@ export class Engine {
     this.target.set(targetPosition)
     this.location.set(targetPosition)
     this.applyTransform()
+    this.checkLock()
+  }
+
+  /**
+   * Проверка на необходимость блокировки слайдера
+   * Блокировка включается, если весь контент помещается в контейнер
+   */
+  public checkLock(): void {
+    const isLocked = this.getMaxScrollPosition() >= this.getMinScrollPosition()
+    
+    if (this._isLocked !== isLocked) {
+      this._isLocked = isLocked
+      
+      this.tvist.root.classList.toggle('tvist--locked', isLocked)
+      
+      if (isLocked) {
+        this.tvist.emit('lock')
+        this.options.on?.lock?.()
+      } else {
+        this.tvist.emit('unlock')
+        this.options.on?.unlock?.()
+      }
+    }
+  }
+
+  /**
+   * Получить состояние блокировки
+   */
+  get isLocked(): boolean {
+    return this._isLocked
   }
 
   /**

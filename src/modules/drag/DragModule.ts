@@ -144,6 +144,9 @@ export class DragModule extends Module {
   private onPointerDown = (e: TouchEvent | MouseEvent | PointerEvent): void => {
     // Игнорируем если уже драгаем
     if (this.isDragging) return
+    
+    // Игнорируем если слайдер заблокирован
+    if (this.tvist.engine.isLocked) return
 
     // Игнорируем правую кнопку мыши
     if ('button' in e && e.button !== 0) return

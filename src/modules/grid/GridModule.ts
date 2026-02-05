@@ -144,7 +144,7 @@ export class GridModule extends Module {
    * Пересчитываем позиции слайдов для сетки и обновляем состояние Engine
    */
   private fixEnginePositions(): void {
-    const engine = this.tvist.engine as any
+    const engine = this.tvist.engine
     const slides = this.tvist.slides
 
     // Считываем реальные позиции из DOM
@@ -158,7 +158,7 @@ export class GridModule extends Module {
     const newPositions = slides.map(slide => slide.offsetLeft)
 
     // Перезаписываем позиции в Engine
-    engine.slidePositions = newPositions
+    engine.setSlidePositions(newPositions)
 
     // Нужно обновить текущую позицию (location/target), так как Engine мог рассчитать её 
     // по старой (линейной) логике во время update()
@@ -167,6 +167,9 @@ export class GridModule extends Module {
 
     engine.target.set(correctPosition)
     engine.location.set(correctPosition)
-    engine.applyTransform()
+    engine.applyTransformPublic()
+    
+    // Проверяем блокировку после обновления позиций (возможно контент теперь влезает)
+    engine.checkLock()
   }
 }
