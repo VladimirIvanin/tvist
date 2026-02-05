@@ -26,6 +26,9 @@ import CenterLoopExample from './examples/CenterLoopExample.vue'
 import GridExample from './examples/GridExample.vue'
 import GridDimensionsExample from './examples/GridDimensionsExample.vue'
 
+// Update Options example
+import UpdateOptionsExample from './examples/UpdateOptionsExample.vue'
+
 export default {
   extends: DefaultTheme,
   Layout: () => {
@@ -57,5 +60,8 @@ export default {
     // Grid examples
     app.component('GridExample', GridExample)
     app.component('GridDimensionsExample', GridDimensionsExample)
+
+    // Update Options example
+    app.component('UpdateOptionsExample', UpdateOptionsExample)
   }
 } satisfies Theme

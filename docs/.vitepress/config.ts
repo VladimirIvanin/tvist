@@ -48,7 +48,13 @@ export default defineConfig({
         text: 'API',
         items: [
           { text: 'Обзор API', link: '/api/' },
-          { text: 'Опции', link: '/api/options' }
+          { text: 'Опции', link: '/api/options' },
+          { text: 'Методы', link: '/api/methods' },
+          { text: 'Свойства', link: '/api/properties' },
+          { text: 'События', link: '/api/events' },
+          { text: 'Статические методы', link: '/api/static' },
+          { text: 'Модули', link: '/api/modules' },
+          { text: 'TypeScript', link: '/api/typescript' }
         ]
       },
       {
@@ -60,6 +66,7 @@ export default defineConfig({
           { text: 'Peek', link: '/examples/peek' },
           { text: 'Center', link: '/examples/center' },
           { text: 'Responsive', link: '/examples/responsive' },
+          { text: 'Update Options', link: '/examples/update-options' },
           { text: 'Loop', link: '/examples/loop' },
           { text: 'Fade Effect', link: '/examples/effect-fade' },
           { text: 'Cube Effect', link: '/examples/effect-cube' },
