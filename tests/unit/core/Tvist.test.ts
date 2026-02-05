@@ -198,7 +198,7 @@ describe('Tvist', () => {
         perPage: 2,
       })
 
-      const initialWidth = slider.engine.slideWidthValue
+      const initialWidth = slider.engine.slideSizeValue
 
       fixture.root.style.width = '1200px'
       Object.defineProperty(fixture.root, 'offsetWidth', {
@@ -207,7 +207,7 @@ describe('Tvist', () => {
       })
       slider.update()
 
-      const newWidth = slider.engine.slideWidthValue
+      const newWidth = slider.engine.slideSizeValue
 
       expect(newWidth).not.toBe(initialWidth)
       expect(newWidth).toBe(600) // 1200 / 2 = 600
