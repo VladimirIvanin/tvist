@@ -138,7 +138,7 @@ export class Tvist {
     }, 100)
 
     if (typeof ResizeObserver !== 'undefined') {
-      this.resizeObserver = new ResizeObserver((entries) => {
+      this.resizeObserver = new ResizeObserver(() => {
         // Используем throttle handler
         this.resizeHandler?.()
       })
