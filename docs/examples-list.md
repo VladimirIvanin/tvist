@@ -19,6 +19,7 @@ import AutoplayExample from './.vitepress/theme/examples/AutoplayExample.vue'
 import ThumbsExample from './.vitepress/theme/examples/ThumbsExample.vue'
 import GridExample from './.vitepress/theme/examples/GridExample.vue'
 import GridDimensionsExample from './.vitepress/theme/examples/GridDimensionsExample.vue'
+import UpdateOptionsExample from './.vitepress/theme/examples/UpdateOptionsExample.vue'
 </script>
 
 <div class="examples-page">
@@ -47,43 +48,49 @@ import GridDimensionsExample from './.vitepress/theme/examples/GridDimensionsExa
 
 <ResponsiveExample detailsLink="./examples/responsive" />
 
-## 7. Loop Mode
+## 7. Update Options: динамическое изменение
+
+::: tip 
+Интерактивная демонстрация динамического изменения опций слайдера. [Открыть полную версию →](./examples/update-options)
+:::
+
+## 8. Loop Mode
 
 <LoopExample detailsLink="./examples/loop" />
 
-## 8. Fade Effect
+## 9. Fade Effect
 
 <FadeExample detailsLink="./examples/effect-fade" />
 
-## 9. Cube Effect
+## 10. Cube Effect
 
 <CubeExample detailsLink="./examples/effect-cube" />
 
-## 10. Вертикальный
+## 11. Вертикальный
 
 <VerticalExample detailsLink="./examples/vertical" />
 
-## 11. Вертикальные миниатюры (Gallery)
+## 12. Вертикальные миниатюры (Gallery)
 
 <VerticalThumbsExample detailsLink="./examples/vertical" />
 
-## 12. Drag + Navigation
+## 13. Drag + Navigation
 
 <DragNavigationExample detailsLink="./examples/modules" />
 
-## 13. Autoplay + Pagination
+## 14. Autoplay + Pagination
 
 <AutoplayExample detailsLink="./examples/modules" />
 
-## 14. Thumbs Sync
+## 15. Thumbs Sync
 
 <ThumbsExample detailsLink="./examples/thumbs" />
 
-## 15. Grid Layout
+## 16. Grid Layout
 
 <GridExample detailsLink="./examples/grid" />
 
-## 16. Grid Dimensions
+## 17. Grid Dimensions
 
 <GridDimensionsExample detailsLink="./examples/grid" />
 

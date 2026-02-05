@@ -2,6 +2,30 @@
 
 Tvist использует модульную архитектуру. Базовая функциональность (drag, навигация) включена по умолчанию, а дополнительные возможности подключаются через модули.
 
+## Список модулей
+
+### Навигация и управление
+- [`NavigationModule`](#navigationmodule) - Навигационные стрелки
+- [`PaginationModule`](#paginationmodule) - Пагинация (буллеты, дроби, прогресс)
+- [`DragModule`](#dragmodule) - Перетаскивание мышью/тачем
+- [`SlideStatesModule`](#slidestatesmodule) - Классы состояния слайдов
+
+### Автоматизация
+- [`AutoplayModule`](#autoplaymodule) - Автоматическая прокрутка
+- [`LoopModule`](#loopmodule) - Бесконечная прокрутка
+
+### Визуальные эффекты
+- [`EffectModule`](#effectmodule) - Эффекты переходов (fade, cube)
+- [`GridModule`](#gridmodule) - Сеточная раскладка
+
+### Адаптивность
+- [`BreakpointsModule`](#breakpointsmodule) - Адаптивные настройки
+
+### Связанные слайдеры
+- [`ThumbsModule`](#thumbsmodule) - Связь с миниатюрами
+
+---
+
 ## Архитектура модулей
 
 Каждый модуль:

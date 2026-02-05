@@ -2,6 +2,19 @@
 
 Статические методы и свойства класса Tvist доступны без создания экземпляра слайдера.
 
+## Список
+
+### Свойства
+- [`VERSION`](#version) - Версия библиотеки
+- [`MODULES`](#modules) - Глобальный реестр модулей
+
+### Методы
+- [`registerModule()`](#registermodule) - Регистрация модуля
+- [`unregisterModule()`](#unregistermodule) - Удаление модуля
+- [`getRegisteredModules()`](#getregisteredmodules) - Список зарегистрированных модулей
+
+---
+
 ## Свойства
 
 ### VERSION
