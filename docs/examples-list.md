@@ -17,6 +17,8 @@ import VerticalThumbsExample from './.vitepress/theme/examples/VerticalThumbsExa
 import DragNavigationExample from './.vitepress/theme/examples/DragNavigationExample.vue'
 import AutoplayExample from './.vitepress/theme/examples/AutoplayExample.vue'
 import ThumbsExample from './.vitepress/theme/examples/ThumbsExample.vue'
+import GridExample from './.vitepress/theme/examples/GridExample.vue'
+import GridDimensionsExample from './.vitepress/theme/examples/GridDimensionsExample.vue'
 </script>
 
 <div class="examples-page">
@@ -76,6 +78,14 @@ import ThumbsExample from './.vitepress/theme/examples/ThumbsExample.vue'
 ## 14. Thumbs Sync
 
 <ThumbsExample detailsLink="./examples/thumbs" />
+
+## 15. Grid Layout
+
+<GridExample detailsLink="./examples/grid" />
+
+## 16. Grid Dimensions
+
+<GridDimensionsExample detailsLink="./examples/grid" />
 
 </div>
 

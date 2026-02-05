@@ -98,6 +98,23 @@ new Tvist('.tvist', {
 }
 ```
 
+## Center + Loop (Бесконечное центрирование)
+
+Комбинация `center: true` и `loop: true` позволяет создать бесконечную карусель с активным элементом по центру.
+
+<ExampleCard title="Center с Loop" description="Бесконечная прокрутка с центрированием">
+  <CenterLoopExample />
+</ExampleCard>
+
+```js
+new Tvist('.tvist', {
+  perPage: 3,
+  center: true,
+  loop: true,
+  speed: 400,
+})
+```
+
 ## Как это работает
 
 ### Логика центрирования
@@ -161,23 +178,6 @@ new Tvist('.tvist', {
       center: false, // Отключаем центрирование на маленьких экранах
     },
   },
-})
-```
-
-## Center + Loop (Бесконечное центрирование)
-
-Комбинация `center: true` и `loop: true` позволяет создать бесконечную карусель с активным элементом по центру.
-
-<ExampleCard title="Center с Loop" description="Бесконечная прокрутка с центрированием">
-  <CenterLoopExample />
-</ExampleCard>
-
-```js
-new Tvist('.tvist', {
-  perPage: 3,
-  center: true,
-  loop: true,
-  speed: 400,
 })
 ```
 

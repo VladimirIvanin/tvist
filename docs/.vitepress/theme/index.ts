@@ -22,6 +22,10 @@ import CenterPerPage2Example from './examples/CenterPerPage2Example.vue'
 import CenterPerPage4Example from './examples/CenterPerPage4Example.vue'
 import CenterLoopExample from './examples/CenterLoopExample.vue'
 
+// Grid examples
+import GridExample from './examples/GridExample.vue'
+import GridDimensionsExample from './examples/GridDimensionsExample.vue'
+
 export default {
   extends: DefaultTheme,
   Layout: () => {
@@ -49,5 +53,9 @@ export default {
     app.component('CenterPerPage2Example', CenterPerPage2Example)
     app.component('CenterPerPage4Example', CenterPerPage4Example)
     app.component('CenterLoopExample', CenterLoopExample)
+
+    // Grid examples
+    app.component('GridExample', GridExample)
+    app.component('GridDimensionsExample', GridDimensionsExample)
   }
 } satisfies Theme
