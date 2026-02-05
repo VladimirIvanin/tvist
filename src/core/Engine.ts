@@ -47,8 +47,8 @@ export class Engine {
     // Вычисляем endIndex для Counter
     const perPage = options.perPage ?? 1
     
-    // В режиме loop или navigation разрешаем выбирать любой слайд
-    const counterEndIndex = (isLoop || options.isNavigation)
+    // В режиме loop или navigation или center разрешаем выбирать любой слайд
+    const counterEndIndex = (isLoop || options.isNavigation || options.center)
       ? slideCount - 1 
       : Math.max(0, slideCount - perPage)
     
@@ -314,8 +314,8 @@ export class Engine {
 
     let targetPosition = this.getScrollPositionForIndex(normalizedIndex)
 
-    // При center режиме тоже применяем ограничения для навигации
-    if ((isNavigation || this.options.center) && !this.options.loop) {
+    // При навигации применяем ограничения (но не для center режима)
+    if (isNavigation && !this.options.loop && !this.options.center) {
       const peekTrim = this.options.peekTrim !== false
       const maxPos = peekTrim ? this.getMaxScrollPosition() : -this.getSlidePosition(endIndex)
       const minPos = peekTrim ? this.getMinScrollPosition() : 0

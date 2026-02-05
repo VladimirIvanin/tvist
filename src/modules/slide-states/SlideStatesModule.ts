@@ -55,6 +55,7 @@ export class SlideStatesModule extends Module {
       // Определяем, является ли слайд активным
       const isActive = index === activeIndex
 
+
       // Определяем prev и next с учётом loop
       let isPrev = false
       let isNext = false

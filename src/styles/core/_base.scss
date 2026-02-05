@@ -29,7 +29,7 @@
     
     // Performance optimization: рендерим только видимые слайды
     content-visibility: auto;
-    contain-intrinsic-size: auto 500px;
+    // contain-intrinsic-size: auto 500px;
 
     // Классы состояний слайдов
     // Эти классы применяются модулем SlideStatesModule

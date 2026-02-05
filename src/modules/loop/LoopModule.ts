@@ -38,16 +38,21 @@ export class LoopModule extends Module {
   }
 
   init(): void {
+    console.log('DEBUG: LoopModule init called. options:', JSON.stringify(this.options))
     if (!this.options.loop) {
+      console.log('DEBUG: Loop disabled')
       return
     }
 
     // Защита от повторной инициализации
     if (this.isInitialized) {
+      console.log('DEBUG: Already initialized')
       return
     }
 
     this.originalSlidesCount = this.tvist.slides.length
+    console.log('DEBUG: originalSlidesCount:', this.originalSlidesCount)
+
 
     if (this.originalSlidesCount < 2) {
       return
@@ -57,6 +62,7 @@ export class LoopModule extends Module {
 
     // Вычисляем количество клонов
     this.cloneCount = this.computeCloneCount()
+    console.log('DEBUG: cloneCount:', this.cloneCount)
 
     // Создаём клоны
     this.createClones()
@@ -332,7 +338,9 @@ export class LoopModule extends Module {
    */
   getRealIndex(): number {
     const physicalIndex = this.tvist.engine.index.get()
-    return this.physicalToLogical(physicalIndex)
+    const logical = this.physicalToLogical(physicalIndex)
+    console.log(`DEBUG: getRealIndex. physical: ${physicalIndex}, logical: ${logical}`)
+    return logical
   }
 
   /**
