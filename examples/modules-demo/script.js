@@ -37,28 +37,34 @@ document.getElementById('stop-autoplay').addEventListener('click', () => {
   }
 })
 
-// Слайдер 3: Breakpoints
+// Слайдер 3: Breakpoints (Container First + Auto Width)
 const slider3 = new Tvist('#slider3', {
-  perPage: 4,
+  // Вместо фиксированного perPage указываем минимальную ширину слайда
+  slideMinWidth: 200, 
+  perPage: 1, // Fallback
   gap: 20,
   drag: true,
   arrows: true,
+  // Включаем режим container query
+  breakpointsBase: 'container',
   pagination: {
     type: 'bullets',
     clickable: true
   },
   breakpoints: {
     1024: {
-      perPage: 3,
-      gap: 15
+      gap: 15,
+      // Можно менять slideMinWidth на разных разрешениях
+      slideMinWidth: 180
     },
     768: {
-      perPage: 2,
-      gap: 10
+      gap: 10,
+      slideMinWidth: 150
     },
     480: {
-      perPage: 1,
-      gap: 0
+      gap: 5,
+      slideMinWidth: 0, // Отключаем авто-расчет
+      perPage: 1        // Принудительно 1 слайд
     }
   }
 })
@@ -66,11 +72,16 @@ const slider3 = new Tvist('#slider3', {
 // Отслеживаем breakpoints
 slider3.on('breakpoint', (bp) => {
   const info = document.getElementById('breakpoint-info')
-  let name = 'desktop (4 слайда)'
-  if (bp === 1024) name = 'laptop (3 слайда)'
-  if (bp === 768) name = 'tablet (2 слайда)'
-  if (bp === 480) name = 'mobile (1 слайд)'
-  info.innerHTML = `<strong>Текущий breakpoint:</strong> ${name}`
+  const width = slider3.engine.containerWidthValue
+  info.innerHTML = `<strong>Container Width:</strong> ${Math.round(width)}px | <strong>Breakpoint:</strong> ${bp || 'default'} | <strong>PerPage:</strong> ${slider3.options.perPage}`
+})
+
+// Обновляем инфо при ресайзе
+slider3.on('resize', () => {
+   const info = document.getElementById('breakpoint-info')
+   const width = slider3.engine.containerWidthValue
+   const bp = slider3.getModule('breakpoints')?.getCurrentBreakpoint()
+   info.innerHTML = `<strong>Container Width:</strong> ${Math.round(width)}px | <strong>Breakpoint:</strong> ${bp || 'default'} | <strong>PerPage:</strong> ${slider3.options.perPage}`
 })
 
 // Слайдер 4: Fraction

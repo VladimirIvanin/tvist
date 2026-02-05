@@ -68,6 +68,19 @@ export class Engine {
     // Размер контейнера
     this.containerWidth = getOuterWidth(this.tvist.root)
 
+    // Автоматический расчет perPage если задан slideMinWidth
+    if (this.options.slideMinWidth && this.options.slideMinWidth > 0) {
+      const gap = this.options.gap ?? 0
+      const minWidth = this.options.slideMinWidth
+      
+      // (width + gap) / (minWidth + gap)
+      const calculatedPerPage = Math.floor(
+        (this.containerWidth + gap) / (minWidth + gap)
+      )
+      
+      this.options.perPage = Math.max(1, calculatedPerPage)
+    }
+
     // Размер одного слайда с учётом perPage и gap
     const perPage = this.options.perPage ?? 1
     const gap = this.options.gap ?? 0

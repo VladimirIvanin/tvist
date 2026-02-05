@@ -35,6 +35,7 @@ export class Tvist {
 
   // Обработчик resize (для отписки)
   private resizeHandler?: () => void
+  private resizeObserver?: ResizeObserver
 
   // Опциональный резолвер индекса (для модулей типа Loop)
   public indexResolver?: (index: number) => number
@@ -136,7 +137,16 @@ export class Tvist {
       this.emit('resize')
     }, 100)
 
-    window.addEventListener('resize', this.resizeHandler)
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver((entries) => {
+        // Используем throttle handler
+        this.resizeHandler?.()
+      })
+      this.resizeObserver.observe(this.root)
+    } else {
+      // Fallback для старых браузеров
+      window.addEventListener('resize', this.resizeHandler)
+    }
   }
 
   // ==================== ПУБЛИЧНОЕ API ====================
@@ -207,7 +217,9 @@ export class Tvist {
     this.engine.destroy()
 
     // Удаляем обработчик resize
-    if (this.resizeHandler) {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect()
+    } else if (this.resizeHandler) {
       window.removeEventListener('resize', this.resizeHandler)
     }
 
