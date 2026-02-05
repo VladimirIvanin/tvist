@@ -42,7 +42,7 @@ export class BreakpointsModule extends Module {
     this.mediaQueries.forEach((mq) => {
       try {
         mq.removeEventListener('change', this.handleMediaChange)
-      } catch () {
+      } catch {
         // Fallback for older browsers
         mq.removeListener(this.handleMediaChange)
       }

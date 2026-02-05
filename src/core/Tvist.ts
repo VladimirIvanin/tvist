@@ -310,6 +310,28 @@ export class Tvist {
     return this
   }
 
+  /**
+   * Синхронизация с другим экземпляром Tvist
+   * @param target - целевой экземпляр для синхронизации
+   */
+  sync(target: Tvist): this {
+    // 1. Когда скроллится этот слайдер -> скроллим целевой
+    this.on('slideChange', (index: number) => {
+      if (target.activeIndex !== index) {
+        target.scrollTo(index)
+      }
+    })
+
+    // 2. Когда скроллится целевой -> скроллим этот
+    target.on('slideChange', (index: number) => {
+      if (this.activeIndex !== index) {
+        this.scrollTo(index)
+      }
+    })
+
+    return this
+  }
+
   // ==================== СТАТИЧЕСКИЕ МЕТОДЫ ====================
 
   /**

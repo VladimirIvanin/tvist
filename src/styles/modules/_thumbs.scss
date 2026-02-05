@@ -1,0 +1,19 @@
+@use "../core/variables" as *;
+
+.tvist--nav {
+  .tvist__slide {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+    border: 2px solid transparent;
+
+    &--nav-active {
+      opacity: 1;
+      border-color: #ccc; // Дефолтный стиль, можно переопределить
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}

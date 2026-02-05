@@ -86,10 +86,15 @@ export interface TvistOptions {
     viewportPadding?: number
   }
   
-  // Thumbs
+  // Thumbs & Navigation
   thumbs?: {
     slider: Tvist
   }
+  /**
+   * Если true, слайдер будет вести себя как навигация (клики по слайдам делают их активными)
+   * Используется для создания thumbnail-слайдеров
+   */
+  isNavigation?: boolean
   
   // Virtual
   virtual?: boolean | {
