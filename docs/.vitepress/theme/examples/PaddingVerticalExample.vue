@@ -28,7 +28,7 @@ onMounted(() => {
   if (sliderRef.value) {
     slider = new Tvist(sliderRef.value, {
       direction: 'vertical',
-      padding: { top: 50, bottom: 100 },
+      peek: { top: 50, bottom: 100 },
       perPage: 1,
       arrows: true,
       pagination: true

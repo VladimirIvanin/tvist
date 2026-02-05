@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { Tvist } from '../../src/core/Tvist'
 import type { TvistOptions } from '../../src/core/types'
 
-describe('Padding integration', () => {
+describe('Peek integration', () => {
   let root: HTMLElement
   let tvist: Tvist | null = null
 
@@ -22,7 +22,7 @@ describe('Padding integration', () => {
     // Задаём фиксированные размеры для тестов
     root.style.width = '1000px'
     root.style.height = '500px'
-    
+
     // Мокируем offsetWidth/offsetHeight для тестовой среды
     Object.defineProperty(root, 'offsetWidth', {
       configurable: true,
@@ -45,9 +45,9 @@ describe('Padding integration', () => {
   })
 
   describe('Horizontal slider', () => {
-    it('should apply numeric padding to container', () => {
+    it('should apply numeric peek to container', () => {
       const options: TvistOptions = {
-        padding: 50,
+        peek: 50,
         direction: 'horizontal'
       }
 
@@ -58,9 +58,9 @@ describe('Padding integration', () => {
       expect(container.style.paddingRight).toBe('50px')
     })
 
-    it('should apply string padding to container', () => {
+    it('should apply string peek to container', () => {
       const options: TvistOptions = {
-        padding: '2rem',
+        peek: '2rem',
         direction: 'horizontal'
       }
 
@@ -71,9 +71,9 @@ describe('Padding integration', () => {
       expect(container.style.paddingRight).toBe('2rem')
     })
 
-    it('should apply object padding with different left/right values', () => {
+    it('should apply object peek with different left/right values', () => {
       const options: TvistOptions = {
-        padding: { left: 30, right: 70 },
+        peek: { left: 30, right: 70 },
         direction: 'horizontal'
       }
 
@@ -84,9 +84,9 @@ describe('Padding integration', () => {
       expect(container.style.paddingRight).toBe('70px')
     })
 
-    it('should apply object padding with mixed units', () => {
+    it('should apply object peek with mixed units', () => {
       const options: TvistOptions = {
-        padding: { left: '1rem', right: 50 },
+        peek: { left: '1rem', right: 50 },
         direction: 'horizontal'
       }
 
@@ -97,9 +97,9 @@ describe('Padding integration', () => {
       expect(container.style.paddingRight).toBe('50px')
     })
 
-    it('should handle partial object padding', () => {
+    it('should handle partial object peek', () => {
       const options: TvistOptions = {
-        padding: { left: 50 },
+        peek: { left: 50 },
         direction: 'horizontal'
       }
 
@@ -112,9 +112,9 @@ describe('Padding integration', () => {
   })
 
   describe('Vertical slider', () => {
-    it('should apply numeric padding to container', () => {
+    it('should apply numeric peek to container', () => {
       const options: TvistOptions = {
-        padding: 50,
+        peek: 50,
         direction: 'vertical'
       }
 
@@ -125,9 +125,9 @@ describe('Padding integration', () => {
       expect(container.style.paddingBottom).toBe('50px')
     })
 
-    it('should apply object padding with different top/bottom values', () => {
+    it('should apply object peek with different top/bottom values', () => {
       const options: TvistOptions = {
-        padding: { top: 30, bottom: 70 },
+        peek: { top: 30, bottom: 70 },
         direction: 'vertical'
       }
 
@@ -139,10 +139,10 @@ describe('Padding integration', () => {
     })
   })
 
-  describe('Padding with perPage', () => {
-    it('should calculate slide size considering padding', () => {
+  describe('Peek with perPage', () => {
+    it('should calculate slide size considering peek', () => {
       const options: TvistOptions = {
-        padding: 100, // 100px left + 100px right = 200px total
+        peek: 100, // 100px left + 100px right = 200px total
         perPage: 2,
         gap: 20,
         direction: 'horizontal'
@@ -161,9 +161,9 @@ describe('Padding integration', () => {
       })
     })
 
-    it('should calculate slide size with asymmetric padding', () => {
+    it('should calculate slide size with asymmetric peek', () => {
       const options: TvistOptions = {
-        padding: { left: 50, right: 150 }, // 200px total
+        peek: { left: 50, right: 150 }, // 200px total
         perPage: 2,
         gap: 20,
         direction: 'horizontal'
@@ -183,8 +183,8 @@ describe('Padding integration', () => {
     })
   })
 
-  describe('Padding without value', () => {
-    it('should not apply padding when not specified', () => {
+  describe('Peek without value', () => {
+    it('should not apply peek when not specified', () => {
       const options: TvistOptions = {
         direction: 'horizontal'
       }
@@ -197,10 +197,10 @@ describe('Padding integration', () => {
     })
   })
 
-  describe('Padding with CSS units', () => {
+  describe('Peek with CSS units', () => {
     it('should work with rem units', () => {
       const options: TvistOptions = {
-        padding: '1rem',
+        peek: '1rem',
         direction: 'horizontal'
       }
 
@@ -213,7 +213,7 @@ describe('Padding integration', () => {
 
     it('should work with percentage units', () => {
       const options: TvistOptions = {
-        padding: '10%',
+        peek: '10%',
         direction: 'horizontal'
       }
 
@@ -226,7 +226,7 @@ describe('Padding integration', () => {
 
     it('should work with em units', () => {
       const options: TvistOptions = {
-        padding: '2em',
+        peek: '2em',
         direction: 'horizontal'
       }
 
@@ -238,10 +238,10 @@ describe('Padding integration', () => {
     })
   })
 
-  describe('Padding edge cases', () => {
-    it('should handle zero padding', () => {
+  describe('Peek edge cases', () => {
+    it('should handle zero peek', () => {
       const options: TvistOptions = {
-        padding: 0,
+        peek: 0,
         direction: 'horizontal'
       }
 
@@ -252,9 +252,9 @@ describe('Padding integration', () => {
       expect(container.style.paddingRight).toBe('0px')
     })
 
-    it('should handle empty object padding', () => {
+    it('should handle empty object peek', () => {
       const options: TvistOptions = {
-        padding: {},
+        peek: {},
         direction: 'horizontal'
       }
 

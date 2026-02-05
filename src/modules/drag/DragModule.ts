@@ -87,20 +87,22 @@ export class DragModule extends Module {
   }
 
   /**
-   * Обновление границ для rubberband (в пикселях)
+   * Обновление границ для rubberband.
+   * При loop границ нет. Без loop: peekTrim — min/max без левого/правого peek.
    */
   private updateBounds(): void {
-    const { slides, engine } = this.tvist
+    const { engine, slides } = this.tvist
     const perPage = this.options.perPage ?? 1
 
-    // Границы в пикселях (позиции первого и последнего слайда)
-    this.minPosition = 0
-    this.maxPosition = -engine.getSlidePosition(slides.length - perPage)
-
-    // С loop границ нет
     if (this.options.loop) {
       this.minPosition = Infinity
       this.maxPosition = -Infinity
+    } else {
+      const usePeekTrim = this.options.peekTrim !== false
+      this.minPosition = usePeekTrim ? engine.getMinScrollPosition() : 0
+      this.maxPosition = usePeekTrim
+        ? engine.getMaxScrollPosition()
+        : -engine.getSlidePosition(slides.length - perPage)
     }
   }
 

@@ -39,30 +39,30 @@ export interface TvistOptions {
   gap?: number
   
   /**
-   * Padding слайдера. Для горизонтального слайдера - left/right, для вертикального - top/bottom
+   * Peek — отступы, показывающие часть соседних слайдов (чтобы было видно, что есть ещё слайды).
+   * Для горизонтального слайдера: left/right, для вертикального: top/bottom.
    * @default undefined
    * @example
-   * // Единое значение (px)
-   * padding: 10
-   * 
-   * // CSS формат
-   * padding: '1rem'
-   * 
-   * // Разные значения для горизонтального слайдера
-   * padding: { left: 10, right: 20 }
-   * padding: { left: '1rem', right: '2rem' }
-   * 
-   * // Разные значения для вертикального слайдера
-   * padding: { top: 10, bottom: 20 }
+   * peek: 10
+   * peek: '1rem'
+   * peek: { left: 10, right: 20 }
+   * peek: { top: 10, bottom: 20 }
    */
-  padding?: number | string | { 
+  peek?: number | string | { 
     left?: number | string
     right?: number | string 
   } | { 
     top?: number | string
     bottom?: number | string 
   }
-  
+
+  /**
+   * Peek trim: при true (по умолчанию) концовка прижимается к краю — последний слайд без дыры справа/снизу.
+   * При включённом loop не применяется.
+   * @default true
+   */
+  peekTrim?: boolean
+
   /**
    * Скорость анимации перехода в миллисекундах
    * @default 300

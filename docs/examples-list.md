@@ -27,9 +27,9 @@ import ThumbsExample from './.vitepress/theme/examples/ThumbsExample.vue'
 
 <PerPageExample detailsLink="./examples/perpage" />
 
-## 3. Padding: отступы слайдера
+## 3. Peek: часть соседних слайдов
 
-<PaddingBasicExample detailsLink="./examples/padding" />
+<PaddingBasicExample detailsLink="./examples/peek" />
 
 ## 4. Адаптивный слайдер (Responsive)
 

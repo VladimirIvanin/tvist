@@ -9,7 +9,7 @@ import { Animator } from './Animator'
 import type { Tvist } from './Tvist'
 import type { TvistOptions } from './types'
 import { getOuterWidth, getOuterHeight } from '../utils/dom'
-import { applyPadding, getPaddingValue, getPaddingValueFromOptions } from '../utils/padding'
+import { applyPeek, getPeekValue, getPeekValueFromOptions } from '../utils/peek'
 
 export class Engine {
   // Позиции
@@ -26,8 +26,8 @@ export class Engine {
   private containerSize = 0
   private slideSize = 0
   private slidePositions: number[] = []
-  private paddingStart = 0 // padding слева/сверху
-  private paddingEnd = 0   // padding справа/снизу
+  private peekStart = 0 // peek слева/сверху
+  private peekEnd = 0   // peek справа/снизу
 
   // Ссылки
   private tvist: Tvist
@@ -55,19 +55,37 @@ export class Engine {
     this.index = new Counter(slideCount, startIndex, isLoop, counterEndIndex)
     this.animator = new Animator()
 
-    // Применяем padding к контейнеру
-    this.applyContainerPadding()
+    // Применяем peek к контейнеру
+    this.applyPeek()
     
     // Первичный расчёт размеров
     this.calculateSizes()
     this.calculatePositions()
+
+    // Начальная позиция с учётом trim (в начале — без левого peek, в конце — без правого)
+    const initialPos = this.getScrollPositionForIndex(startIndex)
+    this.location.set(initialPos)
+    this.target.set(initialPos)
+    this.applyTransform()
   }
 
   /**
-   * Применяет padding к контейнеру слайдов
+   * Позиция скролла для индекса. При loop peekTrim не применяется.
    */
-  private applyContainerPadding(): void {
-    applyPadding(this.tvist.container, this.options)
+  private getScrollPositionForIndex(index: number): number {
+    if (this.options.loop) return -this.getSlidePosition(index)
+    const endIndex = this.getEndIndex()
+    const peekTrim = this.options.peekTrim !== false
+    if (index === 0) return peekTrim ? this.getMinScrollPosition() : 0
+    if (index === endIndex) return peekTrim ? this.getMaxScrollPosition() : -this.getSlidePosition(index)
+    return -this.getSlidePosition(index)
+  }
+
+  /**
+   * Применяет peek к контейнеру слайдов
+   */
+  private applyPeek(): void {
+    applyPeek(this.tvist.container, this.options)
   }
 
   /**
@@ -80,44 +98,39 @@ export class Engine {
     if (slides.length === 0) {
       this.containerSize = 0
       this.slideSize = 0
-      this.paddingStart = 0
-      this.paddingEnd = 0
+      this.peekStart = 0
+      this.peekEnd = 0
       return
     }
 
-    // Получаем значения padding
-    // Сначала пытаемся получить из опций (для числовых значений)
+    // Получаем значения peek из опций (для числовых значений)
     if (isVertical) {
-      this.paddingStart = getPaddingValueFromOptions(this.options, 'top')
-      this.paddingEnd = getPaddingValueFromOptions(this.options, 'bottom')
-      
-      // Если padding задан строкой (CSS единицы), читаем из DOM
-      if (this.paddingStart === 0 && this.options.padding) {
-        this.paddingStart = getPaddingValue(this.tvist.container, 'top')
+      this.peekStart = getPeekValueFromOptions(this.options, 'top')
+      this.peekEnd = getPeekValueFromOptions(this.options, 'bottom')
+
+      if (this.peekStart === 0 && this.options.peek) {
+        this.peekStart = getPeekValue(this.tvist.container, 'top')
       }
-      if (this.paddingEnd === 0 && this.options.padding) {
-        this.paddingEnd = getPaddingValue(this.tvist.container, 'bottom')
+      if (this.peekEnd === 0 && this.options.peek) {
+        this.peekEnd = getPeekValue(this.tvist.container, 'bottom')
       }
     } else {
-      this.paddingStart = getPaddingValueFromOptions(this.options, 'left')
-      this.paddingEnd = getPaddingValueFromOptions(this.options, 'right')
-      
-      // Если padding задан строкой (CSS единицы), читаем из DOM
-      if (this.paddingStart === 0 && this.options.padding) {
-        this.paddingStart = getPaddingValue(this.tvist.container, 'left')
+      this.peekStart = getPeekValueFromOptions(this.options, 'left')
+      this.peekEnd = getPeekValueFromOptions(this.options, 'right')
+
+      if (this.peekStart === 0 && this.options.peek) {
+        this.peekStart = getPeekValue(this.tvist.container, 'left')
       }
-      if (this.paddingEnd === 0 && this.options.padding) {
-        this.paddingEnd = getPaddingValue(this.tvist.container, 'right')
+      if (this.peekEnd === 0 && this.options.peek) {
+        this.peekEnd = getPeekValue(this.tvist.container, 'right')
       }
     }
 
-    // Размер контейнера (внешний размер root элемента)
-    const rootSize = isVertical 
+    const rootSize = isVertical
       ? getOuterHeight(this.tvist.root)
       : getOuterWidth(this.tvist.root)
-    
-    // Доступный размер для слайдов = размер контейнера - padding
-    this.containerSize = rootSize - this.paddingStart - this.paddingEnd
+
+    this.containerSize = rootSize - this.peekStart - this.peekEnd
 
     // Автоматический расчет perPage если задан slideMinSize
     if (this.options.slideMinSize && this.options.slideMinSize > 0) {
@@ -208,6 +221,40 @@ export class Engine {
   }
 
   /**
+   * Минимальная позиция скролла (при trim — первый слайд прижат к левому краю, левый peek не показывается).
+   */
+  getMinScrollPosition(): number {
+    if (this.options.loop) return -Infinity
+    const isVertical = this.options.direction === 'vertical'
+    const peekStart = isVertical
+      ? getPeekValue(this.tvist.container, 'top')
+      : getPeekValue(this.tvist.container, 'left')
+    return -(peekStart || this.peekStart)
+  }
+
+  /**
+   * Максимальная позиция скролла (отрицательная).
+   * При этой позиции правый край последнего слайда совпадает с правым краем root — правый peek не показывается (trim).
+   * Формула: чтобы контент lastPageRight был у правого края root: position = rootSize - peekStart - lastPageRight.
+   */
+  getMaxScrollPosition(): number {
+    if (this.options.loop) return -Infinity
+    const endIndex = this.getEndIndex()
+    const perPage = this.options.perPage ?? 1
+    const gap = this.options.gap ?? 0
+    const lastPageRight = this.getSlidePosition(endIndex) + perPage * this.slideSize + (perPage - 1) * gap
+    const isVertical = this.options.direction === 'vertical'
+    const rootSize = isVertical
+      ? getOuterHeight(this.tvist.root)
+      : getOuterWidth(this.tvist.root)
+    let peekStart = isVertical
+      ? getPeekValue(this.tvist.container, 'top')
+      : getPeekValue(this.tvist.container, 'left')
+    if (peekStart === 0 && this.peekStart > 0) peekStart = this.peekStart
+    return rootSize - peekStart - lastPageRight
+  }
+
+  /**
    * Получить позицию слайда по индексу
    */
   getSlidePosition(index: number): number {
@@ -235,13 +282,13 @@ export class Engine {
     // Нормализуем индекс через Counter
     const normalizedIndex = this.index.set(clampedIndex) ?? 0
 
-    // Получаем целевую позицию
-    let targetPosition = -this.getSlidePosition(normalizedIndex)
-    
-    // В режиме навигации (без loop) ограничиваем позицию скролла
+    let targetPosition = this.getScrollPositionForIndex(normalizedIndex)
+
     if (isNavigation && !this.options.loop) {
-      const endPosition = -this.getSlidePosition(endIndex)
-      targetPosition = Math.max(targetPosition, endPosition)
+      const peekTrim = this.options.peekTrim !== false
+      const maxPos = peekTrim ? this.getMaxScrollPosition() : -this.getSlidePosition(endIndex)
+      const minPos = peekTrim ? this.getMinScrollPosition() : 0
+      targetPosition = Math.max(maxPos, Math.min(minPos, targetPosition))
     }
 
     // События
@@ -324,15 +371,13 @@ export class Engine {
    * Обновление размеров (вызывается при resize)
    */
   update(): void {
-    // Переприменяем padding (может измениться при breakpoints)
-    this.applyContainerPadding()
+    this.applyPeek()
     
     this.calculateSizes()
     this.calculatePositions()
 
-    // Пересчитываем позицию для текущего слайда
     const currentIndex = this.index.get()
-    const targetPosition = -this.getSlidePosition(currentIndex)
+    const targetPosition = this.getScrollPositionForIndex(currentIndex)
 
     this.target.set(targetPosition)
     this.location.set(targetPosition)

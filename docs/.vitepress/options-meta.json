@@ -19,10 +19,16 @@
       "description": "Расстояние между слайдами в пикселях"
     },
     {
-      "name": "padding",
+      "name": "peek",
       "type": "number | string | { left?: number | string, right?: number | string } | { top?: number | string, bottom?: number | string }",
       "default": "undefined",
-      "description": "Отступы слайдера. Для горизонтального - left/right, для вертикального - top/bottom. Поддерживает числа (px), строки (CSS единицы) и объекты для разных значений"
+      "description": "Peek — отступы, показывающие часть соседних слайдов. Для горизонтального - left/right, для вертикального - top/bottom"
+    },
+    {
+      "name": "peekTrim",
+      "type": "boolean",
+      "default": "true",
+      "description": "Peek trim: при true концовка прижимается к краю. Peek — зазор для соседних слайдов"
     },
     {
       "name": "speed",

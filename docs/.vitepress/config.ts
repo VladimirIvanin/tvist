@@ -46,7 +46,7 @@ export default defineConfig({
           { text: 'Все примеры', link: '/examples-list' },
           { text: 'Базовый', link: '/examples/basic' },
           { text: 'PerPage', link: '/examples/perpage' },
-          { text: 'Padding', link: '/examples/padding' },
+          { text: 'Peek', link: '/examples/peek' },
           { text: 'Responsive', link: '/examples/responsive' },
           { text: 'Loop', link: '/examples/loop' },
           { text: 'Fade Effect', link: '/examples/effect-fade' },

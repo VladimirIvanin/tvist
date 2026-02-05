@@ -14,6 +14,7 @@ import PaddingPerPageExample from './examples/PaddingPerPageExample.vue'
 import PaddingVerticalExample from './examples/PaddingVerticalExample.vue'
 import PaddingBreakpointsExample from './examples/PaddingBreakpointsExample.vue'
 import PaddingMixedUnitsExample from './examples/PaddingMixedUnitsExample.vue'
+import PeekTrimExample from './examples/PeekTrimExample.vue'
 
 export default {
   extends: DefaultTheme,
@@ -35,5 +36,6 @@ export default {
     app.component('PaddingVerticalExample', PaddingVerticalExample)
     app.component('PaddingBreakpointsExample', PaddingBreakpointsExample)
     app.component('PaddingMixedUnitsExample', PaddingMixedUnitsExample)
+    app.component('PeekTrimExample', PeekTrimExample)
   }
 } satisfies Theme
