@@ -1,0 +1,78 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: #f5f5f5;
+}
+
+.demo-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Main Slider Styles */
+#main-slider {
+    margin-bottom: 10px;
+}
+
+#main-slider .tvist__slide {
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+/* Thumb Slider Styles */
+#thumb-slider {
+    margin-bottom: 20px;
+}
+
+#thumb-slider .tvist__slide {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+    cursor: pointer;
+}
+
+#thumb-slider .tvist__slide.is-active {
+    opacity: 1;
+    border: 3px solid #333;
+}
+
+/* Code Block Styles */
+.code-block {
+    margin-top: 30px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.code-block h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.code-block pre {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+    margin: 0;
+    border: 1px solid #e9ecef;
+}

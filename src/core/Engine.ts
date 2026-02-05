@@ -43,9 +43,13 @@ export class Engine {
     
     // Вычисляем endIndex для Counter
     const perPage = options.perPage ?? 1
-    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
     
-    this.index = new Counter(slideCount, startIndex, isLoop, endIndex)
+    // В режиме loop или navigation разрешаем выбирать любой слайд
+    const counterEndIndex = (isLoop || options.isNavigation)
+      ? slideCount - 1 
+      : Math.max(0, slideCount - perPage)
+    
+    this.index = new Counter(slideCount, startIndex, isLoop, counterEndIndex)
     this.animator = new Animator()
 
     // Первичный расчёт размеров
@@ -158,7 +162,10 @@ export class Engine {
   scrollTo(index: number, instant = false): void {
     // Ограничиваем индекс до endIndex (если не loop)
     const endIndex = this.getEndIndex()
-    const clampedIndex = this.options.loop 
+    const isNavigation = this.options.isNavigation
+
+    // Если включен режим навигации, разрешаем выбор слайдов за пределами endIndex
+    const clampedIndex = this.options.loop || isNavigation
       ? index 
       : Math.max(0, Math.min(index, endIndex))
 
@@ -166,7 +173,13 @@ export class Engine {
     const normalizedIndex = this.index.set(clampedIndex) ?? 0
 
     // Получаем целевую позицию
-    const targetPosition = -this.getSlidePosition(normalizedIndex)
+    let targetPosition = -this.getSlidePosition(normalizedIndex)
+    
+    // В режиме навигации (без loop) ограничиваем позицию скролла
+    if (isNavigation && !this.options.loop) {
+      const endPosition = -this.getSlidePosition(endIndex)
+      targetPosition = Math.max(targetPosition, endPosition)
+    }
 
     // События
     this.tvist.emit('beforeSlideChange', normalizedIndex)
@@ -293,8 +306,13 @@ export class Engine {
    */
   canScrollNext(): boolean {
     if (this.options.loop) return true
-    const endIndex = this.getEndIndex()
-    return this.index.get() < endIndex
+    
+    // В режиме навигации лимит - это последний слайд
+    const limit = this.options.isNavigation
+      ? this.tvist.slides.length - 1
+      : this.getEndIndex()
+
+    return this.index.get() < limit
   }
 
   /**
