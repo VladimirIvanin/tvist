@@ -9,7 +9,6 @@ pnpm-lock.yaml
 # Build output
 dist/
 build/
-docs-dist/
 *.tsbuildinfo
 
 # Testing

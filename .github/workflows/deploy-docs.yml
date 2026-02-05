@@ -36,6 +36,18 @@ jobs:
       - name: Build documentation
         run: npm run docs:build
 
+      - name: Verify build output
+        run: |
+          echo "Checking if docs/.vitepress/dist exists..."
+          if [ ! -d "docs/.vitepress/dist" ]; then
+            echo "Error: docs/.vitepress/dist directory not found!"
+            echo "Listing docs/.vitepress contents:"
+            ls -la docs/.vitepress/ || echo "docs/.vitepress/ not found"
+            exit 1
+          fi
+          echo "Build output verified. Contents:"
+          ls -la docs/.vitepress/dist
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

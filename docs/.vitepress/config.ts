@@ -5,7 +5,6 @@ export default defineConfig({
   description: "Модульный и легковесный слайдер для современного веба",
   lang: 'ru-RU',
   base: '/tvist/',
-  outDir: '../docs-dist',
   
   vite: {
     resolve: {
