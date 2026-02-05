@@ -15,6 +15,7 @@ export class GridModule extends Module {
 
   override init(): void {
     if (this.shouldBeActive()) {
+      this.isActive = true
       this.applyGrid()
       this.fixEnginePositions()
     }
@@ -24,12 +25,18 @@ export class GridModule extends Module {
     this.removeGrid()
   }
 
+  private isActive = false
+
   override onUpdate(): void {
     if (this.shouldBeActive()) {
+      this.isActive = true
       this.applyGrid()
       this.fixEnginePositions()
-    } else {
+    } else if (this.isActive) {
+      this.isActive = false
       this.removeGrid()
+      // Форсим обновление Engine, чтобы он вернул свои стили
+      this.tvist.engine.update()
     }
   }
 
