@@ -19,6 +19,12 @@
       "description": "Расстояние между слайдами в пикселях"
     },
     {
+      "name": "padding",
+      "type": "number | string | { left?: number | string, right?: number | string } | { top?: number | string, bottom?: number | string }",
+      "default": "undefined",
+      "description": "Отступы слайдера. Для горизонтального - left/right, для вертикального - top/bottom. Поддерживает числа (px), строки (CSS единицы) и объекты для разных значений"
+    },
+    {
       "name": "speed",
       "type": "number",
       "default": "300",
