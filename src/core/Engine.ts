@@ -269,10 +269,11 @@ export class Engine {
    */
   getMaxScrollPosition(): number {
     if (this.options.loop) return -Infinity
-    const endIndex = this.getEndIndex()
-    const perPage = this.options.perPage ?? 1
-    const gap = this.options.gap ?? 0
-    const lastPageRight = this.getSlidePosition(endIndex) + perPage * this.slideSize + (perPage - 1) * gap
+    
+    // Рассчитываем правую границу всего контента по последнему слайду
+    const lastIndex = this.tvist.slides.length - 1
+    const lastPageRight = this.getSlidePosition(lastIndex) + this.slideSize
+
     const isVertical = this.options.direction === 'vertical'
     const rootSize = isVertical
       ? getOuterHeight(this.tvist.root)
