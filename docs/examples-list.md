@@ -5,7 +5,9 @@
 <script setup>
 import BasicExample from './.vitepress/theme/examples/BasicExample.vue'
 import PerPageExample from './.vitepress/theme/examples/PerPageExample.vue'
-import PaddingBasicExample from './.vitepress/theme/examples/PaddingBasicExample.vue'
+import PeekBasicExample from './.vitepress/theme/examples/PeekBasicExample.vue'
+import CenterBasicExample from './.vitepress/theme/examples/CenterBasicExample.vue'
+import CenterPerPage2Example from './.vitepress/theme/examples/CenterPerPage2Example.vue'
 import ResponsiveExample from './.vitepress/theme/examples/ResponsiveExample.vue'
 import LoopExample from './.vitepress/theme/examples/LoopExample.vue'
 import FadeExample from './.vitepress/theme/examples/FadeExample.vue'
@@ -29,41 +31,49 @@ import ThumbsExample from './.vitepress/theme/examples/ThumbsExample.vue'
 
 ## 3. Peek: часть соседних слайдов
 
-<PaddingBasicExample detailsLink="./examples/peek" />
+<PeekBasicExample detailsLink="./examples/peek" />
 
-## 4. Адаптивный слайдер (Responsive)
+## 4. Center: центрирование активного слайда
+
+<CenterBasicExample detailsLink="./examples/center" />
+
+## 5. Center с perPage: 2 (половинки по бокам)
+
+<CenterPerPage2Example detailsLink="./examples/center" />
+
+## 6. Адаптивный слайдер (Responsive)
 
 <ResponsiveExample detailsLink="./examples/responsive" />
 
-## 5. Loop Mode
+## 7. Loop Mode
 
 <LoopExample detailsLink="./examples/loop" />
 
-## 6. Fade Effect
+## 8. Fade Effect
 
 <FadeExample detailsLink="./examples/effect-fade" />
 
-## 7. Cube Effect
+## 9. Cube Effect
 
 <CubeExample detailsLink="./examples/effect-cube" />
 
-## 8. Вертикальный
+## 10. Вертикальный
 
 <VerticalExample detailsLink="./examples/vertical" />
 
-## 9. Вертикальные миниатюры (Gallery)
+## 11. Вертикальные миниатюры (Gallery)
 
 <VerticalThumbsExample detailsLink="./examples/vertical" />
 
-## 10. Drag + Navigation
+## 12. Drag + Navigation
 
 <DragNavigationExample detailsLink="./examples/modules" />
 
-## 11. Autoplay + Pagination
+## 13. Autoplay + Pagination
 
 <AutoplayExample detailsLink="./examples/modules" />
 
-## 12. Thumbs Sync
+## 14. Thumbs Sync
 
 <ThumbsExample detailsLink="./examples/thumbs" />
 

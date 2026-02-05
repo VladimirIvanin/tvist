@@ -19,6 +19,7 @@ import './modules/pagination'
 import './modules/autoplay'
 import './modules/breakpoints'
 import './modules/loop'
+import './modules/slide-states'
 import './modules/thumbs'
 import './modules/effects'
 

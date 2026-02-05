@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tvist - Container Query Demo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="demo-wrapper">
+    <h1>Tvist с Container Queries</h1>
+    <p>Демонстрация работы с CSS Container Queries и множественными слайдерами</p>
+
+    <!-- Первый слайдер -->
+    <div class="slider-container" style="width: 600px;">
+      <h2>Слайдер 1 (600px)</h2>
+      <div class="tvist" id="slider1">
+        <div class="tvist__container">
+          <div class="tvist__slide">
+            <div class="slide-content">Slide 1</div>
+          </div>
+          <div class="tvist__slide">
+            <div class="slide-content">Slide 2</div>
+          </div>
+          <div class="tvist__slide">
+            <div class="slide-content">Slide 3</div>
+          </div>
+          <div class="tvist__slide">
+            <div class="slide-content">Slide 4</div>
+          </div>
+          <div class="tvist__slide">
+            <div class="slide-content">Slide 5</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Второй слайдер -->
+    <div class="slider-container" style="width: 400px;">
+      <h2>Слайдер 2 (400px)</h2>
+      <div class="tvist" id="slider2">
+        <div class="tvist__container">
+          <div class="tvist__slide">
+            <div class="slide-content">Slide A</div>
+          </div>
+          <div class="tvist__slide">
+            <div class="slide-content">Slide B</div>
+          </div>
+          <div class="tvist__slide">
+            <div class="slide-content">Slide C</div>
+          </div>
+          <div class="tvist__slide">
+            <div class="slide-content">Slide D</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Третий слайдер -->
+    <div class="slider-container" style="width: 800px;">
+      <h2>Слайдер 3 (800px)</h2>
+      <div class="tvist" id="slider3">
+        <div class="tvist__container">
+          <div class="tvist__slide">
+            <div class="slide-content">Slide X</div>
+          </div>
+          <div class="tvist__slide">
+            <div class="slide-content">Slide Y</div>
+          </div>
+          <div class="tvist__slide">
+            <div class="slide-content">Slide Z</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info">
+      <h3>Информация о размерах:</h3>
+      <div id="info-output"></div>
+    </div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  padding: 2rem;
+  background: #f5f5f5;
+}
+
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  margin-bottom: 1rem;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+p {
+  margin-bottom: 2rem;
+  color: #666;
+}
+
+/* Container Queries для адаптивности */
+.slider-wrapper {
+  container-type: inline-size;
+  container-name: slider;
+  background: white;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tvist {
+  width: 100%;
+  overflow: hidden;
+}
+
+.tvist__slide {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Адаптивность через Container Queries */
+@container slider (min-width: 600px) {
+  .tvist__slide {
+    min-height: 250px;
+  }
+}
+
+@container slider (min-width: 900px) {
+  .tvist__slide {
+    min-height: 300px;
+  }
+}

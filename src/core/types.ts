@@ -74,6 +74,13 @@ export interface TvistOptions {
    * @default 'horizontal'
    */
   direction?: 'horizontal' | 'vertical'
+
+  /**
+   * Центрирование активного слайда. При true активный слайд будет находиться по центру контейнера.
+   * Работает как опция focus: 'center' в Splide или centeredSlides в Swiper.
+   * @default false
+   */
+  center?: boolean
   
   // Начальные значения
   

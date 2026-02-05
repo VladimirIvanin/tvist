@@ -55,8 +55,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { Tvist } from '../../../../src/index.ts'
-import '../../../../src/styles/tvist.scss'
+import { Tvist } from 'tvist'
 
 const sliderTrimRef = ref<HTMLElement>()
 const sliderNoTrimRef = ref<HTMLElement>()

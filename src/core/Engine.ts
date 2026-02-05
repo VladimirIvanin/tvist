@@ -70,15 +70,44 @@ export class Engine {
   }
 
   /**
+   * Вычисляет offset для центрирования (аналог Splide offset и Swiper centeredSlides)
+   */
+  private getCenterOffset(_index: number): number {
+    if (!this.options.center) return 0
+    
+    const isVertical = this.options.direction === 'vertical'
+    const rootSize = isVertical
+      ? getOuterHeight(this.tvist.root)
+      : getOuterWidth(this.tvist.root)
+    
+    // Формула из Splide: (listSize - slideSize) / 2
+    // listSize - это размер видимой области (root), slideSize - размер одного слайда
+    return (rootSize - this.peekStart - this.peekEnd - this.slideSize) / 2
+  }
+
+  /**
    * Позиция скролла для индекса. При loop peekTrim не применяется.
    */
   private getScrollPositionForIndex(index: number): number {
-    if (this.options.loop) return -this.getSlidePosition(index)
+    const basePosition = -this.getSlidePosition(index)
+    const centerOffset = this.getCenterOffset(index)
+    
+    if (this.options.loop) {
+      return basePosition + centerOffset
+    }
+    
     const endIndex = this.getEndIndex()
     const peekTrim = this.options.peekTrim !== false
+    
+    // При центрировании применяем offset
+    if (this.options.center) {
+      return basePosition + centerOffset
+    }
+    
+    // Без центрирования применяем старую логику с peekTrim
     if (index === 0) return peekTrim ? this.getMinScrollPosition() : 0
-    if (index === endIndex) return peekTrim ? this.getMaxScrollPosition() : -this.getSlidePosition(index)
-    return -this.getSlidePosition(index)
+    if (index === endIndex) return peekTrim ? this.getMaxScrollPosition() : basePosition
+    return basePosition
   }
 
   /**
@@ -204,14 +233,15 @@ export class Engine {
    * Вычисляет последний допустимый индекс для скролла
    * Логика из Splide: endIndex = slideCount - perPage
    * Это гарантирует, что всегда показывается perPage слайдов
+   * При center: true (аналог hasFocus в Splide) всегда slideCount - 1
    */
   private getEndIndex(): number {
     const slideCount = this.tvist.slides.length
     const perPage = this.options.perPage ?? 1
     const isLoop = this.options.loop === true
 
-    if (isLoop) {
-      // В режиме loop можно скроллить к любому слайду
+    if (isLoop || this.options.center || this.options.isNavigation) {
+      // В режиме loop, center или navigation можно скроллить к любому слайду
       return slideCount - 1
     }
 
@@ -274,8 +304,8 @@ export class Engine {
     const endIndex = this.getEndIndex()
     const isNavigation = this.options.isNavigation
 
-    // Если включен режим навигации, разрешаем выбор слайдов за пределами endIndex
-    const clampedIndex = this.options.loop || isNavigation
+    // Если включен режим навигации или center, разрешаем выбор слайдов за пределами endIndex
+    const clampedIndex = this.options.loop || isNavigation || this.options.center
       ? index 
       : Math.max(0, Math.min(index, endIndex))
 
@@ -284,7 +314,8 @@ export class Engine {
 
     let targetPosition = this.getScrollPositionForIndex(normalizedIndex)
 
-    if (isNavigation && !this.options.loop) {
+    // При center режиме тоже применяем ограничения для навигации
+    if ((isNavigation || this.options.center) && !this.options.loop) {
       const peekTrim = this.options.peekTrim !== false
       const maxPos = peekTrim ? this.getMaxScrollPosition() : -this.getSlidePosition(endIndex)
       const minPos = peekTrim ? this.getMinScrollPosition() : 0

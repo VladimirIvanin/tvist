@@ -1,6 +1,6 @@
 <template>
   <div class="example">
-    <div ref="sliderRef" class="tvist padding-asymmetric">
+    <div ref="sliderRef" class="tvist peek-mixed">
       <div class="tvist__container">
         <div v-for="i in 5" :key="i" class="tvist__slide">
           <div class="slide-content">
@@ -10,16 +10,15 @@
       </div>
     </div>
     <div class="info">
-      <span class="badge left">Left: 50px</span>
-      <span class="badge right">Right: 150px</span>
+      <span class="badge">Left: 2rem</span>
+      <span class="badge">Right: 100px</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { Tvist } from '../../../../src/index.ts'
-import '../../../../src/styles/tvist.scss'
+import { Tvist } from 'tvist'
 
 const sliderRef = ref<HTMLElement>()
 let slider: Tvist | null = null
@@ -27,7 +26,7 @@ let slider: Tvist | null = null
 onMounted(() => {
   if (sliderRef.value) {
     slider = new Tvist(sliderRef.value, {
-      peek: { left: 50, right: 150 },
+      peek: { left: '2rem', right: 100 },
       perPage: 1,
       arrows: true,
       pagination: true
@@ -63,7 +62,7 @@ onBeforeUnmount(() => {
 .slide-content {
   width: 100%;
   height: 90%;
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -86,15 +85,7 @@ onBeforeUnmount(() => {
   border-radius: 4px;
   font-size: 0.875rem;
   font-weight: 500;
-}
-
-.badge.left {
-  background: #e3f2fd;
-  color: #1976d2;
-}
-
-.badge.right {
-  background: #fce4ec;
-  color: #c2185b;
+  background: #f3e5f5;
+  color: #7b1fa2;
 }
 </style>

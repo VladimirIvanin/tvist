@@ -11,7 +11,7 @@ description: Примеры использования peek — показ ча�
 
 Одинаковый peek с обеих сторон:
 
-<PaddingBasicExample />
+<PeekBasicExample />
 
 ```js
 import Tvist from 'tvist'
@@ -26,7 +26,7 @@ new Tvist('.tvist', {
 
 Можно использовать CSS единицы измерения:
 
-<PaddingPercentExample />
+<PeekPercentExample />
 
 ```js
 new Tvist('.tvist', {
@@ -39,7 +39,7 @@ new Tvist('.tvist', {
 
 Разные значения для левой и правой стороны:
 
-<PaddingAsymmetricExample />
+<PeekAsymmetricExample />
 
 ```js
 new Tvist('.tvist', {
@@ -55,7 +55,7 @@ new Tvist('.tvist', {
 
 Peek работает вместе с `perPage`:
 
-<PaddingPerPageExample />
+<PeekPerPageExample />
 
 ```js
 new Tvist('.tvist', {
@@ -69,7 +69,7 @@ new Tvist('.tvist', {
 
 Для вертикального слайдера используйте `top` и `bottom`:
 
-<PaddingVerticalExample />
+<PeekVerticalExample />
 
 ```js
 new Tvist('.tvist', {
@@ -86,7 +86,7 @@ new Tvist('.tvist', {
 
 Peek можно изменять на разных breakpoints:
 
-<PaddingBreakpointsExample />
+<PeekBreakpointsExample />
 
 ```js
 new Tvist('.tvist', {
@@ -124,7 +124,7 @@ new Tvist('.tvist', { peek: 40, perPage: 1, peekTrim: false })
 
 Можно комбинировать разные единицы измерения:
 
-<PaddingMixedUnitsExample />
+<PeekMixedUnitsExample />
 
 ```js
 new Tvist('.tvist', {

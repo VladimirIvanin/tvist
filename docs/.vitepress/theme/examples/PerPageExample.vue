@@ -72,8 +72,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, reactive } from 'vue'
-import { Tvist } from '../../../../src/index.ts'
-import '../../../../src/styles/tvist.scss'
+import { Tvist } from 'tvist'
 import ExampleCard from '../ExampleCard.vue'
 
 const slider1El = ref(null)

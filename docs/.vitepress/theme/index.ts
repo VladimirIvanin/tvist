@@ -6,15 +6,20 @@ import './style.css'
 import ExampleCard from './ExampleCard.vue'
 import OptionsTable from './OptionsTable.vue'
 
-// Padding examples
-import PaddingBasicExample from './examples/PaddingBasicExample.vue'
-import PaddingPercentExample from './examples/PaddingPercentExample.vue'
-import PaddingAsymmetricExample from './examples/PaddingAsymmetricExample.vue'
-import PaddingPerPageExample from './examples/PaddingPerPageExample.vue'
-import PaddingVerticalExample from './examples/PaddingVerticalExample.vue'
-import PaddingBreakpointsExample from './examples/PaddingBreakpointsExample.vue'
-import PaddingMixedUnitsExample from './examples/PaddingMixedUnitsExample.vue'
+// Peek examples
+import PeekBasicExample from './examples/PeekBasicExample.vue'
+import PeekPercentExample from './examples/PeekPercentExample.vue'
+import PeekAsymmetricExample from './examples/PeekAsymmetricExample.vue'
+import PeekPerPageExample from './examples/PeekPerPageExample.vue'
+import PeekVerticalExample from './examples/PeekVerticalExample.vue'
+import PeekBreakpointsExample from './examples/PeekBreakpointsExample.vue'
+import PeekMixedUnitsExample from './examples/PeekMixedUnitsExample.vue'
 import PeekTrimExample from './examples/PeekTrimExample.vue'
+
+// Center examples
+import CenterBasicExample from './examples/CenterBasicExample.vue'
+import CenterPerPage2Example from './examples/CenterPerPage2Example.vue'
+import CenterPerPage4Example from './examples/CenterPerPage4Example.vue'
 
 export default {
   extends: DefaultTheme,
@@ -28,14 +33,19 @@ export default {
     app.component('ExampleCard', ExampleCard)
     app.component('OptionsTable', OptionsTable)
     
-    // Padding examples
-    app.component('PaddingBasicExample', PaddingBasicExample)
-    app.component('PaddingPercentExample', PaddingPercentExample)
-    app.component('PaddingAsymmetricExample', PaddingAsymmetricExample)
-    app.component('PaddingPerPageExample', PaddingPerPageExample)
-    app.component('PaddingVerticalExample', PaddingVerticalExample)
-    app.component('PaddingBreakpointsExample', PaddingBreakpointsExample)
-    app.component('PaddingMixedUnitsExample', PaddingMixedUnitsExample)
+    // Peek examples
+    app.component('PeekBasicExample', PeekBasicExample)
+    app.component('PeekPercentExample', PeekPercentExample)
+    app.component('PeekAsymmetricExample', PeekAsymmetricExample)
+    app.component('PeekPerPageExample', PeekPerPageExample)
+    app.component('PeekVerticalExample', PeekVerticalExample)
+    app.component('PeekBreakpointsExample', PeekBreakpointsExample)
+    app.component('PeekMixedUnitsExample', PeekMixedUnitsExample)
     app.component('PeekTrimExample', PeekTrimExample)
+    
+    // Center examples
+    app.component('CenterBasicExample', CenterBasicExample)
+    app.component('CenterPerPage2Example', CenterPerPage2Example)
+    app.component('CenterPerPage4Example', CenterPerPage4Example)
   }
 } satisfies Theme

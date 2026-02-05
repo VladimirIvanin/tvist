@@ -1,8 +1,8 @@
 <template>
   <div class="example">
-    <div ref="sliderRef" class="tvist padding-basic">
+    <div ref="sliderRef" class="tvist peek-perpage">
       <div class="tvist__container">
-        <div v-for="i in 5" :key="i" class="tvist__slide">
+        <div v-for="i in 9" :key="i" class="tvist__slide">
           <div class="slide-content">
             {{ i }}
           </div>
@@ -14,8 +14,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { Tvist } from '../../../../src/index.ts'
-import '../../../../src/styles/tvist.scss'
+import { Tvist } from 'tvist'
 
 const sliderRef = ref<HTMLElement>()
 let slider: Tvist | null = null
@@ -23,12 +22,9 @@ let slider: Tvist | null = null
 onMounted(() => {
   if (sliderRef.value) {
     slider = new Tvist(sliderRef.value, {
-      peek: {
-        left: 0,
-        right: 60
-      },
+      peek: 50,
+      perPage: 3,
       gap: 20,
-      perPage: 1,
       arrows: true,
       pagination: true
     })
@@ -41,10 +37,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.example {
-  width: 100%;
-}
-
 .tvist {
   width: 100%;
   height: 300px;
@@ -67,13 +59,13 @@ onBeforeUnmount(() => {
 .slide-content {
   width: 100%;
   height: 90%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 48px;
+  font-size: 32px;
   font-weight: bold;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
