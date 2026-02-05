@@ -50,7 +50,7 @@ export function setCubeEffect(
     
     // Hide all clones - cube is inherently cyclic and doesn't need them
     cloneSlides.forEach(clone => {
-        clone.style.visibility = 'hidden'
+        clone.style.display = 'none'
     })
     
     const numOriginalSlides = originalSlides.length
@@ -61,7 +61,7 @@ export function setCubeEffect(
     // We invert the rotation direction so that "next" slide (right) comes to front
     const progressTotal = -translate / slideWidth
     const wrapperRotate = -(progressTotal * 90)
-    
+
     // zOffset already computed from faceWidth above (cube radius = half of actual face width)
     // Fix: Rotate around the center of the cube (which is at 0,0,0 in local space because slides are pushed out)
     container.style.transformOrigin = `50% 50%`
@@ -76,30 +76,25 @@ export function setCubeEffect(
         
         // Fix for horizontal scroll and layout issues:
         // Use position: absolute to collapse the container width and avoid page overflow.
-        slide.style.position = 'absolute'
-        slide.style.left = '0'
-        slide.style.top = '0'
-        slide.style.width = '100%'
-        slide.style.height = '100%'
+        // Moved to _cube.scss with !important
 
         // Reset any margin that might be set by the engine
-        slide.style.margin = '0'
+        // Moved to _cube.scss with !important
         
         // Fix for content clipping issues:
         // Ensure 3D context is preserved for children (content + shadows)
-        slide.style.transformStyle = 'preserve-3d'
-        slide.style.webkitTransformStyle = 'preserve-3d'
+        // Moved to _cube.scss
 
         // Set origin to center (standard rotation around own axis)
         // Previous logic using -zOffset caused gaps between faces
-        slide.style.transformOrigin = '50% 50%'
+        // Moved to _cube.scss with !important
         
         // Z-Index and depth: angle relative to viewport (normalize to 0-360 range)
         let netAngle = (slideAngle + wrapperRotate) % 360
         if (netAngle < 0) netAngle += 360
         
         // Standard Cube Logic: Rotate around center, then push out by radius (zOffset)
-        const transform = `rotateY(${slideAngle}deg) translateZ(${zOffset}px)`
+        const transform = `rotateY(${slideAngle}deg) translate3d(0, 0, ${zOffset}px)`
         slide.style.transform = transform
         
         // Cosine = how "front" the face is. 0°→1, 180°→-1. Keep z-index for stacking fallback.
@@ -121,11 +116,10 @@ export function setCubeEffect(
         // Chrome bug workaround: Sometimes Chrome fails to render content with hidden backface.
         // However, for a proper cube effect, we MUST hide backfaces to avoid seeing inside the cube.
         // We rely on z-index to handle sorting, but backface-visibility: hidden gives the cleanest look.
-        slide.style.backfaceVisibility = 'hidden'
-        slide.style.webkitBackfaceVisibility = 'hidden'
+        // Moved to _cube.scss
 
         // _base.scss sets content-visibility: auto. 
-        slide.style.contentVisibility = 'visible'
+        // Moved to _cube.scss with !important
 
         // Show only slides in range
         slide.style.visibility = isInRange ? 'visible' : 'hidden'

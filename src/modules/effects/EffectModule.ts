@@ -29,6 +29,7 @@ export class EffectModule extends Module {
     // Set container styles for 3D
     if (this.options.effect === 'cube') {
         this.tvist.container.style.transformStyle = 'preserve-3d'
+        this.tvist.root.classList.add('tvist--cube')
         // root keeps overflow: hidden from _base.scss — clips 3D faces to viewport
         const padding = this.options.cubeEffect?.viewportPadding ?? 10
         this.tvist.root.style.padding = `${padding}px`
@@ -59,6 +60,7 @@ export class EffectModule extends Module {
     this.tvist.root.style.removeProperty('overflow')
     this.tvist.root.style.removeProperty('padding')
     this.tvist.root.style.removeProperty('box-sizing')
+    this.tvist.root.classList.remove('tvist--cube')
   }
 
   private onSetTranslate(_tvist: Tvist, translate: number): void {

@@ -9,6 +9,7 @@
 // Modules
 @use 'modules/navigation';
 @use 'modules/pagination';
+@use 'modules/cube';
 
 // Сброс box-sizing для корректных расчётов
 * {
