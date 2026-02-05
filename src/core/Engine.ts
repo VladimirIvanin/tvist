@@ -9,6 +9,7 @@ import { Animator } from './Animator'
 import type { Tvist } from './Tvist'
 import type { TvistOptions } from './types'
 import { getOuterWidth, getOuterHeight } from '../utils/dom'
+import { applyPadding, getPaddingValue, getPaddingValueFromOptions } from '../utils/padding'
 
 export class Engine {
   // Позиции
@@ -25,6 +26,8 @@ export class Engine {
   private containerSize = 0
   private slideSize = 0
   private slidePositions: number[] = []
+  private paddingStart = 0 // padding слева/сверху
+  private paddingEnd = 0   // padding справа/снизу
 
   // Ссылки
   private tvist: Tvist
@@ -52,9 +55,19 @@ export class Engine {
     this.index = new Counter(slideCount, startIndex, isLoop, counterEndIndex)
     this.animator = new Animator()
 
+    // Применяем padding к контейнеру
+    this.applyContainerPadding()
+    
     // Первичный расчёт размеров
     this.calculateSizes()
     this.calculatePositions()
+  }
+
+  /**
+   * Применяет padding к контейнеру слайдов
+   */
+  private applyContainerPadding(): void {
+    applyPadding(this.tvist.container, this.options)
   }
 
   /**
@@ -67,13 +80,44 @@ export class Engine {
     if (slides.length === 0) {
       this.containerSize = 0
       this.slideSize = 0
+      this.paddingStart = 0
+      this.paddingEnd = 0
       return
     }
 
-    // Размер контейнера
-    this.containerSize = isVertical 
+    // Получаем значения padding
+    // Сначала пытаемся получить из опций (для числовых значений)
+    if (isVertical) {
+      this.paddingStart = getPaddingValueFromOptions(this.options, 'top')
+      this.paddingEnd = getPaddingValueFromOptions(this.options, 'bottom')
+      
+      // Если padding задан строкой (CSS единицы), читаем из DOM
+      if (this.paddingStart === 0 && this.options.padding) {
+        this.paddingStart = getPaddingValue(this.tvist.container, 'top')
+      }
+      if (this.paddingEnd === 0 && this.options.padding) {
+        this.paddingEnd = getPaddingValue(this.tvist.container, 'bottom')
+      }
+    } else {
+      this.paddingStart = getPaddingValueFromOptions(this.options, 'left')
+      this.paddingEnd = getPaddingValueFromOptions(this.options, 'right')
+      
+      // Если padding задан строкой (CSS единицы), читаем из DOM
+      if (this.paddingStart === 0 && this.options.padding) {
+        this.paddingStart = getPaddingValue(this.tvist.container, 'left')
+      }
+      if (this.paddingEnd === 0 && this.options.padding) {
+        this.paddingEnd = getPaddingValue(this.tvist.container, 'right')
+      }
+    }
+
+    // Размер контейнера (внешний размер root элемента)
+    const rootSize = isVertical 
       ? getOuterHeight(this.tvist.root)
       : getOuterWidth(this.tvist.root)
+    
+    // Доступный размер для слайдов = размер контейнера - padding
+    this.containerSize = rootSize - this.paddingStart - this.paddingEnd
 
     // Автоматический расчет perPage если задан slideMinSize
     if (this.options.slideMinSize && this.options.slideMinSize > 0) {
@@ -280,6 +324,9 @@ export class Engine {
    * Обновление размеров (вызывается при resize)
    */
   update(): void {
+    // Переприменяем padding (может измениться при breakpoints)
+    this.applyContainerPadding()
+    
     this.calculateSizes()
     this.calculatePositions()
 

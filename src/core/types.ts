@@ -39,6 +39,31 @@ export interface TvistOptions {
   gap?: number
   
   /**
+   * Padding слайдера. Для горизонтального слайдера - left/right, для вертикального - top/bottom
+   * @default undefined
+   * @example
+   * // Единое значение (px)
+   * padding: 10
+   * 
+   * // CSS формат
+   * padding: '1rem'
+   * 
+   * // Разные значения для горизонтального слайдера
+   * padding: { left: 10, right: 20 }
+   * padding: { left: '1rem', right: '2rem' }
+   * 
+   * // Разные значения для вертикального слайдера
+   * padding: { top: 10, bottom: 20 }
+   */
+  padding?: number | string | { 
+    left?: number | string
+    right?: number | string 
+  } | { 
+    top?: number | string
+    bottom?: number | string 
+  }
+  
+  /**
    * Скорость анимации перехода в миллисекундах
    * @default 300
    */
