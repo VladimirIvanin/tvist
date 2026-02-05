@@ -159,8 +159,7 @@ export class GridModule extends Module {
     while (slideIndex < this.originalSlides.length) {
       // Получаем размеры текущей страницы (циклически)
       const [rows, cols] = dimensions[dimensionIndex % dimensions.length] ?? [1, 1]
-      const slidesPerPage = rows * cols
-      
+
       const outerSlide = this.createOuterSlide()
       
       for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
