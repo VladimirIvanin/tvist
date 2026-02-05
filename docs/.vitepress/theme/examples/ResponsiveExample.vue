@@ -1,18 +1,19 @@
 <template>
   <ExampleCard 
     title="Адаптивный слайдер (Responsive)" 
-    description="Автоматическая подстройка количества слайдов под разные размеры экрана с помощью breakpoints и slideMinSize"
+    description="Container-first: размеры и perPage считаются от контейнера слайдера. Breakpoints и slideMinSize подстраивают количество слайдов под ширину контейнера (или окна — по умолчанию)."
   >
     <div class="demo-wrapper">
       <!-- Breakpoints Example -->
       <div class="demo-section">
-        <h3>С использованием breakpoints</h3>
+        <h3>С использованием breakpoints (по умолчанию — по окну)</h3>
         <p class="description">
-          Количество слайдов меняется в зависимости от ширины окна:
+          Breakpoints по умолчанию привязаны к ширине окна (viewport). Количество слайдов:
           <strong>≥1200px</strong> — 4 слайда,
           <strong>≥992px</strong> — 3 слайда,
           <strong>≥768px</strong> — 2 слайда,
-          <strong>&lt;768px</strong> — 1 слайд
+          <strong>&lt;768px</strong> — 1 слайд.
+          Размеры слайдов всегда считаются от контейнера.
         </p>
         <div ref="slider1El" class="tvist">
           <div class="tvist__container">
@@ -43,10 +44,10 @@
 
       <!-- slideMinSize Example -->
       <div class="demo-section">
-        <h3>С использованием slideMinSize</h3>
+        <h3>С использованием slideMinSize (container-first)</h3>
         <p class="description">
-          Количество слайдов рассчитывается автоматически: минимальная ширина слайда = 250px.
-          Попробуйте изменить размер окна браузера!
+          perPage считается от ширины контейнера: минимальная ширина слайда = 250px.
+          При изменении размера контейнера (окно, сайдбар, grid) слайдер обновляется автоматически.
         </p>
         <div ref="slider2El" class="tvist slider-minsize">
           <div class="tvist__container">
