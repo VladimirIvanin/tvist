@@ -5,6 +5,7 @@
 <script setup>
 import BasicExample from './.vitepress/theme/examples/BasicExample.vue'
 import PerPageExample from './.vitepress/theme/examples/PerPageExample.vue'
+import PaddingBasicExample from './.vitepress/theme/examples/PaddingBasicExample.vue'
 import ResponsiveExample from './.vitepress/theme/examples/ResponsiveExample.vue'
 import LoopExample from './.vitepress/theme/examples/LoopExample.vue'
 import FadeExample from './.vitepress/theme/examples/FadeExample.vue'
@@ -26,39 +27,43 @@ import ThumbsExample from './.vitepress/theme/examples/ThumbsExample.vue'
 
 <PerPageExample detailsLink="./examples/perpage" />
 
-## 3. Адаптивный слайдер (Responsive)
+## 3. Padding: отступы слайдера
+
+<PaddingBasicExample detailsLink="./examples/padding" />
+
+## 4. Адаптивный слайдер (Responsive)
 
 <ResponsiveExample detailsLink="./examples/responsive" />
 
-## 4. Loop Mode
+## 5. Loop Mode
 
 <LoopExample detailsLink="./examples/loop" />
 
-## 5. Fade Effect
+## 6. Fade Effect
 
 <FadeExample detailsLink="./examples/effect-fade" />
 
-## 6. Cube Effect
+## 7. Cube Effect
 
 <CubeExample detailsLink="./examples/effect-cube" />
 
-## 7. Вертикальный
+## 8. Вертикальный
 
 <VerticalExample detailsLink="./examples/vertical" />
 
-## 8. Вертикальные миниатюры (Gallery)
+## 9. Вертикальные миниатюры (Gallery)
 
 <VerticalThumbsExample detailsLink="./examples/vertical" />
 
-## 9. Drag + Navigation
+## 10. Drag + Navigation
 
 <DragNavigationExample detailsLink="./examples/modules" />
 
-## 10. Autoplay + Pagination
+## 11. Autoplay + Pagination
 
 <AutoplayExample detailsLink="./examples/modules" />
 
-## 11. Thumbs Sync
+## 12. Thumbs Sync
 
 <ThumbsExample detailsLink="./examples/thumbs" />
 
@@ -69,6 +74,13 @@ import ThumbsExample from './.vitepress/theme/examples/ThumbsExample.vue'
   display: grid;
   gap: 48px;
   margin-top: 32px;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Дочерние элементы не растягивают грид */
+.examples-page > * {
+  min-width: 0;
 }
 
 .examples-page h2 {

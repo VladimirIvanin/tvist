@@ -23,7 +23,11 @@ let slider: Tvist | null = null
 onMounted(() => {
   if (sliderRef.value) {
     slider = new Tvist(sliderRef.value, {
-      padding: 50,
+      padding: {
+        left: 0,
+        right: 60
+      },
+      gap: 20,
       perPage: 1,
       arrows: true,
       pagination: true
@@ -37,6 +41,10 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.example {
+  width: 100%;
+}
+
 .tvist {
   width: 100%;
   height: 300px;
