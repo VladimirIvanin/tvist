@@ -9,7 +9,7 @@ function displayConfig(id, config) {
   }
 }
 
-// Слайдер 1: Drag + Navigation
+// Слайдер 1: Drag + Navigation (пагинация не передана — модуль не рендерится)
 const config1 = {
   perPage: 1,
   gap: 0,
@@ -21,7 +21,7 @@ const config1 = {
 const slider1 = new Tvist('#slider1', config1)
 displayConfig('config1', config1)
 
-// Слайдер 2: Autoplay + Pagination
+// Слайдер 2: Autoplay + Pagination (стрелки не переданы — модуль не рендерится)
 const config2 = {
   perPage: 1,
   gap: 0,
@@ -112,8 +112,9 @@ const config4 = {
 const slider4 = new Tvist('#slider4', config4)
 displayConfig('config4', config4)
 
-// Логируем события
-[slider1, slider2, slider3, slider4].forEach((slider, i) => {
+// Логируем события (только для успешно созданных слайдеров)
+const sliders = [slider1, slider2, slider3, slider4].filter(Boolean)
+sliders.forEach((slider, i) => {
   slider.on('slideChanged', (index) => {
     console.log(`Slider ${i + 1}: active slide = ${index}`)
   })

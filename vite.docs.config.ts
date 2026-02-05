@@ -19,6 +19,7 @@ export default defineConfig({
         loop: resolve(__dirname, 'examples/loop-demo/index.html'),
         'effect-fade': resolve(__dirname, 'examples/effect-fade/index.html'),
         'effect-cube': resolve(__dirname, 'examples/effect-cube/index.html'),
+        thumbs: resolve(__dirname, 'examples/thumbs-demo/index.html'),
       },
     },
     sourcemap: false,
