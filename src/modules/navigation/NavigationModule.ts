@@ -50,7 +50,8 @@ export class NavigationModule extends Module {
   }
 
   protected override shouldBeActive(): boolean {
-    return this.options.arrows !== false
+    const { arrows } = this.options
+    return !!arrows
   }
 
   /**

@@ -50,7 +50,8 @@ export class PaginationModule extends Module {
   }
 
   protected override shouldBeActive(): boolean {
-    return this.options.pagination !== false
+    const { pagination } = this.options
+    return !!pagination
   }
 
   /**
