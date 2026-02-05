@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { Engine } from '../../../src/core/Engine'
 import { Tvist } from '../../../src/core/Tvist'
 
@@ -214,6 +214,62 @@ describe('Engine', () => {
 
     const transform = slider.container.style.transform
     expect(transform).toContain('translate3d(0')
+  })
+
+  it('should calculate perPage based on slideMinWidth', () => {
+    // containerWidth = 1000 (from beforeEach)
+    
+    // Case 1: 1000 / 200 = 5 slides per page
+    const slider1 = new Tvist(root, {
+      slideMinWidth: 200,
+      gap: 0
+    })
+    expect(slider1.options.perPage).toBe(5)
+
+    // Case 2: (1000 + 20) / (300 + 20) = 1020 / 320 = 3.18 -> 3 slides
+    const slider2 = new Tvist(root, {
+      slideMinWidth: 300,
+      gap: 20
+    })
+    expect(slider2.options.perPage).toBe(3)
+
+    // Case 3: slideMinWidth larger than container -> 1 slide
+    const slider3 = new Tvist(root, {
+      slideMinWidth: 1200,
+      gap: 0
+    })
+    expect(slider3.options.perPage).toBe(1)
+  })
+
+  it('should recalculate perPage on resize with slideMinWidth', () => {
+    // containerWidth = 1000
+    // slideMinWidth = 400 => perPage = floor(1000/400) = 2
+    const slider = new Tvist(root, {
+      slideMinWidth: 400,
+      gap: 0
+    })
+    
+    expect(slider.options.perPage).toBe(2)
+
+    // Resize to 1500 => perPage = floor(1500/400) = 3
+    root.style.width = '1500px'
+    Object.defineProperty(root, 'offsetWidth', {
+      configurable: true,
+      value: 1500
+    })
+    
+    slider.update()
+    expect(slider.options.perPage).toBe(3)
+    
+    // Resize to 300 => perPage = floor(300/400) = 0 -> should be 1
+    root.style.width = '300px'
+    Object.defineProperty(root, 'offsetWidth', {
+      configurable: true,
+      value: 300
+    })
+    
+    slider.update()
+    expect(slider.options.perPage).toBe(1)
   })
 })
 
