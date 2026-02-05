@@ -68,6 +68,6 @@ src/
 
 ### Ссылки
 
-- Документация: http://localhost:5178/tvist/api/
-- Таблица опций: http://localhost:5178/tvist/api/options
-- Репозиторий: https://github.com/VladimirIvanin/tvist
+- [Документация](/api/)
+- [Таблица опций](/api/options)
+- [Репозиторий](https://github.com/VladimirIvanin/tvist)
