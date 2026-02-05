@@ -8,13 +8,24 @@
       <div class="demo-section">
         <h3>С использованием breakpoints (по умолчанию — по окну)</h3>
         <p class="description">
-          Breakpoints по умолчанию привязаны к ширине окна (viewport). Количество слайдов:
-          <strong>≥1200px</strong> — 4 слайда,
-          <strong>≥992px</strong> — 3 слайда,
-          <strong>≥768px</strong> — 2 слайда,
-          <strong>&lt;768px</strong> — 1 слайд.
-          Размеры слайдов всегда считаются от контейнера.
+          <strong>Как считается респонсив:</strong>
+          <br>• <strong>Какой breakpoint применить</strong> (и какой perPage) — по умолчанию по <strong>ширине окна</strong> (window). То есть «правила» (4→3→2→1 слайда) зависят от viewport.
+          <br>• <strong>Размеры слайдов</strong> — всегда от <strong>ширины контейнера</strong> слайдера: ширина слайда = (ширина контейнера − отступы) / perPage. Контент не «от окна», а от блока, в котором живёт слайдер.
+          <br>Итого: окно решает «сколько колонок», контейнер — «какой размер в пикселях». Пресеты ниже меняют границы breakpoints на лету.
         </p>
+        <div class="breakpoint-presets">
+          <span class="presets-label">Пресеты breakpoints:</span>
+          <button
+            v-for="preset in breakpointPresets"
+            :key="preset.id"
+            type="button"
+            class="preset-btn"
+            :class="{ active: activePresetId === preset.id }"
+            @click="applyPreset(preset.id)"
+          >
+            {{ preset.label }}
+          </button>
+        </div>
         <div ref="slider1El" class="tvist">
           <div class="tvist__container">
             <div v-for="i in 12" :key="i" class="tvist__slide">
@@ -36,9 +47,9 @@
           <button @click="slider1?.next()" :disabled="!slider1?.canScrollNext">Next →</button>
         </div>
         <div class="current-breakpoint">
-          Текущий breakpoint: 
-          <strong>{{ state1.breakpoint || 'default' }}</strong>
-          | perPage: <strong>{{ state1.perPage }}</strong>
+          Пресет: <strong>{{ breakpointPresets.find(p => p.id === activePresetId)?.label ?? activePresetId }}</strong>
+          · Текущий breakpoint: <strong>{{ state1.breakpoint ?? '—' }}</strong>
+          · perPage: <strong>{{ state1.perPage }}</strong>
         </div>
       </div>
 
@@ -109,7 +120,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, reactive } from 'vue'
+import { ref, onMounted, onUnmounted, reactive, nextTick } from 'vue'
 import { Tvist } from 'tvist'
 import ExampleCard from '../ExampleCard.vue'
 
@@ -125,6 +136,51 @@ const state1 = reactive({ current: 1, total: 12, breakpoint: null, perPage: 4 })
 const state2 = reactive({ current: 1, total: 12, perPage: 1 })
 const state3 = reactive({ current: 1, total: 8, perPage: 1 })
 
+const activePresetId = ref('default')
+
+/** 4 варианта breakpoints — на десктопе разный perPage (4, 3, 2, 2) */
+const breakpointPresets = [
+  {
+    id: 'default',
+    label: '4 на десктопе',
+    perPage: 4,
+    gap: 20,
+    breakpoints: {
+      1200: { perPage: 3, gap: 16 },
+      992: { perPage: 2, gap: 16 },
+      768: { perPage: 1, gap: 0 }
+    }
+  },
+  {
+    id: 'wide',
+    label: '3 на десктопе',
+    perPage: 3,
+    gap: 18,
+    breakpoints: {
+      1024: { perPage: 2, gap: 16 },
+      640: { perPage: 1, gap: 12 }
+    }
+  },
+  {
+    id: 'narrow',
+    label: '2 на десктопе',
+    perPage: 2,
+    gap: 20,
+    breakpoints: {
+      900: { perPage: 1, gap: 0 }
+    }
+  },
+  {
+    id: 'flat',
+    label: '2 везде (плоско)',
+    perPage: 2,
+    gap: 12,
+    breakpoints: {
+      600: { perPage: 1, gap: 8 }
+    }
+  }
+]
+
 const updateState = (slider, state, total) => {
   if (slider) {
     state.current = slider.activeIndex + 1
@@ -133,28 +189,31 @@ const updateState = (slider, state, total) => {
   }
 }
 
-onMounted(() => {
-  // Slider 1: Breakpoints (window-based)
-  if (slider1El.value) {
+function initSlider1(presetId) {
+  const preset = breakpointPresets.find((p) => p.id === presetId) || breakpointPresets[0]
+  const el = slider1El.value
+  if (!el) return
+  const container = el.querySelector('.tvist__container')
+  const slides = el.querySelectorAll('.tvist__slide')
+  slider1.value?.destroy()
+  // Сбрасываем инлайн-стили, чтобы новый экземпляр не унаследовал старое состояние
+  nextTick(() => {
+    if (container) {
+      container.style.transform = ''
+    }
+    slides.forEach((s) => {
+      s.style.width = ''
+      s.style.height = ''
+      s.style.marginRight = ''
+      s.style.marginBottom = ''
+    })
+    if (!slider1El.value) return
     slider1.value = new Tvist(slider1El.value, {
-      perPage: 4,
-      gap: 20,
+      perPage: preset.perPage ?? 4,
+      gap: preset.gap ?? 20,
       speed: 300,
       drag: true,
-      breakpoints: {
-        1200: {
-          perPage: 3,
-          gap: 16
-        },
-        992: {
-          perPage: 2,
-          gap: 16
-        },
-        768: {
-          perPage: 1,
-          gap: 0
-        }
-      },
+      breakpoints: { ...preset.breakpoints },
       on: {
         slideChanged: () => updateState(slider1.value, state1, 12),
         created: (instance) => updateState(instance, state1, 12),
@@ -164,7 +223,17 @@ onMounted(() => {
         }
       }
     })
-  }
+  })
+}
+
+function applyPreset(presetId) {
+  activePresetId.value = presetId
+  initSlider1(presetId)
+}
+
+onMounted(() => {
+  // Slider 1: Breakpoints (window-based), с возможностью смены пресета
+  initSlider1(activePresetId.value)
 
   // Slider 2: slideMinSize (auto-calculation)
   if (slider2El.value) {
@@ -306,6 +375,38 @@ onUnmounted(() => {
 .tvist__slide:nth-child(12n+10) { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
 .tvist__slide:nth-child(12n+11) { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
 .tvist__slide:nth-child(12n+12) { background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%); }
+
+.breakpoint-presets {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.presets-label {
+  font-size: 13px;
+  color: #666;
+  font-weight: 500;
+}
+
+.preset-btn {
+  font-size: 13px;
+  padding: 8px 14px;
+  background: #e8eaf0;
+  color: #444;
+  border: 1px solid #d0d4dc;
+}
+
+.preset-btn:hover {
+  background: #dde0e8;
+}
+
+.preset-btn.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
 
 .controls {
   display: flex;
