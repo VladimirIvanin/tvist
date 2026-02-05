@@ -44,8 +44,8 @@ onMounted(() => {
         slideChanged: () => {
           state.current = slider.value.activeIndex + 1
         },
-        created: () => {
-          state.current = 1
+        created: (instance) => {
+          state.current = instance.activeIndex + 1
         }
       }
     })

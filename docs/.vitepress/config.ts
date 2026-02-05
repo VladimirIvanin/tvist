@@ -36,7 +36,18 @@ export default defineConfig({
       },
       {
         text: 'Примеры',
-        link: '/examples-list'
+        items: [
+          { text: 'Все примеры', link: '/examples-list' },
+          { text: 'Базовый', link: '/examples/basic' },
+          { text: 'PerPage', link: '/examples/perpage' },
+          { text: 'Responsive', link: '/examples/responsive' },
+          { text: 'Loop', link: '/examples/loop' },
+          { text: 'Fade Effect', link: '/examples/effect-fade' },
+          { text: 'Cube Effect', link: '/examples/effect-cube' },
+          { text: 'Vertical', link: '/examples/vertical' },
+          { text: 'Modules', link: '/examples/modules' },
+          { text: 'Thumbs', link: '/examples/thumbs' }
+        ]
       }
     ],
 

@@ -4,6 +4,8 @@
 
 <script setup>
 import BasicExample from './.vitepress/theme/examples/BasicExample.vue'
+import PerPageExample from './.vitepress/theme/examples/PerPageExample.vue'
+import ResponsiveExample from './.vitepress/theme/examples/ResponsiveExample.vue'
 import LoopExample from './.vitepress/theme/examples/LoopExample.vue'
 import FadeExample from './.vitepress/theme/examples/FadeExample.vue'
 import CubeExample from './.vitepress/theme/examples/CubeExample.vue'
@@ -20,35 +22,43 @@ import ThumbsExample from './.vitepress/theme/examples/ThumbsExample.vue'
 
 <BasicExample />
 
-## 2. Loop Mode
+## 2. PerPage: несколько слайдов на экран
+
+<PerPageExample />
+
+## 3. Адаптивный слайдер (Responsive)
+
+<ResponsiveExample />
+
+## 4. Loop Mode
 
 <LoopExample />
 
-## 3. Fade Effect
+## 5. Fade Effect
 
 <FadeExample />
 
-## 4. Cube Effect
+## 6. Cube Effect
 
 <CubeExample />
 
-## 5. Вертикальный
+## 7. Вертикальный
 
 <VerticalExample />
 
-## 6. Вертикальные миниатюры (Gallery)
+## 8. Вертикальные миниатюры (Gallery)
 
 <VerticalThumbsExample />
 
-## 7. Drag + Navigation
+## 9. Drag + Navigation
 
 <DragNavigationExample />
 
-## 8. Autoplay + Pagination
+## 10. Autoplay + Pagination
 
 <AutoplayExample />
 
-## 9. Thumbs Sync
+## 11. Thumbs Sync
 
 <ThumbsExample />
 

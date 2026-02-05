@@ -45,9 +45,9 @@ onMounted(() => {
           state.activeIndex = slider.value.activeIndex
           state.realIndex = slider.value.realIndex ?? 0
         },
-        created: () => {
-          state.activeIndex = slider.value.activeIndex
-          state.realIndex = slider.value.realIndex ?? 0
+        created: (instance) => {
+          state.activeIndex = instance.activeIndex
+          state.realIndex = instance.realIndex ?? 0
         }
       }
     })
