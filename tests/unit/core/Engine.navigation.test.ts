@@ -67,4 +67,49 @@ describe('Engine Navigation Mode', () => {
     // Ожидаем, что слайдер остановился на позиции endIndex (4)
     expect(location).toBe(-800) 
   })
+
+  it('should calculate bounds correctly with gap in navigation mode', () => {
+    // 6 slides, 150px width, 10px gap
+    // Container width = 4 * 150 + 3 * 10 = 630
+    
+    // Override mocks for this test
+    Object.defineProperties(HTMLElement.prototype, {
+      clientWidth: { get: () => 630 },
+      offsetWidth: { get: () => 630 }
+    })
+    // @ts-ignore
+    HTMLElement.prototype.getBoundingClientRect = () => ({ width: 630 } as DOMRect)
+
+    container.innerHTML = `
+      <div class="tvist__container">
+        ${Array.from({ length: 6 }).map((_, i) => `<div class="tvist__slide">${i}</div>`).join('')}
+      </div>
+    `
+    
+    tvist = new Tvist(container, {
+      perPage: 4,
+      gap: 10,
+      isNavigation: true,
+      speed: 0
+    })
+
+    // (630 - 3 * 10) / 4 = 150
+    expect(tvist.engine.slideSizeValue).toBe(150)
+
+    // Scroll to last slide
+    tvist.scrollTo(5)
+    
+    expect(tvist.activeIndex).toBe(5)
+    
+    // Content width = 6 * 150 + 5 * 10 = 900 + 50 = 950?
+    // Wait. calculateSizes uses:
+    // pos[i] = i * (slideSize + gap)
+    // pos[5] = 5 * (150 + 10) = 800.
+    // End of slide 5 = 800 + 150 = 950.
+    
+    // Max scroll = RootSize - ContentSize = 630 - 950 = -320.
+    
+    const location = (tvist.engine as any).location.get()
+    expect(location).toBe(-320)
+  })
 })
