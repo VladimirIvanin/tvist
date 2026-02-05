@@ -137,7 +137,16 @@ export class NavigationModule extends Module {
       ? arrows.hiddenClass ?? 'hidden'
       : 'hidden'
 
-    // С loop всегда можно листать
+    // Если слайдер заблокирован (контент влезает), отключаем и скрываем стрелки
+    if (this.tvist.engine.isLocked) {
+      this.disableArrow(this.prevButton, disabledClass)
+      this.disableArrow(this.nextButton, disabledClass)
+      this.hideArrow(this.prevButton, hiddenClass)
+      this.hideArrow(this.nextButton, hiddenClass)
+      return
+    }
+
+    // С loop всегда можно листать (если не заблокирован)
     if (this.options.loop) {
       this.enableArrow(this.prevButton, disabledClass)
       this.enableArrow(this.nextButton, disabledClass)

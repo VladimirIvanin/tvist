@@ -50,8 +50,8 @@ export class GridModule extends Module {
     const { grid, gap: globalGap = 0 } = this.options
     if (!grid) return
 
-    const rows = grid.rows || 1
-    const cols = grid.cols || 1
+    const rows = grid.rows ?? 1
+    const cols = grid.cols ?? 1
     const dimensions = grid.dimensions
     
     // Gap handling
@@ -159,6 +159,17 @@ export class GridModule extends Module {
 
     // Перезаписываем позиции в Engine
     engine.setSlidePositions(newPositions)
+
+    // Обновляем размер слайда в Engine
+    // Берем ширину первого слайда, так как в Grid все ячейки обычно равны (или кратны)
+    if (slides.length > 0) {
+      // Используем offsetWidth для получения реальной ширины элемента с учетом Grid
+      const firstSlide = slides[0]
+      if (firstSlide) {
+        const realSlideSize = firstSlide.offsetWidth
+        engine.setSlideSize(realSlideSize)
+      }
+    }
 
     // Нужно обновить текущую позицию (location/target), так как Engine мог рассчитать её 
     // по старой (линейной) логике во время update()

@@ -64,6 +64,8 @@ export class Engine {
     // Первичный расчёт размеров
     this.calculateSizes()
     this.calculatePositions()
+
+    // Проверяем блокировку после расчета размеров
     this.checkLock()
 
     // Начальная позиция с учётом trim (в начале — без левого peek, в конце — без правого)
@@ -238,6 +240,13 @@ export class Engine {
    */
   public setSlidePositions(positions: number[]): void {
     this.slidePositions = positions
+  }
+
+  /**
+   * Установить размер слайда вручную (используется в GridModule)
+   */
+  public setSlideSize(size: number): void {
+    this.slideSize = size
   }
 
   /**
@@ -418,6 +427,9 @@ export class Engine {
     
     this.calculateSizes()
     this.calculatePositions()
+    
+    // Проверяем блокировку после обновления (важно для resize)
+    this.checkLock()
 
     const currentIndex = this.index.get()
     const targetPosition = this.getScrollPositionForIndex(currentIndex)
@@ -425,16 +437,98 @@ export class Engine {
     this.target.set(targetPosition)
     this.location.set(targetPosition)
     this.applyTransform()
-    this.checkLock()
   }
 
   /**
    * Проверка на необходимость блокировки слайдера
    * Блокировка включается, если весь контент помещается в контейнер
+   * И реально некуда листать (min >= max позиции)
    */
   public checkLock(): void {
-    const isLocked = this.getMaxScrollPosition() >= this.getMinScrollPosition()
+    // Loop режим никогда не блокируется
+    if (this.options.loop) {
+      this.setLocked(false)
+      return
+    }
     
+    // Если слайдов больше чем perPage, то всегда есть куда листать (не блокируем)
+    const slideCount = this.tvist.slides.length
+    const perPage = this.options.perPage ?? 1
+    
+    if (slideCount > perPage) {
+      // Проверяем физическую возможность скролла только если размеры установлены
+      // (slideSize = 0 означает что размеры не установлены, например в тестах)
+      if (this.slideSize > 0) {
+        // Вычисляем границы скролла
+        const minScroll = this.getMinScrollPosition()
+        const maxScroll = this.getMaxScrollPosition()
+        
+        // Если maxScroll >= minScroll, то скроллить физически некуда
+        // (maxScroll отрицательный и меньше по модулю означает, что есть куда листать вправо)
+        const cannotScroll = maxScroll >= minScroll - 1 // -1 для погрешности округления
+        
+        if (cannotScroll) {
+          this.setLocked(true)
+          return
+        }
+      }
+      
+      // Если slideSize = 0 (тесты) или есть куда скроллить - не блокируем
+      this.setLocked(false)
+      return
+    }
+    
+    const contentSize = this.getContentSize()
+    const containerSize = this.containerSize
+    
+    // Блокируем, если контент меньше или равен контейнеру
+    // Добавляем небольшой допуск (1px) для избежания проблем с округлением
+    const contentFits = contentSize <= containerSize + 1
+    
+    // Дополнительная проверка: есть ли физическая возможность скролла?
+    // Только если размеры установлены
+    if (this.slideSize > 0) {
+      const minScroll = this.getMinScrollPosition()
+      const maxScroll = this.getMaxScrollPosition()
+      
+      // Если maxScroll >= minScroll, то скроллить некуда
+      const cannotScroll = maxScroll >= minScroll - 1
+      
+      const isLocked = contentFits && cannotScroll
+      this.setLocked(isLocked)
+    } else {
+      // Если размеры не установлены - блокируем только если slideCount <= perPage
+      this.setLocked(slideCount <= perPage)
+    }
+  }
+
+  /**
+   * Вычисляет реальный размер контента (включая клоны)
+   */
+  private getContentSize(): number {
+    const slides = this.tvist.slides
+    
+    if (slides.length === 0) return 0
+    
+    let minPos = Infinity
+    let maxPos = -Infinity
+    
+    for (let i = 0; i < slides.length; i++) {
+      const pos = this.getSlidePosition(i)
+      const size = this.slideSizeValue
+      
+      if (pos < minPos) minPos = pos
+      if (pos + size > maxPos) maxPos = pos + size
+    }
+    
+    // console.log('checkLock debug', { minPos, maxPos, diff: maxPos - minPos, container: this.containerSize, slides: slides.length })
+
+    if (minPos === Infinity) return 0
+    
+    return maxPos - minPos
+  }
+
+  private setLocked(isLocked: boolean): void {
     if (this._isLocked !== isLocked) {
       this._isLocked = isLocked
       
@@ -490,6 +584,7 @@ export class Engine {
    */
   canScrollNext(): boolean {
     if (this.options.loop) return true
+    if (this.isLocked) return false
     
     // В режиме навигации лимит - это последний слайд
     const limit = this.options.isNavigation
@@ -504,6 +599,7 @@ export class Engine {
    */
   canScrollPrev(): boolean {
     if (this.options.loop) return true
+    if (this.isLocked) return false
     return this.index.get() > 0
   }
 
