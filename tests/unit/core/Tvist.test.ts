@@ -319,6 +319,18 @@ describe('Tvist', () => {
   describe('resize handling', () => {
     it('should listen to window resize', async () => {
       const onResize = vi.fn()
+      let resizeCallback: ResizeObserverCallback | undefined
+
+      // Переопределяем мок ResizeObserver для перехвата callback
+      const OriginalResizeObserver = global.ResizeObserver
+      global.ResizeObserver = class ResizeObserver {
+        constructor(callback: ResizeObserverCallback) {
+          resizeCallback = callback
+        }
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      } as any
 
       const slider = new Tvist(fixture.root, {
         on: {
@@ -326,8 +338,10 @@ describe('Tvist', () => {
         },
       })
 
-      // Эмулируем resize
-      window.dispatchEvent(new Event('resize'))
+      // Эмулируем срабатывание ResizeObserver
+      if (resizeCallback) {
+        resizeCallback([], {} as any)
+      }
 
       // Throttle задержит вызов
       await new Promise((resolve) => setTimeout(resolve, 150))
@@ -335,6 +349,7 @@ describe('Tvist', () => {
       expect(onResize).toHaveBeenCalled()
 
       slider.destroy()
+      global.ResizeObserver = OriginalResizeObserver
     })
 
     it('should remove resize listener on destroy', () => {
