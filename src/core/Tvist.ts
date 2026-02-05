@@ -88,6 +88,11 @@ export class Tvist {
     // Инициализация системы событий
     this.events = new EventEmitter()
 
+    // Применяем классы состояния
+    if (this.options.direction === 'vertical') {
+      this.root.classList.add('tvist--vertical')
+    }
+
     // Регистрируем обработчики из опций
     if (this.options.on) {
       Object.entries(this.options.on).forEach(([event, handler]) => {
@@ -186,6 +191,13 @@ export class Tvist {
    * Обновить размеры и пересчитать позиции
    */
   update(): this {
+    // Обновляем класс направления
+    if (this.options.direction === 'vertical') {
+      this.root.classList.add('tvist--vertical')
+    } else {
+      this.root.classList.remove('tvist--vertical')
+    }
+
     this.engine.update()
 
     // Вызываем onUpdate на модулях

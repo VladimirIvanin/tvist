@@ -8,13 +8,13 @@ export function setCubeEffect(
 ): void {
     const { slides, container, root } = tvist
     const cubeOptions = options.cubeEffect ?? {}
-    const slideWidth = tvist.engine.slideWidthValue
+    const slideSize = tvist.engine.slideSizeValue
 
     // Container must have explicit size when slides are absolute (otherwise it collapses to 0)
     container.style.width = '100%'
     container.style.height = '100%'
     // Use actual rendered width for cube geometry — avoids gap when root has padding
-    const faceWidth = container.clientWidth > 0 ? container.clientWidth : slideWidth
+    const faceWidth = container.clientWidth > 0 ? container.clientWidth : slideSize
     const zOffset = faceWidth / 2
     
     // Options
@@ -59,7 +59,7 @@ export function setCubeEffect(
     // translate corresponds to linear movement.
     // Width = 90 degrees.
     // We invert the rotation direction so that "next" slide (right) comes to front
-    const progressTotal = -translate / slideWidth
+    const progressTotal = -translate / slideSize
     const wrapperRotate = -(progressTotal * 90)
 
     // zOffset already computed from faceWidth above (cube radius = half of actual face width)

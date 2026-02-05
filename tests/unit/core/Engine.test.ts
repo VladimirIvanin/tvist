@@ -45,10 +45,10 @@ describe('Engine', () => {
       gap: 20,
     })
 
-    // slideWidth = (1000 - 20 * (3-1)) / 3 = (1000 - 40) / 3 = 320
-    const slideWidth = slider.engine.slideWidthValue
+    // slideSize = (1000 - 20 * (3-1)) / 3 = (1000 - 40) / 3 = 320
+    const slideSize = slider.engine.slideSizeValue
 
-    expect(slideWidth).toBeCloseTo(320, 0)
+    expect(slideSize).toBeCloseTo(320, 0)
   })
 
   it('should calculate positions correctly', () => {
@@ -120,7 +120,7 @@ describe('Engine', () => {
       gap: 10,
     })
 
-    const initialWidth = slider.engine.slideWidthValue
+    const initialWidth = slider.engine.slideSizeValue
 
     // Изменяем размер контейнера и мокаем новый offsetWidth
     root.style.width = '1200px'
@@ -130,7 +130,7 @@ describe('Engine', () => {
     })
     slider.update()
 
-    const newWidth = slider.engine.slideWidthValue
+    const newWidth = slider.engine.slideSizeValue
 
     expect(newWidth).not.toBe(initialWidth)
     expect(newWidth).toBeCloseTo(595, 0) // (1200 - 10) / 2 = 595
@@ -216,36 +216,36 @@ describe('Engine', () => {
     expect(transform).toContain('translate3d(0')
   })
 
-  it('should calculate perPage based on slideMinWidth', () => {
+  it('should calculate perPage based on slideMinSize', () => {
     // containerWidth = 1000 (from beforeEach)
     
     // Case 1: 1000 / 200 = 5 slides per page
     const slider1 = new Tvist(root, {
-      slideMinWidth: 200,
+      slideMinSize: 200,
       gap: 0
     })
     expect(slider1.options.perPage).toBe(5)
 
     // Case 2: (1000 + 20) / (300 + 20) = 1020 / 320 = 3.18 -> 3 slides
     const slider2 = new Tvist(root, {
-      slideMinWidth: 300,
+      slideMinSize: 300,
       gap: 20
     })
     expect(slider2.options.perPage).toBe(3)
 
-    // Case 3: slideMinWidth larger than container -> 1 slide
+    // Case 3: slideMinSize larger than container -> 1 slide
     const slider3 = new Tvist(root, {
-      slideMinWidth: 1200,
+      slideMinSize: 1200,
       gap: 0
     })
     expect(slider3.options.perPage).toBe(1)
   })
 
-  it('should recalculate perPage on resize with slideMinWidth', () => {
+  it('should recalculate perPage on resize with slideMinSize', () => {
     // containerWidth = 1000
-    // slideMinWidth = 400 => perPage = floor(1000/400) = 2
+    // slideMinSize = 400 => perPage = floor(1000/400) = 2
     const slider = new Tvist(root, {
-      slideMinWidth: 400,
+      slideMinSize: 400,
       gap: 0
     })
     

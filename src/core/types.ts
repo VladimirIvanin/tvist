@@ -20,7 +20,7 @@ declare module './Tvist' {
 export interface TvistOptions {
   // Базовые настройки
   perPage?: number
-  slideMinWidth?: number // Минимальная ширина слайда для автоматического расчета perPage
+  slideMinSize?: number // Минимальный размер слайда (ширина или высота) для автоматического расчета perPage
   gap?: number
   speed?: number
   direction?: 'horizontal' | 'vertical'

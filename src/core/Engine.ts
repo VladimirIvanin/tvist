@@ -8,7 +8,7 @@ import { Counter } from './Counter'
 import { Animator } from './Animator'
 import type { Tvist } from './Tvist'
 import type { TvistOptions } from './types'
-import { getOuterWidth } from '../utils/dom'
+import { getOuterWidth, getOuterHeight } from '../utils/dom'
 
 export class Engine {
   // Позиции
@@ -22,8 +22,8 @@ export class Engine {
   readonly animator: Animator
 
   // Кэш размеров
-  private containerWidth = 0
-  private slideWidth = 0
+  private containerSize = 0
+  private slideSize = 0
   private slidePositions: number[] = []
 
   // Ссылки
@@ -62,24 +62,27 @@ export class Engine {
    */
   private calculateSizes(): void {
     const slides = this.tvist.slides
+    const isVertical = this.options.direction === 'vertical'
 
     if (slides.length === 0) {
-      this.containerWidth = 0
-      this.slideWidth = 0
+      this.containerSize = 0
+      this.slideSize = 0
       return
     }
 
     // Размер контейнера
-    this.containerWidth = getOuterWidth(this.tvist.root)
+    this.containerSize = isVertical 
+      ? getOuterHeight(this.tvist.root)
+      : getOuterWidth(this.tvist.root)
 
-    // Автоматический расчет perPage если задан slideMinWidth
-    if (this.options.slideMinWidth && this.options.slideMinWidth > 0) {
+    // Автоматический расчет perPage если задан slideMinSize
+    if (this.options.slideMinSize && this.options.slideMinSize > 0) {
       const gap = this.options.gap ?? 0
-      const minWidth = this.options.slideMinWidth
+      const minSize = this.options.slideMinSize
       
-      // (width + gap) / (minWidth + gap)
+      // (size + gap) / (minSize + gap)
       const calculatedPerPage = Math.floor(
-        (this.containerWidth + gap) / (minWidth + gap)
+        (this.containerSize + gap) / (minSize + gap)
       )
       
       this.options.perPage = Math.max(1, calculatedPerPage)
@@ -89,21 +92,37 @@ export class Engine {
     const perPage = this.options.perPage ?? 1
     const gap = this.options.gap ?? 0
 
-    // Формула: slideWidth = (containerWidth - gap * (perPage - 1)) / perPage
-    this.slideWidth = (this.containerWidth - gap * (perPage - 1)) / perPage
+    // Формула: slideSize = (containerSize - gap * (perPage - 1)) / perPage
+    this.slideSize = (this.containerSize - gap * (perPage - 1)) / perPage
 
     // Защита от некорректных значений
-    if (this.slideWidth < 0 || !isFinite(this.slideWidth)) {
-      this.slideWidth = 0
+    if (this.slideSize < 0 || !isFinite(this.slideSize)) {
+      this.slideSize = 0
     }
 
-    // Устанавливаем ширину слайдам
+    // Устанавливаем размеры слайдам
     slides.forEach((slide) => {
-      if (this.slideWidth > 0) {
-        slide.style.width = `${this.slideWidth}px`
+      // Сбрасываем стили перед установкой новых (на случай смены ориентации)
+      slide.style.width = ''
+      slide.style.height = ''
+      slide.style.marginRight = ''
+      slide.style.marginBottom = ''
+
+      if (this.slideSize > 0) {
+        if (isVertical) {
+          slide.style.height = `${this.slideSize}px`
+          slide.style.width = '100%' // Слайд должен занимать всю ширину контейнера
+        } else {
+          slide.style.width = `${this.slideSize}px`
+        }
       }
+
       if (gap > 0 && slide !== slides[slides.length - 1]) {
-        slide.style.marginRight = `${gap}px`
+        if (isVertical) {
+          slide.style.marginBottom = `${gap}px`
+        } else {
+          slide.style.marginRight = `${gap}px`
+        }
       }
     })
   }
@@ -118,8 +137,8 @@ export class Engine {
     this.slidePositions = []
 
     for (let i = 0; i < slides.length; i++) {
-      // Позиция = index * (slideWidth + gap)
-      const position = i * (this.slideWidth + gap)
+      // Позиция = index * (slideSize + gap)
+      const position = i * (this.slideSize + gap)
       this.slidePositions.push(position)
     }
   }
@@ -238,15 +257,15 @@ export class Engine {
    */
   private applyTransform(): void {
     const container = this.tvist.container
-    const x = this.location.get()
+    const pos = this.location.get()
 
     if (this.options.direction === 'vertical') {
-      container.style.transform = `translate3d(0, ${x}px, 0)`
+      container.style.transform = `translate3d(0, ${pos}px, 0)`
     } else {
-      container.style.transform = `translate3d(${x}px, 0, 0)`
+      container.style.transform = `translate3d(${pos}px, 0, 0)`
     }
     
-    this.tvist.emit('setTranslate', this.tvist, x)
+    this.tvist.emit('setTranslate', this.tvist, pos)
   }
 
   /**
@@ -274,17 +293,17 @@ export class Engine {
   }
 
   /**
-   * Получить ширину слайда
+   * Получить размер слайда (ширина или высота)
    */
-  get slideWidthValue(): number {
-    return this.slideWidth
+  get slideSizeValue(): number {
+    return this.slideSize
   }
 
   /**
-   * Получить ширину контейнера
+   * Получить размер контейнера (ширина или высота)
    */
-  get containerWidthValue(): number {
-    return this.containerWidth
+  get containerSizeValue(): number {
+    return this.containerSize
   }
 
   /**
@@ -330,4 +349,3 @@ export class Engine {
     this.animator.stop()
   }
 }
-

@@ -235,9 +235,9 @@ export class LoopModule extends Module {
    */
   private checkClonePosition(): void {
     const position = this.tvist.engine.location.get()
-    const slideWidth = this.tvist.engine.slideWidthValue
+    const slideSize = this.tvist.engine.slideSizeValue
     const gap = this.options.gap ?? 0
-    const slideWithGap = slideWidth + gap
+    const slideWithGap = slideSize + gap
 
     if (slideWithGap === 0) return
 

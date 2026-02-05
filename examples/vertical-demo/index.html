@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tvist - Vertical Examples</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Vertical Examples</h1>
+    <p class="subtitle">Примеры использования вертикальной ориентации</p>
+
+    <!-- Demo 1: Simple Vertical -->
+    <div class="demo-section">
+      <h2>1. Простой вертикальный слайдер</h2>
+      <div id="slider-simple" class="tvist tvist--h-500">
+        <div class="tvist__container">
+          <div class="tvist__slide">1</div>
+          <div class="tvist__slide">2</div>
+          <div class="tvist__slide">3</div>
+          <div class="tvist__slide">4</div>
+          <div class="tvist__slide">5</div>
+          <div class="tvist__slide">6</div>
+        </div>
+      </div>
+      
+      <div class="controls">
+        <button id="prevBtn">↑ Prev</button>
+        <button id="nextBtn">Next ↓</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Demo 2: Vertical Thumbs -->
+    <div class="demo-section">
+      <h2>2. Вертикальные миниатюры (Gallery)</h2>
+      <p class="description">
+        Сложный кейс: вертикальная лента миниатюр слева синхронизирована с основным горизонтальным слайдером.
+        У миниатюр включен <code>slideMinSize</code> для адаптивности.
+      </p>
+      
+      <div class="gallery-wrapper">
+        <!-- Thumbs (Vertical) -->
+        <div id="thumbs-vertical" class="tvist tvist-thumbs">
+          <div class="tvist__container">
+            <div class="tvist__slide" style="background-color: #e74c3c;">1</div>
+            <div class="tvist__slide" style="background-color: #3498db;">2</div>
+            <div class="tvist__slide" style="background-color: #2ecc71;">3</div>
+            <div class="tvist__slide" style="background-color: #f1c40f;">4</div>
+            <div class="tvist__slide" style="background-color: #9b59b6;">5</div>
+            <div class="tvist__slide" style="background-color: #34495e;">6</div>
+          </div>
+        </div>
+
+        <!-- Main (Horizontal) -->
+        <div id="main-horizontal" class="tvist tvist-main">
+          <div class="tvist__container">
+            <div class="tvist__slide" style="background-color: #e74c3c;">Slide 1</div>
+            <div class="tvist__slide" style="background-color: #3498db;">Slide 2</div>
+            <div class="tvist__slide" style="background-color: #2ecc71;">Slide 3</div>
+            <div class="tvist__slide" style="background-color: #f1c40f;">Slide 4</div>
+            <div class="tvist__slide" style="background-color: #9b59b6;">Slide 5</div>
+            <div class="tvist__slide" style="background-color: #34495e;">Slide 6</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code Example -->
+    <div class="code">
+      <h3>Код для галереи</h3>
+      <pre><code>const thumbs = new Tvist('#thumbs', {
+  direction: 'vertical',
+  slideMinSize: 80, // Адаптивная высота миниатюр
+  gap: 10,
+  isNavigation: true
+})
+
+const main = new Tvist('#main', {
+  direction: 'horizontal', // По умолчанию
+  perPage: 1
+})
+
+main.sync(thumbs) // Синхронизация</code></pre>
+    </div>
+  </div>
+
+  <script type="module" src="./script.js"></script>
+</body>
+</html>

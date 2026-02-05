@@ -65,13 +65,13 @@ export class EffectModule extends Module {
 
   private onSetTranslate(_tvist: Tvist, translate: number): void {
     const { slides } = this.tvist
-    const slideWidth = this.tvist.engine.slideWidthValue
+    const slideSize = this.tvist.engine.slideSizeValue
     
     slides.forEach((slide, i) => {
       const slidePosition = this.tvist.engine.getSlidePosition(i)
       // translate is negative location
       const offset = translate + slidePosition
-      const progress = offset / slideWidth
+      const progress = offset / slideSize
       this.slideProgress.set(slide, progress)
 
       if (this.options.effect === 'fade') {

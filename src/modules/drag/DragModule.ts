@@ -435,9 +435,9 @@ export class DragModule extends Module {
     const startIndex = engine.activeIndex
     
     // Размер слайда с gap
-    const slideWidth = engine.slideWidthValue
+    const slideSize = engine.slideSizeValue
     const gap = this.options.gap ?? 0
-    const slideWithGap = slideWidth + gap
+    const slideWithGap = slideSize + gap
     
     if (slideWithGap === 0) {
       this.tvist.engine.scrollTo(startIndex)
@@ -450,9 +450,9 @@ export class DragModule extends Module {
       ? this.currentX - this.startX 
       : this.currentY - this.startY
     
-    // Threshold = 20% от ширины слайда (как в Embla)
+    // Threshold = 20% от размера слайда (как в Embla)
     // Или минимум 80px (как swipeThreshold в Glide)
-    const threshold = Math.max(slideWidth * 0.2, 80)
+    const threshold = Math.max(slideSize * 0.2, 80)
     
     // Определяем целевой индекс
     let targetIndex: number
