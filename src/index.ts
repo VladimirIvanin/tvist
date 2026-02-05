@@ -22,6 +22,8 @@ import './modules/loop'
 import './modules/slide-states'
 import './modules/thumbs'
 import './modules/effects'
+import './modules/grid'
+
 
 // Types
 export type { TvistOptions } from './core/types'

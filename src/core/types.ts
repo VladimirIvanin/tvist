@@ -272,6 +272,33 @@ export interface TvistOptions {
     renderSlide?: (data: any, index: number) => string
   }
   
+  // Grid
+  
+  /**
+   * Сетка слайдов
+   * @default undefined
+   */
+  grid?: {
+    /** Количество рядов */
+    rows?: number
+    /** Количество колонок */
+    cols?: number
+    /** 
+     * Отступы сетки. Можно задать отдельно для строк и колонок.
+     * Если не задано, используется глобальный gap.
+     */
+    gap?: {
+      row?: number | string
+      col?: number | string
+    } | number | string
+    /**
+     * Размеры ячеек для каждого слайда [colSpan, rowSpan]
+     * Массив повторяется, если слайдов больше, чем определений
+     * @example [[2, 1], [1, 2]]
+     */
+    dimensions?: [number, number][]
+  }
+  
   // Marquee
   
   // TODO: Реализовать модуль Marquee

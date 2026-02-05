@@ -1,0 +1,11 @@
+.tvist__container--grid {
+  display: grid;
+  grid-auto-flow: column;
+  box-sizing: border-box;
+
+  // Сбрасываем марджины, которые ставит Engine, так как используем gap сетки
+  .tvist__slide {
+    margin-right: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}

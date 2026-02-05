@@ -13,4 +13,6 @@ export { LoopModule } from './loop'
 export { SlideStatesModule } from './slide-states'
 export { ThumbsModule } from './thumbs'
 export { EffectModule } from './effects'
+export { GridModule } from './grid'
+
 

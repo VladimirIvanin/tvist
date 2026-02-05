@@ -11,6 +11,7 @@
 @use 'modules/pagination';
 @use 'modules/cube';
 @use 'modules/thumbs';
+@use 'modules/grid';
 
 // Сброс box-sizing для корректных расчётов
 * {
