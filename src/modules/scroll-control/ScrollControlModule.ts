@@ -1,6 +1,6 @@
 /**
  * ScrollControl - модуль для управления слайдером через скролл
- * Поддерживает wheel events на десктопе и touch events на мобильных устройствах
+ * Поддерживает wheel events на десктопе
  */
 
 import { Module } from '../Module'
@@ -23,11 +23,6 @@ export class ScrollControlModule extends Module {
   private scrollTimer?: number
   private lastWheelTime = 0
   private wheelThrottle = 50 // мс между обработкой событий
-  
-  // Touch events для мобильных устройств
-  private touchStartX = 0
-  private touchStartY = 0
-  private isTouching = false
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
@@ -62,9 +57,8 @@ export class ScrollControlModule extends Module {
       return
     }
 
-    // Добавляем обработчики событий
+    // Добавляем обработчик wheel событий
     this.attachWheelListener()
-    this.attachTouchListeners()
   }
 
   /**
@@ -72,15 +66,6 @@ export class ScrollControlModule extends Module {
    */
   private attachWheelListener(): void {
     this.tvist.root.addEventListener('wheel', this.handleWheel, { passive: false })
-  }
-
-  /**
-   * Добавить обработчики touch событий для мобильных
-   */
-  private attachTouchListeners(): void {
-    this.tvist.root.addEventListener('touchstart', this.handleTouchStart, { passive: true })
-    this.tvist.root.addEventListener('touchmove', this.handleTouchMove, { passive: false })
-    this.tvist.root.addEventListener('touchend', this.handleTouchEnd, { passive: true })
   }
 
   /**
@@ -174,85 +159,6 @@ export class ScrollControlModule extends Module {
   }
 
   /**
-   * Обработчик начала touch события
-   */
-  private handleTouchStart = (event: TouchEvent): void => {
-    if (event.touches.length !== 1) return
-    
-    const touch = event.touches[0]
-    if (!touch) return
-    
-    this.touchStartX = touch.clientX
-    this.touchStartY = touch.clientY
-    this.isTouching = true
-  }
-
-  /**
-   * Обработчик движения touch события
-   */
-  private handleTouchMove = (event: TouchEvent): void => {
-    if (!this.isTouching || event.touches.length !== 1) return
-
-    const touch = event.touches[0]
-    if (!touch) return
-    
-    const deltaX = touch.clientX - this.touchStartX
-    const deltaY = touch.clientY - this.touchStartY
-    
-    const isVertical = this.options.direction === 'vertical'
-    const mainDelta = isVertical ? deltaY : deltaX
-    const crossDelta = isVertical ? deltaX : deltaY
-
-    // Если движение в перпендикулярном направлении больше, игнорируем
-    if (Math.abs(crossDelta) > Math.abs(mainDelta)) {
-      return
-    }
-
-    // Проверяем, достаточно ли большое движение для переключения слайда
-    const threshold = 50 // минимальное расстояние в пикселях
-
-    if (Math.abs(mainDelta) < threshold) {
-      return
-    }
-
-    // Проверяем границы
-    const isAtStart = !this.tvist.engine.canScrollPrev()
-    const isAtEnd = !this.tvist.engine.canScrollNext()
-    
-    const swipingForward = mainDelta < 0 // свайп влево/вверх
-    const swipingBackward = mainDelta > 0 // свайп вправо/вниз
-
-    // Если на краю и пытаемся выйти за границы
-    if ((isAtStart && swipingBackward) || (isAtEnd && swipingForward)) {
-      if (this.releaseOnEdges) {
-        return
-      }
-      event.preventDefault()
-      return
-    }
-
-    // Предотвращаем нативный скролл
-    event.preventDefault()
-
-    // Выполняем переход
-    if (swipingForward) {
-      this.tvist.next()
-    } else if (swipingBackward) {
-      this.tvist.prev()
-    }
-
-    // Сбрасываем состояние
-    this.isTouching = false
-  }
-
-  /**
-   * Обработчик окончания touch события
-   */
-  private handleTouchEnd = (): void => {
-    this.isTouching = false
-  }
-
-  /**
    * Хук обновления опций
    */
   override onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
@@ -272,10 +178,7 @@ export class ScrollControlModule extends Module {
       window.clearTimeout(this.scrollTimer)
     }
 
-    // Удаляем обработчики событий
+    // Удаляем обработчик wheel событий
     this.tvist.root.removeEventListener('wheel', this.handleWheel)
-    this.tvist.root.removeEventListener('touchstart', this.handleTouchStart)
-    this.tvist.root.removeEventListener('touchmove', this.handleTouchMove)
-    this.tvist.root.removeEventListener('touchend', this.handleTouchEnd)
   }
 }
