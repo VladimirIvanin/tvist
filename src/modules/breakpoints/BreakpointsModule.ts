@@ -201,18 +201,43 @@ export class BreakpointsModule extends Module {
       }
     }
 
-    // Если breakpoint изменился
-    if (newBreakpoint !== this.currentBreakpoint) {
+    // Проверяем, нужно ли применить брейкпоинт
+    const shouldApply = newBreakpoint !== this.currentBreakpoint || this.shouldReapplyBreakpoint(newBreakpoint)
+    
+    if (shouldApply) {
+      const oldBreakpoint = this.currentBreakpoint
       this.currentBreakpoint = newBreakpoint
       
       this.applyBreakpoint(newBreakpoint)
-      this.emit('breakpoint', newBreakpoint)
+      
+      // Эмитим событие только если брейкпоинт действительно изменился
+      if (newBreakpoint !== oldBreakpoint) {
+        this.emit('breakpoint', newBreakpoint)
 
-      // Вызываем callback из опций
-      if (this.originalOptions.on?.breakpoint) {
-        this.originalOptions.on.breakpoint(newBreakpoint)
+        // Вызываем callback из опций
+        if (this.originalOptions.on?.breakpoint) {
+          this.originalOptions.on.breakpoint(newBreakpoint)
+        }
       }
     }
+  }
+
+  /**
+   * Проверяет, нужно ли повторно применить брейкпоинт
+   * (например, если состояние enabled было изменено вручную)
+   */
+  private shouldReapplyBreakpoint(bp: number | null): boolean {
+    // Определяем ожидаемое состояние enabled для данного брейкпоинта
+    const expectedOptions: TvistOptions = { ...this.originalOptions }
+    if (bp !== null && this.options.breakpoints?.[bp]) {
+      Object.assign(expectedOptions, this.options.breakpoints[bp])
+    }
+    
+    const expectedEnabled = expectedOptions.enabled !== false
+    const actualEnabled = this.tvist.isEnabled
+    
+    // Если состояние не соответствует ожидаемому, нужно применить брейкпоинт
+    return expectedEnabled !== actualEnabled
   }
 
   /**
