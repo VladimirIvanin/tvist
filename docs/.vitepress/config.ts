@@ -71,6 +71,8 @@ export default defineConfig({
           { text: 'Fade Effect', link: '/examples/effect-fade' },
           { text: 'Cube Effect', link: '/examples/effect-cube' },
           { text: 'Vertical', link: '/examples/vertical' },
+          { text: 'Scroll Control', link: '/examples/scroll-control' },
+          { text: 'Scrollbar', link: '/examples/scrollbar' },
           { text: 'Modules', link: '/examples/modules' },
           { text: 'Thumbs', link: '/examples/thumbs' },
           { text: 'Grid', link: '/examples/grid' }
