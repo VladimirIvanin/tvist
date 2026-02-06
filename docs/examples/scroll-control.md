@@ -15,60 +15,7 @@ const slider = new Tvist('.tvist', {
 
 ## Горизонтальный слайдер
 
-<script setup>
-import { ref, onMounted } from 'vue'
-import Tvist from 'tvist'
-
-const horizontalRef = ref(null)
-const verticalRef = ref(null)
-
-onMounted(() => {
-  if (horizontalRef.value) {
-    new Tvist(horizontalRef.value, {
-      wheel: true,
-      speed: 300,
-      pagination: {
-        type: 'bullets',
-        clickable: true
-      }
-    })
-  }
-  if (verticalRef.value) {
-    new Tvist(verticalRef.value, {
-      direction: 'vertical',
-      wheel: true,
-      speed: 300,
-      pagination: {
-        type: 'bullets',
-        clickable: true
-      }
-    })
-  }
-})
-</script>
-
-<div ref="horizontalRef" class="tvist" style="margin-bottom: 2rem; height: 300px;">
-  <div class="tvist__container">
-    <div class="tvist__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
-      Слайд 1
-      <div style="position: absolute; bottom: 20px; font-size: 14px; opacity: 0.8;">
-        Используйте колесико мыши или свайп
-      </div>
-    </div>
-    <div class="tvist__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
-      Слайд 2
-    </div>
-    <div class="tvist__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
-      Слайд 3
-    </div>
-    <div class="tvist__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
-      Слайд 4
-    </div>
-    <div class="tvist__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
-      Слайд 5
-    </div>
-  </div>
-</div>
+<ScrollControlDocExample show="horizontal" />
 
 **Код:**
 ```javascript
@@ -80,25 +27,7 @@ const slider = new Tvist('.tvist', {
 
 ## Вертикальный слайдер
 
-<div ref="verticalRef" class="tvist tvist--vertical" style="height: 400px; margin-bottom: 2rem;">
-  <div class="tvist__container">
-    <div class="tvist__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
-      Слайд 1
-      <div style="position: absolute; bottom: 20px; font-size: 14px; opacity: 0.8;">
-        Скроллите вертикально
-      </div>
-    </div>
-    <div class="tvist__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
-      Слайд 2
-    </div>
-    <div class="tvist__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
-      Слайд 3
-    </div>
-    <div class="tvist__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
-      Слайд 4
-    </div>
-  </div>
-</div>
+<ScrollControlDocExample show="vertical" />
 
 **Код:**
 ```javascript

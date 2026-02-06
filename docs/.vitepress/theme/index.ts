@@ -29,6 +29,9 @@ import GridDimensionsExample from './examples/GridDimensionsExample.vue'
 // Update Options example
 import UpdateOptionsExample from './examples/UpdateOptionsExample.vue'
 
+// Scroll Control (for doc page)
+import ScrollControlDocExample from './examples/ScrollControlDocExample.vue'
+
 export default {
   extends: DefaultTheme,
   Layout: () => {
@@ -63,5 +66,7 @@ export default {
 
     // Update Options example
     app.component('UpdateOptionsExample', UpdateOptionsExample)
+
+    app.component('ScrollControlDocExample', ScrollControlDocExample)
   }
 } satisfies Theme
