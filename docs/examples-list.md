@@ -23,6 +23,7 @@ import GridDimensionsExample from './.vitepress/theme/examples/GridDimensionsExa
 import UpdateOptionsExample from './.vitepress/theme/examples/UpdateOptionsExample.vue'
 import ScrollControlExample from './.vitepress/theme/examples/ScrollControlExample.vue'
 import ScrollbarExample from './.vitepress/theme/examples/ScrollbarExample.vue'
+import MarqueeExample from './.vitepress/theme/examples/MarqueeExample.vue'
 </script>
 
 <div class="examples-page">
@@ -65,47 +66,51 @@ import ScrollbarExample from './.vitepress/theme/examples/ScrollbarExample.vue'
 
 <LoopExample detailsLink="./examples/loop" />
 
-## 10. Fade Effect
+## 10. Marquee (Бегущая строка)
+
+<MarqueeExample detailsLink="./examples/marquee" />
+
+## 11. Fade Effect
 
 <FadeExample detailsLink="./examples/effect-fade" />
 
-## 11. Cube Effect
+## 12. Cube Effect
 
 <CubeExample detailsLink="./examples/effect-cube" />
 
-## 12. Вертикальный
+## 13. Вертикальный
 
 <VerticalExample detailsLink="./examples/vertical" />
 
-## 13. Вертикальные миниатюры (Gallery)
+## 14. Вертикальные миниатюры (Gallery)
 
 <VerticalThumbsExample detailsLink="./examples/vertical" />
 
-## 14. Drag + Navigation
+## 15. Drag + Navigation
 
 <DragNavigationExample detailsLink="./examples/modules" />
 
-## 15. Autoplay + Pagination
+## 16. Autoplay + Pagination
 
 <AutoplayExample detailsLink="./examples/modules" />
 
-## 16. Thumbs Sync
+## 17. Thumbs Sync
 
 <ThumbsExample detailsLink="./examples/thumbs" />
 
-## 17. Grid Layout
+## 18. Grid Layout
 
 <GridExample detailsLink="./examples/grid" />
 
-## 18. Grid Dimensions
+## 19. Grid Dimensions
 
 <GridDimensionsExample detailsLink="./examples/grid" />
 
-## 19. Scroll Control
+## 20. Scroll Control
 
 <ScrollControlExample detailsLink="./examples/scroll-control" />
 
-## 20. Scrollbar
+## 21. Scrollbar
 
 <ScrollbarExample detailsLink="./examples/scrollbar" />
 

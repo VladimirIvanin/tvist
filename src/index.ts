@@ -25,6 +25,7 @@ import './modules/effects'
 import './modules/grid'
 import './modules/scroll-control'
 import './modules/scrollbar'
+import './modules/marquee'
 
 
 // Types

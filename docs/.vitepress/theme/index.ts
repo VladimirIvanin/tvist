@@ -32,6 +32,10 @@ import UpdateOptionsExample from './examples/UpdateOptionsExample.vue'
 // Scroll Control (for doc page)
 import ScrollControlDocExample from './examples/ScrollControlDocExample.vue'
 
+// Marquee examples
+import MarqueeExample from './examples/MarqueeExample.vue'
+import MarqueeDocExample from './examples/MarqueeDocExample.vue'
+
 export default {
   extends: DefaultTheme,
   Layout: () => {
@@ -68,5 +72,9 @@ export default {
     app.component('UpdateOptionsExample', UpdateOptionsExample)
 
     app.component('ScrollControlDocExample', ScrollControlDocExample)
+    
+    // Marquee examples
+    app.component('MarqueeExample', MarqueeExample)
+    app.component('MarqueeDocExample', MarqueeDocExample)
   }
 } satisfies Theme

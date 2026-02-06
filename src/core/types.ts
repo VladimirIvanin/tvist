@@ -301,19 +301,18 @@ export interface TvistOptions {
   
   // Marquee
   
-  // TODO: Реализовать модуль Marquee
   /**
    * Режим бегущей строки (непрерывная прокрутка)
    * @default false
    */
-  // marquee?: boolean | {
-  //   /** Скорость прокрутки в пикселях в секунду */
-  //   speed?: number
-  //   /** Направление прокрутки */
-  //   direction?: 'left' | 'right'
-  //   /** Пауза при наведении курсора */
-  //   pauseOnHover?: boolean
-  // }
+  marquee?: boolean | {
+    /** Скорость прокрутки в пикселях в секунду */
+    speed?: number
+    /** Направление прокрутки: 'left' | 'right' для horizontal, 'up' | 'down' для vertical */
+    direction?: 'left' | 'right' | 'up' | 'down'
+    /** Пауза при наведении курсора */
+    pauseOnHover?: boolean
+  }
   
   // Keyboard
   
