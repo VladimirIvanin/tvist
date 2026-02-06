@@ -81,13 +81,23 @@ export function createSliderFixture(config: SliderFixtureConfig = {}): SliderFix
   root.appendChild(container)
   document.body.appendChild(root)
 
-  // Мокируем offsetWidth для тестового окружения (happy-dom)
+  // Мокируем offsetWidth и clientWidth для тестового окружения (happy-dom)
   Object.defineProperty(root, 'offsetWidth', {
     configurable: true,
     value: width,
   })
 
   Object.defineProperty(root, 'offsetHeight', {
+    configurable: true,
+    value: height,
+  })
+
+  Object.defineProperty(root, 'clientWidth', {
+    configurable: true,
+    value: width,
+  })
+
+  Object.defineProperty(root, 'clientHeight', {
     configurable: true,
     value: height,
   })
@@ -240,8 +250,18 @@ export function resizeSlider(root: HTMLElement, width: number, height?: number):
     value: width,
   })
 
+  Object.defineProperty(root, 'clientWidth', {
+    configurable: true,
+    value: width,
+  })
+
   if (height) {
     Object.defineProperty(root, 'offsetHeight', {
+      configurable: true,
+      value: height,
+    })
+
+    Object.defineProperty(root, 'clientHeight', {
       configurable: true,
       value: height,
     })

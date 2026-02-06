@@ -25,6 +25,7 @@ describe('Tvist - enabled with breakpoints', () => {
         enabled: false,
         perPage: 1,
         gap: 16,
+        breakpointsBase: 'container',
         breakpoints: {
           767: {
             enabled: true,
@@ -65,6 +66,7 @@ describe('Tvist - enabled with breakpoints', () => {
       const slider = new Tvist(mobileFixture.root, {
         enabled: false, // По умолчанию отключен
         perPage: 1,
+        breakpointsBase: 'container',
         breakpoints: {
           767: {
             enabled: true // Включен на мобильных
@@ -96,6 +98,7 @@ describe('Tvist - enabled with breakpoints', () => {
       const slider = new Tvist(fixture.root, {
         enabled: true, // По умолчанию включен
         perPage: 3,
+        breakpointsBase: 'container',
         breakpoints: {
           1024: {
             enabled: true,
@@ -130,6 +133,7 @@ describe('Tvist - enabled with breakpoints', () => {
     it('should keep breakpoints module active when slider is disabled', () => {
       const slider = new Tvist(fixture.root, {
         enabled: false,
+        breakpointsBase: 'container',
         breakpoints: {
           500: { perPage: 1 }
         }
@@ -145,6 +149,7 @@ describe('Tvist - enabled with breakpoints', () => {
       const slider = new Tvist(fixture.root, {
         enabled: false,
         perPage: 3,
+        breakpointsBase: 'container',
         breakpoints: {
           767: {
             perPage: 1
@@ -171,6 +176,7 @@ describe('Tvist - enabled with breakpoints', () => {
         perPage: 3,
         gap: 0,
         drag: false,
+        breakpointsBase: 'container',
         breakpoints: {
           767: {
             enabled: true,
@@ -199,6 +205,7 @@ describe('Tvist - enabled with breakpoints', () => {
         enabled: true,
         perPage: 3,
         gap: 20,
+        breakpointsBase: 'container',
         breakpoints: {
           767: {
             enabled: false,
@@ -235,6 +242,7 @@ describe('Tvist - enabled with breakpoints', () => {
     it('should handle enabled: undefined in breakpoint (should not change state)', () => {
       const slider = new Tvist(fixture.root, {
         enabled: true,
+        breakpointsBase: 'container',
         breakpoints: {
           767: {
             perPage: 1
@@ -255,6 +263,7 @@ describe('Tvist - enabled with breakpoints', () => {
     it('should handle rapid breakpoint changes', () => {
       const slider = new Tvist(fixture.root, {
         enabled: false,
+        breakpointsBase: 'container',
         breakpoints: {
           767: { enabled: true },
           480: { enabled: false }
@@ -282,6 +291,7 @@ describe('Tvist - enabled with breakpoints', () => {
     it('should not break when toggling enabled manually during breakpoint changes', () => {
       const slider = new Tvist(fixture.root, {
         enabled: false,
+        breakpointsBase: 'container',
         breakpoints: {
           767: { enabled: true }
         }
