@@ -11,8 +11,8 @@
  */
 
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest'
-import { Tvist } from '../../../src/core/Tvist'
-import { DragModule } from '../../../src/modules/drag/DragModule'
+import { Tvist } from '@core/Tvist'
+import { DragModule } from '@modules/drag/DragModule'
 import {
   createSliderFixture,
   simulateDrag,

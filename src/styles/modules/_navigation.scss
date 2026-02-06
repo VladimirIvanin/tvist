@@ -2,30 +2,32 @@
  * Navigation (Arrows) Styles
  */
 
-.tvist__arrow {
+@use '../core/variables' as *;
+
+.#{$tvist-block}__arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
 
   // Размеры
-  width: var(--tvist-arrow-size, 40px);
-  height: var(--tvist-arrow-size, 40px);
+  width: var(--#{$tvist-block}-arrow-size, 40px);
+  height: var(--#{$tvist-block}-arrow-size, 40px);
 
   // Стили кнопки
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--tvist-arrow-bg, rgba(0, 0, 0, 0.5));
-  color: var(--tvist-arrow-color, #fff);
+  background: var(--#{$tvist-block}-arrow-bg, rgba(0, 0, 0, 0.5));
+  color: var(--#{$tvist-block}-arrow-color, #fff);
   border: none;
-  border-radius: var(--tvist-arrow-radius, 50%);
+  border-radius: var(--#{$tvist-block}-arrow-radius, 50%);
   cursor: pointer;
   transition: all 0.3s ease;
 
   // Hover эффект
   &:hover:not(:disabled) {
-    background: var(--tvist-arrow-hover-bg, rgba(0, 0, 0, 0.7));
+    background: var(--#{$tvist-block}-arrow-hover-bg, rgba(0, 0, 0, 0.7));
     transform: translateY(-50%) scale(1.1);
   }
 
@@ -49,19 +51,19 @@
 
   // Позиционирование
   &--prev {
-    left: var(--tvist-arrow-offset, 10px);
+    left: var(--#{$tvist-block}-arrow-offset, 10px);
   }
 
   &--next {
-    right: var(--tvist-arrow-offset, 10px);
+    right: var(--#{$tvist-block}-arrow-offset, 10px);
   }
 }
 
 // Адаптивность
 @media (max-width: 768px) {
-  .tvist__arrow {
-    --tvist-arrow-size: 32px;
-    --tvist-arrow-offset: 5px;
+  .#{$tvist-block}__arrow {
+    --#{$tvist-block}-arrow-size: 32px;
+    --#{$tvist-block}-arrow-offset: 5px;
   }
 }
 

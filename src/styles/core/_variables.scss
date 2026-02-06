@@ -1,26 +1,30 @@
 /**
- * CSS переменные
+ * CSS переменные и префикс BEM-блока
+ * Префикс с версией (tvist-v0) для сосуществования нескольких версий на одной странице
  */
 
+$tvist-block: 'tvist-v0' !default;
+
+// CSS-переменные с префиксом версии (--tvist-v0-*) для сосуществования нескольких версий
 :root {
   // Отступы
-  --tvist-gap: 0px;
-  
+  --#{$tvist-block}-gap: 0px;
+
   // Стрелки навигации
-  --tvist-arrow-size: 40px;
-  --tvist-arrow-color: #000;
-  --tvist-arrow-bg: rgba(255, 255, 255, 0.9);
-  --tvist-arrow-hover-bg: rgba(255, 255, 255, 1);
-  --tvist-arrow-disabled-opacity: 0.3;
-  
+  --#{$tvist-block}-arrow-size: 40px;
+  --#{$tvist-block}-arrow-color: #000;
+  --#{$tvist-block}-arrow-bg: rgba(255, 255, 255, 0.9);
+  --#{$tvist-block}-arrow-hover-bg: rgba(255, 255, 255, 1);
+  --#{$tvist-block}-arrow-disabled-opacity: 0.3;
+
   // Пагинация
-  --tvist-pagination-color: #000;
-  --tvist-pagination-color-active: #007aff;
-  --tvist-bullet-size: 8px;
-  --tvist-bullet-spacing: 6px;
-  
+  --#{$tvist-block}-pagination-color: #000;
+  --#{$tvist-block}-pagination-color-active: #007aff;
+  --#{$tvist-block}-bullet-size: 8px;
+  --#{$tvist-block}-bullet-spacing: 6px;
+
   // Z-indexes
-  --tvist-z-arrows: 10;
-  --tvist-z-pagination: 10;
+  --#{$tvist-block}-z-arrows: 10;
+  --#{$tvist-block}-z-pagination: 10;
 }
 

@@ -163,12 +163,12 @@
     </div>
 
     <div class="slider-wrapper">
-      <div ref="sliderEl" class="tvist" :class="{ 'tvist--vertical': options.direction === 'vertical' }">
-        <div class="tvist__container">
+      <div ref="sliderEl" class="tvist-v0" :class="{ 'tvist-v0--vertical': options.direction === 'vertical' }">
+        <div class="tvist-v0__container">
           <div 
             v-for="i in 8" 
             :key="i" 
-            class="tvist__slide"
+            class="tvist-v0__slide"
           >
             <div class="slide-content">
               <span class="slide-number">{{ i }}</span>
@@ -498,14 +498,14 @@ function applyPreset(preset: string) {
   height: 400px;
 }
 
-.tvist__slide {
+.tvist-v0__slide {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 200px;
 }
 
-.tvist--vertical .tvist__slide {
+.tvist-v0--vertical .tvist-v0__slide {
   min-height: auto;
 }
 

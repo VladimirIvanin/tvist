@@ -7,6 +7,7 @@
  */
 
 import { Module } from '../Module'
+import { TVIST_CLASSES } from '../../core/constants'
 
 export class ThumbsModule extends Module {
   readonly name = 'thumbs'
@@ -22,11 +23,11 @@ export class ThumbsModule extends Module {
 
   private initNavigation(): void {
     // Добавляем класс модификатор на корневой элемент
-    this.tvist.root.classList.add('tvist--nav')
+    this.tvist.root.classList.add(TVIST_CLASSES.nav)
 
     const slides = this.tvist.slides
     const listeners: (() => void)[] = []
-    const activeClass = 'tvist__slide--nav-active'
+    const activeClass = TVIST_CLASSES.slideNavActive
     const legacyActiveClass = 'is-active' // Как в Splide
 
     // 1. Обработка кликов

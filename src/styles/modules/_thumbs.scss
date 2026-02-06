@@ -1,7 +1,7 @@
 @use "../core/variables" as *;
 
-.tvist--nav {
-  .tvist__slide {
+.#{$tvist-block}--nav {
+  .#{$tvist-block}__slide {
     cursor: pointer;
     opacity: 0.6;
     transition: opacity 0.3s ease;

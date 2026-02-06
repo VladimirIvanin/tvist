@@ -3,11 +3,11 @@
     <div class="demo-wrapper">
       <div class="cube-wrapper">
         <div ref="sliderEl" class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">Slide 1</div>
-            <div class="tvist__slide">Slide 2</div>
-            <div class="tvist__slide">Slide 3</div>
-            <div class="tvist__slide">Slide 4</div>
+          <div class="tvist-v0__container">
+            <div class="tvist-v0__slide">Slide 1</div>
+            <div class="tvist-v0__slide">Slide 2</div>
+            <div class="tvist-v0__slide">Slide 3</div>
+            <div class="tvist-v0__slide">Slide 4</div>
           </div>
         </div>
       </div>
@@ -70,7 +70,7 @@ onUnmounted(() => {
   background: #f5f5f5;
 }
 
-.tvist__slide {
+.tvist-v0__slide {
   height: 100%;
   display: flex;
   align-items: center;
@@ -80,10 +80,10 @@ onUnmounted(() => {
   color: white;
 }
 
-.tvist :deep(.tvist__slide[data-tvist-slide-index="0"]) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist :deep(.tvist__slide[data-tvist-slide-index="1"]) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist :deep(.tvist__slide[data-tvist-slide-index="2"]) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist :deep(.tvist__slide[data-tvist-slide-index="3"]) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist :deep(.tvist-v0__slide[data-tvist-slide-index="0"]) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist :deep(.tvist-v0__slide[data-tvist-slide-index="1"]) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist :deep(.tvist-v0__slide[data-tvist-slide-index="2"]) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist :deep(.tvist-v0__slide[data-tvist-slide-index="3"]) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 
 .controls {
   display: flex;

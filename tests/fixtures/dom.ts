@@ -3,6 +3,8 @@
  * Создание типичных HTML структур для тестирования слайдера
  */
 
+import { TVIST_CLASSES } from '@core/constants'
+
 /**
  * Конфигурация для создания слайдера
  */
@@ -57,20 +59,20 @@ export function createSliderFixture(config: SliderFixtureConfig = {}): SliderFix
 
   // Создаём root
   const root = document.createElement('div')
-  root.className = ['tvist', ...rootClasses].join(' ')
+  root.className = [TVIST_CLASSES.block, ...rootClasses].join(' ')
   root.style.width = `${width}px`
   root.style.height = `${height}px`
   if (id) root.id = id
 
   // Создаём container
   const container = document.createElement('div')
-  container.className = 'tvist__container'
+  container.className = TVIST_CLASSES.container
 
   // Создаём слайды
   const slides: HTMLElement[] = []
   for (let i = 0; i < slidesCount; i++) {
     const slide = document.createElement('div')
-    slide.className = ['tvist__slide', ...slideClasses].join(' ')
+    slide.className = [TVIST_CLASSES.slide, ...slideClasses].join(' ')
     slide.textContent = slideContents?.[i] ?? `Slide ${i + 1}`
     slide.style.width = `${width}px`
     slide.style.height = `${height}px`
@@ -156,11 +158,11 @@ export function createInvalidSliderFixture(): { root: HTMLElement; cleanup: () =
  */
 export function createEmptySliderFixture(): SliderFixture {
   const root = document.createElement('div')
-  root.className = 'tvist'
+  root.className = TVIST_CLASSES.block
   root.style.width = '1000px'
 
   const container = document.createElement('div')
-  container.className = 'tvist__container'
+  container.className = TVIST_CLASSES.container
   root.appendChild(container)
   document.body.appendChild(root)
 

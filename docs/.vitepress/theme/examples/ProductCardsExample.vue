@@ -13,12 +13,12 @@
         </p>
         
         <div ref="containerRef" class="products-container">
-          <div class="tvist">
-            <div class="tvist__container">
+          <div class="tvist-v0">
+            <div class="tvist-v0__container">
               <div 
                 v-for="product in products" 
                 :key="product.id" 
-                class="tvist__slide product-card"
+                class="tvist-v0__slide product-card"
               >
                 <div class="product-image" :style="{ background: product.color }">
                   <div class="product-badge" v-if="product.badge">{{ product.badge }}</div>
@@ -123,7 +123,7 @@ const updateSlideInfo = () => {
 onMounted(() => {
   if (!containerRef.value) return
   
-  const sliderEl = containerRef.value.querySelector('.tvist')
+  const sliderEl = containerRef.value.querySelector('.tvist-v0')
   if (!sliderEl) return
 
   // Инициализируем слайдер с breakpoints
@@ -209,7 +209,7 @@ onUnmounted(() => {
 }
 
 /* Когда слайдер отключен (десктоп) - показываем как сетку */
-.tvist.tvist--disabled .tvist__container {
+.tvist-v0.tvist-v0--disabled .tvist-v0__container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
@@ -217,7 +217,7 @@ onUnmounted(() => {
   transform: none !important;
 }
 
-.tvist.tvist--disabled .tvist__slide {
+.tvist-v0.tvist-v0--disabled .tvist-v0__slide {
   width: auto !important;
   margin: 0 !important;
 }
@@ -232,11 +232,11 @@ onUnmounted(() => {
 }
 
 /* В режиме сетки (disabled) - добавляем тень и hover */
-.tvist.tvist--disabled .product-card {
+.tvist-v0.tvist-v0--disabled .product-card {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.tvist.tvist--disabled .product-card:hover {
+.tvist-v0.tvist-v0--disabled .product-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
@@ -389,7 +389,7 @@ onUnmounted(() => {
 
 /* Адаптивность для планшетов */
 @media (max-width: 1024px) and (min-width: 768px) {
-  .tvist.tvist--disabled .tvist__container {
+  .tvist-v0.tvist-v0--disabled .tvist-v0__container {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }

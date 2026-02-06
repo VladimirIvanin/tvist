@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '../../src/core/Tvist'
 import type { TvistOptions } from '../../src/core/types'
 
@@ -8,13 +9,13 @@ describe('Peek integration', () => {
 
   beforeEach(() => {
     root = document.createElement('div')
-    root.className = 'tvist'
+    root.className = TVIST_CLASSES.block
     root.innerHTML = `
-      <div class="tvist__container">
-        <div class="tvist__slide">Slide 1</div>
-        <div class="tvist__slide">Slide 2</div>
-        <div class="tvist__slide">Slide 3</div>
-        <div class="tvist__slide">Slide 4</div>
+      <div class="${TVIST_CLASSES.container}">
+        <div class="${TVIST_CLASSES.slide}">Slide 1</div>
+        <div class="${TVIST_CLASSES.slide}">Slide 2</div>
+        <div class="${TVIST_CLASSES.slide}">Slide 3</div>
+        <div class="${TVIST_CLASSES.slide}">Slide 4</div>
       </div>
     `
     document.body.appendChild(root)
@@ -52,7 +53,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingLeft).toBe('50px')
       expect(container.style.paddingRight).toBe('50px')
@@ -65,7 +66,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingLeft).toBe('2rem')
       expect(container.style.paddingRight).toBe('2rem')
@@ -78,7 +79,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingLeft).toBe('30px')
       expect(container.style.paddingRight).toBe('70px')
@@ -91,7 +92,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingLeft).toBe('1rem')
       expect(container.style.paddingRight).toBe('50px')
@@ -104,7 +105,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingLeft).toBe('50px')
       expect(container.style.paddingRight).toBe('0px')
@@ -119,7 +120,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingTop).toBe('50px')
       expect(container.style.paddingBottom).toBe('50px')
@@ -132,7 +133,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingTop).toBe('30px')
       expect(container.style.paddingBottom).toBe('70px')
@@ -149,7 +150,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const slides = Array.from(root.querySelectorAll('.tvist__slide')) as HTMLElement[]
+      const slides = Array.from(root.querySelectorAll(`.${TVIST_CLASSES.slide}`)) as HTMLElement[]
 
       // Доступная ширина = 1000px - 100px (left) - 100px (right) = 800px
       // Размер слайда = (800px - 20px gap) / 2 = 390px
@@ -170,7 +171,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const slides = Array.from(root.querySelectorAll('.tvist__slide')) as HTMLElement[]
+      const slides = Array.from(root.querySelectorAll(`.${TVIST_CLASSES.slide}`)) as HTMLElement[]
 
       // Доступная ширина = 1000px - 50px (left) - 150px (right) = 800px
       // Размер слайда = (800px - 20px gap) / 2 = 390px
@@ -190,7 +191,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingLeft).toBe('0px')
       expect(container.style.paddingRight).toBe('0px')
@@ -205,7 +206,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingLeft).toBe('1rem')
       expect(container.style.paddingRight).toBe('1rem')
@@ -218,7 +219,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingLeft).toBe('10%')
       expect(container.style.paddingRight).toBe('10%')
@@ -231,7 +232,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingLeft).toBe('2em')
       expect(container.style.paddingRight).toBe('2em')
@@ -246,7 +247,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingLeft).toBe('0px')
       expect(container.style.paddingRight).toBe('0px')
@@ -259,7 +260,7 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector('.tvist__container') as HTMLElement
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       expect(container.style.paddingLeft).toBe('0px')
       expect(container.style.paddingRight).toBe('0px')

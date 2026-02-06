@@ -11,6 +11,7 @@
  */
 
 import { Module } from '../Module'
+import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -161,7 +162,7 @@ export class MarqueeModule extends Module {
         // Маркируем как клон
         clone.setAttribute('data-tvist-marquee-clone', 'true')
         clone.setAttribute('data-tvist-slide-index', String(originalSlides.length - 1 - index))
-        clone.classList.add('tvist__slide--marquee-clone')
+        clone.classList.add(TVIST_CLASSES.slideMarqueeClone)
         
         // Удаляем id
         clone.removeAttribute('id')
@@ -177,7 +178,7 @@ export class MarqueeModule extends Module {
         // Маркируем как клон
         clone.setAttribute('data-tvist-marquee-clone', 'true')
         clone.setAttribute('data-tvist-slide-index', String(index))
-        clone.classList.add('tvist__slide--marquee-clone')
+        clone.classList.add(TVIST_CLASSES.slideMarqueeClone)
         
         // Удаляем id
         clone.removeAttribute('id')

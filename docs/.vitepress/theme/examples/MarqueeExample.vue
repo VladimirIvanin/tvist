@@ -5,8 +5,8 @@
   >
     <div class="demo-wrapper">
       <div class="tvist marquee-demo" ref="sliderEl">
-        <div class="tvist__container">
-          <div v-for="i in 6" :key="i" class="tvist__slide">
+        <div class="tvist-v0__container">
+          <div v-for="i in 6" :key="i" class="tvist-v0__slide">
             <div class="marquee-item">
               <div class="marquee-icon">{{ getIcon(i) }}</div>
               <div class="marquee-label">Элемент {{ i }}</div>

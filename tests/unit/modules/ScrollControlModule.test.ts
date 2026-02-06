@@ -9,8 +9,8 @@
  */
 
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest'
-import { Tvist } from '../../../src/core/Tvist'
-import { ScrollControlModule } from '../../../src/modules/scroll-control/ScrollControlModule'
+import { Tvist } from '@core/Tvist'
+import { ScrollControlModule } from '@modules/scroll-control/ScrollControlModule'
 import {
   createSliderFixture,
   waitForAnimation,

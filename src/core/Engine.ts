@@ -6,6 +6,7 @@
 import { Vector1D } from './Vector1D'
 import { Counter } from './Counter'
 import { Animator } from './Animator'
+import { TVIST_CLASSES } from './constants'
 import type { Tvist } from './Tvist'
 import type { TvistOptions } from './types'
 import { getOuterWidth, getOuterHeight } from '../utils/dom'
@@ -540,7 +541,7 @@ export class Engine {
     if (this._isLocked !== isLocked) {
       this._isLocked = isLocked
       
-      this.tvist.root.classList.toggle('tvist--locked', isLocked)
+      this.tvist.root.classList.toggle(TVIST_CLASSES.locked, isLocked)
       
       if (isLocked) {
         this.tvist.emit('lock')

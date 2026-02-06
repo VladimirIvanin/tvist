@@ -10,8 +10,9 @@
  */
 
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest'
-import { Tvist } from '../../../src/core/Tvist'
-import { ScrollbarModule } from '../../../src/modules/scrollbar/ScrollbarModule'
+import { TVIST_CLASSES } from '@core/constants'
+import { Tvist } from '@core/Tvist'
+import { ScrollbarModule } from '@modules/scrollbar/ScrollbarModule'
 import {
   createSliderFixture,
   waitForAnimation,
@@ -48,19 +49,19 @@ describe('ScrollbarModule', () => {
 
   describe('Initialization', () => {
     it('должен создавать DOM элементы скроллбара', () => {
-      const scrollbarEl = slider.root.querySelector('.tvist__scrollbar')
+      const scrollbarEl = slider.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)
       expect(scrollbarEl).toBeTruthy()
       
-      const trackEl = scrollbarEl?.querySelector('.tvist__scrollbar-track')
+      const trackEl = scrollbarEl?.querySelector(`.${TVIST_CLASSES.scrollbarTrack}`)
       expect(trackEl).toBeTruthy()
       
-      const thumbEl = scrollbarEl?.querySelector('.tvist__scrollbar-thumb')
+      const thumbEl = scrollbarEl?.querySelector(`.${TVIST_CLASSES.scrollbarThumb}`)
       expect(thumbEl).toBeTruthy()
     })
 
     it('должен добавлять класс направления для горизонтального слайдера', () => {
-      const scrollbarEl = slider.root.querySelector('.tvist__scrollbar')
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--horizontal')).toBe(true)
+      const scrollbarEl = slider.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarHorizontal)).toBe(true)
     })
 
     it('должен добавлять класс направления для вертикального слайдера', () => {
@@ -70,8 +71,8 @@ describe('ScrollbarModule', () => {
         scrollbar: true,
       })
 
-      const scrollbarEl = slider.root.querySelector('.tvist__scrollbar')
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--vertical')).toBe(true)
+      const scrollbarEl = slider.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarVertical)).toBe(true)
     })
 
     it('должен регистрироваться как модуль', () => {
@@ -83,7 +84,7 @@ describe('ScrollbarModule', () => {
 
   describe('Position Update', () => {
     it('должен обновлять позицию ползунка при изменении слайда', async () => {
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
       expect(thumbEl).toBeTruthy()
 
       // Начальная позиция
@@ -105,7 +106,7 @@ describe('ScrollbarModule', () => {
         scrollbar: true,
       })
 
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
       const thumbWidth = parseFloat(thumbEl?.style.width || '0')
 
       // При perPage=2 и 5 слайдах, ползунок должен занимать 40% (2/5)
@@ -113,7 +114,7 @@ describe('ScrollbarModule', () => {
     })
 
     it('должен иметь правильное стартовое положение (0%)', () => {
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
       expect(thumbEl).toBeTruthy()
 
       // На первом слайде позиция должна быть 0%
@@ -126,7 +127,7 @@ describe('ScrollbarModule', () => {
     })
 
     it('должен плавно перемещаться во время анимации перехода', async () => {
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
       expect(thumbEl).toBeTruthy()
 
       // Запоминаем начальную позицию
@@ -157,7 +158,7 @@ describe('ScrollbarModule', () => {
     })
 
     it('должен корректно позиционироваться на последнем слайде', async () => {
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
       expect(thumbEl).toBeTruthy()
 
       // Переходим к последнему слайду
@@ -179,7 +180,7 @@ describe('ScrollbarModule', () => {
         scrollbar: true,
       })
 
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
       expect(thumbEl).toBeTruthy()
 
       // Проверяем стартовую позицию для вертикального направления
@@ -193,7 +194,7 @@ describe('ScrollbarModule', () => {
 
   describe('Click Navigation', () => {
     it('должен переходить к слайду при клике по треку', async () => {
-      const trackEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-track')
+      const trackEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarTrack}`)
       expect(trackEl).toBeTruthy()
       expect(slider.activeIndex).toBe(0)
 
@@ -227,7 +228,7 @@ describe('ScrollbarModule', () => {
     })
 
     it('не должен переходить при клике по ползунку', async () => {
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
       expect(thumbEl).toBeTruthy()
       expect(slider.activeIndex).toBe(0)
 
@@ -247,11 +248,11 @@ describe('ScrollbarModule', () => {
 
   describe('Drag & Drop', () => {
     it('должен начинать перетаскивание при mousedown на ползунке', () => {
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
       expect(thumbEl).toBeTruthy()
 
-      const scrollbarEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar')
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--dragging')).toBe(false)
+      const scrollbarEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbar}`)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(false)
 
       // Начинаем перетаскивание
       const mouseDownEvent = new MouseEvent('mousedown', {
@@ -262,12 +263,12 @@ describe('ScrollbarModule', () => {
       thumbEl!.dispatchEvent(mouseDownEvent)
 
       // Класс dragging должен добавиться
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--dragging')).toBe(true)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(true)
     })
 
     it('должен обновлять позицию при перетаскивании', () => {
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
-      const trackEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-track')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
+      const trackEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarTrack}`)
       expect(thumbEl).toBeTruthy()
       expect(trackEl).toBeTruthy()
 
@@ -307,8 +308,8 @@ describe('ScrollbarModule', () => {
     })
 
     it('должен завершать перетаскивание при mouseup', async () => {
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
-      const scrollbarEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
+      const scrollbarEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbar}`)
       expect(thumbEl).toBeTruthy()
 
       // Начинаем и завершаем перетаскивание
@@ -318,17 +319,17 @@ describe('ScrollbarModule', () => {
         bubbles: true,
       }))
       
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--dragging')).toBe(true)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(true)
 
       document.dispatchEvent(new MouseEvent('mouseup'))
       
       // Класс dragging должен удалиться
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--dragging')).toBe(false)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(false)
     })
 
     it('должен делать snap к ближайшему слайду после завершения drag', async () => {
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
-      const trackEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-track')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
+      const trackEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarTrack}`)
       expect(thumbEl).toBeTruthy()
       expect(trackEl).toBeTruthy()
 
@@ -376,8 +377,8 @@ describe('ScrollbarModule', () => {
     })
 
     it('должен поддерживать touch события', () => {
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
-      const scrollbarEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
+      const scrollbarEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbar}`)
       expect(thumbEl).toBeTruthy()
 
       // Touch start
@@ -389,12 +390,12 @@ describe('ScrollbarModule', () => {
       })
       thumbEl!.dispatchEvent(touchStartEvent)
 
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--dragging')).toBe(true)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(true)
 
       // Touch end
       document.dispatchEvent(new TouchEvent('touchend'))
       
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--dragging')).toBe(false)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(false)
     })
 
     it('должен отключать drag при draggable: false', () => {
@@ -405,8 +406,8 @@ describe('ScrollbarModule', () => {
         },
       })
 
-      const thumbEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar-thumb')
-      const scrollbarEl = slider.root.querySelector<HTMLElement>('.tvist__scrollbar')
+      const thumbEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbarThumb}`)
+      const scrollbarEl = slider.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.scrollbar}`)
       expect(thumbEl).toBeTruthy()
 
       // Пытаемся начать drag
@@ -417,7 +418,7 @@ describe('ScrollbarModule', () => {
       }))
 
       // Класс dragging не должен добавиться
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--dragging')).toBe(false)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(false)
     })
   })
 
@@ -430,8 +431,8 @@ describe('ScrollbarModule', () => {
         },
       })
 
-      const scrollbarEl = slider.root.querySelector('.tvist__scrollbar')
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--hidden')).toBe(true)
+      const scrollbarEl = slider.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarHidden)).toBe(true)
     })
 
     it('должен показывать скроллбар при наведении мыши', () => {
@@ -442,14 +443,14 @@ describe('ScrollbarModule', () => {
         },
       })
 
-      const scrollbarEl = slider.root.querySelector('.tvist__scrollbar')
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--hidden')).toBe(true)
+      const scrollbarEl = slider.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarHidden)).toBe(true)
 
       // Наводим мышь
       const mouseEnterEvent = new MouseEvent('mouseenter', { bubbles: true })
       slider.root.dispatchEvent(mouseEnterEvent)
 
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--hidden')).toBe(false)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarHidden)).toBe(false)
     })
   })
 
@@ -460,7 +461,7 @@ describe('ScrollbarModule', () => {
         scrollbar: false,
       })
 
-      const scrollbarEl = slider.root.querySelector('.tvist__scrollbar')
+      const scrollbarEl = slider.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)
       expect(scrollbarEl).toBeFalsy()
     })
 
@@ -495,19 +496,19 @@ describe('ScrollbarModule', () => {
         },
       })
 
-      const scrollbarEl = slider.root.querySelector('.tvist__scrollbar')
-      expect(scrollbarEl?.classList.contains('tvist__scrollbar--hidden')).toBe(true)
+      const scrollbarEl = slider.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)
+      expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarHidden)).toBe(true)
     })
   })
 
   describe('Cleanup', () => {
     it('должен удалять DOM элементы при destroy', () => {
-      const scrollbarEl = slider.root.querySelector('.tvist__scrollbar')
+      const scrollbarEl = slider.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)
       expect(scrollbarEl).toBeTruthy()
 
       slider.destroy()
 
-      const scrollbarElAfter = slider.root.querySelector('.tvist__scrollbar')
+      const scrollbarElAfter = slider.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)
       expect(scrollbarElAfter).toBeFalsy()
     })
   })

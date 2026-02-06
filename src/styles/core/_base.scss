@@ -2,7 +2,9 @@
  * Базовые стили слайдера
  */
 
-.tvist {
+@use 'variables' as *;
+
+.#{$tvist-block} {
   position: relative;
   overflow: hidden;
   width: 100%;
@@ -59,20 +61,20 @@
   
   // Вертикальная ориентация
   &--vertical {
-    .tvist__container {
+    .#{$tvist-block}__container {
       flex-direction: column;
     }
   }
   
   // Состояние dragging
   &--dragging {
-    .tvist__container {
+    .#{$tvist-block}__container {
       transition: none !important;
       cursor: grabbing;
       user-select: none;
     }
     
-    .tvist__slide {
+    .#{$tvist-block}__slide {
       pointer-events: none;
     }
   }

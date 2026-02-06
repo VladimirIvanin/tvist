@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '../../src/core/Tvist'
 import { createSliderFixture } from '../fixtures/dom'
 import '../../src/modules/drag'
@@ -41,7 +42,7 @@ describe('Lock functionality', () => {
     })
 
     expect(slider.engine.isLocked).toBe(true)
-    expect(fixture.root.classList.contains('tvist--locked')).toBe(true)
+    expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(true)
     expect(onLock).toHaveBeenCalled()
     expect(onUnlock).not.toHaveBeenCalled()
   })
@@ -61,7 +62,7 @@ describe('Lock functionality', () => {
     })
 
     expect(slider.engine.isLocked).toBe(false)
-    expect(fixture.root.classList.contains('tvist--locked')).toBe(false)
+    expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(false)
   })
 
   it('should prevent drag when locked', () => {
@@ -185,7 +186,7 @@ describe('Lock functionality', () => {
     slider.update()
 
     expect(slider.engine.isLocked).toBe(false)
-    expect(fixture.root.classList.contains('tvist--locked')).toBe(false)
+    expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(false)
   })
 
   it('should handle Grid lock correctly', () => {

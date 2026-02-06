@@ -37,7 +37,7 @@ npm run typecheck       # Проверка типов
 - Используем Vitest + happy-dom
 
 ### Стили
-- BEM нотация: `.tvist__element--modifier`
+- BEM нотация: `.tvist-v0__element--modifier`
 - SCSS с modern-compiler API
 - Переменные в `_variables.scss`
 - Базовые стили в `_base.scss`

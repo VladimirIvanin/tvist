@@ -13,11 +13,11 @@ import FadeExample from '../.vitepress/theme/examples/FadeExample.vue'
 **HTML:**
 ```html
 <div class="tvist">
-  <div class="tvist__container">
-    <div class="tvist__slide">Slide 1</div>
-    <div class="tvist__slide">Slide 2</div>
-    <div class="tvist__slide">Slide 3</div>
-    <div class="tvist__slide">Slide 4</div>
+  <div class="tvist-v0__container">
+    <div class="tvist-v0__slide">Slide 1</div>
+    <div class="tvist-v0__slide">Slide 2</div>
+    <div class="tvist-v0__slide">Slide 3</div>
+    <div class="tvist-v0__slide">Slide 4</div>
   </div>
 </div>
 ```
@@ -43,7 +43,7 @@ const slider = new Tvist('.tvist', {
   border-radius: 12px;
 }
 
-.tvist__slide {
+.tvist-v0__slide {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,8 +52,8 @@ const slider = new Tvist('.tvist', {
   color: white;
 }
 
-.tvist__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v0__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v0__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v0__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v0__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 ```

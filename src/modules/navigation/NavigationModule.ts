@@ -10,6 +10,7 @@
  */
 
 import { Module } from '../Module'
+import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -75,8 +76,8 @@ export class NavigationModule extends Module {
     }
 
     // Если не найдены - ищем по дефолтным классам
-    this.prevButton ??= this.tvist.root.querySelector<HTMLElement>('.tvist__arrow--prev')
-    this.nextButton ??= this.tvist.root.querySelector<HTMLElement>('.tvist__arrow--next')
+    this.prevButton ??= this.tvist.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.arrowPrev}`)
+    this.nextButton ??= this.tvist.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.arrowNext}`)
   }
 
   /**

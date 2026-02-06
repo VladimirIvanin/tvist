@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { Tvist } from '../../../src/core/Tvist'
+import { Tvist } from '@core/Tvist'
 import { createSliderFixture, createInvalidSliderFixture, createEmptySliderFixture } from '../../fixtures'
 import type { SliderFixture } from '../../fixtures'
 
@@ -41,7 +41,7 @@ describe('Tvist', () => {
 
       expect(() => {
         new Tvist(invalidRoot)
-      }).toThrow('container ".tvist__container" not found')
+      }).toThrow(/container "\.[^"]+__container" not found/)
 
       cleanup()
     })

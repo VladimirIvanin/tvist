@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { TVIST_CLASSES } from '@core/constants'
 import { createSliderFixture, type SliderFixture } from '../../../fixtures'
-import { Tvist } from '../../../../src/core/Tvist'
-import { LoopModule } from '../../../../src/modules/loop/LoopModule'
+import { Tvist } from '@core/Tvist'
+import { LoopModule } from '@modules/loop/LoopModule'
 
 describe('LoopModule', () => {
   let fixture: SliderFixture
@@ -53,7 +54,7 @@ describe('LoopModule', () => {
       perPage: 1
     })
 
-    const slides = fixture.container.querySelectorAll('.tvist__slide')
+    const slides = fixture.container.querySelectorAll(`.${TVIST_CLASSES.slide}`)
     // 4 originals + 2 prepend + 2 append = 8 (perPage * 2 rule)
     expect(slides.length).toBe(8)
 
@@ -292,7 +293,7 @@ describe('LoopModule', () => {
       const originals = fixture.container.querySelectorAll('[data-tvist-original]')
       expect(originals.length).toBe(0)
 
-      const slides = fixture.container.querySelectorAll('.tvist__slide')
+      const slides = fixture.container.querySelectorAll(`.${TVIST_CLASSES.slide}`)
       expect(slides.length).toBe(4)
 
       expect('realIndex' in slider).toBe(false)

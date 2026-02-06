@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import Tvist from '../../../src/core/Tvist'
-import { EffectModule } from '../../../src/modules/effects/EffectModule'
+import { TVIST_CLASSES } from '@core/constants'
+import Tvist from '@core/Tvist'
+import { EffectModule } from '@modules/effects/EffectModule'
 
 // Manually register for test isolation or import the index
 Tvist.registerModule('effect', EffectModule)
@@ -10,15 +11,15 @@ describe('EffectModule', () => {
   
   beforeEach(() => {
     document.body.innerHTML = `
-      <div class="tvist">
-        <div class="tvist__container">
-          <div class="tvist__slide">Slide 1</div>
-          <div class="tvist__slide">Slide 2</div>
-          <div class="tvist__slide">Slide 3</div>
+      <div class="${TVIST_CLASSES.block}">
+        <div class="${TVIST_CLASSES.container}">
+          <div class="${TVIST_CLASSES.slide}">Slide 1</div>
+          <div class="${TVIST_CLASSES.slide}">Slide 2</div>
+          <div class="${TVIST_CLASSES.slide}">Slide 3</div>
         </div>
       </div>
     `
-    container = document.querySelector('.tvist') as HTMLElement
+    container = document.querySelector(`.${TVIST_CLASSES.block}`) as HTMLElement
     
     // Mock offsetWidth to allow calculation of slideWidth
     Object.defineProperty(container, 'offsetWidth', {

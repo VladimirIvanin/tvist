@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '../../../src/index' // Импортируем из index для регистрации модулей
 import { createSliderFixture } from '../../fixtures'
 import type { SliderFixture } from '../../fixtures'
@@ -19,7 +20,7 @@ describe('Tvist - enabled option', () => {
       const slider = new Tvist(fixture.root)
 
       expect(slider.isEnabled).toBe(true)
-      expect(slider.root.classList.contains('tvist--disabled')).toBe(false)
+      expect(slider.root.classList.contains(TVIST_CLASSES.disabled)).toBe(false)
     })
 
     it('should initialize with enabled: false', () => {
@@ -28,7 +29,7 @@ describe('Tvist - enabled option', () => {
       })
 
       expect(slider.isEnabled).toBe(false)
-      expect(slider.root.classList.contains('tvist--disabled')).toBe(true)
+      expect(slider.root.classList.contains(TVIST_CLASSES.disabled)).toBe(true)
     })
 
     it('should not apply transform when disabled', () => {
@@ -78,7 +79,7 @@ describe('Tvist - enabled option', () => {
       slider.disable()
 
       expect(slider.isEnabled).toBe(false)
-      expect(slider.root.classList.contains('tvist--disabled')).toBe(true)
+      expect(slider.root.classList.contains(TVIST_CLASSES.disabled)).toBe(true)
     })
 
     it('should remove transform when disabling', () => {
@@ -178,7 +179,7 @@ describe('Tvist - enabled option', () => {
       slider.enable()
 
       expect(slider.isEnabled).toBe(true)
-      expect(slider.root.classList.contains('tvist--disabled')).toBe(false)
+      expect(slider.root.classList.contains(TVIST_CLASSES.disabled)).toBe(false)
     })
 
     it('should apply transform when enabling', () => {

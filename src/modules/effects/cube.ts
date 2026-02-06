@@ -1,3 +1,4 @@
+import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -137,10 +138,11 @@ export function setCubeEffect(
 }
 
 function addSlideShadows(slide: HTMLElement, opacity: number) {
-    let shadow: HTMLElement | null = slide.querySelector<HTMLElement>('.tvist-shadow')
+    const shadowClass = TVIST_CLASSES.shadow
+    let shadow: HTMLElement | null = slide.querySelector<HTMLElement>(`.${shadowClass}`)
     if (!shadow) {
         shadow = document.createElement('div')
-        shadow.className = 'tvist-shadow'
+        shadow.className = shadowClass
         shadow.style.position = 'absolute'
         shadow.style.left = '0'
         shadow.style.top = '0'

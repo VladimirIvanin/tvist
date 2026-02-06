@@ -31,7 +31,7 @@ function displayInfo() {
   
   const infoHtml = sliders.map(({ id, instance }) => {
     const root = document.getElementById(id)
-    const slide = root.querySelector('.tvist__slide')
+    const slide = root.querySelector('.tvist-v0__slide')
     const rootWidth = root.offsetWidth
     const slideWidth = slide ? slide.offsetWidth : 0
     const containerSize = instance.engine.containerSizeValue

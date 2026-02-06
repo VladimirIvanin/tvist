@@ -26,9 +26,9 @@
             {{ preset.label }}
           </button>
         </div>
-        <div ref="slider1El" class="tvist">
-          <div class="tvist__container">
-            <div v-for="i in 12" :key="i" class="tvist__slide">
+        <div ref="slider1El" class="tvist-v0">
+          <div class="tvist-v0__container">
+            <div v-for="i in 12" :key="i" class="tvist-v0__slide">
               <div class="slide-content">
                 <span class="slide-number">{{ i }}</span>
                 <span class="slide-label">Slide {{ i }}</span>
@@ -61,8 +61,8 @@
           При изменении размера контейнера (окно, сайдбар, grid) слайдер обновляется автоматически.
         </p>
         <div ref="slider2El" class="tvist slider-minsize">
-          <div class="tvist__container">
-            <div v-for="i in 12" :key="i" class="tvist__slide">
+          <div class="tvist-v0__container">
+            <div v-for="i in 12" :key="i" class="tvist-v0__slide">
               <div class="slide-content">
                 <span class="slide-number">{{ i }}</span>
                 <span class="slide-label">Slide {{ i }}</span>
@@ -93,9 +93,9 @@
           Этот слайдер находится в узком контейнере.
         </p>
         <div class="narrow-container">
-          <div ref="slider3El" class="tvist">
-            <div class="tvist__container">
-              <div v-for="i in 8" :key="i" class="tvist__slide">
+          <div ref="slider3El" class="tvist-v0">
+            <div class="tvist-v0__container">
+              <div v-for="i in 8" :key="i" class="tvist-v0__slide">
                 <div class="slide-content">
                   <span class="slide-number">{{ i }}</span>
                 </div>
@@ -193,8 +193,8 @@ function initSlider1(presetId) {
   const preset = breakpointPresets.find((p) => p.id === presetId) || breakpointPresets[0]
   const el = slider1El.value
   if (!el) return
-  const container = el.querySelector('.tvist__container')
-  const slides = el.querySelectorAll('.tvist__slide')
+  const container = el.querySelector('.tvist-v0__container')
+  const slides = el.querySelectorAll('.tvist-v0__slide')
   slider1.value?.destroy()
   // Сбрасываем инлайн-стили, чтобы новый экземпляр не унаследовал старое состояние
   nextTick(() => {
@@ -333,7 +333,7 @@ onUnmounted(() => {
   margin: 0 auto;
 }
 
-.tvist__slide {
+.tvist-v0__slide {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -363,18 +363,18 @@ onUnmounted(() => {
 }
 
 /* Градиенты для слайдов - используем nth-child для повторяющегося паттерна */
-.tvist__slide:nth-child(12n+1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist__slide:nth-child(12n+2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist__slide:nth-child(12n+3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist__slide:nth-child(12n+4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-.tvist__slide:nth-child(12n+5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
-.tvist__slide:nth-child(12n+6) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
-.tvist__slide:nth-child(12n+7) { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
-.tvist__slide:nth-child(12n+8) { background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); }
-.tvist__slide:nth-child(12n+9) { background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%); }
-.tvist__slide:nth-child(12n+10) { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
-.tvist__slide:nth-child(12n+11) { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
-.tvist__slide:nth-child(12n+12) { background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%); }
+.tvist-v0__slide:nth-child(12n+1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v0__slide:nth-child(12n+2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v0__slide:nth-child(12n+3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v0__slide:nth-child(12n+4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v0__slide:nth-child(12n+5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.tvist-v0__slide:nth-child(12n+6) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+.tvist-v0__slide:nth-child(12n+7) { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+.tvist-v0__slide:nth-child(12n+8) { background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); }
+.tvist-v0__slide:nth-child(12n+9) { background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%); }
+.tvist-v0__slide:nth-child(12n+10) { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+.tvist-v0__slide:nth-child(12n+11) { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+.tvist-v0__slide:nth-child(12n+12) { background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%); }
 
 .breakpoint-presets {
   display: flex;

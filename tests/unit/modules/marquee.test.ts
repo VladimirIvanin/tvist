@@ -3,7 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { Tvist } from '../../../src/core/Tvist'
+import { TVIST_CLASSES } from '@core/constants'
+import { Tvist } from '@core/Tvist'
 import '../../../src/modules/marquee' // Импортируем для регистрации
 import { MarqueeModule } from '../../../src/modules/marquee'
 
@@ -14,12 +15,12 @@ describe('MarqueeModule', () => {
   beforeEach(() => {
     // Создаём DOM структуру
     root = document.createElement('div')
-    root.className = 'tvist'
+    root.className = TVIST_CLASSES.block
     root.innerHTML = `
-      <div class="tvist__container">
-        <div class="tvist__slide">Slide 1</div>
-        <div class="tvist__slide">Slide 2</div>
-        <div class="tvist__slide">Slide 3</div>
+      <div class="${TVIST_CLASSES.container}">
+        <div class="${TVIST_CLASSES.slide}">Slide 1</div>
+        <div class="${TVIST_CLASSES.slide}">Slide 2</div>
+        <div class="${TVIST_CLASSES.slide}">Slide 3</div>
       </div>
     `
     document.body.appendChild(root)
@@ -187,8 +188,8 @@ describe('MarqueeModule', () => {
     slider.destroy()
 
     // После destroy должны остаться только оригинальные слайды
-    const container = root.querySelector('.tvist__container')
-    const remainingSlides = container?.querySelectorAll('.tvist__slide')
+    const container = root.querySelector(`.${TVIST_CLASSES.container}`)
+    const remainingSlides = container?.querySelectorAll(`.${TVIST_CLASSES.slide}`)
     expect(remainingSlides?.length).toBe(3)
   })
 
@@ -294,7 +295,7 @@ describe('MarqueeModule', () => {
 
     const module = slider.modules.get('marquee') as MarqueeModule
     const api = module?.getMarquee()
-    const container = root.querySelector('.tvist__container') as HTMLElement
+    const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
     // Для left: transform начинается с translate3d(-0px, 0, 0) = translate3d(0px, 0, 0)
     const initialTransform = container.style.transform

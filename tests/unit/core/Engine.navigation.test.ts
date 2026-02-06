@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { Tvist } from '../../../src/core/Tvist'
+import { TVIST_CLASSES } from '@core/constants'
+import { Tvist } from '@core/Tvist'
 
 describe('Engine Navigation Mode', () => {
   let container: HTMLElement
@@ -8,10 +9,10 @@ describe('Engine Navigation Mode', () => {
   beforeEach(() => {
     // Создаем DOM структуру
     container = document.createElement('div')
-    container.className = 'tvist'
+    container.className = TVIST_CLASSES.block
     container.innerHTML = `
-      <div class="tvist__container">
-        ${Array.from({ length: 8 }).map((_, i) => `<div class="tvist__slide">${i}</div>`).join('')}
+      <div class="${TVIST_CLASSES.container}">
+        ${Array.from({ length: 8 }).map((_, i) => `<div class="${TVIST_CLASSES.slide}">${i}</div>`).join('')}
       </div>
     `
     document.body.appendChild(container)
@@ -81,8 +82,8 @@ describe('Engine Navigation Mode', () => {
     HTMLElement.prototype.getBoundingClientRect = () => ({ width: 630 } as DOMRect)
 
     container.innerHTML = `
-      <div class="tvist__container">
-        ${Array.from({ length: 6 }).map((_, i) => `<div class="tvist__slide">${i}</div>`).join('')}
+      <div class="${TVIST_CLASSES.container}">
+        ${Array.from({ length: 6 }).map((_, i) => `<div class="${TVIST_CLASSES.slide}">${i}</div>`).join('')}
       </div>
     `
     

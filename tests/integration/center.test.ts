@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '../../src/index'
 import { createSliderFixture } from '../fixtures'
 
@@ -243,18 +244,18 @@ describe('Center Mode Integration', () => {
       const slides = tvist.slides
 
       // Изначальное состояние
-      expect(slides[2].classList.contains('tvist__slide--prev')).toBe(true)
-      expect(slides[3].classList.contains('tvist__slide--active')).toBe(true)
-      expect(slides[4].classList.contains('tvist__slide--next')).toBe(true)
+      expect(slides[2].classList.contains(TVIST_CLASSES.slidePrev)).toBe(true)
+      expect(slides[3].classList.contains(TVIST_CLASSES.slideActive)).toBe(true)
+      expect(slides[4].classList.contains(TVIST_CLASSES.slideNext)).toBe(true)
 
       // Переходим к следующему
       tvist.next()
       await new Promise(resolve => setTimeout(resolve, 50))
 
       // Новое состояние
-      expect(slides[3].classList.contains('tvist__slide--prev')).toBe(true)
-      expect(slides[4].classList.contains('tvist__slide--active')).toBe(true)
-      expect(slides[5].classList.contains('tvist__slide--next')).toBe(true)
+      expect(slides[3].classList.contains(TVIST_CLASSES.slidePrev)).toBe(true)
+      expect(slides[4].classList.contains(TVIST_CLASSES.slideActive)).toBe(true)
+      expect(slides[5].classList.contains(TVIST_CLASSES.slideNext)).toBe(true)
     })
   })
 })

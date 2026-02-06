@@ -3,7 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'
-import { Tvist } from '../../../src/core/Tvist'
+import { TVIST_CLASSES } from '@core/constants'
+import { Tvist } from '@core/Tvist'
 
 describe('Engine - endIndex logic', () => {
   let container: HTMLElement
@@ -20,19 +21,19 @@ describe('Engine - endIndex logic', () => {
   describe('scrollTo with endIndex', () => {
     it('should limit scrollTo to endIndex when perPage > 1', () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 4,
         speed: 0
       })
@@ -49,19 +50,19 @@ describe('Engine - endIndex logic', () => {
 
     it('should allow scrolling to any index in loop mode', () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 4,
         speed: 0,
         loop: true
@@ -74,18 +75,18 @@ describe('Engine - endIndex logic', () => {
 
     it('should work correctly with perPage = 1', () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
           </div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 1,
         speed: 0
       })
@@ -109,14 +110,14 @@ describe('Engine - endIndex logic', () => {
 
       testCases.forEach(({ slides, perPage, expectedEndIndex }) => {
         container.innerHTML = `
-          <div class="tvist">
-            <div class="tvist__container">
-              ${Array.from({ length: slides }, (_, i) => `<div class="tvist__slide">${i + 1}</div>`).join('')}
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: slides }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
             </div>
           </div>
         `
 
-        const slider = new Tvist(container.querySelector('.tvist')!, {
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
           perPage,
           speed: 0
         })
@@ -131,19 +132,19 @@ describe('Engine - endIndex logic', () => {
   describe('canScrollNext with endIndex', () => {
     it('should return false when at endIndex', () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 4,
         speed: 0
       })
@@ -157,19 +158,19 @@ describe('Engine - endIndex logic', () => {
 
     it('should return true in loop mode even at endIndex', () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 4,
         speed: 0,
         loop: true
@@ -183,19 +184,19 @@ describe('Engine - endIndex logic', () => {
   describe('scrollBy with endIndex', () => {
     it('should not scroll beyond endIndex', () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 4,
         speed: 0
       })

@@ -4,6 +4,7 @@
  */
 
 import { Module } from '../Module'
+import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -106,13 +107,13 @@ export class ScrollbarModule extends Module {
     // Если кастомный контейнер не указан, создаём свой
     if (!this.scrollbarEl) {
       this.scrollbarEl = document.createElement('div')
-      this.scrollbarEl.className = scrollbarOptions.scrollbarClass ?? 'tvist__scrollbar'
+      this.scrollbarEl.className = scrollbarOptions.scrollbarClass ?? TVIST_CLASSES.scrollbar
       
       // Добавляем класс направления
       if (isVertical) {
-        this.scrollbarEl.classList.add('tvist__scrollbar--vertical')
+        this.scrollbarEl.classList.add(TVIST_CLASSES.scrollbarVertical)
       } else {
-        this.scrollbarEl.classList.add('tvist__scrollbar--horizontal')
+        this.scrollbarEl.classList.add(TVIST_CLASSES.scrollbarHorizontal)
       }
 
       this.tvist.root.appendChild(this.scrollbarEl)
@@ -120,17 +121,17 @@ export class ScrollbarModule extends Module {
 
     // Создаём трек и ползунок
     this.trackEl = document.createElement('div')
-    this.trackEl.className = scrollbarOptions.trackClass ?? 'tvist__scrollbar-track'
+    this.trackEl.className = scrollbarOptions.trackClass ?? TVIST_CLASSES.scrollbarTrack
 
     this.thumbEl = document.createElement('div')
-    this.thumbEl.className = scrollbarOptions.thumbClass ?? 'tvist__scrollbar-thumb'
+    this.thumbEl.className = scrollbarOptions.thumbClass ?? TVIST_CLASSES.scrollbarThumb
 
     this.trackEl.appendChild(this.thumbEl)
     this.scrollbarEl.appendChild(this.trackEl)
 
     // Применяем класс hide если нужно
     if (this.hide) {
-      this.scrollbarEl.classList.add('tvist__scrollbar--hidden')
+      this.scrollbarEl.classList.add(TVIST_CLASSES.scrollbarHidden)
     }
   }
 
@@ -227,7 +228,7 @@ export class ScrollbarModule extends Module {
     this.dragStartY = clientY
     this.dragStartScroll = this.tvist.engine.location.get()
 
-    this.scrollbarEl?.classList.add('tvist__scrollbar--dragging')
+    this.scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarDragging)
   }
 
   /**
@@ -345,7 +346,7 @@ export class ScrollbarModule extends Module {
    */
   private endDrag(): void {
     this.isDragging = false
-    this.scrollbarEl?.classList.remove('tvist__scrollbar--dragging')
+    this.scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarDragging)
     
     // После завершения drag делаем snap к ближайшему слайду
     const currentPos = this.tvist.engine.location.get()
@@ -432,7 +433,7 @@ export class ScrollbarModule extends Module {
   private showScrollbar = (): void => {
     if (!this.hide) return
     
-    this.scrollbarEl?.classList.remove('tvist__scrollbar--hidden')
+    this.scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarHidden)
     
     // Сбрасываем таймер скрытия
     if (this.hideTimer) {
@@ -448,7 +449,7 @@ export class ScrollbarModule extends Module {
     if (!this.hide || this.isDragging) return
 
     this.hideTimer = window.setTimeout(() => {
-      this.scrollbarEl?.classList.add('tvist__scrollbar--hidden')
+      this.scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarHidden)
     }, this.hideDelay)
   }
 
@@ -474,9 +475,9 @@ export class ScrollbarModule extends Module {
 
       // Применяем класс hide
       if (this.hide) {
-        this.scrollbarEl?.classList.add('tvist__scrollbar--hidden')
+        this.scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarHidden)
       } else {
-        this.scrollbarEl?.classList.remove('tvist__scrollbar--hidden')
+        this.scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarHidden)
       }
 
       this.updateScrollbar()

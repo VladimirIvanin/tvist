@@ -1,11 +1,11 @@
 <template>
   <div class="center-basic-example">
     <div class="tvist" ref="slider">
-      <div class="tvist__container">
+      <div class="tvist-v0__container">
         <div 
           v-for="i in 7" 
           :key="i" 
-          class="tvist__slide"
+          class="tvist-v0__slide"
         >
           <div class="slide-content">
             <span class="slide-number">{{ i }}</span>
@@ -100,21 +100,21 @@ onBeforeUnmount(() => {
 }
 
 /* Стили для активного слайда */
-.tvist__slide--active .slide-content {
+.tvist-v0__slide--active .slide-content {
   transform: scale(1.1);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
 /* Стили для предыдущего и следующего слайдов */
-.tvist__slide--prev .slide-content,
-.tvist__slide--next .slide-content {
+.tvist-v0__slide--prev .slide-content,
+.tvist-v0__slide--next .slide-content {
   opacity: 0.6;
   transform: scale(0.9);
 }
 
 /* Стили для невидимых слайдов */
-.tvist__slide:not(.tvist__slide--visible) .slide-content {
+.tvist-v0__slide:not(.tvist-v0__slide--visible) .slide-content {
   opacity: 0.3;
 }
 

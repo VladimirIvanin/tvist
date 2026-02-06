@@ -5,7 +5,8 @@
 import './styles/tvist.scss'
 
 // Core
-export { Tvist } from './core/Tvist'
+export { Tvist, Tvist as TvistV0 } from './core/Tvist'
+export { TVIST_CSS_PREFIX, TVIST_CLASSES } from './core/constants'
 export { Engine } from './core/Engine'
 export { Vector1D } from './core/Vector1D'
 export { Counter } from './core/Counter'
@@ -40,3 +41,5 @@ export * from './modules'
 
 // Дефолтный экспорт
 export { Tvist as default } from './core/Tvist'
+
+// Для браузера: TvistV0 и TVIST_CSS_PREFIX позволяют использовать несколько версий на одной странице без конфликтов

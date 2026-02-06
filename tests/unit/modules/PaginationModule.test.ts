@@ -3,7 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { Tvist } from '../../../src/core/Tvist'
+import { TVIST_CLASSES } from '@core/constants'
+import { Tvist } from '@core/Tvist'
 // Импортируем модуль через index для автоматической регистрации
 import '../../../src/modules/pagination'
 
@@ -23,20 +24,20 @@ describe('PaginationModule', () => {
     it('should create correct number of bullets when perPage > 1', () => {
       // 6 слайдов, perPage: 4 → должно быть 3 точки (6 - 4 + 1 = 3)
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
-          <div class="tvist__pagination"></div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 4,
         pagination: {
           type: 'bullets',
@@ -44,26 +45,26 @@ describe('PaginationModule', () => {
         }
       })
 
-      const bullets = container.querySelectorAll('.tvist__bullet')
+      const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       expect(bullets.length).toBe(3)
     })
 
     it('should create correct number of bullets when perPage = 1', () => {
       // 5 слайдов, perPage: 1 → должно быть 5 точек
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
           </div>
-          <div class="tvist__pagination"></div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 1,
         pagination: {
           type: 'bullets',
@@ -71,7 +72,7 @@ describe('PaginationModule', () => {
         }
       })
 
-      const bullets = container.querySelectorAll('.tvist__bullet')
+      const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       expect(bullets.length).toBe(5)
     })
 
@@ -85,15 +86,15 @@ describe('PaginationModule', () => {
 
       testCases.forEach(({ slides, perPage, expected }) => {
         container.innerHTML = `
-          <div class="tvist">
-            <div class="tvist__container">
-              ${Array.from({ length: slides }, (_, i) => `<div class="tvist__slide">${i + 1}</div>`).join('')}
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: slides }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
             </div>
-            <div class="tvist__pagination"></div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
         `
 
-        const slider = new Tvist(container.querySelector('.tvist')!, {
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
           perPage,
           pagination: {
             type: 'bullets',
@@ -101,27 +102,27 @@ describe('PaginationModule', () => {
           }
         })
 
-        const bullets = container.querySelectorAll('.tvist__bullet')
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
         expect(bullets.length).toBe(expected)
       })
     })
 
     it('should activate correct bullet based on current page', async () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
-          <div class="tvist__pagination"></div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 3,
         speed: 0, // Отключаем анимацию для тестов
         pagination: {
@@ -130,7 +131,7 @@ describe('PaginationModule', () => {
         }
       })
 
-      const bullets = container.querySelectorAll('.tvist__bullet')
+      const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       
       // Изначально активна первая точка (index 0)
       expect(bullets[0].classList.contains('active')).toBe(true)
@@ -148,20 +149,20 @@ describe('PaginationModule', () => {
 
     it('should navigate to correct slide when clicking bullet', () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
-          <div class="tvist__pagination"></div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 4,
         speed: 0,
         pagination: {
@@ -170,7 +171,7 @@ describe('PaginationModule', () => {
         }
       })
 
-      const bullets = container.querySelectorAll<HTMLElement>('.tvist__bullet')
+      const bullets = container.querySelectorAll<HTMLElement>(`.${TVIST_CLASSES.bullet}`)
       
       // Клик по последней точке должен перейти к endIndex (2)
       // endIndex = 6 - 4 = 2
@@ -186,28 +187,28 @@ describe('PaginationModule', () => {
   describe('Fraction pagination', () => {
     it('should show correct page numbers with perPage > 1', () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
-          <div class="tvist__pagination"></div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 4,
         pagination: {
           type: 'fraction'
         }
       })
 
-      const current = container.querySelector('.tvist__pagination-current')
-      const total = container.querySelector('.tvist__pagination-total')
+      const current = container.querySelector(`.${TVIST_CLASSES.paginationCurrent}`)
+      const total = container.querySelector(`.${TVIST_CLASSES.paginationTotal}`)
 
       expect(current?.textContent).toBe('1')
       expect(total?.textContent).toBe('3') // 6 - 4 + 1 = 3 позиции
@@ -217,20 +218,20 @@ describe('PaginationModule', () => {
   describe('Progress pagination', () => {
     it('should calculate progress based on valid positions', async () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
-          <div class="tvist__pagination"></div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 3,
         speed: 0, // Отключаем анимацию
         pagination: {
@@ -238,7 +239,7 @@ describe('PaginationModule', () => {
         }
       })
 
-      let progressBar = container.querySelector<HTMLElement>('.tvist__pagination-progress-bar')
+      let progressBar = container.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`)
 
       // Первая позиция (1/4) = 25% (6-3+1=4 позиции: 0,1,2,3)
       expect(progressBar?.style.width).toBe('25%')
@@ -249,7 +250,7 @@ describe('PaginationModule', () => {
         slider.scrollTo(3)
       })
       
-      progressBar = container.querySelector<HTMLElement>('.tvist__pagination-progress-bar')
+      progressBar = container.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`)
       expect(progressBar?.style.width).toBe('100%')
     })
   })
@@ -257,20 +258,20 @@ describe('PaginationModule', () => {
   describe('EndIndex logic', () => {
     it('should not allow scrolling beyond endIndex when perPage > 1', async () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
-          <div class="tvist__pagination"></div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 4,
         speed: 0,
         pagination: {
@@ -291,20 +292,20 @@ describe('PaginationModule', () => {
 
     it('should navigate to endIndex when clicking last pagination bullet', () => {
       container.innerHTML = `
-        <div class="tvist">
-          <div class="tvist__container">
-            <div class="tvist__slide">1</div>
-            <div class="tvist__slide">2</div>
-            <div class="tvist__slide">3</div>
-            <div class="tvist__slide">4</div>
-            <div class="tvist__slide">5</div>
-            <div class="tvist__slide">6</div>
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
           </div>
-          <div class="tvist__pagination"></div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
       `
 
-      const slider = new Tvist(container.querySelector('.tvist')!, {
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
         perPage: 4,
         speed: 0,
         pagination: {
@@ -313,7 +314,7 @@ describe('PaginationModule', () => {
         }
       })
 
-      const bullets = container.querySelectorAll<HTMLElement>('.tvist__bullet')
+      const bullets = container.querySelectorAll<HTMLElement>(`.${TVIST_CLASSES.bullet}`)
       
       // Должно быть 3 точки (6 - 4 + 1 = 3)
       expect(bullets.length).toBe(3)
@@ -332,15 +333,15 @@ describe('PaginationModule', () => {
 
       testCases.forEach(({ slides, perPage, expectedBullets, endIndex }) => {
         container.innerHTML = `
-          <div class="tvist">
-            <div class="tvist__container">
-              ${Array.from({ length: slides }, (_, i) => `<div class="tvist__slide">${i + 1}</div>`).join('')}
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: slides }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
             </div>
-            <div class="tvist__pagination"></div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
         `
 
-        const slider = new Tvist(container.querySelector('.tvist')!, {
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
           perPage,
           speed: 0,
           pagination: {
@@ -349,7 +350,7 @@ describe('PaginationModule', () => {
           }
         })
 
-        const bullets = container.querySelectorAll('.tvist__bullet')
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
         expect(bullets.length).toBe(expectedBullets)
 
         // Проверяем что нельзя перейти дальше endIndex

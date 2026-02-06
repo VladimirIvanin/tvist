@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createSliderFixture, simulateDrag, waitForAnimation, type SliderFixture } from '../../../fixtures'
-import { Tvist } from '../../../../src/core/Tvist'
-import { LoopModule } from '../../../../src/modules/loop/LoopModule'
-import { DragModule } from '../../../../src/modules/drag/DragModule'
+import { Tvist } from '@core/Tvist'
+import { LoopModule } from '@modules/loop/LoopModule'
+import { DragModule } from '@modules/drag/DragModule'
 
 // Регистрируем модули
 Tvist.registerModule('loop', LoopModule)

@@ -6,12 +6,18 @@
 import { Engine } from './Engine'
 import { EventEmitter } from './EventEmitter'
 import { getElement, children } from '../utils/dom'
+import { TVIST_CLASSES } from './constants'
 import type { TvistOptions } from './types'
 import type { Module, ModuleConstructor } from '../modules/Module'
 import { throttle } from './Animator'
 
 export class Tvist {
   static readonly VERSION = '1.0.0'
+
+  /** Карта BEM-классов (tvist-v0, tvist-v0__container, …). Для использования нескольких версий на одной странице */
+  static readonly CLASSES = TVIST_CLASSES
+  /** Префикс BEM-блока для CSS (tvist-v0). @deprecated Используйте Tvist.CLASSES.block */
+  static readonly CSS_PREFIX = TVIST_CLASSES.block
 
   // Реестр модулей (статический)
   static readonly MODULES = new Map<string, ModuleConstructor>()
@@ -56,7 +62,7 @@ export class Tvist {
     this.root = getElement(target)
 
     // Находим контейнер
-    const containerSelector = '.tvist__container'
+    const containerSelector = `.${TVIST_CLASSES.container}`
     const containerElement = this.root.querySelector<HTMLElement>(
       containerSelector
     )
@@ -70,7 +76,7 @@ export class Tvist {
     this.container = containerElement
 
     // Получаем слайды
-    this._slides = children(this.container, '.tvist__slide')
+    this._slides = children(this.container, `.${TVIST_CLASSES.slide}`)
 
     if (this.slides.length === 0) {
       console.warn('Tvist: no slides found')
@@ -97,11 +103,11 @@ export class Tvist {
 
     // Применяем классы состояния
     if (this.options.direction === 'vertical') {
-      this.root.classList.add('tvist--vertical')
+      this.root.classList.add(TVIST_CLASSES.vertical)
     }
 
     if (!this._isEnabled) {
-      this.root.classList.add('tvist--disabled')
+      this.root.classList.add(TVIST_CLASSES.disabled)
     }
 
     // Регистрируем обработчики из опций
@@ -215,9 +221,9 @@ export class Tvist {
 
     // Обновляем класс направления
     if (this.options.direction === 'vertical') {
-      this.root.classList.add('tvist--vertical')
+      this.root.classList.add(TVIST_CLASSES.vertical)
     } else {
-      this.root.classList.remove('tvist--vertical')
+      this.root.classList.remove(TVIST_CLASSES.vertical)
     }
 
     this.engine.update()
@@ -243,9 +249,9 @@ export class Tvist {
     // Обработка изменения direction
     if (newOptions.direction !== undefined && newOptions.direction !== oldOptions.direction) {
       if (this.options.direction === 'vertical') {
-        this.root.classList.add('tvist--vertical')
+        this.root.classList.add(TVIST_CLASSES.vertical)
       } else {
-        this.root.classList.remove('tvist--vertical')
+        this.root.classList.remove(TVIST_CLASSES.vertical)
       }
     }
 
@@ -322,7 +328,7 @@ export class Tvist {
     if (!this._isEnabled) return this
 
     this._isEnabled = false
-    this.root.classList.add('tvist--disabled')
+    this.root.classList.add(TVIST_CLASSES.disabled)
 
     // Очищаем стили
     this.clearSliderStyles()
@@ -354,7 +360,7 @@ export class Tvist {
     if (this._isEnabled) return this
 
     this._isEnabled = true
-    this.root.classList.remove('tvist--disabled')
+    this.root.classList.remove(TVIST_CLASSES.disabled)
 
     // Переинициализируем модули (кроме breakpoints - он уже работает)
     Tvist.MODULES.forEach((ModuleClass, name) => {
@@ -436,7 +442,7 @@ export class Tvist {
    * Используется LoopModule после перемещения слайдов
    */
   updateSlidesList(): void {
-    this._slides = children(this.container, '.tvist__slide')
+    this._slides = children(this.container, `.${TVIST_CLASSES.slide}`)
   }
 
   /**

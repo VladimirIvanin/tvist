@@ -9,6 +9,7 @@
  */
 
 import { Module } from '../Module'
+import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -69,7 +70,7 @@ export class PaginationModule extends Module {
     }
 
     // Если не найден - ищем по дефолтному классу
-    this.container ??= this.tvist.root.querySelector('.tvist__pagination')
+    this.container ??= this.tvist.root.querySelector(`.${TVIST_CLASSES.pagination}`)
   }
 
   /**
@@ -120,8 +121,8 @@ export class PaginationModule extends Module {
       ? pagination.clickable ?? true
       : true
     const bulletClass = typeof pagination === 'object' && pagination !== null
-      ? pagination.bulletClass ?? 'tvist__bullet'
-      : 'tvist__bullet'
+      ? pagination.bulletClass ?? TVIST_CLASSES.bullet
+      : TVIST_CLASSES.bullet
 
     this.container.innerHTML = ''
     this.bullets = []
@@ -188,9 +189,9 @@ export class PaginationModule extends Module {
       html = pagination.renderFraction(currentPage, totalPages)
     } else {
       html = `
-        <span class="tvist__pagination-current">${currentPage}</span>
-        <span class="tvist__pagination-separator"> / </span>
-        <span class="tvist__pagination-total">${totalPages}</span>
+        <span class="${TVIST_CLASSES.paginationCurrent}">${currentPage}</span>
+        <span class="${TVIST_CLASSES.paginationSeparator}"> / </span>
+        <span class="${TVIST_CLASSES.paginationTotal}">${totalPages}</span>
       `
     }
 
@@ -214,8 +215,8 @@ export class PaginationModule extends Module {
     const progress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0
 
     this.container.innerHTML = `
-      <div class="tvist__pagination-progress">
-        <div class="tvist__pagination-progress-bar" style="width: ${progress}%"></div>
+      <div class="${TVIST_CLASSES.paginationProgress}">
+        <div class="${TVIST_CLASSES.paginationProgressBar}" style="width: ${progress}%"></div>
       </div>
     `
   }
@@ -288,7 +289,7 @@ export class PaginationModule extends Module {
    * Обновление progress bar
    */
   private updateProgressActive(): void {
-    const progressBar = this.container?.querySelector<HTMLElement>('.tvist__pagination-progress-bar')
+    const progressBar = this.container?.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`)
     if (progressBar) {
       const { slides } = this.tvist
       const perPage = this.options.perPage ?? 1

@@ -12,6 +12,7 @@
  */
 
 import { Module } from '../Module'
+import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -200,7 +201,7 @@ export class LoopModule extends Module {
     clone.setAttribute('data-tvist-clone', 'true')
     clone.setAttribute('data-tvist-clone-position', position)
     clone.setAttribute('data-tvist-slide-index', String(originalIndex))
-    clone.classList.add('tvist__slide--clone')
+    clone.classList.add(TVIST_CLASSES.slideClone)
     
     // Удаляем атрибуты оригинала
     clone.removeAttribute('id')

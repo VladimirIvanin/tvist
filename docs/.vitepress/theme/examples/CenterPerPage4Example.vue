@@ -8,11 +8,11 @@
     </div>
 
     <div class="tvist" ref="slider">
-      <div class="tvist__container">
+      <div class="tvist-v0__container">
         <div 
           v-for="i in 12" 
           :key="i" 
-          class="tvist__slide"
+          class="tvist-v0__slide"
         >
           <div class="slide-content">
             <div class="slide-inner">
@@ -164,7 +164,7 @@ onBeforeUnmount(() => {
 }
 
 /* Активный слайд */
-.tvist__slide--active .slide-content {
+.tvist-v0__slide--active .slide-content {
   transform: scale(1.08);
   box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
   border-color: #667eea;
@@ -172,32 +172,32 @@ onBeforeUnmount(() => {
   z-index: 10;
 }
 
-.tvist__slide--active .slide-number {
+.tvist-v0__slide--active .slide-number {
   color: #f5576c;
   font-size: 56px;
 }
 
 /* Предыдущий и следующий */
-.tvist__slide--prev .slide-content,
-.tvist__slide--next .slide-content {
+.tvist-v0__slide--prev .slide-content,
+.tvist-v0__slide--next .slide-content {
   opacity: 0.85;
   transform: scale(0.98);
   border-color: #667eea30;
 }
 
-.tvist__slide--prev .slide-number,
-.tvist__slide--next .slide-number {
+.tvist-v0__slide--prev .slide-number,
+.tvist-v0__slide--next .slide-number {
   color: #764ba2;
 }
 
 /* Видимые, но не активные/prev/next */
-.tvist__slide--visible:not(.tvist__slide--active):not(.tvist__slide--prev):not(.tvist__slide--next) .slide-content {
+.tvist-v0__slide--visible:not(.tvist-v0__slide--active):not(.tvist-v0__slide--prev):not(.tvist-v0__slide--next) .slide-content {
   opacity: 0.5;
   transform: scale(0.94);
 }
 
 /* Невидимые */
-.tvist__slide:not(.tvist__slide--visible) .slide-content {
+.tvist-v0__slide:not(.tvist-v0__slide--visible) .slide-content {
   opacity: 0.25;
 }
 

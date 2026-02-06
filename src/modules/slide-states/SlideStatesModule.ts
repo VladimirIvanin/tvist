@@ -5,6 +5,7 @@
  */
 
 import { Module } from '../Module'
+import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -12,10 +13,10 @@ export class SlideStatesModule extends Module {
   readonly name = 'slide-states'
 
   // Классы состояний
-  private readonly CLASS_ACTIVE = 'tvist__slide--active'
-  private readonly CLASS_PREV = 'tvist__slide--prev'
-  private readonly CLASS_NEXT = 'tvist__slide--next'
-  private readonly CLASS_VISIBLE = 'tvist__slide--visible'
+  private readonly CLASS_ACTIVE = TVIST_CLASSES.slideActive
+  private readonly CLASS_PREV = TVIST_CLASSES.slidePrev
+  private readonly CLASS_NEXT = TVIST_CLASSES.slideNext
+  private readonly CLASS_VISIBLE = TVIST_CLASSES.slideVisible
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)

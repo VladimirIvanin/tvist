@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { Tvist } from '../../../src/core/Tvist'
-import { GridModule } from '../../../src/modules/grid/GridModule'
+import { TVIST_CLASSES } from '@core/constants'
+import { Tvist } from '@core/Tvist'
+import { GridModule } from '@modules/grid/GridModule'
 
 describe('GridModule', () => {
   let container: HTMLElement
@@ -12,9 +13,9 @@ describe('GridModule', () => {
     
     document.body.innerHTML = ''
     container = document.createElement('div')
-    container.className = 'tvist'
+    container.className = TVIST_CLASSES.block
     container.innerHTML = `
-      <div class="tvist__container"></div>
+      <div class="${TVIST_CLASSES.container}"></div>
     `
     document.body.appendChild(container)
   })
@@ -26,10 +27,10 @@ describe('GridModule', () => {
   })
 
   const createSlides = (count: number) => {
-    const sliderContainer = container.querySelector('.tvist__container')!
+    const sliderContainer = container.querySelector(`.${TVIST_CLASSES.container}`)!
     for (let i = 0; i < count; i++) {
       const slide = document.createElement('div')
-      slide.className = 'tvist__slide'
+      slide.className = TVIST_CLASSES.slide
       slide.textContent = `Slide ${i + 1}`
       sliderContainer.appendChild(slide)
     }
@@ -47,17 +48,17 @@ describe('GridModule', () => {
       })
 
       // Должно быть 2 страницы (8 слайдов / 4 слайда на страницу)
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       expect(pages).toHaveLength(2)
 
       // Каждая страница должна иметь 2 ряда
       pages.forEach(page => {
-        const rows = page.querySelectorAll('.tvist__grid-row')
+        const rows = page.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
         expect(rows).toHaveLength(2)
         
         // Каждый ряд должен иметь 2 колонки
         rows.forEach(row => {
-          const cols = row.querySelectorAll('.tvist__grid-col')
+          const cols = row.querySelectorAll(`.${TVIST_CLASSES.gridCol}`)
           expect(cols).toHaveLength(2)
         })
       })
@@ -74,12 +75,12 @@ describe('GridModule', () => {
       })
 
       // Должно быть 3 страницы (10 слайдов: 4+4+2)
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       expect(pages).toHaveLength(3)
 
       // На последней странице только 2 слайда
       const lastPage = pages[2]
-      const items = lastPage?.querySelectorAll('.tvist__grid-item')
+      const items = lastPage?.querySelectorAll(`.${TVIST_CLASSES.gridItem}`)
       expect(items).toHaveLength(2)
     })
 
@@ -97,8 +98,8 @@ describe('GridModule', () => {
         }
       })
 
-      const page = container.querySelector('.tvist__slide--grid-page')
-      const rows = page?.querySelectorAll('.tvist__grid-row')
+      const page = container.querySelector(`.${TVIST_CLASSES.slideGridPage}`)
+      const rows = page?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
       
       // Первый ряд должен иметь margin-bottom
       const firstRow = rows?.[0] as HTMLElement
@@ -110,7 +111,7 @@ describe('GridModule', () => {
       expect(marginBottom === '' || marginBottom === '0px').toBe(true)
 
       // Колонки в первом ряду
-      const cols = firstRow?.querySelectorAll('.tvist__grid-col')
+      const cols = firstRow?.querySelectorAll(`.${TVIST_CLASSES.gridCol}`)
       const firstCol = cols?.[0] as HTMLElement
       expect(firstCol?.style.marginRight).toBe('20px')
       
@@ -129,11 +130,11 @@ describe('GridModule', () => {
         }
       })
 
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       expect(pages).toHaveLength(2) // 6 слайдов / 3 = 2 страницы
       
       pages.forEach(page => {
-        const rows = page.querySelectorAll('.tvist__grid-row')
+        const rows = page.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
         expect(rows).toHaveLength(3)
       })
     })
@@ -153,23 +154,23 @@ describe('GridModule', () => {
         }
       })
 
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       expect(pages).toHaveLength(3)
 
       // Страница 1: 2×2
-      const page1Rows = pages[0]?.querySelectorAll('.tvist__grid-row')
+      const page1Rows = pages[0]?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
       expect(page1Rows).toHaveLength(2)
-      const page1Row1Cols = page1Rows?.[0]?.querySelectorAll('.tvist__grid-col')
+      const page1Row1Cols = page1Rows?.[0]?.querySelectorAll(`.${TVIST_CLASSES.gridCol}`)
       expect(page1Row1Cols).toHaveLength(2)
 
       // Страница 2: 1×2
-      const page2Rows = pages[1]?.querySelectorAll('.tvist__grid-row')
+      const page2Rows = pages[1]?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
       expect(page2Rows).toHaveLength(1)
-      const page2Row1Cols = page2Rows?.[0]?.querySelectorAll('.tvist__grid-col')
+      const page2Row1Cols = page2Rows?.[0]?.querySelectorAll(`.${TVIST_CLASSES.gridCol}`)
       expect(page2Row1Cols).toHaveLength(2)
 
       // Страница 3: 2×2
-      const page3Rows = pages[2]?.querySelectorAll('.tvist__grid-row')
+      const page3Rows = pages[2]?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
       expect(page3Rows).toHaveLength(2)
     })
 
@@ -186,14 +187,14 @@ describe('GridModule', () => {
       })
 
       // 12 слайдов: 4 (стр1) + 2 (стр2) + 4 (стр3) + 2 (стр4) = 12
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       expect(pages).toHaveLength(4)
 
       // Проверяем цикличность
-      expect(pages[0]?.querySelectorAll('.tvist__grid-row')).toHaveLength(2) // 2×2
-      expect(pages[1]?.querySelectorAll('.tvist__grid-row')).toHaveLength(1) // 1×2
-      expect(pages[2]?.querySelectorAll('.tvist__grid-row')).toHaveLength(2) // 2×2 (цикл)
-      expect(pages[3]?.querySelectorAll('.tvist__grid-row')).toHaveLength(1) // 1×2 (цикл)
+      expect(pages[0]?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)).toHaveLength(2) // 2×2
+      expect(pages[1]?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)).toHaveLength(1) // 1×2
+      expect(pages[2]?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)).toHaveLength(2) // 2×2 (цикл)
+      expect(pages[3]?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)).toHaveLength(1) // 1×2 (цикл)
     })
 
     it('должен корректно распределять слайды по dimensions страницам', () => {
@@ -209,22 +210,22 @@ describe('GridModule', () => {
         }
       })
 
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       
       // Страница 1: 4 слайда
-      const page1Items = pages[0]?.querySelectorAll('.tvist__grid-item')
+      const page1Items = pages[0]?.querySelectorAll(`.${TVIST_CLASSES.gridItem}`)
       expect(page1Items).toHaveLength(4)
       expect(page1Items?.[0]?.textContent).toBe('Slide 1')
       expect(page1Items?.[3]?.textContent).toBe('Slide 4')
 
       // Страница 2: 2 слайда
-      const page2Items = pages[1]?.querySelectorAll('.tvist__grid-item')
+      const page2Items = pages[1]?.querySelectorAll(`.${TVIST_CLASSES.gridItem}`)
       expect(page2Items).toHaveLength(2)
       expect(page2Items?.[0]?.textContent).toBe('Slide 5')
       expect(page2Items?.[1]?.textContent).toBe('Slide 6')
 
       // Страница 3: 1 слайд (последний)
-      const page3Items = pages[2]?.querySelectorAll('.tvist__grid-item')
+      const page3Items = pages[2]?.querySelectorAll(`.${TVIST_CLASSES.gridItem}`)
       expect(page3Items).toHaveLength(1)
       expect(page3Items?.[0]?.textContent).toBe('Slide 7')
     })
@@ -242,17 +243,17 @@ describe('GridModule', () => {
         }
       })
 
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       
       // Проверяем gap на первой странице (2×2)
-      const page1Rows = pages[0]?.querySelectorAll('.tvist__grid-row')
+      const page1Rows = pages[0]?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
       const page1FirstRow = page1Rows?.[0] as HTMLElement
       expect(page1FirstRow?.style.marginBottom).toBe('15px')
 
       // Проверяем gap на второй странице (1×2)
-      const page2Rows = pages[1]?.querySelectorAll('.tvist__grid-row')
+      const page2Rows = pages[1]?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
       const page2Row = page2Rows?.[0] as HTMLElement
-      const page2Cols = page2Row?.querySelectorAll('.tvist__grid-col')
+      const page2Cols = page2Row?.querySelectorAll(`.${TVIST_CLASSES.gridCol}`)
       const page2FirstCol = page2Cols?.[0] as HTMLElement
       expect(page2FirstCol?.style.marginRight).toBe('15px')
     })
@@ -261,7 +262,7 @@ describe('GridModule', () => {
   describe('Сохранение и восстановление слайдов', () => {
     it('должен сохранять оригинальные слайды', () => {
       createSlides(4)
-      const originalSlides = Array.from(container.querySelectorAll('.tvist__slide'))
+      const originalSlides = Array.from(container.querySelectorAll(`.${TVIST_CLASSES.slide}`))
       
       slider = new Tvist(container, {
         grid: {
@@ -271,7 +272,7 @@ describe('GridModule', () => {
       })
 
       // Оригинальные слайды должны быть обернуты, но не удалены
-      const gridItems = container.querySelectorAll('.tvist__grid-item')
+      const gridItems = container.querySelectorAll(`.${TVIST_CLASSES.gridItem}`)
       expect(gridItems).toHaveLength(4)
       
       // Проверяем, что это те же элементы
@@ -291,19 +292,19 @@ describe('GridModule', () => {
       })
 
       // Grid создан
-      expect(container.querySelectorAll('.tvist__slide--grid-page')).toHaveLength(1)
+      expect(container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)).toHaveLength(1)
 
       // Уничтожаем
       slider.destroy()
 
       // Grid структура удалена
-      expect(container.querySelectorAll('.tvist__slide--grid-page')).toHaveLength(0)
-      expect(container.querySelectorAll('.tvist__grid-row')).toHaveLength(0)
+      expect(container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)).toHaveLength(0)
+      expect(container.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)).toHaveLength(0)
       
       // Оригинальные слайды восстановлены
-      const slides = container.querySelectorAll('.tvist__slide')
+      const slides = container.querySelectorAll(`.${TVIST_CLASSES.slide}`)
       expect(slides).toHaveLength(4)
-      expect(slides[0]?.classList.contains('tvist__grid-item')).toBe(false)
+      expect(slides[0]?.classList.contains(TVIST_CLASSES.gridItem)).toBe(false)
     })
 
     it('должен корректно пересоздавать grid при update', () => {
@@ -316,7 +317,7 @@ describe('GridModule', () => {
         }
       })
 
-      expect(container.querySelectorAll('.tvist__slide--grid-page')).toHaveLength(2)
+      expect(container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)).toHaveLength(2)
 
       // Уничтожаем и создаем новый с другими опциями
       slider.destroy()
@@ -329,14 +330,14 @@ describe('GridModule', () => {
       })
 
       // Должно быть 2 страницы по 4 колонки
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       expect(pages).toHaveLength(2)
       
       pages.forEach(page => {
-        const rows = page.querySelectorAll('.tvist__grid-row')
+        const rows = page.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
         expect(rows).toHaveLength(1) // Только 1 ряд
         
-        const cols = rows[0]?.querySelectorAll('.tvist__grid-col')
+        const cols = rows[0]?.querySelectorAll(`.${TVIST_CLASSES.gridCol}`)
         expect(cols).toHaveLength(4) // 4 колонки
       })
     })
@@ -352,7 +353,7 @@ describe('GridModule', () => {
         }
       })
 
-      expect(container.querySelectorAll('.tvist__slide--grid-page')).toHaveLength(2) // 6/4 = 2 страницы (неполная)
+      expect(container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)).toHaveLength(2) // 6/4 = 2 страницы (неполная)
 
       // Уничтожаем и переключаемся на dimensions
       slider.destroy()
@@ -365,10 +366,10 @@ describe('GridModule', () => {
         }
       })
 
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       expect(pages).toHaveLength(1) // Все 6 слайдов на одной странице
       
-      const rows = pages[0]?.querySelectorAll('.tvist__grid-row')
+      const rows = pages[0]?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
       expect(rows).toHaveLength(3) // 3 ряда
     })
   })
@@ -384,10 +385,10 @@ describe('GridModule', () => {
         }
       })
 
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       expect(pages).toHaveLength(1)
       
-      const items = pages[0]?.querySelectorAll('.tvist__grid-item')
+      const items = pages[0]?.querySelectorAll(`.${TVIST_CLASSES.gridItem}`)
       expect(items).toHaveLength(1)
     })
 
@@ -403,7 +404,7 @@ describe('GridModule', () => {
       })
 
       // Должен использовать fixed grid (fallback)
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       expect(pages).toHaveLength(1)
     })
 
@@ -418,12 +419,12 @@ describe('GridModule', () => {
         }
       })
 
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       expect(pages).toHaveLength(2) // 8/4 = 2 страницы
       
       // Обе страницы должны иметь одинаковую структуру
       pages.forEach(page => {
-        const rows = page.querySelectorAll('.tvist__grid-row')
+        const rows = page.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
         expect(rows).toHaveLength(2)
       })
     })
@@ -439,8 +440,8 @@ describe('GridModule', () => {
         }
       })
 
-      const page = container.querySelector('.tvist__slide--grid-page')
-      const rows = page?.querySelectorAll('.tvist__grid-row')
+      const page = container.querySelector(`.${TVIST_CLASSES.slideGridPage}`)
+      const rows = page?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
       const firstRow = rows?.[0] as HTMLElement
       
       expect(firstRow?.style.marginBottom).toBe('0px')
@@ -457,14 +458,14 @@ describe('GridModule', () => {
       })
 
       // 20 слайдов / 20 на страницу = 1 страница
-      const pages = container.querySelectorAll('.tvist__slide--grid-page')
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
       expect(pages).toHaveLength(1)
       
-      const rows = pages[0]?.querySelectorAll('.tvist__grid-row')
+      const rows = pages[0]?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
       expect(rows).toHaveLength(5)
       
       rows?.forEach(row => {
-        const cols = row.querySelectorAll('.tvist__grid-col')
+        const cols = row.querySelectorAll(`.${TVIST_CLASSES.gridCol}`)
         expect(cols).toHaveLength(4)
       })
     })
@@ -483,7 +484,7 @@ describe('GridModule', () => {
 
       // После создания grid, slides должны быть wrapper-страницами
       expect(slider.slides).toHaveLength(2) // 2 страницы
-      expect(slider.slides[0]?.classList.contains('tvist__slide--grid-page')).toBe(true)
+      expect(slider.slides[0]?.classList.contains(TVIST_CLASSES.slideGridPage)).toBe(true)
     })
 
     it('должен правильно считать количество страниц для навигации', () => {

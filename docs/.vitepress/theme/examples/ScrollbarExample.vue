@@ -5,9 +5,9 @@
     :detailsLink="detailsLink"
   >
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist" style="position: relative;">
-        <div class="tvist__container">
-          <div class="tvist__slide slide-1">
+      <div ref="sliderEl" class="tvist-v0" style="position: relative;">
+        <div class="tvist-v0__container">
+          <div class="tvist-v0__slide slide-1">
             <div class="slide-content">
               <div class="slide-title">Слайд 1</div>
               <div class="slide-hint">
@@ -16,22 +16,22 @@
               </div>
             </div>
           </div>
-          <div class="tvist__slide slide-2">
+          <div class="tvist-v0__slide slide-2">
             <div class="slide-content">
               <div class="slide-title">Слайд 2</div>
             </div>
           </div>
-          <div class="tvist__slide slide-3">
+          <div class="tvist-v0__slide slide-3">
             <div class="slide-content">
               <div class="slide-title">Слайд 3</div>
             </div>
           </div>
-          <div class="tvist__slide slide-4">
+          <div class="tvist-v0__slide slide-4">
             <div class="slide-content">
               <div class="slide-title">Слайд 4</div>
             </div>
           </div>
-          <div class="tvist__slide slide-5">
+          <div class="tvist-v0__slide slide-5">
             <div class="slide-content">
               <div class="slide-title">Слайд 5</div>
             </div>
@@ -135,7 +135,7 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.tvist__slide {
+.tvist-v0__slide {
   display: flex;
   align-items: center;
   justify-content: center;

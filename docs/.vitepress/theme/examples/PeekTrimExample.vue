@@ -6,8 +6,8 @@
         <div class="col">
           <div class="label">peekTrim: true — конец прижат к краю</div>
           <div ref="sliderTrimRef" class="tvist">
-            <div class="tvist__container">
-              <div v-for="i in 5" :key="i" class="tvist__slide">
+            <div class="tvist-v0__container">
+              <div v-for="i in 5" :key="i" class="tvist-v0__slide">
                 <div class="slide-content">{{ i }}</div>
               </div>
             </div>
@@ -16,8 +16,8 @@
         <div class="col">
           <div class="label">peekTrim: false — справа остаётся зазор</div>
           <div ref="sliderNoTrimRef" class="tvist">
-            <div class="tvist__container">
-              <div v-for="i in 5" :key="i" class="tvist__slide">
+            <div class="tvist-v0__container">
+              <div v-for="i in 5" :key="i" class="tvist-v0__slide">
                 <div class="slide-content">{{ i }}</div>
               </div>
             </div>
@@ -31,8 +31,8 @@
         <div class="col">
           <div class="label">loop: true, peek: 40</div>
           <div ref="sliderLoopRef" class="tvist">
-            <div class="tvist__container">
-              <div v-for="i in 5" :key="i" class="tvist__slide">
+            <div class="tvist-v0__container">
+              <div v-for="i in 5" :key="i" class="tvist-v0__slide">
                 <div class="slide-content">{{ i }}</div>
               </div>
             </div>
@@ -41,8 +41,8 @@
         <div class="col">
           <div class="label">loop: true, peek: 60, perPage: 2</div>
           <div ref="sliderLoopPerPageRef" class="tvist">
-            <div class="tvist__container">
-              <div v-for="i in 6" :key="i" class="tvist__slide">
+            <div class="tvist-v0__container">
+              <div v-for="i in 6" :key="i" class="tvist-v0__slide">
                 <div class="slide-content">{{ i }}</div>
               </div>
             </div>
@@ -163,11 +163,11 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-.tvist__container {
+.tvist-v0__container {
   height: 100%;
 }
 
-.tvist__slide {
+.tvist-v0__slide {
   height: 100%;
   display: flex;
   align-items: center;

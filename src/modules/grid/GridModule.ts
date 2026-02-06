@@ -1,4 +1,5 @@
 import { Module } from '../Module'
+import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -191,7 +192,7 @@ export class GridModule extends Module {
    */
   private createOuterSlide(): HTMLElement {
     const outerSlide = document.createElement('div')
-    outerSlide.className = 'tvist__slide tvist__slide--grid-page'
+    outerSlide.className = `${TVIST_CLASSES.slide} ${TVIST_CLASSES.slideGridPage}`
     outerSlide.style.cssText = 'display: flex; flex-direction: column; width: 100%; height: 100%;'
     return outerSlide
   }
@@ -201,7 +202,7 @@ export class GridModule extends Module {
    */
   private createRowElement(rowIndex: number, totalRows: number): HTMLElement {
     const rowEl = document.createElement('div')
-    rowEl.className = 'tvist__grid-row'
+    rowEl.className = TVIST_CLASSES.gridRow
     rowEl.style.cssText = `
       display: flex;
       flex: 1;
@@ -215,7 +216,7 @@ export class GridModule extends Module {
    */
   private createColWrapper(colIndex: number, totalCols: number): HTMLElement {
     const colWrapper = document.createElement('div')
-    colWrapper.className = 'tvist__grid-col'
+    colWrapper.className = TVIST_CLASSES.gridCol
     colWrapper.style.cssText = `
       flex: 1;
       ${colIndex < totalCols - 1 ? `margin-right: ${this.getGapValue('col')}px;` : ''}
@@ -227,9 +228,9 @@ export class GridModule extends Module {
    * Оборачивает оригинальный слайд в колонку
    */
   private wrapSlide(originalSlide: HTMLElement, colWrapper: HTMLElement): void {
-    // Убираем класс tvist__slide, чтобы updateSlidesList не находил его
-    originalSlide.classList.remove('tvist__slide')
-    originalSlide.classList.add('tvist__grid-item')
+    // Убираем класс tvist-v0__slide, чтобы updateSlidesList не находил его
+originalSlide.classList.remove(TVIST_CLASSES.slide)
+        originalSlide.classList.add(TVIST_CLASSES.gridItem)
     originalSlide.style.width = '100%'
     originalSlide.style.height = '100%'
     colWrapper.appendChild(originalSlide)
@@ -268,9 +269,9 @@ export class GridModule extends Module {
       container.innerHTML = ''
       
       this.originalSlides.forEach(slide => {
-        // Восстанавливаем класс tvist__slide
-        slide.classList.remove('tvist__grid-item')
-        slide.classList.add('tvist__slide')
+        // Восстанавливаем класс tvist-v0__slide
+        slide.classList.remove(TVIST_CLASSES.gridItem)
+        slide.classList.add(TVIST_CLASSES.slide)
         slide.style.width = ''
         slide.style.height = ''
         container.appendChild(slide)

@@ -3,7 +3,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import { Tvist } from '../../../src/core/Tvist'
+import { TVIST_CLASSES } from '@core/constants'
+import { Tvist } from '@core/Tvist'
 import { createSliderFixture } from '../../fixtures'
 import type { SliderFixture } from '../../fixtures'
 import '../../../src/modules/autoplay' // Регистрация модуля autoplay
@@ -53,12 +54,12 @@ describe('Tvist.updateOptions()', () => {
     const slider = new Tvist(fixture.root, { direction: 'horizontal' })
 
     expect(slider.options.direction).toBe('horizontal')
-    expect(fixture.root.classList.contains('tvist--vertical')).toBe(false)
+    expect(fixture.root.classList.contains(TVIST_CLASSES.vertical)).toBe(false)
 
     slider.updateOptions({ direction: 'vertical' })
 
     expect(slider.options.direction).toBe('vertical')
-    expect(fixture.root.classList.contains('tvist--vertical')).toBe(true)
+    expect(fixture.root.classList.contains(TVIST_CLASSES.vertical)).toBe(true)
   })
 
   it('должен обновлять несколько опций одновременно', () => {

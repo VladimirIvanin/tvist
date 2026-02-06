@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { Engine } from '../../../src/core/Engine'
-import { Tvist } from '../../../src/core/Tvist'
+import { TVIST_CLASSES } from '@core/constants'
+import { Engine } from '@core/Engine'
+import { Tvist } from '@core/Tvist'
 
 describe('Engine', () => {
   let container: HTMLElement
@@ -9,15 +10,15 @@ describe('Engine', () => {
   beforeEach(() => {
     // Создаём DOM структуру
     root = document.createElement('div')
-    root.className = 'tvist'
+    root.className = TVIST_CLASSES.block
     root.style.width = '1000px'
 
     const sliderContainer = document.createElement('div')
-    sliderContainer.className = 'tvist__container'
+    sliderContainer.className = TVIST_CLASSES.container
 
     for (let i = 0; i < 5; i++) {
       const slide = document.createElement('div')
-      slide.className = 'tvist__slide'
+      slide.className = TVIST_CLASSES.slide
       slide.textContent = `Slide ${i + 1}`
       sliderContainer.appendChild(slide)
     }

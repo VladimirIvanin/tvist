@@ -27,8 +27,8 @@ import ProductCardsExample from '../.vitepress/theme/examples/ProductCardsExampl
 
 ```html
 <div class="tvist">
-  <div class="tvist__container">
-    <div class="tvist__slide product-card">
+  <div class="tvist-v0__container">
+    <div class="tvist-v0__slide product-card">
       <div class="product-image">
         <div class="product-badge">ХИТ</div>
       </div>
@@ -58,7 +58,7 @@ import ProductCardsExample from '../.vitepress/theme/examples/ProductCardsExampl
 }
 
 /* Когда слайдер отключен (десктоп) - показываем как сетку */
-.tvist.tvist--disabled .tvist__container {
+.tvist.tvist--disabled .tvist-v0__container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
@@ -66,14 +66,14 @@ import ProductCardsExample from '../.vitepress/theme/examples/ProductCardsExampl
   transform: none !important; /* Отменяем transform от слайдера */
 }
 
-.tvist.tvist--disabled .tvist__slide {
+.tvist.tvist--disabled .tvist-v0__slide {
   width: auto !important; /* Отменяем фиксированную ширину */
   margin: 0 !important;    /* Отменяем margin от gap */
 }
 
 /* Планшеты: 2 колонки */
 @media (max-width: 1024px) and (min-width: 768px) {
-  .tvist.tvist--disabled .tvist__container {
+  .tvist.tvist--disabled .tvist-v0__container {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
@@ -173,8 +173,8 @@ window.addEventListener('beforeunload', () => {
 ```vue
 <template>
   <div class="tvist">
-    <div class="tvist__container">
-      <div v-for="product in products" :key="product.id" class="tvist__slide product-card">
+    <div class="tvist-v0__container">
+      <div v-for="product in products" :key="product.id" class="tvist-v0__slide product-card">
         <!-- Контент карточки -->
       </div>
     </div>
@@ -288,9 +288,9 @@ function ProductCards() {
 
   return (
     <div className="tvist">
-      <div className="tvist__container">
+      <div className="tvist-v0__container">
         {products.map(product => (
-          <div key={product.id} className="tvist__slide product-card">
+          <div key={product.id} className="tvist-v0__slide product-card">
             {/* Контент карточки */}
           </div>
         ))}
@@ -358,7 +358,7 @@ Tvist автоматически переключается между режи�
 
 ```css
 /* Режим сетки */
-.tvist.tvist--disabled .tvist__container {
+.tvist.tvist--disabled .tvist-v0__container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   transform: none !important;

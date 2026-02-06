@@ -1,16 +1,16 @@
 <template>
   <ExampleCard title="Grid Layout" description="Сетка слайдов с настройкой строк и колонок" :detailsLink="detailsLink">
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist">
-        <div class="tvist__container">
-          <div class="tvist__slide">1</div>
-          <div class="tvist__slide">2</div>
-          <div class="tvist__slide">3</div>
-          <div class="tvist__slide">4</div>
-          <div class="tvist__slide">5</div>
-          <div class="tvist__slide">6</div>
-          <div class="tvist__slide">7</div>
-          <div class="tvist__slide">8</div>
+      <div ref="sliderEl" class="tvist-v0">
+        <div class="tvist-v0__container">
+          <div class="tvist-v0__slide">1</div>
+          <div class="tvist-v0__slide">2</div>
+          <div class="tvist-v0__slide">3</div>
+          <div class="tvist-v0__slide">4</div>
+          <div class="tvist-v0__slide">5</div>
+          <div class="tvist-v0__slide">6</div>
+          <div class="tvist-v0__slide">7</div>
+          <div class="tvist-v0__slide">8</div>
         </div>
       </div>
     </div>
@@ -67,7 +67,7 @@ onUnmounted(() => {
   height: 300px;
 }
 
-.tvist__grid-item {
+.tvist-v0__grid-item {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,12 +77,12 @@ onUnmounted(() => {
   border-radius: 8px;
 }
 
-.tvist__slide:nth-child(1) .tvist__grid-item { background: #667eea; }
-.tvist__slide:nth-child(2) .tvist__grid-item { background: #764ba2; }
-.tvist__slide:nth-child(3) .tvist__grid-item { background: #f093fb; }
-.tvist__slide:nth-child(4) .tvist__grid-item { background: #f5576c; }
-.tvist__slide:nth-child(5) .tvist__grid-item { background: #4facfe; }
-.tvist__slide:nth-child(6) .tvist__grid-item { background: #00f2fe; }
-.tvist__slide:nth-child(7) .tvist__grid-item { background: #43e97b; }
-.tvist__slide:nth-child(8) .tvist__grid-item { background: #38f9d7; }
+.tvist-v0__slide:nth-child(1) .tvist-v0__grid-item { background: #667eea; }
+.tvist-v0__slide:nth-child(2) .tvist-v0__grid-item { background: #764ba2; }
+.tvist-v0__slide:nth-child(3) .tvist-v0__grid-item { background: #f093fb; }
+.tvist-v0__slide:nth-child(4) .tvist-v0__grid-item { background: #f5576c; }
+.tvist-v0__slide:nth-child(5) .tvist-v0__grid-item { background: #4facfe; }
+.tvist-v0__slide:nth-child(6) .tvist-v0__grid-item { background: #00f2fe; }
+.tvist-v0__slide:nth-child(7) .tvist-v0__grid-item { background: #43e97b; }
+.tvist-v0__slide:nth-child(8) .tvist-v0__grid-item { background: #38f9d7; }
 </style>

@@ -14,24 +14,24 @@ import ThumbsExample from '../.vitepress/theme/examples/ThumbsExample.vue'
 ```html
 <!-- Main Slider -->
 <div class="tvist main-slider">
-  <div class="tvist__container">
-    <div class="tvist__slide">1</div>
-    <div class="tvist__slide">2</div>
-    <div class="tvist__slide">3</div>
+  <div class="tvist-v0__container">
+    <div class="tvist-v0__slide">1</div>
+    <div class="tvist-v0__slide">2</div>
+    <div class="tvist-v0__slide">3</div>
     <!-- ... -->
   </div>
 </div>
 
 <!-- Thumbnail Slider -->
 <div class="tvist thumb-slider">
-  <div class="tvist__container">
-    <div class="tvist__slide">1</div>
-    <div class="tvist__slide">2</div>
-    <div class="tvist__slide">3</div>
+  <div class="tvist-v0__container">
+    <div class="tvist-v0__slide">1</div>
+    <div class="tvist-v0__slide">2</div>
+    <div class="tvist-v0__slide">3</div>
     <!-- ... -->
   </div>
-  <button class="tvist__arrow tvist__arrow--prev">‹</button>
-  <button class="tvist__arrow tvist__arrow--next">›</button>
+  <button class="tvist-v0__arrow tvist-v0__arrow--prev">‹</button>
+  <button class="tvist-v0__arrow tvist-v0__arrow--next">›</button>
 </div>
 ```
 

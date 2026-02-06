@@ -45,7 +45,7 @@ p {
   overflow: hidden;
 }
 
-.tvist__slide {
+.tvist-v0__slide {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   display: flex;
@@ -59,13 +59,13 @@ p {
 
 /* Адаптивность через Container Queries */
 @container slider (min-width: 600px) {
-  .tvist__slide {
+  .tvist-v0__slide {
     min-height: 250px;
   }
 }
 
 @container slider (min-width: 900px) {
-  .tvist__slide {
+  .tvist-v0__slide {
     min-height: 300px;
   }
 }

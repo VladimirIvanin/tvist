@@ -126,10 +126,10 @@ Tvist.registerModule('slide-states', SlideStatesModule)
 Управление классами состояния слайдов (active, prev, next, visible).
 
 **Автоматически применяет классы:**
-- `.tvist__slide--active` - активный слайд
-- `.tvist__slide--prev` - предыдущий слайд
-- `.tvist__slide--next` - следующий слайд
-- `.tvist__slide--visible` - видимый слайд
+- `.tvist-v0__slide--active` - активный слайд
+- `.tvist-v0__slide--prev` - предыдущий слайд
+- `.tvist-v0__slide--next` - следующий слайд
+- `.tvist-v0__slide--visible` - видимый слайд
 
 ### Автоматизация
 

@@ -51,7 +51,7 @@ slider.root.style.maxWidth = '1200px'
 readonly container: HTMLElement
 ```
 
-Контейнер слайдов (элемент с классом `.tvist__container`).
+Контейнер слайдов (элемент с классом `.tvist-v0__container`).
 
 **Примеры:**
 
@@ -61,7 +61,7 @@ console.log(slider.container.offsetWidth)
 
 // Добавить слайд
 const newSlide = document.createElement('div')
-newSlide.className = 'tvist__slide'
+newSlide.className = 'tvist-v0__slide'
 newSlide.textContent = 'Новый слайд'
 slider.container.appendChild(newSlide)
 slider.update()
@@ -96,7 +96,7 @@ const lastSlide = slider.slides[slider.slides.length - 1]
 
 // Найти слайд с условием
 const activeSlide = slider.slides.find(slide => 
-  slide.classList.contains('tvist__slide--active')
+  slide.classList.contains('tvist-v0__slide--active')
 )
 ```
 

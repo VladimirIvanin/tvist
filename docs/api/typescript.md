@@ -504,7 +504,7 @@ export const Slider: React.FC<SliderProps> = ({ options, children }) => {
 
   return (
     <div ref={sliderRef} className="tvist">
-      <div className="tvist__container">
+      <div className="tvist-v0__container">
         {children}
       </div>
     </div>

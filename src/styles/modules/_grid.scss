@@ -1,23 +1,25 @@
 // Grid модуль использует flexbox структуру с вложенными элементами
 // Все стили задаются inline в GridModule.ts
 
-.tvist__slide--grid-page {
+@use '../core/variables' as *;
+
+.#{$tvist-block}__slide--grid-page {
   // Страница сетки - содержит ряды и колонки
   flex-shrink: 0;
 }
 
-.tvist__grid-row {
+.#{$tvist-block}__grid-row {
   // Ряд в сетке
   box-sizing: border-box;
 }
 
-.tvist__grid-col {
+.#{$tvist-block}__grid-col {
   // Колонка в сетке
   box-sizing: border-box;
   overflow: hidden;
 }
 
-.tvist__grid-item {
+.#{$tvist-block}__grid-item {
   // Оригинальный слайд внутри колонки
   box-sizing: border-box;
 }

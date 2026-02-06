@@ -8,14 +8,14 @@
 
 ```html
 <div class="tvist">
-  <div class="tvist__wrapper">
-    <div class="tvist__slide">
+  <div class="tvist-v0__wrapper">
+    <div class="tvist-v0__slide">
       <img src="slide-1.jpg" alt="Slide 1">
     </div>
-    <div class="tvist__slide">
+    <div class="tvist-v0__slide">
       <img src="slide-2.jpg" alt="Slide 2">
     </div>
-    <div class="tvist__slide">
+    <div class="tvist-v0__slide">
       <img src="slide-3.jpg" alt="Slide 3">
     </div>
   </div>
@@ -81,10 +81,10 @@ HTML с элементами навигации:
 
 ```html
 <div class="tvist">
-  <div class="tvist__wrapper">
-    <div class="tvist__slide">Slide 1</div>
-    <div class="tvist__slide">Slide 2</div>
-    <div class="tvist__slide">Slide 3</div>
+  <div class="tvist-v0__wrapper">
+    <div class="tvist-v0__slide">Slide 1</div>
+    <div class="tvist-v0__slide">Slide 2</div>
+    <div class="tvist-v0__slide">Slide 3</div>
   </div>
   
   <!-- Стрелки навигации -->
@@ -180,7 +180,7 @@ console.log(slider.slides.length); // Количество слайдов
       max-width: 800px;
       margin: 0 auto;
     }
-    .tvist__slide {
+    .tvist-v0__slide {
       height: 400px;
       display: flex;
       align-items: center;
@@ -192,10 +192,10 @@ console.log(slider.slides.length); // Количество слайдов
 </head>
 <body>
   <div class="tvist">
-    <div class="tvist__wrapper">
-      <div class="tvist__slide">Слайд 1</div>
-      <div class="tvist__slide">Слайд 2</div>
-      <div class="tvist__slide">Слайд 3</div>
+    <div class="tvist-v0__wrapper">
+      <div class="tvist-v0__slide">Слайд 1</div>
+      <div class="tvist-v0__slide">Слайд 2</div>
+      <div class="tvist-v0__slide">Слайд 3</div>
     </div>
     <div class="tvist-button-prev">←</div>
     <div class="tvist-button-next">→</div>

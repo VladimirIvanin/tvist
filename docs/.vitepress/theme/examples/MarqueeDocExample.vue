@@ -2,8 +2,8 @@
   <div class="marquee-example">
     <h3>Базовый пример</h3>
     <div ref="basicSlider" class="tvist marquee-basic">
-      <div class="tvist__container">
-        <div v-for="i in 8" :key="i" class="tvist__slide">
+      <div class="tvist-v0__container">
+        <div v-for="i in 8" :key="i" class="tvist-v0__slide">
           <div class="marquee-card">
             <div class="marquee-icon">🎨</div>
             <div class="marquee-text">Слайд {{ i }}</div>
@@ -32,8 +32,8 @@
 
     <h3>Логотипы партнёров</h3>
     <div ref="logosSlider" class="tvist marquee-logos">
-      <div class="tvist__container">
-        <div v-for="i in 6" :key="i" class="tvist__slide">
+      <div class="tvist-v0__container">
+        <div v-for="i in 6" :key="i" class="tvist-v0__slide">
           <div class="logo-card">
             <div class="logo-placeholder">Logo {{ i }}</div>
           </div>
@@ -43,8 +43,8 @@
 
     <h3>Вертикальная бегущая строка</h3>
     <div ref="verticalSlider" class="tvist marquee-vertical">
-      <div class="tvist__container">
-        <div v-for="i in 5" :key="i" class="tvist__slide">
+      <div class="tvist-v0__container">
+        <div v-for="i in 5" :key="i" class="tvist-v0__slide">
           <div class="news-item">
             <span class="news-icon">📢</span>
             <span class="news-text">Новость {{ i }}: Важное объявление</span>

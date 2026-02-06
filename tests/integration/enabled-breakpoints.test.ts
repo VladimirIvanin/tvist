@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '../../src/index'
 import { createSliderFixture, resizeSlider } from '../fixtures'
 import type { SliderFixture } from '../fixtures'
@@ -41,7 +42,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Изначально должен быть отключен (ширина 1000px > 767px)
       expect(slider.isEnabled).toBe(false)
-      expect(slider.root.classList.contains('tvist--disabled')).toBe(true)
+      expect(slider.root.classList.contains(TVIST_CLASSES.disabled)).toBe(true)
 
       // Изменяем ширину на мобильную
       resizeSlider(fixture.root, 500)
@@ -51,7 +52,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Теперь должен быть включен
       expect(slider.isEnabled).toBe(true)
-      expect(slider.root.classList.contains('tvist--disabled')).toBe(false)
+      expect(slider.root.classList.contains(TVIST_CLASSES.disabled)).toBe(false)
       expect(onEnabled).toHaveBeenCalled()
       expect(onBreakpoint).toHaveBeenCalledWith(767)
     })

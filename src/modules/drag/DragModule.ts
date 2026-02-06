@@ -12,6 +12,7 @@
  */
 
 import { Module } from '../Module'
+import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -201,7 +202,7 @@ export class DragModule extends Module {
         // Emit события
         this.emit('dragStart', e)
         // Добавляем класс dragging (отключает transition)
-        this.tvist.root.classList.add('tvist--dragging')
+        this.tvist.root.classList.add(TVIST_CLASSES.dragging)
       } else {
         return // Ждем превышения порога
       }
@@ -260,7 +261,7 @@ export class DragModule extends Module {
       this.isDragging = false
 
       // Восстанавливаем transition (удаляем класс)
-      this.tvist.root.classList.remove('tvist--dragging')
+      this.tvist.root.classList.remove(TVIST_CLASSES.dragging)
 
       // Вычисляем velocity
       const velocity = this.calculateVelocity()

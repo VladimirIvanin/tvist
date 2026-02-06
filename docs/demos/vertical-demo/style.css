@@ -64,7 +64,7 @@ h2 {
   border-radius: 8px;
 }
 
-.tvist__slide {
+.tvist-v0__slide {
   height: 100%;
   display: flex;
   align-items: center;
@@ -81,11 +81,11 @@ h2 {
   height: 400px; /* Фиксированная высота контейнера */
 }
 
-.tvist--h-500 .tvist__slide {
+.tvist--h-500 .tvist-v0__slide {
   /* Градиенты для первого демо */
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
-.tvist--h-500 .tvist__slide:nth-child(even) {
+.tvist--h-500 .tvist-v0__slide:nth-child(even) {
   background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
 }
 
@@ -96,7 +96,7 @@ h2 {
   height: 400px; /* Высота всей галереи */
 }
 
-.tvist__container {
+.tvist-v0__container {
   height: 100%;
 }
 
@@ -106,7 +106,7 @@ h2 {
   height: 100%; /* На всю высоту враппера */
 }
 
-.tvist-thumbs .tvist__slide {
+.tvist-thumbs .tvist-v0__slide {
   cursor: pointer;
   opacity: 0.6;
   transition: opacity 0.3s, border-color 0.3s;
@@ -114,8 +114,8 @@ h2 {
 }
 
 /* Активный класс (добавляется ThumbsModule или вручную) */
-.tvist-thumbs .tvist__slide.is-active,
-.tvist-thumbs .tvist__slide--nav-active {
+.tvist-thumbs .tvist-v0__slide.is-active,
+.tvist-thumbs .tvist-v0__slide--nav-active {
   opacity: 1;
   border-color: #333;
 }
@@ -126,7 +126,7 @@ h2 {
   height: 100%;
 }
 
-.tvist-main .tvist__slide {
+.tvist-main .tvist-v0__slide {
   font-size: 48px;
 }
 
