@@ -151,22 +151,41 @@ export class MarqueeModule extends Module {
   private createClones(): void {
     const container = this.tvist.container
     const originalSlides = Array.from(this.tvist.slides)
+    const isReverse = this.direction === 'right' || this.direction === 'down'
 
-    // Клонируем все слайды и добавляем в конец
-    originalSlides.forEach((slide, index) => {
-      const clone = slide.cloneNode(true) as HTMLElement
-      
-      // Маркируем как клон
-      clone.setAttribute('data-tvist-marquee-clone', 'true')
-      clone.setAttribute('data-tvist-slide-index', String(index))
-      clone.classList.add('tvist__slide--marquee-clone')
-      
-      // Удаляем id
-      clone.removeAttribute('id')
-      
-      container.appendChild(clone)
-      this.clones.push(clone)
-    })
+    if (isReverse) {
+      // Для right/down: клоны добавляем В НАЧАЛО
+      originalSlides.reverse().forEach((slide, index) => {
+        const clone = slide.cloneNode(true) as HTMLElement
+        
+        // Маркируем как клон
+        clone.setAttribute('data-tvist-marquee-clone', 'true')
+        clone.setAttribute('data-tvist-slide-index', String(originalSlides.length - 1 - index))
+        clone.classList.add('tvist__slide--marquee-clone')
+        
+        // Удаляем id
+        clone.removeAttribute('id')
+        
+        container.insertBefore(clone, container.firstChild)
+        this.clones.unshift(clone)
+      })
+    } else {
+      // Для left/up: клоны добавляем В КОНЕЦ
+      originalSlides.forEach((slide, index) => {
+        const clone = slide.cloneNode(true) as HTMLElement
+        
+        // Маркируем как клон
+        clone.setAttribute('data-tvist-marquee-clone', 'true')
+        clone.setAttribute('data-tvist-slide-index', String(index))
+        clone.classList.add('tvist__slide--marquee-clone')
+        
+        // Удаляем id
+        clone.removeAttribute('id')
+        
+        container.appendChild(clone)
+        this.clones.push(clone)
+      })
+    }
 
     // Обновляем список слайдов
     this.tvist.updateSlidesList()
@@ -276,23 +295,22 @@ export class MarqueeModule extends Module {
     const distance = this.speed * deltaTime
 
     // Обновляем позицию в зависимости от направления
-    switch (this.direction) {
-      case 'left':
-      case 'up':
-        this.currentPosition += distance
-        // Loop: если прошли весь контент, возвращаемся в начало
-        if (this.currentPosition >= this.totalSize) {
-          this.currentPosition = 0
-        }
-        break
-      case 'right':
-      case 'down':
-        this.currentPosition -= distance
-        // Loop: если ушли в отрицательную зону, возвращаемся в конец
-        if (this.currentPosition <= -this.totalSize) {
-          this.currentPosition = 0
-        }
-        break
+    const isReverse = this.direction === 'right' || this.direction === 'down'
+    
+    if (isReverse) {
+      // Для right/down: уменьшаем позицию (движемся от totalSize к 0)
+      this.currentPosition -= distance
+      // Loop: когда достигаем 0, возвращаемся к totalSize
+      if (this.currentPosition <= 0) {
+        this.currentPosition = this.totalSize
+      }
+    } else {
+      // Для left/up: увеличиваем позицию (движемся от 0 к totalSize)
+      this.currentPosition += distance
+      // Loop: когда достигаем totalSize, возвращаемся к 0
+      if (this.currentPosition >= this.totalSize) {
+        this.currentPosition = 0
+      }
     }
 
     // Применяем transform
@@ -304,6 +322,10 @@ export class MarqueeModule extends Module {
    */
   private applyTransform(): void {
     const isHorizontal = this.options.direction !== 'vertical'
+    
+    // Всегда используем отрицательное значение currentPosition
+    // Для left/up: currentPosition положительный (0 → totalSize), transform отрицательный
+    // Для right/down: currentPosition отрицательный (0 → -totalSize), transform положительный
     const transform = isHorizontal
       ? `translate3d(${-this.currentPosition}px, 0, 0)`
       : `translate3d(0, ${-this.currentPosition}px, 0)`
@@ -378,7 +400,13 @@ export class MarqueeModule extends Module {
           this.removeClones()
           this.createClones()
           this.calculateTotalSize()
-          this.currentPosition = 0
+          // Для right/down начинаем с totalSize (клоны слева, показываем оригиналы)
+          // Для left/up начинаем с 0
+          const isReverse = direction === 'right' || direction === 'down'
+          this.currentPosition = isReverse ? this.totalSize : 0
+          this.lastTimestamp = null // Сбрасываем timestamp для корректного deltaTime
+          // Сразу применяем transform для корректного отображения
+          this.applyTransform()
         }
       },
       getDirection: () => this.direction
