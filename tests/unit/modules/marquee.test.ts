@@ -253,4 +253,124 @@ describe('MarqueeModule', () => {
     const api = (module as MarqueeModule)?.getMarquee()
     expect(api).toBeDefined()
   })
+
+  it('должен корректно менять направление и пересоздавать клоны', () => {
+    slider = new Tvist(root, {
+      marquee: {
+        direction: 'left'
+      }
+    })
+
+    const module = slider.modules.get('marquee') as MarqueeModule
+    const api = module?.getMarquee()
+
+    // Проверяем начальное состояние
+    expect(api?.getDirection()).toBe('left')
+    expect(slider.slides.length).toBe(6) // 3 оригинала + 3 клона
+
+    // Меняем направление
+    api?.setDirection('right')
+
+    // Проверяем что направление изменилось
+    expect(api?.getDirection()).toBe('right')
+    
+    // Проверяем что клоны пересозданы (количество слайдов должно остаться прежним)
+    expect(slider.slides.length).toBe(6)
+    
+    // Проверяем что клоны действительно существуют
+    const clones = Array.from(slider.slides).filter(slide => 
+      slide.hasAttribute('data-tvist-marquee-clone')
+    )
+    expect(clones.length).toBe(3)
+  })
+
+  it('должен корректно применять transform при смене направления', () => {
+    slider = new Tvist(root, {
+      marquee: {
+        direction: 'left',
+        speed: 60
+      }
+    })
+
+    const module = slider.modules.get('marquee') as MarqueeModule
+    const api = module?.getMarquee()
+    const container = root.querySelector('.tvist__container') as HTMLElement
+
+    // Для left: transform начинается с translate3d(-0px, 0, 0) = translate3d(0px, 0, 0)
+    const initialTransform = container.style.transform
+    expect(initialTransform).toMatch(/translate3d\((0px|-0px), 0, 0\)/)
+    
+    // Меняем направление на right
+    api?.setDirection('right')
+
+    // Для right: transform начинается с translate3d(-totalSize, 0, 0)
+    // В тестовой среде JSDOM слайды имеют нулевые размеры, поэтому totalSize = 0
+    // В реальном браузере это будет отрицательное значение
+    const newTransform = container.style.transform
+    // Проверяем что transform был применен (содержит translate3d)
+    expect(newTransform).toMatch(/translate3d\([^)]*\)/)
+    
+    // Проверяем что клоны были пересозданы в правильном порядке (это более важно)
+    const slides = Array.from(slider.slides)
+    expect(slides[0].hasAttribute('data-tvist-marquee-clone')).toBe(true)
+  })
+
+  it('не должен пересоздавать клоны при смене на то же направление', () => {
+    slider = new Tvist(root, {
+      marquee: {
+        direction: 'left'
+      }
+    })
+
+    const module = slider.modules.get('marquee') as MarqueeModule
+    const api = module?.getMarquee()
+
+    // Запоминаем первый клон
+    const firstClone = Array.from(slider.slides).find(slide => 
+      slide.hasAttribute('data-tvist-marquee-clone')
+    )
+
+    // Устанавливаем то же направление
+    api?.setDirection('left')
+
+    // Проверяем что клон остался тем же объектом (не пересоздан)
+    const firstCloneAfter = Array.from(slider.slides).find(slide => 
+      slide.hasAttribute('data-tvist-marquee-clone')
+    )
+    expect(firstCloneAfter).toBe(firstClone)
+  })
+
+  it('должен размещать клоны в конце для left и в начале для right', () => {
+    // Проверяем left - клоны в конце
+    slider = new Tvist(root, {
+      marquee: {
+        direction: 'left'
+      }
+    })
+
+    let slides = Array.from(slider.slides)
+    // Первые 3 слайда - оригиналы (без атрибута data-tvist-marquee-clone)
+    expect(slides[0].hasAttribute('data-tvist-marquee-clone')).toBe(false)
+    expect(slides[1].hasAttribute('data-tvist-marquee-clone')).toBe(false)
+    expect(slides[2].hasAttribute('data-tvist-marquee-clone')).toBe(false)
+    // Последние 3 слайда - клоны
+    expect(slides[3].hasAttribute('data-tvist-marquee-clone')).toBe(true)
+    expect(slides[4].hasAttribute('data-tvist-marquee-clone')).toBe(true)
+    expect(slides[5].hasAttribute('data-tvist-marquee-clone')).toBe(true)
+
+    // Проверяем right - клоны в начале
+    const module = slider.modules.get('marquee') as MarqueeModule
+    const api = module?.getMarquee()
+    api?.setDirection('right')
+
+    slides = Array.from(slider.slides)
+    // Первые 3 слайда - клоны
+    expect(slides[0].hasAttribute('data-tvist-marquee-clone')).toBe(true)
+    expect(slides[1].hasAttribute('data-tvist-marquee-clone')).toBe(true)
+    expect(slides[2].hasAttribute('data-tvist-marquee-clone')).toBe(true)
+    // Последние 3 слайда - оригиналы
+    expect(slides[3].hasAttribute('data-tvist-marquee-clone')).toBe(false)
+    expect(slides[4].hasAttribute('data-tvist-marquee-clone')).toBe(false)
+    expect(slides[5].hasAttribute('data-tvist-marquee-clone')).toBe(false)
+  })
 })
