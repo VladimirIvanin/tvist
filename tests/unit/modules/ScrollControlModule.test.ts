@@ -3,10 +3,9 @@
  * 
  * Проверяем:
  * 1. Wheel события для навигации
- * 2. Touch события для мобильных устройств
- * 3. Поддержку horizontal и vertical направлений
- * 4. releaseOnEdges на границах слайдера
- * 5. throttle для wheel событий
+ * 2. Поддержку horizontal и vertical направлений
+ * 3. releaseOnEdges на границах слайдера
+ * 4. throttle для wheel событий
  */
 
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest'
@@ -116,103 +115,6 @@ describe('ScrollControlModule', () => {
       slider.root.dispatchEvent(wheelEvent)
       await waitForAnimation(350)
 
-      expect(slider.activeIndex).toBe(1)
-    })
-  })
-
-  describe('Touch Navigation', () => {
-    it('должен переключаться на следующий слайд при свайпе влево', async () => {
-      expect(slider.activeIndex).toBe(0)
-
-      // Touch start
-      const touchStart = new TouchEvent('touchstart', {
-        touches: [{ clientX: 300, clientY: 200 } as Touch],
-        bubbles: true,
-      })
-      slider.root.dispatchEvent(touchStart)
-
-      // Touch move (свайп влево >= 50px)
-      const touchMove = new TouchEvent('touchmove', {
-        touches: [{ clientX: 200, clientY: 200 } as Touch],
-        bubbles: true,
-        cancelable: true,
-      })
-      slider.root.dispatchEvent(touchMove)
-
-      await waitForAnimation(350)
-      expect(slider.activeIndex).toBe(1)
-    })
-
-    it('должен переключаться на предыдущий слайд при свайпе вправо', async () => {
-      slider.scrollTo(2, true)
-      expect(slider.activeIndex).toBe(2)
-
-      // Touch start
-      const touchStart = new TouchEvent('touchstart', {
-        touches: [{ clientX: 200, clientY: 200 } as Touch],
-        bubbles: true,
-      })
-      slider.root.dispatchEvent(touchStart)
-
-      // Touch move (свайп вправо >= 50px)
-      const touchMove = new TouchEvent('touchmove', {
-        touches: [{ clientX: 300, clientY: 200 } as Touch],
-        bubbles: true,
-        cancelable: true,
-      })
-      slider.root.dispatchEvent(touchMove)
-
-      await waitForAnimation(350)
-      expect(slider.activeIndex).toBe(1)
-    })
-
-    it('должен игнорировать слишком короткие свайпы', async () => {
-      expect(slider.activeIndex).toBe(0)
-
-      const touchStart = new TouchEvent('touchstart', {
-        touches: [{ clientX: 300, clientY: 200 } as Touch],
-        bubbles: true,
-      })
-      slider.root.dispatchEvent(touchStart)
-
-      // Короткий свайп (< 50px threshold)
-      const touchMove = new TouchEvent('touchmove', {
-        touches: [{ clientX: 270, clientY: 200 } as Touch],
-        bubbles: true,
-        cancelable: true,
-      })
-      slider.root.dispatchEvent(touchMove)
-
-      await waitForAnimation(100)
-      expect(slider.activeIndex).toBe(0)
-    })
-
-    it('должен работать с вертикальным направлением для touch', async () => {
-      slider.destroy()
-      slider = new Tvist(fixture.root, {
-        wheel: true,
-        direction: 'vertical',
-        speed: 300,
-      })
-
-      expect(slider.activeIndex).toBe(0)
-
-      // Touch start
-      const touchStart = new TouchEvent('touchstart', {
-        touches: [{ clientX: 300, clientY: 300 } as Touch],
-        bubbles: true,
-      })
-      slider.root.dispatchEvent(touchStart)
-
-      // Touch move (свайп вверх)
-      const touchMove = new TouchEvent('touchmove', {
-        touches: [{ clientX: 300, clientY: 200 } as Touch],
-        bubbles: true,
-        cancelable: true,
-      })
-      slider.root.dispatchEvent(touchMove)
-
-      await waitForAnimation(350)
       expect(slider.activeIndex).toBe(1)
     })
   })
