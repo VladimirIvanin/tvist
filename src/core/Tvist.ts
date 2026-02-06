@@ -329,7 +329,7 @@ export class Tvist {
 
     // Отключаем модули (кроме breakpoints - он должен работать всегда)
     const modulesToDestroy: string[] = []
-    this.modules.forEach((module, name) => {
+    this.modules.forEach((_module, name) => {
       if (name === 'breakpoints') return // Не трогаем breakpoints
       modulesToDestroy.push(name)
     })
