@@ -68,7 +68,7 @@ let logosInstance: Tvist | null = null
 let verticalInstance: Tvist | null = null
 
 const isPlaying = ref(true)
-const direction = ref<'left' | 'right' | 'up' | 'down'>('left')
+const direction = ref<'left' | 'right'>('left')
 const speed = ref(60)
 
 onMounted(() => {
@@ -82,6 +82,23 @@ onMounted(() => {
       },
       gap: 20
     })
+
+    // Подписываемся на события marquee для синхронизации состояния
+    const marqueeModule = basicInstance.modules.get('marquee')
+    if (marqueeModule) {
+      marqueeModule.on('marqueeStart', () => {
+        isPlaying.value = true
+      })
+      marqueeModule.on('marqueeResume', () => {
+        isPlaying.value = true
+      })
+      marqueeModule.on('marqueePause', () => {
+        isPlaying.value = false
+      })
+      marqueeModule.on('marqueeStop', () => {
+        isPlaying.value = false
+      })
+    }
   }
 
   // Логотипы
@@ -125,11 +142,12 @@ function togglePlay() {
   } else {
     marquee.resume()
   }
-  isPlaying.value = !isPlaying.value
+  // isPlaying обновится автоматически через события
 }
 
 function changeDirection() {
-  const directions: Array<'left' | 'right' | 'up' | 'down'> = ['left', 'right', 'up', 'down']
+  // Только left и right для горизонтального слайдера
+  const directions: Array<'left' | 'right'> = ['left', 'right']
   const currentIndex = directions.indexOf(direction.value)
   const nextIndex = (currentIndex + 1) % directions.length
   direction.value = directions[nextIndex]
@@ -137,6 +155,8 @@ function changeDirection() {
   const marquee = basicInstance?.modules.get('marquee')?.getMarquee?.()
   if (marquee) {
     marquee.setDirection(direction.value)
+    // Синхронизируем состояние после смены направления
+    isPlaying.value = marquee.isRunning()
   }
 }
 

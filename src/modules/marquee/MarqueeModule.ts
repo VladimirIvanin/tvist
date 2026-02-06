@@ -280,16 +280,19 @@ export class MarqueeModule extends Module {
       case 'left':
       case 'up':
         this.currentPosition += distance
+        // Loop: если прошли весь контент, возвращаемся в начало
+        if (this.currentPosition >= this.totalSize) {
+          this.currentPosition = 0
+        }
         break
       case 'right':
       case 'down':
         this.currentPosition -= distance
+        // Loop: если ушли в отрицательную зону, возвращаемся в конец
+        if (this.currentPosition <= -this.totalSize) {
+          this.currentPosition = 0
+        }
         break
-    }
-
-    // Loop: если прошли весь контент, возвращаемся в начало
-    if (Math.abs(this.currentPosition) >= this.totalSize) {
-      this.currentPosition = 0
     }
 
     // Применяем transform

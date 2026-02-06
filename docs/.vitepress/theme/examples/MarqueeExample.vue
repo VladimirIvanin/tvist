@@ -64,6 +64,23 @@ onMounted(() => {
       },
       gap: 20
     })
+
+    // Подписываемся на события marquee для синхронизации состояния
+    const marqueeModule = slider.modules.get('marquee')
+    if (marqueeModule) {
+      marqueeModule.on('marqueeStart', () => {
+        isPlaying.value = true
+      })
+      marqueeModule.on('marqueeResume', () => {
+        isPlaying.value = true
+      })
+      marqueeModule.on('marqueePause', () => {
+        isPlaying.value = false
+      })
+      marqueeModule.on('marqueeStop', () => {
+        isPlaying.value = false
+      })
+    }
   }
 })
 
@@ -80,11 +97,12 @@ function togglePlay() {
   } else {
     marquee.resume()
   }
-  isPlaying.value = !isPlaying.value
+  // isPlaying обновится автоматически через события
 }
 
 function changeDirection() {
-  const directions = ['left', 'right', 'up', 'down']
+  // Только left и right для горизонтального слайдера
+  const directions = ['left', 'right']
   const currentIndex = directions.indexOf(direction.value)
   const nextIndex = (currentIndex + 1) % directions.length
   direction.value = directions[nextIndex]
@@ -92,6 +110,8 @@ function changeDirection() {
   const marquee = slider?.modules.get('marquee')?.getMarquee?.()
   if (marquee) {
     marquee.setDirection(direction.value)
+    // Синхронизируем состояние после смены направления
+    isPlaying.value = marquee.isRunning()
   }
 }
 
