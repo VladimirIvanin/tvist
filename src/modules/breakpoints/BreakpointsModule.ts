@@ -227,11 +227,21 @@ export class BreakpointsModule extends Module {
       Object.assign(newOptions, this.options.breakpoints[bp])
     }
 
+    // Проверяем enabled флаг
+    const shouldBeEnabled = newOptions.enabled !== false
+
     // Применяем новые опции к слайдеру
     Object.assign(this.tvist.options, newOptions)
 
-    // Обновляем слайдер
-    this.tvist.update()
+    // Включаем или отключаем слайдер в зависимости от enabled
+    if (shouldBeEnabled && !this.tvist.isEnabled) {
+      this.tvist.enable()
+    } else if (!shouldBeEnabled && this.tvist.isEnabled) {
+      this.tvist.disable()
+    } else if (shouldBeEnabled && this.tvist.isEnabled) {
+      // Если слайдер уже включен, просто обновляем
+      this.tvist.update()
+    }
   }
 
   /**

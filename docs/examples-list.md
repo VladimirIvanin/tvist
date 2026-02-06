@@ -9,6 +9,7 @@ import PeekBasicExample from './.vitepress/theme/examples/PeekBasicExample.vue'
 import CenterBasicExample from './.vitepress/theme/examples/CenterBasicExample.vue'
 import CenterPerPage2Example from './.vitepress/theme/examples/CenterPerPage2Example.vue'
 import ResponsiveExample from './.vitepress/theme/examples/ResponsiveExample.vue'
+import ProductCardsExample from './.vitepress/theme/examples/ProductCardsExample.vue'
 import LoopExample from './.vitepress/theme/examples/LoopExample.vue'
 import FadeExample from './.vitepress/theme/examples/FadeExample.vue'
 import CubeExample from './.vitepress/theme/examples/CubeExample.vue'
@@ -50,57 +51,61 @@ import ScrollbarExample from './.vitepress/theme/examples/ScrollbarExample.vue'
 
 <ResponsiveExample detailsLink="./examples/responsive" />
 
-## 7. Update Options: динамическое изменение
+## 7. Карточки товаров: сетка → слайдер
+
+<ProductCardsExample detailsLink="./examples/product-cards" />
+
+## 8. Update Options: динамическое изменение
 
 ::: tip 
 Интерактивная демонстрация динамического изменения опций слайдера. [Открыть полную версию →](./examples/update-options)
 :::
 
-## 8. Loop Mode
+## 9. Loop Mode
 
 <LoopExample detailsLink="./examples/loop" />
 
-## 9. Fade Effect
+## 10. Fade Effect
 
 <FadeExample detailsLink="./examples/effect-fade" />
 
-## 10. Cube Effect
+## 11. Cube Effect
 
 <CubeExample detailsLink="./examples/effect-cube" />
 
-## 11. Вертикальный
+## 12. Вертикальный
 
 <VerticalExample detailsLink="./examples/vertical" />
 
-## 12. Вертикальные миниатюры (Gallery)
+## 13. Вертикальные миниатюры (Gallery)
 
 <VerticalThumbsExample detailsLink="./examples/vertical" />
 
-## 13. Drag + Navigation
+## 14. Drag + Navigation
 
 <DragNavigationExample detailsLink="./examples/modules" />
 
-## 14. Autoplay + Pagination
+## 15. Autoplay + Pagination
 
 <AutoplayExample detailsLink="./examples/modules" />
 
-## 15. Thumbs Sync
+## 16. Thumbs Sync
 
 <ThumbsExample detailsLink="./examples/thumbs" />
 
-## 16. Grid Layout
+## 17. Grid Layout
 
 <GridExample detailsLink="./examples/grid" />
 
-## 17. Grid Dimensions
+## 18. Grid Dimensions
 
 <GridDimensionsExample detailsLink="./examples/grid" />
 
-## 18. Scroll Control
+## 19. Scroll Control
 
 <ScrollControlExample detailsLink="./examples/scroll-control" />
 
-## 19. Scrollbar
+## 20. Scrollbar
 
 <ScrollbarExample detailsLink="./examples/scrollbar" />
 

@@ -59,6 +59,7 @@
 
 Прочие настройки:
 
+- `enabled` - включение/отключение слайдера
 - `lazy` - ленивая загрузка изображений
 - `thumbs` - связь с миниатюрами
 - `isNavigation` - режим навигации
@@ -105,6 +106,26 @@ const slider = new Tvist('.slider', {
     1024: {
       perPage: 3,
       gap: 20
+    }
+  }
+})
+```
+
+### Сетка на десктопе, слайдер на мобильных
+
+```javascript
+const slider = new Tvist('.slider', {
+  // По умолчанию (десктоп) - отключен
+  enabled: false,
+  perPage: 1,
+  gap: 16,
+  drag: true,
+  pagination: true,
+  
+  // На мобильных - включен
+  breakpoints: {
+    767: {
+      enabled: true  // Слайдер активен на экранах ≤767px
     }
   }
 })

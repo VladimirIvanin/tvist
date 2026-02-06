@@ -370,13 +370,19 @@ export interface TvistOptions {
    * Адаптивные настройки по breakpoints. Ключ - ширина экрана в пикселях
    * @default undefined
    */
-  breakpoints?: Record<number, Partial<TvistOptions>>
+  breakpoints?: Record<number, Partial<TvistOptions> & { enabled?: boolean }>
   
   /**
    * База для расчёта breakpoints
    * @default 'window'
    */
   breakpointsBase?: 'window' | 'container'
+  
+  /**
+   * Включить/выключить слайдер. При false слайдер не инициализируется (статичный контент)
+   * @default true
+   */
+  enabled?: boolean
   
   // Обработчики событий
   

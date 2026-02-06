@@ -66,6 +66,7 @@ export default defineConfig({
           { text: 'Peek', link: '/examples/peek' },
           { text: 'Center', link: '/examples/center' },
           { text: 'Responsive', link: '/examples/responsive' },
+          { text: 'Карточки товаров', link: '/examples/product-cards' },
           { text: 'Update Options', link: '/examples/update-options' },
           { text: 'Loop', link: '/examples/loop' },
           { text: 'Fade Effect', link: '/examples/effect-fade' },

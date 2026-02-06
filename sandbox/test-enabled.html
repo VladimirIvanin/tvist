@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test enabled option</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .status {
+      padding: 12px 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .status.enabled {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status.disabled {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .tvist {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    /* Когда слайдер отключен - показываем как сетку */
+    .tvist.tvist--disabled .tvist__container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding: 20px;
+      transform: none !important;
+    }
+
+    .tvist.tvist--disabled .tvist__slide {
+      width: auto !important;
+      margin: 0 !important;
+    }
+
+    .tvist__slide {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 48px;
+      font-weight: bold;
+    }
+
+    .tvist__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .tvist__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+    .tvist__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    .tvist__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    .tvist__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+    .tvist__slide:nth-child(6) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+
+    /* В режиме сетки - добавляем тени */
+    .tvist.tvist--disabled .tvist__slide {
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .tvist.tvist--disabled .tvist__slide:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    @media (max-width: 1024px) and (min-width: 768px) {
+      .tvist.tvist--disabled .tvist__container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #5568d3;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test: enabled option</h1>
+  
+  <div id="status" class="status disabled">
+    Статус: Отключен (Сетка)
+  </div>
+
+  <div class="controls">
+    <button onclick="toggleEnabled()">Toggle enabled</button>
+    <button onclick="slider.prev()" id="prevBtn">← Prev</button>
+    <button onclick="slider.next()" id="nextBtn">Next →</button>
+  </div>
+
+  <div class="tvist">
+    <div class="tvist__container">
+      <div class="tvist__slide">1</div>
+      <div class="tvist__slide">2</div>
+      <div class="tvist__slide">3</div>
+      <div class="tvist__slide">4</div>
+      <div class="tvist__slide">5</div>
+      <div class="tvist__slide">6</div>
+    </div>
+  </div>
+
+  <h2>С breakpoints</h2>
+  <p>Измените ширину окна, чтобы увидеть автоматическое переключение:</p>
+  <ul>
+    <li>≥768px: Сетка (enabled: false)</li>
+    <li>&lt;768px: Слайдер (enabled: true)</li>
+  </ul>
+
+  <script type="module">
+    import { Tvist } from '../src/index.ts'
+
+    window.slider = new Tvist('.tvist', {
+      enabled: false,
+      perPage: 1,
+      gap: 16,
+      speed: 300,
+      drag: true,
+      pagination: {
+        type: 'bullets',
+        clickable: true
+      },
+      breakpoints: {
+        767: {
+          enabled: true,
+          perPage: 1,
+          gap: 16
+        }
+      },
+      on: {
+        created: (instance) => {
+          console.log('Created, isEnabled:', instance.isEnabled)
+          updateStatus(instance.isEnabled)
+        },
+        enabled: () => {
+          console.log('Slider enabled')
+          updateStatus(true)
+        },
+        disabled: () => {
+          console.log('Slider disabled')
+          updateStatus(false)
+        },
+        breakpoint: (bp) => {
+          console.log('Breakpoint changed:', bp)
+        }
+      }
+    })
+
+    function updateStatus(isEnabled) {
+      const statusEl = document.getElementById('status')
+      const prevBtn = document.getElementById('prevBtn')
+      const nextBtn = document.getElementById('nextBtn')
+      
+      if (isEnabled) {
+        statusEl.textContent = 'Статус: Включен (Слайдер)'
+        statusEl.className = 'status enabled'
+        prevBtn.disabled = false
+        nextBtn.disabled = false
+      } else {
+        statusEl.textContent = 'Статус: Отключен (Сетка)'
+        statusEl.className = 'status disabled'
+        prevBtn.disabled = true
+        nextBtn.disabled = true
+      }
+    }
+
+    window.toggleEnabled = function() {
+      if (slider.isEnabled) {
+        slider.disable()
+      } else {
+        slider.enable()
+      }
+    }
+
+    window.updateStatus = updateStatus
+  </script>
+</body>
+</html>

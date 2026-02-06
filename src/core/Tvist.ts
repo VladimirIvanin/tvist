@@ -40,6 +40,9 @@ export class Tvist {
   // Опциональный резолвер индекса (для модулей типа Loop)
   public indexResolver?: (index: number) => number
 
+  // Состояние включения/выключения слайдера
+  private _isEnabled = true
+
   /**
    * Создать экземпляр Tvist
    * @param target - селектор или HTMLElement
@@ -82,8 +85,12 @@ export class Tvist {
       drag: true,
       start: 0,
       loop: false,
+      enabled: true,
       ...options,
     }
+
+    // Проверяем начальное состояние enabled
+    this._isEnabled = this.options.enabled !== false
 
     // Инициализация системы событий
     this.events = new EventEmitter()
@@ -91,6 +98,10 @@ export class Tvist {
     // Применяем классы состояния
     if (this.options.direction === 'vertical') {
       this.root.classList.add('tvist--vertical')
+    }
+
+    if (!this._isEnabled) {
+      this.root.classList.add('tvist--disabled')
     }
 
     // Регистрируем обработчики из опций
@@ -105,14 +116,19 @@ export class Tvist {
     // Создаём Engine
     this.engine = new Engine(this, this.options)
 
-    // Инициализируем модули
+    // Инициализируем модули (breakpoints должен работать всегда)
     this.initModules()
 
     // Слушаем resize
     this.setupResizeListener()
 
-    // Первый рендер
-    this.update()
+    // Первый рендер только если слайдер включен
+    if (this._isEnabled) {
+      this.update()
+    } else {
+      // Если отключен, очищаем стили, которые мог установить Engine
+      this.clearSliderStyles()
+    }
 
     // События created
     this.emit('created', this)
@@ -160,6 +176,7 @@ export class Tvist {
    * Следующий слайд
    */
   next(): this {
+    if (!this._isEnabled) return this
     if (this.engine.canScrollNext()) {
       this.engine.scrollBy(1)
     }
@@ -170,6 +187,7 @@ export class Tvist {
    * Предыдущий слайд
    */
   prev(): this {
+    if (!this._isEnabled) return this
     if (this.engine.canScrollPrev()) {
       this.engine.scrollBy(-1)
     }
@@ -182,6 +200,7 @@ export class Tvist {
    * @param instant - мгновенный переход без анимации
    */
   scrollTo(index: number, instant = false): this {
+    if (!this._isEnabled) return this
     const targetIndex = this.indexResolver ? this.indexResolver(index) : index
     this.engine.scrollTo(targetIndex, instant)
     return this
@@ -191,6 +210,9 @@ export class Tvist {
    * Обновить размеры и пересчитать позиции
    */
   update(): this {
+    // Не обновляем, если слайдер отключен
+    if (!this._isEnabled) return this
+
     // Обновляем класс направления
     if (this.options.direction === 'vertical') {
       this.root.classList.add('tvist--vertical')
@@ -274,6 +296,92 @@ export class Tvist {
     this.emit('optionsUpdated', this, newOptions)
 
     return this
+  }
+
+  /**
+   * Очистить стили слайдера (transform и размеры слайдов)
+   */
+  private clearSliderStyles(): void {
+    // Убираем transform с контейнера
+    this.container.style.transform = ''
+
+    // Убираем инлайн-стили со слайдов
+    this.slides.forEach(slide => {
+      slide.style.width = ''
+      slide.style.height = ''
+      slide.style.marginRight = ''
+      slide.style.marginBottom = ''
+    })
+  }
+
+  /**
+   * Отключить слайдер (превратить в статичный контент)
+   * Убирает transform, отключает модули, но сохраняет экземпляр
+   */
+  disable(): this {
+    if (!this._isEnabled) return this
+
+    this._isEnabled = false
+    this.root.classList.add('tvist--disabled')
+
+    // Очищаем стили
+    this.clearSliderStyles()
+
+    // Отключаем модули (кроме breakpoints - он должен работать всегда)
+    const modulesToDestroy: string[] = []
+    this.modules.forEach((module, name) => {
+      if (name === 'breakpoints') return // Не трогаем breakpoints
+      modulesToDestroy.push(name)
+    })
+
+    modulesToDestroy.forEach(name => {
+      try {
+        this.modules.get(name)?.destroy()
+        this.modules.delete(name)
+      } catch (error) {
+        console.error(`Tvist: Error disabling module "${name}":`, error)
+      }
+    })
+
+    this.emit('disabled', this)
+    return this
+  }
+
+  /**
+   * Включить слайдер (восстановить функциональность)
+   */
+  enable(): this {
+    if (this._isEnabled) return this
+
+    this._isEnabled = true
+    this.root.classList.remove('tvist--disabled')
+
+    // Переинициализируем модули (кроме breakpoints - он уже работает)
+    Tvist.MODULES.forEach((ModuleClass, name) => {
+      if (name === 'breakpoints') return // Не переинициализируем breakpoints
+      if (this.modules.has(name)) return // Уже есть
+      
+      try {
+        const module = new ModuleClass(this, this.options)
+        this.modules.set(name, module)
+        module.init()
+      } catch (error) {
+        console.error(`Tvist: Failed to initialize module "${name}":`, error)
+      }
+    })
+
+    // Пересчитываем размеры и позиции
+    this.update()
+
+    this.emit('enabled', this)
+    return this
+  }
+
+  /**
+   * Проверить, включен ли слайдер
+   */
+  get isEnabled(): boolean {
+    return this._isEnabled
   }
 
   /**
