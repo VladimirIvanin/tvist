@@ -23,6 +23,8 @@ import './modules/slide-states'
 import './modules/thumbs'
 import './modules/effects'
 import './modules/grid'
+import './modules/scroll-control'
+import './modules/scrollbar'
 
 
 // Types

@@ -1,0 +1,80 @@
+/**
+ * Scrollbar Module Styles
+ */
+
+@use '../core/variables' as *;
+
+.tvist__scrollbar {
+  position: absolute;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  transition: opacity 0.3s ease;
+  
+  &--hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  &--dragging {
+    .tvist__scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.7);
+    }
+  }
+  
+  // Горизонтальный скроллбар
+  &--horizontal {
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    height: 8px;
+  }
+  
+  // Вертикальный скроллбар
+  &--vertical {
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: 8px;
+  }
+}
+
+.tvist__scrollbar-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.tvist__scrollbar-thumb {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+  cursor: grab;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.6);
+  }
+  
+  &:active {
+    cursor: grabbing;
+    background: rgba(0, 0, 0, 0.7);
+  }
+}
+
+// Минимальная высота/ширина для ползунка, чтобы он был видим
+.tvist__scrollbar-thumb {
+  min-width: 40px;
+  min-height: 40px;
+  
+  .tvist__scrollbar--horizontal & {
+    min-height: 100%;
+    min-width: 40px;
+  }
+  
+  .tvist__scrollbar--vertical & {
+    min-width: 100%;
+    min-height: 40px;
+  }
+}

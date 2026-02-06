@@ -341,6 +341,29 @@ export interface TvistOptions {
     releaseOnEdges?: boolean
   }
   
+  // Scrollbar
+  
+  /**
+   * Кастомный скроллбар для навигации
+   * @default false
+   */
+  scrollbar?: boolean | {
+    /** Селектор или элемент для контейнера скроллбара */
+    container?: string | HTMLElement
+    /** Автоматически скрывать скроллбар при бездействии */
+    hide?: boolean
+    /** Задержка перед скрытием (мс) */
+    hideDelay?: number
+    /** CSS класс для скроллбара */
+    scrollbarClass?: string
+    /** CSS класс для трека скроллбара */
+    trackClass?: string
+    /** CSS класс для ползунка */
+    thumbClass?: string
+    /** Возможность перетаскивания ползунка */
+    draggable?: boolean
+  }
+  
   // Responsive
   
   /**

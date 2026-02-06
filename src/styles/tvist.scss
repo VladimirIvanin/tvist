@@ -12,6 +12,7 @@
 @use 'modules/cube';
 @use 'modules/thumbs';
 @use 'modules/grid';
+@use 'modules/scrollbar';
 
 // Сброс box-sizing для корректных расчётов
 * {

@@ -14,5 +14,7 @@ export { SlideStatesModule } from './slide-states'
 export { ThumbsModule } from './thumbs'
 export { EffectModule } from './effects'
 export { GridModule } from './grid'
+export { ScrollControlModule } from './scroll-control'
+export { ScrollbarModule } from './scrollbar'
 
 

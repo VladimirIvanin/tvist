@@ -20,6 +20,8 @@ import ThumbsExample from './.vitepress/theme/examples/ThumbsExample.vue'
 import GridExample from './.vitepress/theme/examples/GridExample.vue'
 import GridDimensionsExample from './.vitepress/theme/examples/GridDimensionsExample.vue'
 import UpdateOptionsExample from './.vitepress/theme/examples/UpdateOptionsExample.vue'
+import ScrollControlExample from './.vitepress/theme/examples/ScrollControlExample.vue'
+import ScrollbarExample from './.vitepress/theme/examples/ScrollbarExample.vue'
 </script>
 
 <div class="examples-page">
@@ -93,6 +95,14 @@ import UpdateOptionsExample from './.vitepress/theme/examples/UpdateOptionsExamp
 ## 17. Grid Dimensions
 
 <GridDimensionsExample detailsLink="./examples/grid" />
+
+## 18. Scroll Control
+
+<ScrollControlExample detailsLink="./examples/scroll-control" />
+
+## 19. Scrollbar
+
+<ScrollbarExample detailsLink="./examples/scrollbar" />
 
 </div>
 
