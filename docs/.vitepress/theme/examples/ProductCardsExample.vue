@@ -201,7 +201,7 @@ onUnmounted(() => {
 }
 
 /* Контейнер слайдера */
-.tvist {
+.tvist-v0 {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);

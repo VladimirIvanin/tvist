@@ -44,7 +44,7 @@ const slider = new Tvist('.tvist', {
 
 **CSS:**
 ```css
-.tvist {
+.tvist-v0 {
   height: 400px;
 }
 

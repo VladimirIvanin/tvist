@@ -176,7 +176,7 @@ console.log(slider.slides.length); // Количество слайдов
   <title>Мой первый Tvist слайдер</title>
   <link rel="stylesheet" href="node_modules/tvist/dist/tvist.css">
   <style>
-    .tvist {
+    .tvist-v0 {
       max-width: 800px;
       margin: 0 auto;
     }

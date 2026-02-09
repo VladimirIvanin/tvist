@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
   line-height: 1.6;
 }
 
-.tvist {
+.tvist-v0 {
   margin-bottom: 24px;
   background: #fafafa;
   border-radius: 12px;

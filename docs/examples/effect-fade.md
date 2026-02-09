@@ -36,7 +36,7 @@ const slider = new Tvist('.tvist', {
 
 **CSS:**
 ```css
-.tvist {
+.tvist-v0 {
   width: 100%;
   height: 400px;
   background: #000;

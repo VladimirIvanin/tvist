@@ -75,7 +75,7 @@ onBeforeUnmount(() => {
   margin: 0 auto;
 }
 
-.tvist {
+.tvist-v0 {
   margin-bottom: 20px;
   background: #f5f5f5;
   border-radius: 8px;

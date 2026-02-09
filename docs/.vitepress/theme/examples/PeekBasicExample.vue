@@ -44,7 +44,7 @@ onBeforeUnmount(() => {
   width: 100%;
 }
 
-.tvist {
+.tvist-v0 {
   width: 100%;
   height: 300px;
   background: #f5f5f5;

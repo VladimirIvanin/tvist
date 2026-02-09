@@ -50,7 +50,7 @@ onUnmounted(() => {
   border-radius: 12px;
 }
 
-.tvist {
+.tvist-v0 {
   height: 400px;
   background: #000;
   border-radius: 12px;

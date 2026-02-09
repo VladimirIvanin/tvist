@@ -489,7 +489,7 @@ function applyPreset(preset: string) {
   border-radius: 8px;
 }
 
-.tvist {
+.tvist-v0 {
   overflow: hidden;
   margin-bottom: 1rem;
 }

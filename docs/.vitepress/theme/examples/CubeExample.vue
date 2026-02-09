@@ -64,7 +64,7 @@ onUnmounted(() => {
   margin: 0 auto 20px;
 }
 
-.tvist {
+.tvist-v0 {
   width: 100%;
   height: 100%;
   background: #f5f5f5;
