@@ -427,7 +427,6 @@ export class Engine {
     // События генерируем только если индекс действительно изменился
     if (indexChanged) {
       this.tvist.emit('beforeSlideChange', normalizedIndex)
-      this.options.on?.beforeSlideChange?.(normalizedIndex)
     }
 
     if (instant) {
@@ -438,7 +437,6 @@ export class Engine {
       
       if (indexChanged) {
         this.tvist.emit('slideChanged', normalizedIndex)
-        this.options.on?.slideChanged?.(normalizedIndex)
         this.emitReachEdge(normalizedIndex, endIndex)
       }
     } else {
@@ -448,7 +446,6 @@ export class Engine {
       if (indexChanged) {
         this.tvist.emit('transitionStart', normalizedIndex)
         this.tvist.emit('slideChange', normalizedIndex)
-        this.options.on?.slideChange?.(normalizedIndex)
       }
 
       this.animator.animate(
@@ -460,13 +457,11 @@ export class Engine {
           this.applyTransform()
           this.emitProgress()
           this.tvist.emit('scroll')
-          this.options.on?.scroll?.()
         },
         () => {
           if (indexChanged) {
             this.tvist.emit('transitionEnd', normalizedIndex)
             this.tvist.emit('slideChanged', normalizedIndex)
-            this.options.on?.slideChanged?.(normalizedIndex)
             this.emitReachEdge(normalizedIndex, endIndex)
           }
         }
@@ -653,10 +648,8 @@ export class Engine {
       
       if (isLocked) {
         this.tvist.emit('lock')
-        this.options.on?.lock?.()
       } else {
         this.tvist.emit('unlock')
-        this.options.on?.unlock?.()
       }
     }
   }
