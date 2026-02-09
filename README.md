@@ -28,7 +28,7 @@ npm install tvist
 
 - ⚡ **Легковесный** - всего 6.3kb gzip (с модулями!)
 - 🎯 **Модульный** - Engine + Modules архитектура
-- 🖱️ **Drag & Drop** - touch/mouse с rubberband эффектом
+- 🖱️ **Drag & Drop** - touch/mouse с rubberband эффектом, free mode с momentum scroll
 - 🎨 **Navigation** - стрелки с disabled состояниями
 - 📊 **Pagination** - bullets, fraction, progress
 - ⏰ **Autoplay** - с паузами и остановками

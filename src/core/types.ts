@@ -130,6 +130,24 @@ export interface TvistOptions {
   rubberband?: boolean
   
   /**
+   * Привязка к слайдам в free режиме. Если true, после momentum scroll будет snap к ближайшему слайду
+   * @default false
+   */
+  freeSnap?: boolean
+  
+  /**
+   * Сила инерции (flick power). Множитель для скорости при расчёте дистанции momentum scroll
+   * @default 600
+   */
+  flickPower?: number
+  
+  /**
+   * Максимальное количество страниц для flick в обычном режиме
+   * @default 1
+   */
+  flickMaxPages?: number
+  
+  /**
    * CSS селектор для элементов, которые должны сохранять фокус при перетаскивании
    * @default 'button, a, input, select, textarea'
    */

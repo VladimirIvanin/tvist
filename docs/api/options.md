@@ -25,9 +25,10 @@
 
 Настройки drag-функциональности:
 
-- `drag` - включение/отключение перетаскивания
+- `drag` - включение/отключение перетаскивания (`true` | `false` | `'free'`)
 - `dragSpeed` - скорость перетаскивания
 - `rubberband` - эффект резинки на краях
+- `freeSnap` - snap к слайдам в free режиме (только для `drag: 'free'`)
 - `focusableElements` - элементы с сохранением фокуса
 
 ### Навигация
@@ -93,6 +94,25 @@ const slider = new Tvist('.slider', {
   autoplay: 3000,
   loop: true,
   pauseOnHover: true
+})
+```
+
+### Drag Free Mode
+
+```javascript
+// Свободная прокрутка без snap
+const slider = new Tvist('.slider', {
+  drag: 'free',
+  perPage: 3,
+  gap: 20
+})
+
+// Свободная прокрутка с автоматическим snap
+const sliderWithSnap = new Tvist('.slider', {
+  drag: 'free',
+  freeSnap: true, // Выравнивание к слайду после остановки
+  perPage: 3,
+  gap: 20
 })
 ```
 

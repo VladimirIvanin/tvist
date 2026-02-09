@@ -384,6 +384,13 @@ export class Engine {
   }
 
   /**
+   * Получить все позиции слайдов (публичный метод для тестов)
+   */
+  public getSlidePositions(): number[] {
+    return [...this.slidePositions]
+  }
+
+  /**
    * Переход к слайду
    * @param index - индекс целевого слайда
    * @param instant - мгновенный переход без анимации
@@ -609,6 +616,13 @@ export class Engine {
   /**
    * Вычисляет реальный размер контента (включая клоны)
    */
+  /**
+   * Получить общий размер всего контента (публичный метод для модулей)
+   */
+  public getTotalSize(): number {
+    return this.getContentSize()
+  }
+
   private getContentSize(): number {
     const slides = this.tvist.slides
 

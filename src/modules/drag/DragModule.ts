@@ -8,6 +8,7 @@
  * - Momentum scroll с friction
  * - Snap к ближайшему слайду
  * - Free mode без snap
+ * - Free mode с опциональным snap (freeSnap)
  * - Passive listeners для производительности
  */
 
@@ -31,7 +32,6 @@ export class DragModule extends Module {
   private startPosition = 0
   private currentX = 0 // Текущая позиция курсора
   private currentY = 0
-  private history: DragPoint[] = []
 
   // RAF для momentum
   private animationId: number | null = null
@@ -41,12 +41,17 @@ export class DragModule extends Module {
   private maxPosition = 0
 
   // Настройки
-  private readonly FRICTION = 0.85
-  private readonly HISTORY_LENGTH = 5
-  private readonly MIN_VELOCITY = 0.1
-
+  private readonly FRICTION = 0.92 // более плавное затухание
+  private readonly MIN_VELOCITY = 0.05 // Снижен порог для более длинной инерции
+  private readonly LOG_INTERVAL = 200 // Интервал обновления базового события (мс)
+  
   private readonly MIN_DRAG_DISTANCE = 5
   private isPotentialDrag = false
+  
+  // Для расчёта velocity
+  private lastMoveTime = 0
+  private baseEvent: DragPoint | null = null
+  private prevBaseEvent: DragPoint | null = null
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
@@ -104,6 +109,18 @@ export class DragModule extends Module {
       this.maxPosition = usePeekTrim
         ? engine.getMaxScrollPosition()
         : -engine.getSlidePosition(slides.length - perPage)
+    }
+    
+    // Отладка границ
+    if (this.options.debug) {
+      console.log('[DragModule] Границы обновлены:', {
+        minPosition: this.minPosition,
+        maxPosition: this.maxPosition,
+        loop: this.options.loop,
+        peekTrim: this.options.peekTrim !== false,
+        slidesCount: slides.length,
+        perPage
+      })
     }
   }
 
@@ -166,7 +183,11 @@ export class DragModule extends Module {
     this.currentX = point.x
     this.currentY = point.y
     this.startPosition = this.tvist.engine.location.get()
-    this.history = []
+    
+    // Сбрасываем события для velocity tracking
+    this.baseEvent = null
+    this.prevBaseEvent = null
+    this.lastMoveTime = 0
 
     // Останавливаем активную анимацию если была
     this.stopMomentum()
@@ -185,6 +206,8 @@ export class DragModule extends Module {
     const point = this.getPointerPosition(e)
     if (!point) return
 
+    const now = Date.now()
+
     // Сохраняем текущую позицию курсора
     this.currentX = point.x
     this.currentY = point.y
@@ -199,6 +222,9 @@ export class DragModule extends Module {
     if (!this.isDragging) {
       if (absDelta > this.MIN_DRAG_DISTANCE) {
         this.isDragging = true
+        // Инициализируем базовое событие
+        this.baseEvent = { x: point.x, y: point.y, time: now }
+        this.lastMoveTime = now
         // Emit события
         this.emit('dragStart', e)
         // Добавляем класс dragging (отключает transition)
@@ -221,22 +247,17 @@ export class DragModule extends Module {
 
     // Устанавливаем позицию
     const newPosition = this.startPosition + distance
-    // console.log('Updating location to', newPosition)
     this.tvist.engine.location.set(newPosition)
     
     // Применяем transform напрямую (без пересчёта размеров)
     this.tvist.engine.applyTransformPublic()
 
-    // Сохраняем в историю для velocity tracking
-    this.history.push({
-      x: point.x,
-      y: point.y,
-      time: Date.now()
-    })
-
-    // Ограничиваем размер истории
-    if (this.history.length > this.HISTORY_LENGTH) {
-      this.history.shift()
+    // Обновляем базовое событие если прошло достаточно времени
+    const elapsed = now - this.lastMoveTime
+    if (elapsed > this.LOG_INTERVAL) {
+      this.prevBaseEvent = this.baseEvent
+      this.baseEvent = { x: point.x, y: point.y, time: now }
+      this.lastMoveTime = now
     }
 
     // Emit события
@@ -262,6 +283,24 @@ export class DragModule extends Module {
 
       // Восстанавливаем transition (удаляем класс)
       this.tvist.root.classList.remove(TVIST_CLASSES.dragging)
+
+      // Проверяем и ограничиваем позицию после drag (rubberband мог вывести за границы)
+      if (!this.options.loop) {
+        const currentPosition = this.tvist.engine.location.get()
+        let clampedPosition = currentPosition
+        
+        if (currentPosition > this.minPosition) {
+          clampedPosition = this.minPosition
+        } else if (currentPosition < this.maxPosition) {
+          clampedPosition = this.maxPosition
+        }
+        
+        // Если позиция была скорректирована, устанавливаем её
+        if (clampedPosition !== currentPosition) {
+          this.tvist.engine.location.set(clampedPosition)
+          this.tvist.engine.applyTransformPublic()
+        }
+      }
 
       // Вычисляем velocity
       const velocity = this.calculateVelocity()
@@ -343,71 +382,146 @@ export class DragModule extends Module {
   }
 
   /**
-   * Rubberband эффект - более мягкий вариант
-   * Позволяет перетягивать за границы с плавным сопротивлением
+   * Rubberband эффект
+   * Простое деление на константу для сопротивления за границами
    */
   private applyRubberband(distance: number): number {
     const position = this.startPosition + distance
-    const { container } = this.tvist
-    const containerWidth = container.clientWidth
 
     // Внутри границ - полное движение БЕЗ сопротивления
-    // maxPosition отрицательный (например -1200), minPosition = 0
-    // Поэтому: -1200 <= position <= 0
     if (position >= this.maxPosition && position <= this.minPosition) {
       return distance
     }
 
-    // За границей - применяем мягкое сопротивление
-    const overflow = position > this.minPosition 
-      ? position - this.minPosition 
-      : this.maxPosition - position
-
-    // ИСПРАВЛЕННАЯ формула: более мягкое сопротивление
-    // Было: resistance = (1 - overflow/width * 2)² - слишком агрессивно
-    // Стало: resistance = 1 / (1 + overflow/width * 3) - более плавно
-    const friction = 3 // коэффициент трения (чем больше, тем сильнее сопротивление)
-    const resistance = 1 / (1 + (overflow / containerWidth) * friction)
+    const FRICTION = 5
     
-    return distance * resistance
+    // Вычисляем, какая часть distance выходит за границу
+    let inBounds = distance
+    let outOfBounds = 0
+    
+    if (position > this.minPosition) {
+      // Вышли за правую границу
+      const overflow = position - this.minPosition
+      inBounds = distance - overflow
+      outOfBounds = overflow
+    } else if (position < this.maxPosition) {
+      // Вышли за левую границу  
+      const overflow = this.maxPosition - position
+      inBounds = distance + overflow
+      outOfBounds = -overflow
+    }
+    
+    // Часть внутри границ движется нормально, часть за границей - с трением
+    return inBounds + outOfBounds / FRICTION
   }
 
   /**
-   * Вычисление velocity из истории
+   * Вычисление velocity по последнему событию
    */
   private calculateVelocity(): number {
-    if (this.history.length < 2) return 0
+    // В loop режиме или если не превышены границы - считаем velocity
+    const isLoop = this.options.loop
+    const currentPosition = this.tvist.engine.location.get()
+    const exceeded = currentPosition > this.minPosition || currentPosition < this.maxPosition
+    
+    if (!isLoop && exceeded) {
+      return 0 // Не применяем momentum если за границами
+    }
 
-    const recent = this.history[this.history.length - 1]
-    const previous = this.history[0]
-
-    if (!recent || !previous) return 0
+    const now = Date.now()
+    const currentPoint = { x: this.currentX, y: this.currentY, time: now }
+    
+    // Используем prevBaseEvent если baseEvent совпадает с текущим
+    const basePoint = (this.baseEvent && this.baseEvent.time === now && this.prevBaseEvent)
+      ? this.prevBaseEvent
+      : this.baseEvent
+    
+    if (!basePoint) return 0
+    
+    const timeDiff = now - basePoint.time
+    
+    // Если времени прошло слишком много или слишком мало - нет velocity
+    if (timeDiff === 0 || timeDiff >= this.LOG_INTERVAL) {
+      return 0
+    }
 
     const isHorizontal = this.options.direction !== 'vertical'
     const distance = isHorizontal 
-      ? recent.x - previous.x 
-      : recent.y - previous.y
+      ? currentPoint.x - basePoint.x 
+      : currentPoint.y - basePoint.y
 
-    const time = recent.time - previous.time
-
-    if (time === 0) return 0
-
-    return distance / time
+    return distance / timeDiff
   }
 
   /**
    * Momentum scroll (free mode)
+   * Простая инерционная анимация с затуханием
    */
   private startMomentum(initialVelocity: number): void {
-    let velocity = initialVelocity
+    // Проверяем, не за границами ли мы уже (для не-loop режима)
+    const currentPosition = this.tvist.engine.location.get()
+    const isLoop = this.options.loop
+    
+    if (this.options.debug) {
+      console.log('[DragModule] startMomentum:', {
+        currentPosition,
+        initialVelocity,
+        minPosition: this.minPosition,
+        maxPosition: this.maxPosition,
+        isLoop
+      })
+    }
+    
+    if (!isLoop) {
+      const isOutOfBounds = currentPosition > this.minPosition || currentPosition < this.maxPosition
+      
+      // Если за границами - не применяем momentum, сразу snap
+      if (isOutOfBounds) {
+        if (this.options.debug) {
+          console.log('[DragModule] Out of bounds, skipping momentum')
+        }
+        if (this.options.drag !== 'free' || this.options.freeSnap) {
+          this.snapToNearest(initialVelocity)
+        }
+        return
+      }
+    }
+    
+    // Если velocity слишком маленькая - пропускаем momentum
+    if (Math.abs(initialVelocity) < 0.1) {
+      if (this.options.drag !== 'free' || this.options.freeSnap) {
+        this.snapToNearest(initialVelocity)
+      }
+      return
+    }
 
+    const flickPower = this.options.flickPower ?? 600
+    
+    // Преобразуем velocity (px/ms) в начальную скорость для анимации
+    // Умножаем на flickPower для более выраженного эффекта
+    let velocity = initialVelocity * flickPower / 60 // Делим на 60 для нормализации к FPS
+    
     const animate = (): void => {
-      // Применяем friction
+      // Применяем friction для плавного затухания
       velocity *= this.FRICTION
 
       // Обновляем позицию
-      const currentPosition = this.tvist.engine.location.get()
-      const newPosition = currentPosition + velocity
+      const currentPos = this.tvist.engine.location.get()
+      let newPosition = currentPos + velocity
+      
+      // Проверяем границы (если не loop)
+      let hitBoundary = false
+      if (!isLoop) {
+        if (newPosition > this.minPosition) {
+          newPosition = this.minPosition
+          velocity = 0
+          hitBoundary = true
+        } else if (newPosition < this.maxPosition) {
+          newPosition = this.maxPosition
+          velocity = 0
+          hitBoundary = true
+        }
+      }
 
       this.tvist.engine.location.set(newPosition)
       
@@ -418,13 +532,13 @@ export class DragModule extends Module {
       this.emit('scroll')
 
       // Продолжаем если velocity достаточная
-      if (Math.abs(velocity) > this.MIN_VELOCITY) {
+      if (Math.abs(velocity) > this.MIN_VELOCITY && !hitBoundary) {
         this.animationId = requestAnimationFrame(animate)
       } else {
         this.stopMomentum()
-        // Финальный snap если не free mode
-        if (this.options.drag !== 'free') {
-          this.snapToNearest(0)
+        // Финальный snap если не free mode ИЛИ если включён freeSnap
+        if (this.options.drag !== 'free' || this.options.freeSnap) {
+          this.snapToNearest(initialVelocity)
         }
       }
     }
@@ -434,9 +548,57 @@ export class DragModule extends Module {
 
   /**
    * Snap к ближайшему слайду
-   * Логика из Glide + Embla: сравниваем пройденное расстояние с threshold
+   * Две стратегии: threshold для обычного режима, nearest для free+snap
    */
   private snapToNearest(_velocity: number): void {
+    const isFreeSnap = this.options.drag === 'free' && this.options.freeSnap
+    
+    if (isFreeSnap) {
+      // Free+Snap: находим БЛИЖАЙШИЙ слайд к текущей позиции
+      this.snapToNearestSlide()
+    } else {
+      // Обычный режим: используем threshold от стартовой позиции
+      this.snapWithThreshold()
+    }
+  }
+
+  /**
+   * Free+Snap: находим ближайший слайд к текущей позиции
+   */
+  private snapToNearestSlide(): void {
+    const { engine, slides } = this.tvist
+    const currentPosition = engine.location.get()
+    
+    let nearestIndex = 0
+    let minDistance = Infinity
+    
+    // Ищем слайд, чья позиция ближе всего к текущей
+    for (let i = 0; i < slides.length; i++) {
+      const slidePosition = engine.getScrollPositionForIndex(i)
+      const distance = Math.abs(currentPosition - slidePosition)
+      
+      if (distance < minDistance) {
+        minDistance = distance
+        nearestIndex = i
+      }
+    }
+    
+    if (this.options.debug) {
+      console.log('[DragModule] snapToNearestSlide:', {
+        currentPosition,
+        nearestIndex,
+        minDistance
+      })
+    }
+    
+    // Переходим к ближайшему слайду
+    engine.scrollTo(nearestIndex)
+  }
+
+  /**
+   * Обычный snap: используем threshold от начальной позиции drag
+   */
+  private snapWithThreshold(): void {
     const { engine } = this.tvist
     const startIndex = engine.activeIndex
     
@@ -446,7 +608,7 @@ export class DragModule extends Module {
     const slideWithGap = slideSize + gap
     
     if (slideWithGap === 0) {
-      this.tvist.engine.scrollTo(startIndex)
+      engine.scrollTo(startIndex)
       return
     }
     
@@ -478,7 +640,7 @@ export class DragModule extends Module {
     }
     
     // Snap через scrollTo
-    this.tvist.engine.scrollTo(targetIndex)
+    engine.scrollTo(targetIndex)
   }
 
   /**

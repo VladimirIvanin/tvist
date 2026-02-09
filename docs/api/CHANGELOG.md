@@ -1,5 +1,52 @@
 # Changelog - API Documentation
 
+## 2026-02-09
+
+### Добавлено
+
+- ✅ Опция `freeSnap` - автоматическое выравнивание к слайду в free режиме
+- ✅ Страница документации `/examples/drag-free` с интерактивными примерами
+- ✅ Vue компонент `DragFreeDocExample.vue` с 3 режимами drag
+- ✅ Тестовая страница `sandbox/drag-free-test.html`
+
+### Функционал freeSnap
+
+#### Режимы перетаскивания:
+
+```js
+// Обычный режим - snap во время drag
+drag: true
+
+// Free mode - свободная прокрутка
+drag: 'free'
+
+// Free mode + Snap - свободная прокрутка с выравниванием
+drag: 'free',
+freeSnap: true
+```
+
+#### Примеры:
+
+- Free mode без snap - momentum scroll без ограничений
+- Free mode с snap - плавная прокрутка с автоматическим выравниванием
+- Normal mode - классическое поведение слайдера
+- Динамическое переключение режимов
+- Free mode с peek и center
+
+### Изменено
+
+- 📝 Обновлён `src/core/types.ts` - добавлен тип `freeSnap`
+- 📝 Обновлён `src/modules/drag/DragModule.ts` - поддержка snap в free режиме
+- 📝 Обновлён `docs/api/options.md` - документация опции freeSnap
+- 📝 Обновлён `docs/.vitepress/config.ts` - добавлена навигация к примеру
+
+### Документация
+
+- Интерактивные примеры с переключением режимов
+- Описание всех трёх режимов drag
+- Примеры использования с другими модулями
+- Адаптивные настройки с breakpoints
+
 ## 2026-02-05 (Update 2)
 
 ### Добавлено
