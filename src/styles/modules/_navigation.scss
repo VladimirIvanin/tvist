@@ -10,30 +10,29 @@
   transform: translateY(-50%);
   z-index: 10;
 
-  // Размеры
+  // Размеры (область нажатия)
   width: var(--#{$tvist-block}-arrow-size, 40px);
   height: var(--#{$tvist-block}-arrow-size, 40px);
 
-  // Стили кнопки
+  // Только стрелка, без фона
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--#{$tvist-block}-arrow-bg, rgba(0, 0, 0, 0.5));
-  color: var(--#{$tvist-block}-arrow-color, #fff);
+  background: transparent;
+  color: var(--#{$tvist-block}-arrow-color, #333);
   border: none;
-  border-radius: var(--#{$tvist-block}-arrow-radius, 50%);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: color 0.2s ease, opacity 0.2s ease;
 
   // Hover эффект
   &:hover:not(:disabled) {
-    background: var(--#{$tvist-block}-arrow-hover-bg, rgba(0, 0, 0, 0.7));
-    transform: translateY(-50%) scale(1.1);
+    color: var(--#{$tvist-block}-arrow-hover-color, #000);
+    opacity: 0.8;
   }
 
   // Активное состояние
   &:active:not(:disabled) {
-    transform: translateY(-50%) scale(0.95);
+    opacity: 0.6;
   }
 
   // Disabled состояние
