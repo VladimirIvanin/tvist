@@ -339,8 +339,14 @@ export class Engine {
       ? index 
       : Math.max(0, Math.min(index, endIndex))
 
+    // Сохраняем текущий индекс ДО изменения
+    const previousIndex = this.index.get()
+    
     // Нормализуем индекс через Counter
     const normalizedIndex = this.index.set(clampedIndex) ?? 0
+    
+    // Проверяем, действительно ли индекс изменился
+    const indexChanged = normalizedIndex !== previousIndex
 
     let targetPosition = this.getScrollPositionForIndex(normalizedIndex)
 
@@ -352,24 +358,32 @@ export class Engine {
       targetPosition = Math.max(maxPos, Math.min(minPos, targetPosition))
     }
 
-    this.tvist.emit('beforeSlideChange', normalizedIndex)
-    this.options.on?.beforeSlideChange?.(normalizedIndex)
+    // События генерируем только если индекс действительно изменился
+    if (indexChanged) {
+      this.tvist.emit('beforeSlideChange', normalizedIndex)
+      this.options.on?.beforeSlideChange?.(normalizedIndex)
+    }
 
     if (instant) {
       this.target.set(targetPosition)
       this.location.set(targetPosition)
       this.applyTransform()
       this.emitProgress()
-      this.tvist.emit('slideChanged', normalizedIndex)
-      this.options.on?.slideChanged?.(normalizedIndex)
-      this.emitReachEdge(normalizedIndex, endIndex)
+      
+      if (indexChanged) {
+        this.tvist.emit('slideChanged', normalizedIndex)
+        this.options.on?.slideChanged?.(normalizedIndex)
+        this.emitReachEdge(normalizedIndex, endIndex)
+      }
     } else {
       this.target.set(targetPosition)
       const speed = this.options.speed ?? 300
 
-      this.tvist.emit('transitionStart', normalizedIndex)
-      this.tvist.emit('slideChange', normalizedIndex)
-      this.options.on?.slideChange?.(normalizedIndex)
+      if (indexChanged) {
+        this.tvist.emit('transitionStart', normalizedIndex)
+        this.tvist.emit('slideChange', normalizedIndex)
+        this.options.on?.slideChange?.(normalizedIndex)
+      }
 
       this.animator.animate(
         this.location.get(),
@@ -383,10 +397,12 @@ export class Engine {
           this.options.on?.scroll?.()
         },
         () => {
-          this.tvist.emit('transitionEnd', normalizedIndex)
-          this.tvist.emit('slideChanged', normalizedIndex)
-          this.options.on?.slideChanged?.(normalizedIndex)
-          this.emitReachEdge(normalizedIndex, endIndex)
+          if (indexChanged) {
+            this.tvist.emit('transitionEnd', normalizedIndex)
+            this.tvist.emit('slideChanged', normalizedIndex)
+            this.options.on?.slideChanged?.(normalizedIndex)
+            this.emitReachEdge(normalizedIndex, endIndex)
+          }
         }
       )
     }
