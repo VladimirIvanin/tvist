@@ -61,8 +61,8 @@ export class SlideStatesModule extends Module {
     let activeLogicalIndex = activeIndex
     let originalCount = slides.length
 
-    if (isLoop) {
-      activeLogicalIndex = parseInt(activeAttr!, 10)
+    if (activeAttr !== null) {
+      activeLogicalIndex = parseInt(activeAttr, 10)
       
       // Считаем количество оригинальных слайдов
       const originalsCount = slides.reduce((count, slide) => {
