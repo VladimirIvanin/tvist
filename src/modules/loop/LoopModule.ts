@@ -67,7 +67,8 @@ export class LoopModule extends Module {
     this.tvist.updateSlidesList()
 
     // Пересчитываем размеры слайдов (теперь их больше)
-    this.tvist.engine.update()
+    // this.tvist.engine.update() - заменяем на tvist.update() для уведомления модулей
+    this.tvist.update()
 
     // ВАЖНО: Отключаем loop в Counter - теперь индексация линейная [0, totalSlides-1]
     // loopFix будет сам делать прыжок когда достигаем клона
@@ -254,7 +255,7 @@ export class LoopModule extends Module {
     const currentIndex = Math.round(currentFloatIndex)
     
     // Границы для прыжка
-    const prependBoundary = this.cloneCount - 0.5 // За 0.5 слайда до границы
+    const prependBoundary = this.cloneCount - 0.5
     const appendBoundary = this.originalSlidesCount + this.cloneCount - 0.5
 
     // Если близко к prepend клону

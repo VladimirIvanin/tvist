@@ -50,25 +50,62 @@ export class SlideStatesModule extends Module {
   private updateActiveClasses(): void {
     const slides = this.tvist.slides
     const activeIndex = this.tvist.activeIndex
-    const isLoop = this.options.loop === true
+    const activeSlide = slides[activeIndex]
+
+    if (!activeSlide) return
+
+    // Проверяем режим Loop по наличию атрибута data-tvist-slide-index на активном слайде
+    const activeAttr = activeSlide.getAttribute('data-tvist-slide-index')
+    const isLoop = activeAttr !== null
+
+    let activeLogicalIndex = activeIndex
+    let originalCount = slides.length
+
+    if (isLoop) {
+      activeLogicalIndex = parseInt(activeAttr!, 10)
+      
+      // Считаем количество оригинальных слайдов
+      const originalsCount = slides.reduce((count, slide) => {
+        return slide.hasAttribute('data-tvist-original') ? count + 1 : count
+      }, 0)
+      
+      if (originalsCount > 0) {
+        originalCount = originalsCount
+      }
+    }
+
+    // Вычисляем целевые логические индексы для prev/next
+    let prevTargetIndex = activeLogicalIndex - 1
+    let nextTargetIndex = activeLogicalIndex + 1
+
+    if (isLoop) {
+      // В loop режиме индексы циклические относительно originalCount
+      prevTargetIndex = (activeLogicalIndex - 1 + originalCount) % originalCount
+      nextTargetIndex = (activeLogicalIndex + 1) % originalCount
+    }
 
     slides.forEach((slide, index) => {
-      // Определяем, является ли слайд активным
-      const isActive = index === activeIndex
+      let currentLogicalIndex = index
 
+      // В режиме loop используем логический индекс из атрибута
+      if (isLoop) {
+        const attr = slide.getAttribute('data-tvist-slide-index')
+        if (attr !== null) {
+          currentLogicalIndex = parseInt(attr, 10)
+        }
+      }
 
-      // Определяем prev и next с учётом loop
+      // Проверяем совпадение
+      const isActive = currentLogicalIndex === activeLogicalIndex
       let isPrev = false
       let isNext = false
 
       if (isLoop) {
-        // В loop режиме prev/next циклические
-        const prevIndex = activeIndex === 0 ? slides.length - 1 : activeIndex - 1
-        const nextIndex = activeIndex === slides.length - 1 ? 0 : activeIndex + 1
-        isPrev = index === prevIndex
-        isNext = index === nextIndex
+        // В loop режиме сравниваем логические индексы (включая клоны)
+        isPrev = currentLogicalIndex === prevTargetIndex
+        isNext = currentLogicalIndex === nextTargetIndex
       } else {
-        // Без loop prev/next линейные
+        // В обычном режиме сравниваем физические индексы
         isPrev = index === activeIndex - 1
         isNext = index === activeIndex + 1
       }
