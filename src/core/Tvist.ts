@@ -238,7 +238,6 @@ export class Tvist {
 
   /**
    * Обновить опции слайдера динамически (без пересоздания)
-   * Аналог swiper.updateParams()
    * @param newOptions - новые опции для применения
    */
   updateOptions(newOptions: Partial<TvistOptions>): this {

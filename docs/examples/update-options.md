@@ -1,6 +1,6 @@
 # updateOptions - Динамическое изменение
 
-Метод `updateOptions()` позволяет изменять настройки слайдера на лету без необходимости пересоздания экземпляра. Это аналог `swiper.updateParams()`.
+Метод `updateOptions()` позволяет изменять настройки слайдера на лету без необходимости пересоздания экземпляра. 
 
 <script setup>
 import UpdateOptionsExample from '../.vitepress/theme/examples/UpdateOptionsExample.vue'

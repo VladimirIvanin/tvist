@@ -8,7 +8,7 @@
 
 ```html
 <div class="tvist-v0">
-  <div class="tvist-v0__wrapper">
+  <div class="tvist-v0__container">
     <div class="tvist-v0__slide">
       <img src="slide-1.jpg" alt="Slide 1">
     </div>
@@ -81,7 +81,7 @@ HTML с элементами навигации:
 
 ```html
 <div class="tvist-v0">
-  <div class="tvist-v0__wrapper">
+  <div class="tvist-v0__container">
     <div class="tvist-v0__slide">Slide 1</div>
     <div class="tvist-v0__slide">Slide 2</div>
     <div class="tvist-v0__slide">Slide 3</div>
@@ -192,7 +192,7 @@ console.log(slider.slides.length); // Количество слайдов
 </head>
 <body>
   <div class="tvist-v0">
-    <div class="tvist-v0__wrapper">
+    <div class="tvist-v0__container">
       <div class="tvist-v0__slide">Слайд 1</div>
       <div class="tvist-v0__slide">Слайд 2</div>
       <div class="tvist-v0__slide">Слайд 3</div>
