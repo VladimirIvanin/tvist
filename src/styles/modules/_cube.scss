@@ -75,8 +75,7 @@
   height: 100%;
   z-index: 10;
   pointer-events: none;
-  backface-visibility: hidden;
-  
+
   &.#{$tvist-block}-slide-shadow-left,
   &.#{$tvist-block}-slide-shadow-right {
     background-image: linear-gradient(
