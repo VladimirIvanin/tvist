@@ -5,70 +5,51 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { Tvist } from '../../src'
-import { waitForAnimation } from '../fixtures'
+import { waitForAnimation, simulateDrag, createSliderFixture, type SliderFixture } from '../fixtures'
 
 describe('ThumbsModule + DragModule Integration', () => {
-  let container: HTMLElement
+  let mainFixture: SliderFixture
+  let thumbFixture: SliderFixture
   let mainSlider: Tvist
   let thumbSlider: Tvist
-  
+
   beforeEach(() => {
-    vi.useFakeTimers()
-    // Создаём основной слайдер
-    container = document.createElement('div')
-    container.innerHTML = `
-      <div id="main-slider">
-        <div class="tvist-v0__container">
-          <div class="tvist-v0__track">
-            <div class="tvist-v0__slide">Slide 1</div>
-            <div class="tvist-v0__slide">Slide 2</div>
-            <div class="tvist-v0__slide">Slide 3</div>
-            <div class="tvist-v0__slide">Slide 4</div>
-            <div class="tvist-v0__slide">Slide 5</div>
-          </div>
-        </div>
-      </div>
-      
-      <div id="thumb-slider">
-        <div class="tvist-v0__container">
-          <div class="tvist-v0__track">
-            <div class="tvist-v0__slide">Thumb 1</div>
-            <div class="tvist-v0__slide">Thumb 2</div>
-            <div class="tvist-v0__slide">Thumb 3</div>
-            <div class="tvist-v0__slide">Thumb 4</div>
-            <div class="tvist-v0__slide">Thumb 5</div>
-          </div>
-        </div>
-      </div>
-    `
-    document.body.appendChild(container)
-    
-    const mainEl = document.getElementById('main-slider')!
-    const thumbEl = document.getElementById('thumb-slider')!
-    
-    // Инициализируем слайдеры
-    mainSlider = new Tvist(mainEl, {
+    // Фикстуры с размерами нужны для расчёта позиций Engine (slideSize, snap)
+    mainFixture = createSliderFixture({
+      slidesCount: 5,
+      width: 600,
+      height: 400,
+      id: 'main-slider'
+    })
+    thumbFixture = createSliderFixture({
+      slidesCount: 5,
+      width: 600,
+      height: 100,
+      id: 'thumb-slider'
+    })
+
+    mainSlider = new Tvist(mainFixture.root, {
       perPage: 1,
       drag: true
     })
-    
-    thumbSlider = new Tvist(thumbEl, {
+
+    thumbSlider = new Tvist(thumbFixture.root, {
       perPage: 3,
       isNavigation: true,
       drag: true
     })
-    
+
     // Синхронизация: thumbSlider управляет основным
     thumbSlider.on('slideChanged', (index: number) => {
       mainSlider.scrollTo(index)
     })
   })
-  
+
   afterEach(() => {
     mainSlider?.destroy()
     thumbSlider?.destroy()
-    container?.remove()
-    vi.useRealTimers()
+    mainFixture?.cleanup()
+    thumbFixture?.cleanup()
   })
   
   it('короткий свайп в thumbSlider (< threshold) НЕ должен менять основной слайд', async () => {
@@ -80,14 +61,15 @@ describe('ThumbsModule + DragModule Integration', () => {
     expect(thumbSlider.activeIndex).toBe(4)
     
     // Эмулируем короткий свайп в thumbSlider (меньше threshold)
-    const thumbTrack = thumbSlider.track
-    
+    // DragModule вешает обработчики на root
+    const thumbRoot = thumbSlider.root
+
     // Начало drag
     const touchStart = new TouchEvent('touchstart', {
       touches: [{ clientX: 100, clientY: 0 } as Touch],
       bubbles: true
     })
-    thumbTrack.dispatchEvent(touchStart)
+    thumbRoot.dispatchEvent(touchStart)
     
     // Короткое движение (только 30px, что меньше threshold = 80px)
     const touchMove = new TouchEvent('touchmove', {
@@ -122,29 +104,18 @@ describe('ThumbsModule + DragModule Integration', () => {
     expect(mainSlider.activeIndex).toBe(4)
     expect(thumbSlider.activeIndex).toBe(4)
     
-    // Эмулируем длинный свайп в thumbSlider (больше threshold)
-    const thumbTrack = thumbSlider.track
-    
-    const touchStart = new TouchEvent('touchstart', {
-      touches: [{ clientX: 100, clientY: 0 } as Touch],
-      bubbles: true
+    // Эмулируем длинный свайп в thumbSlider (150px вправо, больше threshold = 80px)
+    // Несколько шагов touchmove нужны для корректной обработки драга
+    await simulateDrag({
+      element: thumbSlider.root,
+      startX: 100,
+      startY: 50,
+      deltaX: 150,
+      steps: 5,
+      type: 'touch'
     })
-    thumbTrack.dispatchEvent(touchStart)
     
-    // Длинное движение (150px, что больше threshold = 80px)
-    const touchMove = new TouchEvent('touchmove', {
-      touches: [{ clientX: 250, clientY: 0 } as Touch],
-      bubbles: true,
-      cancelable: true
-    })
-    document.dispatchEvent(touchMove)
-    
-    const touchEnd = new TouchEvent('touchend', {
-      bubbles: true
-    })
-    document.dispatchEvent(touchEnd)
-    
-    // Ждём завершения анимации
+    // Ждём завершения анимации snap
     await waitForAnimation(400)
     
     // Оба слайдера должны перейти к предыдущему слайду
@@ -161,13 +132,13 @@ describe('ThumbsModule + DragModule Integration', () => {
     thumbSlider.on('slideChanged', slideChangedSpy)
     
     // Эмулируем короткий свайп влево (пытаемся пойти дальше последнего)
-    const thumbTrack = thumbSlider.track
-    
+    const thumbRoot = thumbSlider.root
+
     const touchStart = new TouchEvent('touchstart', {
       touches: [{ clientX: 100, clientY: 0 } as Touch],
       bubbles: true
     })
-    thumbTrack.dispatchEvent(touchStart)
+    thumbRoot.dispatchEvent(touchStart)
     
     // Короткий свайп влево
     const touchMove = new TouchEvent('touchmove', {
