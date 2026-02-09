@@ -1,7 +1,7 @@
 <template>
   <ExampleCard title="Вертикальный слайдер" description="Скролл сверху вниз">
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist tvist-vertical">
+      <div ref="sliderEl" class="tvist-v0 tvist-vertical">
         <div class="tvist-v0__container">
           <div class="tvist-v0__slide">1</div>
           <div class="tvist-v0__slide">2</div>

@@ -13,7 +13,7 @@ import ThumbsExample from '../.vitepress/theme/examples/ThumbsExample.vue'
 **HTML:**
 ```html
 <!-- Main Slider -->
-<div class="tvist main-slider">
+<div class="tvist-v0 main-slider">
   <div class="tvist-v0__container">
     <div class="tvist-v0__slide">1</div>
     <div class="tvist-v0__slide">2</div>
@@ -23,7 +23,7 @@ import ThumbsExample from '../.vitepress/theme/examples/ThumbsExample.vue'
 </div>
 
 <!-- Thumbnail Slider -->
-<div class="tvist thumb-slider">
+<div class="tvist-v0 thumb-slider">
   <div class="tvist-v0__container">
     <div class="tvist-v0__slide">1</div>
     <div class="tvist-v0__slide">2</div>

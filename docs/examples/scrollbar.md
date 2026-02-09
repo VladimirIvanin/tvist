@@ -81,7 +81,7 @@ const slider = new Tvist('.tvist', {
 
 ### Вертикальный слайдер
 
-<div ref="verticalRef" class="tvist tvist--vertical" style="height: 400px; margin-bottom: 2rem; position: relative;">
+<div ref="verticalRef" class="tvist-v0 tvist--vertical" style="height: 400px; margin-bottom: 2rem; position: relative;">
   <div class="tvist-v0__container">
     <div class="tvist-v0__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 1

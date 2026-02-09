@@ -1,6 +1,6 @@
 <template>
   <div class="scroll-control-doc">
-    <div v-if="show !== 'vertical'" ref="horizontalRef" class="tvist tvist--horizontal" style="margin-bottom: 2rem; height: 300px;">
+    <div v-if="show !== 'vertical'" ref="horizontalRef" class="tvist-v0 tvist--horizontal" style="margin-bottom: 2rem; height: 300px;">
       <div class="tvist-v0__container">
         <div class="tvist-v0__slide slide-1">
           <span class="slide-title">Слайд 1</span>
@@ -13,7 +13,7 @@
       </div>
     </div>
 
-    <div v-if="show !== 'horizontal'" ref="verticalRef" class="tvist tvist--vertical" style="height: 400px; margin-bottom: 2rem;">
+    <div v-if="show !== 'horizontal'" ref="verticalRef" class="tvist-v0 tvist--vertical" style="height: 400px; margin-bottom: 2rem;">
       <div class="tvist-v0__container">
         <div class="tvist-v0__slide slide-1">
           <span class="slide-title">Слайд 1</span>

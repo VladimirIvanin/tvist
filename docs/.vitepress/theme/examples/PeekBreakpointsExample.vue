@@ -1,6 +1,6 @@
 <template>
   <div class="example">
-    <div ref="sliderRef" class="tvist peek-breakpoints">
+    <div ref="sliderRef" class="tvist-v0 peek-breakpoints">
       <div class="tvist-v0__container">
         <div v-for="i in 9" :key="i" class="tvist-v0__slide">
           <div class="slide-content">

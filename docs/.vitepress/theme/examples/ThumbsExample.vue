@@ -1,7 +1,7 @@
 <template>
   <ExampleCard title="Синхронизация с галереей" description="Главный слайдер + миниатюры">
     <div class="demo-wrapper">
-      <div ref="mainSliderEl" class="tvist main-slider">
+      <div ref="mainSliderEl" class="tvist-v0 main-slider">
         <div class="tvist-v0__container">
           <div class="tvist-v0__slide">1</div>
           <div class="tvist-v0__slide">2</div>
@@ -12,7 +12,7 @@
         </div>
       </div>
 
-      <div ref="thumbSliderEl" class="tvist thumb-slider">
+      <div ref="thumbSliderEl" class="tvist-v0 thumb-slider">
         <div class="tvist-v0__container">
           <div class="tvist-v0__slide">1</div>
           <div class="tvist-v0__slide">2</div>
@@ -33,7 +33,7 @@
 **HTML:**
 ```html
 <!-- Main Slider -->
-<div class="tvist main-slider">
+<div class="tvist-v0 main-slider">
   <div class="tvist-v0__container">
     <div class="tvist-v0__slide">1</div>
     <div class="tvist-v0__slide">2</div>
@@ -45,7 +45,7 @@
 </div>
 
 <!-- Thumbnail Slider -->
-<div class="tvist thumb-slider">
+<div class="tvist-v0 thumb-slider">
   <div class="tvist-v0__container">
     <div class="tvist-v0__slide">1</div>
     <div class="tvist-v0__slide">2</div>

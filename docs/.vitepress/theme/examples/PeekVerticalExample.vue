@@ -1,6 +1,6 @@
 <template>
   <div class="example">
-    <div ref="sliderRef" class="tvist peek-vertical">
+    <div ref="sliderRef" class="tvist-v0 peek-vertical">
       <div class="tvist-v0__container">
         <div v-for="i in 5" :key="i" class="tvist-v0__slide">
           <div class="slide-content">

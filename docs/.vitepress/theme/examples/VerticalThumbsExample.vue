@@ -2,7 +2,7 @@
   <ExampleCard title="Вертикальные миниатюры (Gallery)" description="Вертикальная лента миниатюр слева синхронизирована с основным горизонтальным слайдером. У миниатюр включен slideMinSize для адаптивности">
     <div class="demo-wrapper">
       <div class="gallery-wrapper">
-        <div ref="thumbsVerticalEl" class="tvist tvist-thumbs">
+        <div ref="thumbsVerticalEl" class="tvist-v0 tvist-thumbs">
           <div class="tvist-v0__container">
             <div class="tvist-v0__slide">1</div>
             <div class="tvist-v0__slide">2</div>
@@ -12,7 +12,7 @@
             <div class="tvist-v0__slide">6</div>
           </div>
         </div>
-        <div ref="mainHorizontalEl" class="tvist tvist-main">
+        <div ref="mainHorizontalEl" class="tvist-v0 tvist-main">
           <div class="tvist-v0__container">
             <div class="tvist-v0__slide">Slide 1</div>
             <div class="tvist-v0__slide">Slide 2</div>
@@ -33,7 +33,7 @@
 ```html
 <div class="gallery-wrapper">
   <!-- Vertical Thumbnails (left) -->
-  <div class="tvist tvist-thumbs">
+  <div class="tvist-v0 tvist-thumbs">
     <div class="tvist-v0__container">
       <div class="tvist-v0__slide">1</div>
       <div class="tvist-v0__slide">2</div>
@@ -45,7 +45,7 @@
   </div>
   
   <!-- Main Horizontal Slider (right) -->
-  <div class="tvist tvist-main">
+  <div class="tvist-v0 tvist-main">
     <div class="tvist-v0__container">
       <div class="tvist-v0__slide">Slide 1</div>
       <div class="tvist-v0__slide">Slide 2</div>

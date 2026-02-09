@@ -1,7 +1,7 @@
 <template>
   <div class="marquee-example">
     <h3>Базовый пример</h3>
-    <div ref="basicSlider" class="tvist marquee-basic">
+    <div ref="basicSlider" class="tvist-v0 marquee-basic">
       <div class="tvist-v0__container">
         <div v-for="i in 8" :key="i" class="tvist-v0__slide">
           <div class="marquee-card">
@@ -31,7 +31,7 @@
     </div>
 
     <h3>Логотипы партнёров</h3>
-    <div ref="logosSlider" class="tvist marquee-logos">
+    <div ref="logosSlider" class="tvist-v0 marquee-logos">
       <div class="tvist-v0__container">
         <div v-for="i in 6" :key="i" class="tvist-v0__slide">
           <div class="logo-card">
@@ -42,7 +42,7 @@
     </div>
 
     <h3>Вертикальная бегущая строка</h3>
-    <div ref="verticalSlider" class="tvist marquee-vertical">
+    <div ref="verticalSlider" class="tvist-v0 marquee-vertical">
       <div class="tvist-v0__container">
         <div v-for="i in 5" :key="i" class="tvist-v0__slide">
           <div class="news-item">

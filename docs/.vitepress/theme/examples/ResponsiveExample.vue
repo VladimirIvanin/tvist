@@ -60,7 +60,7 @@
           perPage считается от ширины контейнера: минимальная ширина слайда = 250px.
           При изменении размера контейнера (окно, сайдбар, grid) слайдер обновляется автоматически.
         </p>
-        <div ref="slider2El" class="tvist slider-minsize">
+        <div ref="slider2El" class="tvist-v0 slider-minsize">
           <div class="tvist-v0__container">
             <div v-for="i in 12" :key="i" class="tvist-v0__slide">
               <div class="slide-content">
