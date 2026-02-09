@@ -17,5 +17,6 @@ export { GridModule } from './grid'
 export { ScrollControlModule } from './scroll-control'
 export { ScrollbarModule } from './scrollbar'
 export { MarqueeModule } from './marquee'
+export { LazyLoadModule } from './lazyload'
 
 

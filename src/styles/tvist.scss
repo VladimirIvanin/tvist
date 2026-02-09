@@ -13,6 +13,7 @@
 @use 'modules/thumbs';
 @use 'modules/grid';
 @use 'modules/scrollbar';
+@use 'modules/lazyload';
 
 // Сброс box-sizing для корректных расчётов
 * {

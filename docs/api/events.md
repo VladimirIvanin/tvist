@@ -40,6 +40,10 @@
 - [`visible`](#visible) — слайд вошёл в видимую область
 - [`hidden`](#hidden) — слайд вышел из видимой области
 
+### Ленивая загрузка
+- [`lazyLoaded`](#lazyloaded) — изображение успешно загружено
+- [`lazyLoadError`](#lazyloaderror) — ошибка загрузки изображения
+
 ### Модули (при наличии опций)
 - `navigation:mounted` — стрелки смонтированы
 - `pagination:mounted` — пагинация смонтирована
@@ -502,30 +506,278 @@ hidden: (slide: HTMLElement, index: number) => void
 
 Слайд вошёл в видимую область или вышел из неё (по viewport контейнера). Эмитит модуль slide-states.
 
-## Примеры использования
+## События LazyLoad модуля
 
-### Ленивая загрузка изображений
+События модуля ленивой загрузки изображений (требуется опция `lazy: true`).
+
+### lazyLoaded
+
+```typescript
+lazyLoaded: (img: HTMLImageElement, slideIndex: number) => void
+```
+
+Вызывается когда изображение успешно загружено.
+
+**Параметры:**
+- `img` (`HTMLImageElement`) - загруженное изображение
+- `slideIndex` (`number`) - индекс слайда, в котором находится изображение
+
+**Примеры:**
 
 ```javascript
-slider.on('slideChange', (index) => {
-  const slide = slider.slides[index]
-  const img = slide.querySelector('img[data-src]')
-  
-  if (img && img.dataset.src) {
-    img.src = img.dataset.src
-    delete img.dataset.src
-  }
-  
-  // Предзагрузка следующего слайда
-  const nextSlide = slider.slides[index + 1]
-  if (nextSlide) {
-    const nextImg = nextSlide.querySelector('img[data-src]')
-    if (nextImg && nextImg.dataset.src) {
-      nextImg.src = nextImg.dataset.src
-      delete nextImg.dataset.src
+const slider = new Tvist('.slider', {
+  lazy: true,
+  on: {
+    lazyLoaded: (img, slideIndex) => {
+      console.log(`Изображение загружено в слайде ${slideIndex}`)
+      
+      // Добавить класс для анимации появления
+      img.classList.add('loaded')
+      
+      // Отслеживание в аналитике
+      analytics.track('Image Loaded', {
+        src: img.src,
+        slideIndex: slideIndex,
+        loadTime: performance.now()
+      })
+      
+      // Показать уведомление
+      showNotification(`Слайд ${slideIndex + 1} готов к просмотру`)
     }
   }
 })
+```
+
+**Пример с анимацией:**
+
+```javascript
+slider.on('lazyLoaded', (img, slideIndex) => {
+  // Плавное появление изображения
+  img.style.opacity = '0'
+  img.style.transition = 'opacity 0.3s ease'
+  
+  setTimeout(() => {
+    img.style.opacity = '1'
+  }, 10)
+})
+```
+
+**Пример со счётчиком:**
+
+```javascript
+let loadedCount = 0
+const totalImages = document.querySelectorAll('img[data-src]').length
+
+slider.on('lazyLoaded', (img, slideIndex) => {
+  loadedCount++
+  
+  const progress = (loadedCount / totalImages) * 100
+  document.querySelector('.load-progress').textContent = 
+    `Загружено: ${loadedCount} из ${totalImages} (${progress.toFixed(0)}%)`
+  
+  if (loadedCount === totalImages) {
+    console.log('✅ Все изображения загружены!')
+    hideLoader()
+  }
+})
+```
+
+### lazyLoadError
+
+```typescript
+lazyLoadError: (img: HTMLImageElement, slideIndex: number) => void
+```
+
+Вызывается при ошибке загрузки изображения (404, network error и т.д.).
+
+**Параметры:**
+- `img` (`HTMLImageElement`) - изображение, которое не удалось загрузить
+- `slideIndex` (`number`) - индекс слайда, в котором находится изображение
+
+**Примеры:**
+
+```javascript
+const slider = new Tvist('.slider', {
+  lazy: true,
+  on: {
+    lazyLoadError: (img, slideIndex) => {
+      console.error(`Ошибка загрузки в слайде ${slideIndex}`)
+      
+      // Установить изображение-заглушку
+      img.src = '/images/placeholder.jpg'
+      img.alt = 'Изображение недоступно'
+      
+      // Добавить класс ошибки
+      img.classList.add('load-error')
+      
+      // Логирование в систему мониторинга
+      errorLogger.log({
+        type: 'lazy_load_error',
+        slide: slideIndex,
+        src: img.dataset.src,
+        timestamp: Date.now()
+      })
+    }
+  }
+})
+```
+
+**Пример с повторной попыткой:**
+
+```javascript
+const MAX_RETRIES = 3
+const retryCount = new WeakMap()
+
+slider.on('lazyLoadError', (img, slideIndex) => {
+  const attempts = retryCount.get(img) || 0
+  
+  if (attempts < MAX_RETRIES) {
+    retryCount.set(img, attempts + 1)
+    
+    console.log(`Попытка ${attempts + 1} из ${MAX_RETRIES}`)
+    
+    // Повторная попытка через 2 секунды
+    setTimeout(() => {
+      const originalSrc = img.dataset.src
+      if (originalSrc) {
+        img.src = originalSrc + `?retry=${attempts + 1}`
+      }
+    }, 2000)
+  } else {
+    // После всех попыток показать placeholder
+    img.src = '/images/error-placeholder.jpg'
+    showErrorMessage(`Не удалось загрузить изображение в слайде ${slideIndex + 1}`)
+  }
+})
+```
+
+**Пример с альтернативными источниками:**
+
+```javascript
+slider.on('lazyLoadError', (img, slideIndex) => {
+  // Попробовать альтернативные CDN
+  const fallbackCDNs = [
+    'https://cdn1.example.com',
+    'https://cdn2.example.com',
+    'https://cdn3.example.com'
+  ]
+  
+  const originalSrc = img.dataset.src
+  const currentCDN = img.dataset.currentCdn || 0
+  
+  if (currentCDN < fallbackCDNs.length) {
+    const newSrc = originalSrc.replace(/^https?:\/\/[^\/]+/, fallbackCDNs[currentCDN])
+    img.dataset.currentCdn = currentCDN + 1
+    img.src = newSrc
+    
+    console.log(`Пробуем CDN ${currentCDN + 1}: ${newSrc}`)
+  } else {
+    // Все CDN не работают
+    img.src = '/images/placeholder.jpg'
+    notifyAdmin(`Image load failed for slide ${slideIndex}`, originalSrc)
+  }
+})
+```
+
+**Комбинированный пример:**
+
+```javascript
+const imageStats = {
+  loaded: 0,
+  errors: 0,
+  total: 0
+}
+
+slider.on('created', () => {
+  imageStats.total = document.querySelectorAll('img[data-src]').length
+})
+
+slider.on('lazyLoaded', (img, slideIndex) => {
+  imageStats.loaded++
+  updateLoadStats()
+  
+  // Добавить fade-in эффект
+  img.style.animation = 'fadeIn 0.3s ease'
+})
+
+slider.on('lazyLoadError', (img, slideIndex) => {
+  imageStats.errors++
+  updateLoadStats()
+  
+  // Показать placeholder
+  img.src = '/images/placeholder.jpg'
+  img.classList.add('error')
+  
+  // Уведомление пользователю
+  if (imageStats.errors > 3) {
+    showNotification('Проблемы с загрузкой изображений. Проверьте подключение к интернету.')
+  }
+})
+
+function updateLoadStats() {
+  const total = imageStats.total
+  const loaded = imageStats.loaded
+  const errors = imageStats.errors
+  const pending = total - loaded - errors
+  
+  console.log(`📊 Статистика: загружено ${loaded}, ошибок ${errors}, ожидает ${pending}`)
+  
+  document.querySelector('.stats').innerHTML = `
+    <div>✅ Загружено: ${loaded}</div>
+    <div>❌ Ошибки: ${errors}</div>
+    <div>⏳ Ожидает: ${pending}</div>
+  `
+}
+```
+
+## Примеры использования
+
+### Ленивая загрузка изображений (с модулем LazyLoad)
+
+```javascript
+// Используйте встроенный модуль LazyLoad
+const slider = new Tvist('.slider', {
+  lazy: {
+    preloadPrevNext: 1 // Предзагрузка соседних слайдов
+  },
+  on: {
+    lazyLoaded: (img, slideIndex) => {
+      console.log(`Изображение загружено в слайде ${slideIndex}`)
+      
+      // Плавное появление
+      img.style.opacity = '0'
+      setTimeout(() => {
+        img.style.opacity = '1'
+      }, 10)
+    },
+    lazyLoadError: (img, slideIndex) => {
+      // Замена на placeholder при ошибке
+      img.src = '/images/placeholder.jpg'
+      console.error(`Ошибка загрузки в слайде ${slideIndex}`)
+    }
+  }
+})
+
+// Публичное API для ручной загрузки
+const lazyModule = slider.modules.get('lazyload')
+
+// Загрузить все оставшиеся изображения
+lazyModule.loadAll()
+
+// Загрузить конкретный слайд
+lazyModule.loadSlide(5)
+```
+
+**HTML разметка:**
+
+```html
+<div class="tvist-v0__slide">
+  <img 
+    data-src="image.jpg" 
+    data-srcset="image-400.jpg 400w, image-800.jpg 800w"
+    alt="Описание"
+  >
+</div>
 ```
 
 ### Отслеживание просмотров в аналитике

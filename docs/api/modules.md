@@ -24,6 +24,9 @@ Tvist использует модульную архитектуру. Базов
 ### Связанные слайдеры
 - [`ThumbsModule`](#thumbsmodule) - Связь с миниатюрами
 
+### Производительность
+- [`LazyLoadModule`](#lazyloadmodule) - Ленивая загрузка изображений
+
 ---
 
 ## Архитектура модулей
@@ -402,6 +405,78 @@ const main = new Tvist('.main-slider', {
   }
 })
 ```
+
+### Производительность
+
+#### LazyLoadModule
+
+```javascript
+Tvist.registerModule('lazyload', LazyLoadModule)
+```
+
+Модуль ленивой загрузки изображений для улучшения производительности.
+
+**Возможности:**
+- Загрузка изображений только при приближении к видимой области
+- Предзагрузка соседних слайдов
+- Поддержка `srcset` для адаптивных изображений
+- Spinner во время загрузки
+- События загрузки и ошибок
+
+**Опции:**
+- `lazy` - включение и настройка ленивой загрузки
+
+**Пример:**
+
+```javascript
+const slider = new Tvist('.slider', {
+  lazy: true, // или { preloadPrevNext: 2 }
+  on: {
+    lazyLoaded: (img, slideIndex) => {
+      console.log('Загружено:', slideIndex)
+    },
+    lazyLoadError: (img, slideIndex) => {
+      img.src = '/placeholder.jpg'
+    }
+  }
+})
+```
+
+**HTML разметка:**
+
+```html
+<div class="tvist-v0__slide">
+  <img 
+    data-src="image.jpg" 
+    data-srcset="image-400.jpg 400w, image-800.jpg 800w"
+    alt="Description"
+  >
+</div>
+```
+
+**Публичное API:**
+
+```javascript
+const lazyModule = slider.modules.get('lazyload')
+
+// Загрузить все оставшиеся изображения
+lazyModule.loadAll()
+
+// Загрузить изображения конкретного слайда
+lazyModule.loadSlide(5)
+```
+
+**CSS переменные:**
+
+```css
+.tvist-v0 {
+  --tvist-v0-spinner-size: 50px;
+  --tvist-v0-spinner-color: rgba(0, 0, 0, 0.3);
+  --tvist-v0-loading-overlay: rgba(255, 255, 255, 0.7);
+}
+```
+
+**Подробнее:** [Пример LazyLoad](/examples/lazyload)
 
 ## Создание собственных модулей
 

@@ -13,9 +13,19 @@
 - [x] **ЭТАП 1: MVP Core** - Engine, Animator, Vector1D, Counter, EventEmitter
 - [x] **ЭТАП 2: Essential Modules** - Drag, Navigation, Pagination, Autoplay, Breakpoints
 
+### В процессе
+
+- [x] **ЭТАП 3: Advanced Features** - Loop ✅, LazyLoad ✅, Effects, Thumbs ✅
+  - [x] Loop - бесконечная прокрутка
+  - [x] LazyLoad - ленивая загрузка изображений
+  - [x] Effects - эффекты переходов (fade, cube)
+  - [x] Thumbs - связь с миниатюрами
+  - [x] Grid - сеточная раскладка
+  - [x] Marquee - режим бегущей строки
+  - [x] Scrollbar - кастомный скроллбар
+  
 ### Roadmap
 
-- [ ] **ЭТАП 3: Advanced Features** - Loop, LazyLoad, Effects, Thumbs
 - [ ] **ЭТАП 4: Polish & Production** - Документация, тесты, оптимизация
 
 ## 📦 Установка
@@ -33,6 +43,13 @@ npm install tvist
 - 📊 **Pagination** - bullets, fraction, progress
 - ⏰ **Autoplay** - с паузами и остановками
 - 📱 **Responsive** - container-first: размеры и perPage от контейнера, breakpoints по окну или контейнеру
+- 🔄 **Loop** - бесконечная прокрутка
+- 🖼️ **LazyLoad** - ленивая загрузка изображений
+- ✨ **Effects** - fade, cube эффекты переходов
+- 🔗 **Thumbs** - связь основного слайдера с миниатюрами
+- 📐 **Grid** - сеточная раскладка слайдов
+- 🎬 **Marquee** - режим бегущей строки
+- 📜 **Scrollbar** - кастомный скроллбар для навигации
 - 🚀 **60 FPS** - производительность на первом месте
 - 💎 **TypeScript** - strict mode, полные типы
 - 0️⃣ **Zero deps** - нет внешних зависимостей
