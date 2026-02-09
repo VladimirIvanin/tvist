@@ -2,12 +2,57 @@ import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
+// Кэш для разделения original/clone слайдов и теней
+interface SlideShadows {
+    left: HTMLElement
+    right: HTMLElement
+}
+
+interface CubeCache {
+    originalSlides: HTMLElement[]
+    cloneSlides: HTMLElement[]
+    shadows: WeakMap<HTMLElement, SlideShadows>
+    lastSlidesList: HTMLElement[]
+}
+
+const cubeCache = new WeakMap<Tvist, CubeCache>()
+
+function getCachedSlides(tvist: Tvist): { originalSlides: HTMLElement[], cloneSlides: HTMLElement[] } {
+    const { slides } = tvist
+    let cache = cubeCache.get(tvist)
+    
+    // Если кэш отсутствует или список слайдов изменился — пересоздаём
+    if (!cache?.lastSlidesList || cache.lastSlidesList !== slides) {
+        const originalSlides: HTMLElement[] = []
+        const cloneSlides: HTMLElement[] = []
+        
+        // Один проход вместо двух filter
+        for (const slide of slides) {
+            if (slide.dataset.tvistClone === 'true') {
+                cloneSlides.push(slide)
+            } else {
+                originalSlides.push(slide)
+            }
+        }
+        
+        cache = {
+            originalSlides,
+            cloneSlides,
+            shadows: cache?.shadows ?? new WeakMap(),
+            lastSlidesList: slides
+        }
+        cubeCache.set(tvist, cache)
+    }
+    
+    return { originalSlides: cache.originalSlides, cloneSlides: cache.cloneSlides }
+}
+
 export function setCubeEffect(
     tvist: Tvist,
     translate: number,
     options: TvistOptions
 ): void {
-    const { slides, container, root } = tvist
+    const { container, root } = tvist
     const cubeOptions = options.cubeEffect ?? {}
     const slideSize = tvist.engine.slideSizeValue
 
@@ -40,14 +85,8 @@ export function setCubeEffect(
     container.style.transformStyle = 'preserve-3d'
     container.style.webkitTransformStyle = 'preserve-3d'
     
-    // Separate original slides from clones
-    // Cube effect should only use original slides - clones cause overlapping faces
-    const originalSlides = slides.filter(slide => 
-        slide.dataset.tvistClone !== 'true'
-    )
-    const cloneSlides = slides.filter(slide => 
-        slide.dataset.tvistClone === 'true'
-    )
+    // Используем кэшированные массивы вместо двух filter на каждом кадре
+    const { originalSlides, cloneSlides } = getCachedSlides(tvist)
     
     // Hide all clones - cube is inherently cyclic and doesn't need them
     cloneSlides.forEach(clone => {
@@ -125,34 +164,56 @@ export function setCubeEffect(
         // Show only slides in range
         slide.style.visibility = isInRange ? 'visible' : 'hidden'
         
-        // Shadows
-        if (slideShadows) {
-             // Opacity increases as face turns away (sin of angle)
-             // 0deg -> 0, 90deg -> 1
-             let opacity = Math.abs(Math.sin(netAngle * Math.PI / 180))
-             // Cap opacity to be less dark
-             opacity = Math.min(opacity, 0.7)
-             addSlideShadows(slide, opacity)
+        // Shadows (Swiper-style: две тени на слайд)
+        if (slideShadows && isInRange) {
+             // Вычисляем progress на основе угла поворота грани относительно фронтальной позиции
+             // Нормализуем угол в диапазон -180 до 180
+             let angleDiff = netAngle
+             if (angleDiff > 180) angleDiff -= 360
+             
+             // progress = угол поворота / 90 градусов
+             // При повороте от 0° к 90°: progress идёт от 0 к 1
+             // При повороте от 0° к -90°: progress идёт от 0 к -1
+             const progress = Math.max(Math.min(angleDiff / 90, 1), -1)
+             createSlideShadows(slide, progress, tvist)
         }
     })
 }
 
-function addSlideShadows(slide: HTMLElement, opacity: number) {
-    const shadowClass = TVIST_CLASSES.shadow
-    let shadow: HTMLElement | null = slide.querySelector<HTMLElement>(`.${shadowClass}`)
-    if (!shadow) {
-        shadow = document.createElement('div')
-        shadow.className = shadowClass
-        shadow.style.position = 'absolute'
-        shadow.style.left = '0'
-        shadow.style.top = '0'
-        shadow.style.width = '100%'
-        shadow.style.height = '100%'
-        shadow.style.pointerEvents = 'none'
-        // shadow.style.transition = 'opacity 0.1s' // REMOVED: Causes flickering during drag
-        shadow.style.background = 'rgba(0,0,0,1)' // Base color
-        slide.appendChild(shadow)
+/**
+ * Создаёт и обновляет тени на слайде по образцу Swiper
+ * Две тени: left (видна при повороте влево) и right (видна при повороте вправо)
+ */
+function createSlideShadows(slide: HTMLElement, progress: number, tvist: Tvist) {
+    const cache = cubeCache.get(tvist)
+    if (!cache) return
+    
+    let shadows = cache.shadows.get(slide)
+    
+    // Создаём тени если их ещё нет
+    if (!shadows) {
+        const shadowLeft = document.createElement('div')
+        const shadowRight = document.createElement('div')
+        
+        // Используем классы как в Swiper (определены в _cube.scss)
+        const prefix = TVIST_CLASSES.block
+        shadowLeft.className = `${prefix}-slide-shadow-cube ${prefix}-slide-shadow-left`
+        shadowRight.className = `${prefix}-slide-shadow-cube ${prefix}-slide-shadow-right`
+        
+        // Все стили определены в _cube.scss, только добавляем элементы в DOM
+        slide.appendChild(shadowLeft)
+        slide.appendChild(shadowRight)
+        
+        shadows = { left: shadowLeft, right: shadowRight }
+        cache.shadows.set(slide, shadows)
     }
     
-    shadow.style.opacity = opacity.toString()
+    // Обновляем opacity по логике Swiper:
+    // - Левая тень видна когда progress < 0 (слайд поворачивается влево/приходит)
+    // - Правая тень видна когда progress > 0 (слайд поворачивается вправо/уходит)
+    const leftOpacity = Math.max(-progress, 0)
+    const rightOpacity = Math.max(progress, 0)
+    
+    shadows.left.style.opacity = leftOpacity.toString()
+    shadows.right.style.opacity = rightOpacity.toString()
 }
