@@ -54,9 +54,9 @@ export class SlideStatesModule extends Module {
 
     if (!activeSlide) return
 
-    // Проверяем режим Loop по наличию атрибута data-tvist-slide-index на активном слайде
+    // Режим Loop: по атрибуту на слайде (после инита Loop) или по опции (до проставления атрибутов)
     const activeAttr = activeSlide.getAttribute('data-tvist-slide-index')
-    const isLoop = activeAttr !== null
+    const isLoop = activeAttr !== null || this.options.loop === true
 
     let activeLogicalIndex = activeIndex
     let originalCount = slides.length
@@ -84,6 +84,12 @@ export class SlideStatesModule extends Module {
       nextTargetIndex = (activeLogicalIndex + 1) % originalCount
     }
 
+    const rootRect = this.tvist.root.getBoundingClientRect()
+    const isVertical = this.options.direction === 'vertical'
+    // При нулевых размерах root (например happy-dom) не фильтруем по видимости
+    const canCheckVisibility =
+      (isVertical ? rootRect.height : rootRect.width) > 0
+
     slides.forEach((slide, index) => {
       let currentLogicalIndex = index
 
@@ -110,10 +116,18 @@ export class SlideStatesModule extends Module {
         isNext = index === activeIndex + 1
       }
 
-      // Применяем классы
-      this.toggleClass(slide, this.CLASS_ACTIVE, isActive)
-      this.toggleClass(slide, this.CLASS_PREV, isPrev)
-      this.toggleClass(slide, this.CLASS_NEXT, isNext)
+      // Классы active/prev/next только у видимых слайдов
+      let isVisible = true
+      if (canCheckVisibility) {
+        const slideRect = slide.getBoundingClientRect()
+        isVisible = isVertical
+          ? this.isVerticallyVisible(slideRect, rootRect)
+          : this.isHorizontallyVisible(slideRect, rootRect)
+      }
+
+      this.toggleClass(slide, this.CLASS_ACTIVE, isActive && isVisible)
+      this.toggleClass(slide, this.CLASS_PREV, isPrev && isVisible)
+      this.toggleClass(slide, this.CLASS_NEXT, isNext && isVisible)
     })
   }
 
