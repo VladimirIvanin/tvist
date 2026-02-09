@@ -136,8 +136,23 @@ export class Tvist {
       this.clearSliderStyles()
     }
 
-    // События created
     this.emit('created', this)
+    this.setupSlideClick()
+  }
+
+  /** Делегирование клика по слайду */
+  private setupSlideClick(): void {
+    this.container.addEventListener('click', this.slideClickHandler)
+  }
+
+  private slideClickHandler = (e: MouseEvent): void => {
+    const slide = (e.target as HTMLElement).closest(
+      `.${TVIST_CLASSES.slide}`
+    ) as HTMLElement | null
+    if (!slide) return
+    const index = this.slides.indexOf(slide)
+    if (index === -1) return
+    this.emit('click', index, slide, e)
   }
 
   /**
@@ -161,7 +176,7 @@ export class Tvist {
   private setupResizeListener(): void {
     this.resizeHandler = throttle(() => {
       this.update()
-      this.emit('resize')
+      this.emit('resized')
     }, 100)
 
     if (typeof ResizeObserver !== 'undefined') {
@@ -233,6 +248,7 @@ export class Tvist {
       module.onUpdate?.()
     })
 
+    this.emit('refresh')
     return this
   }
 
@@ -393,7 +409,8 @@ export class Tvist {
    * Уничтожить экземпляр и очистить ресурсы
    */
   destroy(): this {
-    // События destroyed (ДО очистки событий!)
+    this.emit('beforeDestroy', this)
+    this.container.removeEventListener('click', this.slideClickHandler)
     this.emit('destroyed', this)
 
     // Уничтожаем модули

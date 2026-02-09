@@ -59,7 +59,7 @@ export class DragModule extends Module {
     this.updateBounds()
 
     // Обновляем границы при resize
-    this.on('resize', () => this.updateBounds())
+    this.on('resized', () => this.updateBounds())
 
     // Слушаем сдвиг позиций (от LoopModule)
     this.on('positionShifted', this.onPositionShifted)

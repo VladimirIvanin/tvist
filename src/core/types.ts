@@ -395,35 +395,54 @@ export interface TvistOptions {
    * Обработчики событий слайдера
    */
   on?: {
-    /** Вызывается после создания слайдера */
+    /** После создания слайдера */
     created?: (tvist: Tvist) => void
-    /** Вызывается перед уничтожением слайдера */
+    /** Перед уничтожением */
+    beforeDestroy?: (tvist: Tvist) => void
+    /** При уничтожении */
     destroyed?: (tvist: Tvist) => void
-    /** Вызывается перед началом смены слайда */
+    /** Клик по слайду */
+    click?: (index: number, slide: HTMLElement, event: MouseEvent) => void
+    /** Вызван update() — пересчитаны размеры/позиции */
+    refresh?: () => void
+    /** Завершилось изменение размера контейнера */
+    resized?: () => void
+    /** Перед сменой слайда */
     beforeSlideChange?: (index: number) => void
-    /** Вызывается при начале смены слайда */
+    /** Начало смены слайда (старт анимации) */
     slideChange?: (index: number) => void
-    /** Вызывается после завершения смены слайда */
+    /** Смена слайда завершена */
     slideChanged?: (index: number) => void
-    /** Вызывается при начале перетаскивания */
-    dragStart?: () => void
-    /** Вызывается во время перетаскивания */
-    drag?: () => void
-    /** Вызывается при завершении перетаскивания */
-    dragEnd?: () => void
-    /** Вызывается при прокрутке */
+    /** Начало анимации перехода */
+    transitionStart?: (index: number) => void
+    /** Конец анимации перехода */
+    transitionEnd?: (index: number) => void
+    /** Слайд вошёл в видимую область */
+    visible?: (slide: HTMLElement, index: number) => void
+    /** Слайд вышел из видимой области */
+    hidden?: (slide: HTMLElement, index: number) => void
+    /** Во время прокрутки (тики анимации / драг) */
     scroll?: () => void
-    /** Вызывается при изменении размера */
-    resize?: () => void
-    /** Вызывается при смене breakpoint */
+    /** Прогресс прокрутки 0..1, только при !loop */
+    progress?: (progress: number) => void
+    /** Достигнут первый слайд */
+    reachBeginning?: () => void
+    /** Достигнут последний слайд */
+    reachEnd?: () => void
+    /** Начало перетаскивания */
+    dragStart?: () => void
+    /** Во время перетаскивания */
+    drag?: () => void
+    /** Конец перетаскивания */
+    dragEnd?: () => void
+    /** Смена breakpoint */
     breakpoint?: (breakpoint: number | null) => void
-    /** Вызывается при блокировке слайдера (контент помещается в контейнер) */
+    /** Слайдер заблокирован (контент помещается в область) */
     lock?: () => void
-    /** Вызывается при разблокировке слайдера */
+    /** Слайдер разблокирован */
     unlock?: () => void
-    /** Вызывается при динамическом обновлении опций */
+    /** Обновлены опции через updateOptions() */
     optionsUpdated?: (tvist: Tvist, newOptions: Partial<TvistOptions>) => void
-    /** Дополнительные кастомные обработчики */
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
     [key: string]: ((...args: any[]) => void) | undefined
   }

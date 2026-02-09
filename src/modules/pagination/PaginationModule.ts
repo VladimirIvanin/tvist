@@ -38,6 +38,7 @@ export class PaginationModule extends Module {
 
     this.render()
     this.updateActive()
+    this.emit('pagination:mounted')
 
     // Обновляем при изменении слайда
     this.on('slideChanged', () => this.updateActive())

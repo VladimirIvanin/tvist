@@ -339,6 +339,7 @@ export class Engine {
       ? index 
       : Math.max(0, Math.min(index, endIndex))
 
+    const prevIndex = this.index.get()
     // Нормализуем индекс через Counter
     const normalizedIndex = this.index.set(clampedIndex) ?? 0
 
@@ -352,23 +353,26 @@ export class Engine {
       targetPosition = Math.max(maxPos, Math.min(minPos, targetPosition))
     }
 
-    // События
+    const endIndex = this.getEndIndex()
+
     this.tvist.emit('beforeSlideChange', normalizedIndex)
     this.options.on?.beforeSlideChange?.(normalizedIndex)
 
     if (instant) {
-      // Мгновенный переход
       this.target.set(targetPosition)
       this.location.set(targetPosition)
       this.applyTransform()
-      
-      // События после изменения
+      this.emitProgress()
       this.tvist.emit('slideChanged', normalizedIndex)
       this.options.on?.slideChanged?.(normalizedIndex)
+      this.emitReachEdge(normalizedIndex, endIndex)
     } else {
-      // Анимированный переход
       this.target.set(targetPosition)
       const speed = this.options.speed ?? 300
+
+      this.tvist.emit('transitionStart', normalizedIndex)
+      this.tvist.emit('slideChange', normalizedIndex)
+      this.options.on?.slideChange?.(normalizedIndex)
 
       this.animator.animate(
         this.location.get(),
@@ -377,21 +381,39 @@ export class Engine {
         (value) => {
           this.location.set(value)
           this.applyTransform()
-          
-          // Событие во время прокрутки
+          this.emitProgress()
           this.tvist.emit('scroll')
           this.options.on?.scroll?.()
         },
         () => {
-          // Событие после завершения
+          this.tvist.emit('transitionEnd', normalizedIndex)
           this.tvist.emit('slideChanged', normalizedIndex)
           this.options.on?.slideChanged?.(normalizedIndex)
+          this.emitReachEdge(normalizedIndex, endIndex)
         }
       )
-      
-      // Событие начала изменения
-      this.tvist.emit('slideChange', normalizedIndex)
-      this.options.on?.slideChange?.(normalizedIndex)
+    }
+  }
+
+  /** Прогресс прокрутки 0..1 (только при !loop) */
+  private emitProgress(): void {
+    if (this.options.loop) return
+    const minScroll = this.getMinScrollPosition()
+    const maxScroll = this.getMaxScrollPosition()
+    const range = maxScroll - minScroll
+    if (range <= 0) return
+    const pos = this.location.get()
+    const progress = Math.max(0, Math.min(1, (pos - minScroll) / range))
+    this.tvist.emit('progress', progress)
+  }
+
+  /** События достижения начала/конца (reachBeginning / reachEnd) */
+  private emitReachEdge(index: number, endIndex: number): void {
+    if (index <= 0) {
+      this.tvist.emit('reachBeginning')
+    }
+    if (index >= endIndex) {
+      this.tvist.emit('reachEnd')
     }
   }
 
@@ -416,8 +438,9 @@ export class Engine {
     } else {
       container.style.transform = `translate3d(${pos}px, 0, 0)`
     }
-    
+
     this.tvist.emit('setTranslate', this.tvist, pos)
+    this.emitProgress()
   }
 
   /**

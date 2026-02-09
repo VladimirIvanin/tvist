@@ -4,27 +4,45 @@
 
 ## Список событий
 
-### Lifecycle события
-- [`created`](#created) - После создания слайдера
-- [`destroyed`](#destroyed) - Перед уничтожением слайдера
-- [`optionsUpdated`](#optionsupdated) - После обновления опций
+Единая концепция: каждое событие — одно явление, без дубликатов (например, только `created`, только `resized`).
 
-### События навигации
-- [`beforeSlideChange`](#beforeslidechange) - Перед началом смены слайда
-- [`slideChange`](#slidechange) - При начале смены слайда
-- [`slideChanged`](#slidechanged) - После завершения смены слайда
+### Жизненный цикл
+- [`created`](#created) — после создания и инициализации
+- [`beforeDestroy`](#beforedestroy) — перед уничтожением
+- [`destroyed`](#destroyed) — при уничтожении
+- [`refresh`](#refresh) — вызван `update()` (пересчёт размеров/позиций)
+- [`optionsUpdated`](#optionsupdated) — обновлены опции через `updateOptions()`
 
-### События взаимодействия
-- [`dragStart`](#dragstart) - При начале перетаскивания
-- [`drag`](#drag) - Во время перетаскивания
-- [`dragEnd`](#dragend) - При завершении перетаскивания
+### Смена слайда
+- [`beforeSlideChange`](#beforeslidechange) — перед сменой слайда
+- [`slideChange`](#slidechange) — начало смены (старт анимации)
+- [`slideChanged`](#slidechanged) — смена завершена
+- [`transitionStart`](#transitionstart) — начало анимации перехода
+- [`transitionEnd`](#transitionend) — конец анимации перехода
+- [`scroll`](#scroll) — во время прокрутки (тики анимации / драг)
+- [`progress`](#progress) — прогресс прокрутки 0..1 (только при `!loop`)
+- [`reachBeginning`](#reachbeginning) — достигнут первый слайд
+- [`reachEnd`](#reachend) — достигнут последний слайд
 
-### События обновления
-- [`scroll`](#scroll) - При прокрутке
-- [`resize`](#resize) - При изменении размера
-- [`breakpoint`](#breakpoint) - При смене breakpoint
-- [`lock`](#lock) - При блокировке слайдера
-- [`unlock`](#unlock) - При разблокировке слайдера
+### Взаимодействие
+- [`click`](#click) — клик по слайду
+- [`dragStart`](#dragstart) — начало перетаскивания
+- [`drag`](#drag) — во время перетаскивания
+- [`dragEnd`](#dragend) — конец перетаскивания
+
+### Состояние и обновления
+- [`resized`](#resized) — завершилось изменение размера контейнера
+- [`breakpoint`](#breakpoint) — смена breakpoint
+- [`lock`](#lock) — слайдер заблокирован
+- [`unlock`](#unlock) — слайдер разблокирован
+
+### Видимость слайдов
+- [`visible`](#visible) — слайд вошёл в видимую область
+- [`hidden`](#hidden) — слайд вышел из видимой области
+
+### Модули (при наличии опций)
+- `navigation:mounted` — стрелки смонтированы
+- `pagination:mounted` — пагинация смонтирована
 
 ---
 
@@ -38,7 +56,7 @@ const slider = new Tvist('.slider', {
     slideChange: (index) => {
       console.log('Слайд изменился:', index)
     },
-    resize: () => {
+    resized: () => {
       console.log('Размер изменился')
     }
   }
@@ -52,7 +70,7 @@ slider.on('slideChange', (index) => {
   console.log('Слайд изменился:', index)
 })
 
-slider.on('resize', () => {
+slider.on('resized', () => {
   console.log('Размер изменился')
 })
 ```
@@ -111,24 +129,35 @@ const slider = new Tvist('.slider', {
 })
 ```
 
+### beforeDestroy
+
+```typescript
+beforeDestroy: (tvist: Tvist) => void
+```
+
+Вызывается перед уничтожением (до очистки модулей и DOM).
+
 ### destroyed
 
 ```typescript
 destroyed: (tvist: Tvist) => void
 ```
 
-Вызывается перед уничтожением слайдера.
+Вызывается при уничтожении слайдера.
 
 **Параметры:**
-- `tvist` - экземпляр слайдера
+- `tvist` — экземпляр слайдера
 
 **Примеры:**
 
 ```javascript
+slider.on('beforeDestroy', (tvist) => {
+  // Сохранить состояние перед очисткой
+  saveState(tvist)
+})
+
 slider.on('destroyed', (tvist) => {
   console.log('Слайдер уничтожен')
-  
-  // Очистка пользовательских ресурсов
   cleanupCustomFeatures(tvist)
 })
 ```
@@ -241,7 +270,13 @@ slider.on('slideChanged', (index) => {
 
 ## События взаимодействия
 
-События, связанные с пользовательским взаимодействием.
+### click
+
+```typescript
+click: (index: number, slide: HTMLElement, event: MouseEvent) => void
+```
+
+Клик по слайду (делегирование с контейнера). Аргументы: индекс слайда, элемент слайда, объект события.
 
 ### dragStart
 
@@ -316,7 +351,7 @@ slider.on('dragEnd', () => {
 scroll: () => void
 ```
 
-Вызывается при прокрутке (во время анимации перехода между слайдами).
+Вызывается во время прокрутки (тики анимации или при драге). Для прогресса 0..1 используйте событие `progress`.
 
 **Примеры:**
 
@@ -331,21 +366,20 @@ slider.on('scroll', () => {
 })
 ```
 
-### resize
+### resized
 
 ```typescript
-resize: () => void
+resized: () => void
 ```
 
-Вызывается при изменении размера контейнера слайдера.
+Вызывается после завершения изменения размера контейнера (throttle).
 
 **Примеры:**
 
 ```javascript
-slider.on('resize', () => {
+slider.on('resized', () => {
   console.log('Размер контейнера изменился')
   
-  // Адаптивное изменение настроек
   const width = slider.root.offsetWidth
   if (width < 768) {
     slider.updateOptions({ perPage: 1 })
@@ -354,6 +388,40 @@ slider.on('resize', () => {
   }
 })
 ```
+
+### refresh
+
+```typescript
+refresh: () => void
+```
+
+Вызывается при вызове `update()` — пересчитаны размеры и позиции.
+
+### transitionStart / transitionEnd
+
+```typescript
+transitionStart: (index: number) => void
+transitionEnd: (index: number) => void
+```
+
+Начало и конец анимации перехода к слайду. При мгновенном переходе (`instant: true`) не вызываются.
+
+### progress
+
+```typescript
+progress: (progress: number) => void
+```
+
+Прогресс прокрутки от 0 до 1. Вызывается только при `loop: false` (в loop нет однозначного прогресса).
+
+### reachBeginning / reachEnd
+
+```typescript
+reachBeginning: () => void
+reachEnd: () => void
+```
+
+Вызываются при достижении первого или последнего слайда (после `slideChanged`).
 
 ### breakpoint
 
@@ -424,6 +492,15 @@ slider.on('unlock', () => {
   slider.root.classList.remove('is-locked')
 })
 ```
+
+### visible / hidden
+
+```typescript
+visible: (slide: HTMLElement, index: number) => void
+hidden: (slide: HTMLElement, index: number) => void
+```
+
+Слайд вошёл в видимую область или вышел из неё (по viewport контейнера). Эмитит модуль slide-states.
 
 ## Примеры использования
 

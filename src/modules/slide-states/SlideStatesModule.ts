@@ -89,15 +89,20 @@ export class SlideStatesModule extends Module {
     const rootRect = this.tvist.root.getBoundingClientRect()
     const isVertical = this.options.direction === 'vertical'
 
-    slides.forEach((slide) => {
+    slides.forEach((slide, index) => {
       const slideRect = slide.getBoundingClientRect()
-      
-      // Определяем видимость слайда
       const isVisible = isVertical
         ? this.isVerticallyVisible(slideRect, rootRect)
         : this.isHorizontallyVisible(slideRect, rootRect)
 
-      this.toggleClass(slide, this.CLASS_VISIBLE, isVisible)
+      const hadVisible = slide.classList.contains(this.CLASS_VISIBLE)
+      if (isVisible && !hadVisible) {
+        slide.classList.add(this.CLASS_VISIBLE)
+        this.tvist.emit('visible', slide, index)
+      } else if (!isVisible && hadVisible) {
+        slide.classList.remove(this.CLASS_VISIBLE)
+        this.tvist.emit('hidden', slide, index)
+      }
     })
   }
 

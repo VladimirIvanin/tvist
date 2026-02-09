@@ -41,6 +41,7 @@ export class NavigationModule extends Module {
 
     this.attachEvents()
     this.updateArrowsState()
+    this.emit('navigation:mounted')
 
     // Обновляем состояние при изменении слайда
     this.on('slideChanged', () => this.updateArrowsState())
