@@ -9,8 +9,8 @@
           <div class="tvist-v0__slide">4</div>
           <div class="tvist-v0__slide">5</div>
         </div>
-        <button class="tvist-v0__arrow tvist-v0__arrow--prev">‹</button>
-        <button class="tvist-v0__arrow tvist-v0__arrow--next">›</button>
+        <button class="tvist-v0__arrow tvist-v0__arrow--prev"></button>
+        <button class="tvist-v0__arrow tvist-v0__arrow--next"></button>
       </div>
     </div>
 
@@ -28,8 +28,9 @@
     <div class="tvist-v0__slide">4</div>
     <div class="tvist-v0__slide">5</div>
   </div>
-  <button class="tvist-v0__arrow tvist-v0__arrow--prev">‹</button>
-  <button class="tvist-v0__arrow tvist-v0__arrow--next">›</button>
+  <!-- SVG иконки добавляются автоматически -->
+  <button class="tvist-v0__arrow tvist-v0__arrow--prev"></button>
+  <button class="tvist-v0__arrow tvist-v0__arrow--next"></button>
 </div>
 ```
 

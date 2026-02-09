@@ -50,16 +50,76 @@ Tvist.registerModule('navigation', NavigationModule)
 **Опции:**
 - `arrows` - включение и настройка стрелок
 
-**Пример:**
+**Доступные настройки:**
+- `prev` - селектор или элемент для кнопки "назад"
+- `next` - селектор или элемент для кнопки "вперёд"
+- `disabledClass` - CSS класс для неактивных стрелок (по умолчанию `'disabled'`)
+- `hiddenClass` - CSS класс для скрытых стрелок (по умолчанию `'hidden'`)
+- `addIcons` - автоматически добавлять SVG иконки в кнопки (по умолчанию `true`)
+
+**Автоматические SVG иконки:**
+
+По умолчанию модуль автоматически добавляет SVG иконки стрелок в пустые кнопки навигации. Иконки используют `currentColor`, что позволяет легко управлять цветом через CSS:
+
+```html
+<!-- SVG добавится автоматически -->
+<button class="tvist-v0__arrow tvist-v0__arrow--prev"></button>
+<button class="tvist-v0__arrow tvist-v0__arrow--next"></button>
+```
+
+```css
+.tvist-v0__arrow {
+  color: #000; /* Цвет иконки */
+}
+```
+
+Если в кнопке уже есть контент (текст или элементы), SVG не добавляется:
+
+```html
+<!-- SVG НЕ добавится - есть текстовое содержимое -->
+<button class="tvist-v0__arrow tvist-v0__arrow--prev">‹</button>
+<button class="tvist-v0__arrow tvist-v0__arrow--next">›</button>
+```
+
+Отключение автоматических иконок:
+
+```javascript
+const slider = new Tvist('.slider', {
+  arrows: {
+    addIcons: false // Отключить автоматическое добавление SVG
+  }
+})
+```
+
+**Примеры:**
+
+Базовое использование:
 
 ```javascript
 const slider = new Tvist('.slider', {
   arrows: true
-  // или с настройками
+})
+```
+
+С кастомными настройками:
+
+```javascript
+const slider = new Tvist('.slider', {
   arrows: {
     prev: '.custom-prev',
     next: '.custom-next',
-    disabledClass: 'disabled'
+    disabledClass: 'my-disabled',
+    hiddenClass: 'my-hidden'
+  }
+})
+```
+
+Без автоматических иконок:
+
+```javascript
+const slider = new Tvist('.slider', {
+  arrows: {
+    addIcons: false  // Использовать свои иконки/текст
   }
 })
 ```

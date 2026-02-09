@@ -137,6 +137,8 @@ export interface TvistOptions {
     disabledClass?: string
     /** CSS класс для скрытых стрелок */
     hiddenClass?: string
+    /** Автоматически добавлять SVG иконки в кнопки навигации. @default true */
+    addIcons?: boolean
   }
   
   // Pagination

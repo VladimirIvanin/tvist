@@ -10,7 +10,7 @@
  */
 
 import { Module } from '../Module'
-import { TVIST_CLASSES } from '../../core/constants'
+import { TVIST_CLASSES, NAVIGATION_ARROW_SVG } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -39,6 +39,7 @@ export class NavigationModule extends Module {
       return
     }
 
+    this.injectArrowIcons()
     this.attachEvents()
     this.updateArrowsState()
     this.emit('navigation:mounted')
@@ -81,6 +82,53 @@ export class NavigationModule extends Module {
     // Если не найдены - ищем по дефолтным классам
     this.prevButton ??= this.tvist.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.arrowPrev}`)
     this.nextButton ??= this.tvist.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.arrowNext}`)
+  }
+
+  /**
+   * Вставка SVG иконок в кнопки навигации
+   * Логика как в Swiper:
+   * 1. Проверяем опцию addIcons (по умолчанию true)
+   * 2. Проверяем, что кнопка имеет класс стрелки (prev/next)
+   * 3. Проверяем, что в кнопке нет дочерних элементов (пользователь не добавил свой контент)
+   */
+  private injectArrowIcons(): void {
+    const arrows = this.options.arrows
+    const addIcons = typeof arrows === 'object' && arrows !== null
+      ? arrows.addIcons ?? true
+      : true
+
+    if (!addIcons) return
+
+    this.injectIconIntoButton(this.prevButton, 'prev')
+    this.injectIconIntoButton(this.nextButton, 'next')
+  }
+
+  /**
+   * Вставка иконки в конкретную кнопку
+   */
+  private injectIconIntoButton(button: HTMLElement | null, direction: 'prev' | 'next'): void {
+    if (!button) return
+
+    const arrowClass = direction === 'prev' ? TVIST_CLASSES.arrowPrev : TVIST_CLASSES.arrowNext
+
+    // Проверяем что кнопка имеет класс стрелки
+    if (!button.classList.contains(arrowClass)) return
+
+    // Проверяем что в кнопке нет дочерних элементов (пользователь не добавил свой контент)
+    if (button.children.length > 0) return
+
+    // Проверяем что в кнопке нет текстового контента
+    const textContent = button.textContent?.trim()
+    if (textContent && textContent.length > 0) return
+
+    // Вставляем SVG
+    const tempDiv = document.createElement('div')
+    tempDiv.innerHTML = NAVIGATION_ARROW_SVG
+    const svgElement = tempDiv.querySelector('svg')
+    
+    if (svgElement) {
+      button.appendChild(svgElement)
+    }
   }
 
   /**

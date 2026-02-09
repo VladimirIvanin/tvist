@@ -52,11 +52,28 @@
   // Позиционирование
   &--prev {
     left: var(--#{$tvist-block}-arrow-offset, 10px);
+
+    // Поворот иконки для стрелки влево
+    .#{$tvist-block}__arrow-icon {
+      transform: rotate(180deg);
+    }
   }
 
   &--next {
     right: var(--#{$tvist-block}-arrow-offset, 10px);
   }
+}
+
+// Стили для SVG иконки
+.#{$tvist-block}__arrow-icon {
+  width: 100%;
+  height: 100%;
+  max-width: 16px;
+  max-height: 16px;
+  object-fit: contain;
+  transform-origin: center;
+  fill: currentColor;
+  pointer-events: none;
 }
 
 // Адаптивность
