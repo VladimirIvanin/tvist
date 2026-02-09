@@ -18,10 +18,24 @@ $tvist-block: 'tvist-v0' !default;
   --#{$tvist-block}-arrow-disabled-opacity: 0.3;
 
   // Пагинация
+  --#{$tvist-block}-pagination-bottom: 10px;
+  --#{$tvist-block}-pagination-gap: 8px;
   --#{$tvist-block}-pagination-color: #000;
   --#{$tvist-block}-pagination-color-active: #007aff;
   --#{$tvist-block}-bullet-size: 8px;
   --#{$tvist-block}-bullet-spacing: 6px;
+  --#{$tvist-block}-bullet-color: rgba(0, 0, 0, 0.3);
+  --#{$tvist-block}-bullet-hover-color: rgba(0, 0, 0, 0.5);
+  --#{$tvist-block}-bullet-active-color: #000;
+  --#{$tvist-block}-bullet-active-width: 20px;
+  --#{$tvist-block}-bullet-active-radius: 4px;
+  --#{$tvist-block}-fraction-size: 14px;
+  --#{$tvist-block}-fraction-color: #000;
+  --#{$tvist-block}-progress-width: 200px;
+  --#{$tvist-block}-progress-height: 4px;
+  --#{$tvist-block}-progress-bg: rgba(0, 0, 0, 0.1);
+  --#{$tvist-block}-progress-radius: 2px;
+  --#{$tvist-block}-progress-active-color: #000;
 
   // Z-indexes
   --#{$tvist-block}-z-arrows: 10;
