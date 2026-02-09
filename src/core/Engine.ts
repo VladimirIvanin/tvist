@@ -129,6 +129,22 @@ export class Engine {
     // Без центрирования применяем старую логику с peekTrim
     if (index === 0) return peekTrim ? this.getMinScrollPosition() : 0
     if (index === endIndex) return peekTrim ? this.getMaxScrollPosition() : basePosition
+    
+    // В режиме autoWidth/autoHeight проверяем, не создаст ли basePosition дыру справа/снизу
+    const isAutoSize = (!this.options.direction || this.options.direction === 'horizontal') 
+      ? this.options.autoWidth 
+      : this.options.autoHeight
+    
+    if (isAutoSize && peekTrim) {
+      const maxScroll = this.getMaxScrollPosition()
+      
+      // Если basePosition < maxScroll, значит последний слайд не дотянется до правого края
+      // и образуется "дыра". Используем maxScroll вместо basePosition.
+      if (basePosition < maxScroll) {
+        return maxScroll
+      }
+    }
+    
     return basePosition
   }
 
@@ -353,6 +369,7 @@ export class Engine {
       ? getPeekValue(this.tvist.container, 'top')
       : getPeekValue(this.tvist.container, 'left')
     if (peekStart === 0 && this.peekStart > 0) peekStart = this.peekStart
+    
     return rootSize - peekStart - lastPageRight
   }
 
