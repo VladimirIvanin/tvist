@@ -12,7 +12,7 @@ import BasicExample from '../.vitepress/theme/examples/BasicExample.vue'
 
 **HTML:**
 ```html
-<div class="tvist">
+<div class="tvist-v0">
   <div class="tvist-v0__container">
     <div class="tvist-v0__slide">Slide 1</div>
     <div class="tvist-v0__slide">Slide 2</div>

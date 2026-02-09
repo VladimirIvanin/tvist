@@ -2,7 +2,7 @@
   <ExampleCard title="3D Куб" description="3D трансформация в виде куба">
     <div class="demo-wrapper">
       <div class="cube-wrapper">
-        <div ref="sliderEl" class="tvist">
+        <div ref="sliderEl" class="tvist-v0">
           <div class="tvist-v0__container">
             <div class="tvist-v0__slide">Slide 1</div>
             <div class="tvist-v0__slide">Slide 2</div>

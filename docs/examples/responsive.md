@@ -150,7 +150,7 @@ const slider = new Tvist('.tvist', {
 ## HTML разметка
 
 ```html
-<div class="tvist">
+<div class="tvist-v0">
   <div class="tvist-v0__container">
     <div class="tvist-v0__slide">Slide 1</div>
     <div class="tvist-v0__slide">Slide 2</div>

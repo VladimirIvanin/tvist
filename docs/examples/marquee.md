@@ -144,7 +144,7 @@ slider.updateOptions({
 
 ```html
 <div class="partners-slider">
-  <div class="tvist">
+  <div class="tvist-v0">
     <div class="tvist-v0__container">
       <div class="tvist-v0__slide">
         <img src="logo1.png" alt="Partner 1">
@@ -175,7 +175,7 @@ new Tvist('.partners-slider .tvist', {
 
 ```html
 <div class="news-ticker">
-  <div class="tvist">
+  <div class="tvist-v0">
     <div class="tvist-v0__container">
       <div class="tvist-v0__slide">
         <span class="news-item">🔥 Новость 1</span>

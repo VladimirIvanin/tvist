@@ -48,7 +48,7 @@ onMounted(() => {
 
 ### Горизонтальный слайдер
 
-<div ref="basicRef" class="tvist" style="margin-bottom: 2rem; position: relative; height: 300px;">
+<div ref="basicRef" class="tvist-v0" style="margin-bottom: 2rem; position: relative; height: 300px;">
   <div class="tvist-v0__container">
     <div class="tvist-v0__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 1
@@ -114,7 +114,7 @@ const slider = new Tvist('.tvist', {
 
 Скроллбар автоматически скрывается при бездействии.
 
-<div ref="hiddenRef" class="tvist" style="margin-bottom: 2rem; position: relative; height: 300px;">
+<div ref="hiddenRef" class="tvist-v0" style="margin-bottom: 2rem; position: relative; height: 300px;">
   <div class="tvist-v0__container">
     <div class="tvist-v0__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 1
@@ -242,7 +242,7 @@ const slider = new Tvist('.tvist', {
 
 **HTML:**
 ```html
-<div class="tvist">
+<div class="tvist-v0">
   <div class="tvist-v0__container">
     <!-- слайды -->
   </div>

@@ -352,7 +352,7 @@ watch(() => [props.perPage, props.gap, props.speed], ([perPage, gap, speed]) => 
 </script>
 
 <template>
-  <div ref="sliderEl" class="tvist">
+  <div ref="sliderEl" class="tvist-v0">
     <slot />
   </div>
 </template>

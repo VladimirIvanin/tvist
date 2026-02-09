@@ -7,7 +7,7 @@
 Создайте HTML структуру для слайдера:
 
 ```html
-<div class="tvist">
+<div class="tvist-v0">
   <div class="tvist-v0__wrapper">
     <div class="tvist-v0__slide">
       <img src="slide-1.jpg" alt="Slide 1">
@@ -80,7 +80,7 @@ const slider = new Tvist('.tvist', {
 HTML с элементами навигации:
 
 ```html
-<div class="tvist">
+<div class="tvist-v0">
   <div class="tvist-v0__wrapper">
     <div class="tvist-v0__slide">Slide 1</div>
     <div class="tvist-v0__slide">Slide 2</div>
@@ -191,7 +191,7 @@ console.log(slider.slides.length); // Количество слайдов
   </style>
 </head>
 <body>
-  <div class="tvist">
+  <div class="tvist-v0">
     <div class="tvist-v0__wrapper">
       <div class="tvist-v0__slide">Слайд 1</div>
       <div class="tvist-v0__slide">Слайд 2</div>

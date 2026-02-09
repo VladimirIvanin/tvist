@@ -7,7 +7,7 @@
       </p>
     </div>
 
-    <div class="tvist" ref="slider">
+    <div class="tvist-v0" ref="slider">
       <div class="tvist-v0__container">
         <div 
           v-for="i in 12" 

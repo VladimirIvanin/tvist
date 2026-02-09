@@ -13,7 +13,7 @@ import CubeExample from '../.vitepress/theme/examples/CubeExample.vue'
 **HTML:**
 ```html
 <div class="cube-wrapper">
-  <div class="tvist">
+  <div class="tvist-v0">
     <div class="tvist-v0__container">
       <div class="tvist-v0__slide">Slide 1</div>
       <div class="tvist-v0__slide">Slide 2</div>

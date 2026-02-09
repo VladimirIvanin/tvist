@@ -26,7 +26,7 @@ import ProductCardsExample from '../.vitepress/theme/examples/ProductCardsExampl
 Стандартная разметка Tvist (всегда одинаковая):
 
 ```html
-<div class="tvist">
+<div class="tvist-v0">
   <div class="tvist-v0__container">
     <div class="tvist-v0__slide product-card">
       <div class="product-image">
@@ -172,7 +172,7 @@ window.addEventListener('beforeunload', () => {
 
 ```vue
 <template>
-  <div class="tvist">
+  <div class="tvist-v0">
     <div class="tvist-v0__container">
       <div v-for="product in products" :key="product.id" class="tvist-v0__slide product-card">
         <!-- Контент карточки -->

@@ -5,7 +5,7 @@
       <div class="row">
         <div class="col">
           <div class="label">peekTrim: true — конец прижат к краю</div>
-          <div ref="sliderTrimRef" class="tvist">
+          <div ref="sliderTrimRef" class="tvist-v0">
             <div class="tvist-v0__container">
               <div v-for="i in 5" :key="i" class="tvist-v0__slide">
                 <div class="slide-content">{{ i }}</div>
@@ -15,7 +15,7 @@
         </div>
         <div class="col">
           <div class="label">peekTrim: false — справа остаётся зазор</div>
-          <div ref="sliderNoTrimRef" class="tvist">
+          <div ref="sliderNoTrimRef" class="tvist-v0">
             <div class="tvist-v0__container">
               <div v-for="i in 5" :key="i" class="tvist-v0__slide">
                 <div class="slide-content">{{ i }}</div>
@@ -30,7 +30,7 @@
       <div class="row">
         <div class="col">
           <div class="label">loop: true, peek: 40</div>
-          <div ref="sliderLoopRef" class="tvist">
+          <div ref="sliderLoopRef" class="tvist-v0">
             <div class="tvist-v0__container">
               <div v-for="i in 5" :key="i" class="tvist-v0__slide">
                 <div class="slide-content">{{ i }}</div>
@@ -40,7 +40,7 @@
         </div>
         <div class="col">
           <div class="label">loop: true, peek: 60, perPage: 2</div>
-          <div ref="sliderLoopPerPageRef" class="tvist">
+          <div ref="sliderLoopPerPageRef" class="tvist-v0">
             <div class="tvist-v0__container">
               <div v-for="i in 6" :key="i" class="tvist-v0__slide">
                 <div class="slide-content">{{ i }}</div>

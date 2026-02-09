@@ -1,7 +1,7 @@
 <template>
   <ExampleCard title="Автопрокрутка" description="Автоматическая смена слайдов + пагинация">
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist">
+      <div ref="sliderEl" class="tvist-v0">
         <div class="tvist-v0__container">
           <div class="tvist-v0__slide">A</div>
           <div class="tvist-v0__slide">B</div>

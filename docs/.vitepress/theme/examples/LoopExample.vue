@@ -1,7 +1,7 @@
 <template>
   <ExampleCard title="Бесконечная прокрутка" description="Слайдер с бесконечным циклом и 2 слайдами на странице">
     <div class="demo-wrapper">
-      <div class="tvist" ref="sliderEl">
+      <div class="tvist-v0" ref="sliderEl">
         <div class="tvist-v0__container">
           <div class="tvist-v0__slide">1</div>
           <div class="tvist-v0__slide">2</div>

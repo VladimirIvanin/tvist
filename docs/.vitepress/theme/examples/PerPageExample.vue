@@ -7,7 +7,7 @@
       <!-- perPage: 1 -->
       <div class="demo-section">
         <h3>perPage: 1 (по умолчанию)</h3>
-        <div ref="slider1El" class="tvist">
+        <div ref="slider1El" class="tvist-v0">
           <div class="tvist-v0__container">
             <div v-for="i in 8" :key="i" class="tvist-v0__slide">
               <span>{{ i }}</span>
@@ -19,7 +19,7 @@
       <!-- perPage: 2 -->
       <div class="demo-section">
         <h3>perPage: 2</h3>
-        <div ref="slider2El" class="tvist">
+        <div ref="slider2El" class="tvist-v0">
           <div class="tvist-v0__container">
             <div v-for="i in 8" :key="i" class="tvist-v0__slide">
               <span>{{ i }}</span>
@@ -36,7 +36,7 @@
       <!-- perPage: 3 -->
       <div class="demo-section">
         <h3>perPage: 3 с зазором</h3>
-        <div ref="slider3El" class="tvist">
+        <div ref="slider3El" class="tvist-v0">
           <div class="tvist-v0__container">
             <div v-for="i in 8" :key="i" class="tvist-v0__slide">
               <span>{{ i }}</span>
@@ -53,7 +53,7 @@
       <!-- perPage: 4 -->
       <div class="demo-section">
         <h3>perPage: 4 (grid-style)</h3>
-        <div ref="slider4El" class="tvist">
+        <div ref="slider4El" class="tvist-v0">
           <div class="tvist-v0__container">
             <div v-for="i in 12" :key="i" class="tvist-v0__slide">
               <span>{{ i }}</span>
