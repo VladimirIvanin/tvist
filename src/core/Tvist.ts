@@ -148,11 +148,11 @@ export class Tvist {
   private slideClickHandler = (e: MouseEvent): void => {
     const slide = (e.target as HTMLElement).closest(
       `.${TVIST_CLASSES.slide}`
-    ) as HTMLElement | null
+    )
     if (!slide) return
-    const index = this.slides.indexOf(slide)
+    const index = this.slides.indexOf(slide as HTMLElement)
     if (index === -1) return
-    this.emit('click', index, slide, e)
+    this.emit('click', index, slide as HTMLElement, e)
   }
 
   /**

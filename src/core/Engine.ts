@@ -339,7 +339,6 @@ export class Engine {
       ? index 
       : Math.max(0, Math.min(index, endIndex))
 
-    const prevIndex = this.index.get()
     // Нормализуем индекс через Counter
     const normalizedIndex = this.index.set(clampedIndex) ?? 0
 
@@ -352,8 +351,6 @@ export class Engine {
       const minPos = peekTrim ? this.getMinScrollPosition() : 0
       targetPosition = Math.max(maxPos, Math.min(minPos, targetPosition))
     }
-
-    const endIndex = this.getEndIndex()
 
     this.tvist.emit('beforeSlideChange', normalizedIndex)
     this.options.on?.beforeSlideChange?.(normalizedIndex)

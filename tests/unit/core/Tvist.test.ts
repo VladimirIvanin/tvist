@@ -334,7 +334,7 @@ describe('Tvist', () => {
 
       const slider = new Tvist(fixture.root, {
         on: {
-          resize: onResize,
+          resized: onResize,
         },
       })
 
