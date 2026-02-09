@@ -1,7 +1,6 @@
 /**
  * SlideStatesModule - управление классами состояний слайдов
  * Применяет классы active, prev, next, visible к слайдам
- * На основе Splide (Slide.ts) и Swiper (updateSlidesClasses.mjs)
  */
 
 import { Module } from '../Module'

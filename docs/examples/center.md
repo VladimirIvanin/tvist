@@ -119,8 +119,6 @@ new Tvist('.tvist', {
 
 ### Логика центрирования
 
-Центрирование реализовано по принципу Splide (`focus: 'center'`) и Swiper (`centeredSlides`):
-
 1. **Расчет offset** - вычисляется смещение для центрирования:
    ```ts
    offset = (containerSize - slideSize) / 2

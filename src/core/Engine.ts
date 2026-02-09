@@ -1,6 +1,5 @@
 /**
  * Engine - ядро расчётов позиций, размеров, прокрутки
- * Основано на архитектуре Embla (чистая логика) + Splide (компонентный подход)
  */
 
 import { Vector1D } from './Vector1D'
@@ -26,6 +25,8 @@ export class Engine {
   // Кэш размеров
   private containerSize = 0
   private slideSize = 0
+  /** Размеры каждого слайда при autoWidth/autoHeight (измеренные из DOM) */
+  private slideSizes: number[] = []
   private slidePositions: number[] = []
   private peekStart = 0 // peek слева/сверху
   private peekEnd = 0   // peek справа/снизу
@@ -77,19 +78,33 @@ export class Engine {
   }
 
   /**
-   * Вычисляет offset для центрирования (аналог Splide offset и Swiper centeredSlides)
+   * Возвращает размер слайда по индексу (ширина или высота в зависимости от direction).
+   * При autoWidth/autoHeight — измеренный размер из DOM, иначе — общий slideSize.
    */
-  public getCenterOffset(_index: number): number {
+  public getSlideSize(index: number): number {
+    if (
+      this.slideSizes.length > 0 &&
+      index >= 0 &&
+      index < this.slideSizes.length
+    ) {
+      const size = this.slideSizes[index]
+      return size ?? this.slideSize
+    }
+    return this.slideSize
+  }
+
+  /**
+   * Вычисляет offset для центрирования
+   */
+  public getCenterOffset(index: number): number {
     if (!this.options.center) return 0
-    
+
     const isVertical = this.options.direction === 'vertical'
     const rootSize = isVertical
       ? getOuterHeight(this.tvist.root)
       : getOuterWidth(this.tvist.root)
-    
-    // Формула из Splide: (listSize - slideSize) / 2
-    // listSize - это размер видимой области (root), slideSize - размер одного слайда
-    return (rootSize - this.peekStart - this.peekEnd - this.slideSize) / 2
+    const size = this.getSlideSize(index)
+    return (rootSize - this.peekStart - this.peekEnd - size) / 2
   }
 
   /**
@@ -176,56 +191,78 @@ export class Engine {
 
     this.containerSize = rootSize - this.peekStart - this.peekEnd
 
-    // Автоматический расчет perPage если задан slideMinSize
-    if (this.options.slideMinSize && this.options.slideMinSize > 0) {
-      const gap = this.options.gap ?? 0
-      const minSize = this.options.slideMinSize
-      
-      // (size + gap) / (minSize + gap)
-      const calculatedPerPage = Math.floor(
-        (this.containerSize + gap) / (minSize + gap)
-      )
-      
-      this.options.perPage = Math.max(1, calculatedPerPage)
-    }
-
-    // Размер одного слайда с учётом perPage и gap
-    const perPage = this.options.perPage ?? 1
     const gap = this.options.gap ?? 0
+    const autoWidth = !isVertical && this.options.autoWidth === true
+    const autoHeight = isVertical && this.options.autoHeight === true
+    const isAutoSize = autoWidth || autoHeight
 
-    // Формула: slideSize = (containerSize - gap * (perPage - 1)) / perPage
-    this.slideSize = (this.containerSize - gap * (perPage - 1)) / perPage
-
-    // Защита от некорректных значений
-    if (this.slideSize < 0 || !isFinite(this.slideSize)) {
+    if (!isAutoSize) {
+      if (this.options.slideMinSize && this.options.slideMinSize > 0) {
+        const minSize = this.options.slideMinSize
+        const calculatedPerPage = Math.floor(
+          (this.containerSize + gap) / (minSize + gap)
+        )
+        this.options.perPage = Math.max(1, calculatedPerPage)
+      }
+      const perPage = this.options.perPage ?? 1
+      this.slideSize = (this.containerSize - gap * (perPage - 1)) / perPage
+      if (this.slideSize < 0 || !isFinite(this.slideSize)) {
+        this.slideSize = 0
+      }
+      this.slideSizes = []
+    } else {
       this.slideSize = 0
     }
 
-    // Устанавливаем размеры слайдам
-    slides.forEach((slide) => {
-      // Сбрасываем стили перед установкой новых (на случай смены ориентации)
-      slide.style.width = ''
-      slide.style.height = ''
-      slide.style.marginRight = ''
-      slide.style.marginBottom = ''
-
-      if (this.slideSize > 0) {
-        if (isVertical) {
-          slide.style.height = `${this.slideSize}px`
-          slide.style.width = '100%' // Слайд должен занимать всю ширину контейнера
-        } else {
-          slide.style.width = `${this.slideSize}px`
+    if (isAutoSize) {
+      // В режиме autoWidth/autoHeight только добавляем gap, НЕ трогаем размеры
+      slides.forEach((slide, i) => {
+        // Сбрасываем только margin (gap может измениться)
+        slide.style.marginRight = ''
+        slide.style.marginBottom = ''
+        
+        if (gap > 0 && i !== slides.length - 1) {
+          if (isVertical) {
+            slide.style.marginBottom = `${gap}px`
+          } else {
+            slide.style.marginRight = `${gap}px`
+          }
         }
-      }
+      })
+      
+      // Измеряем реальные размеры из DOM (CSS или инлайн стили)
+      this.slideSizes = slides.map((slide) =>
+        isVertical ? getOuterHeight(slide) : getOuterWidth(slide)
+      )
+    } else {
+      // В обычном режиме устанавливаем размеры принудительно
+      slides.forEach((slide, i) => {
+        slide.style.width = ''
+        slide.style.height = ''
+        slide.style.marginRight = ''
+        slide.style.marginBottom = ''
 
-      if (gap > 0 && slide !== slides[slides.length - 1]) {
-        if (isVertical) {
-          slide.style.marginBottom = `${gap}px`
-        } else {
-          slide.style.marginRight = `${gap}px`
+        if (this.slideSize > 0) {
+          if (isVertical) {
+            slide.style.height = `${this.slideSize}px`
+            slide.style.width = '100%'
+          } else {
+            slide.style.width = `${this.slideSize}px`
+          }
         }
-      }
-    })
+        
+        if (gap > 0 && i !== slides.length - 1) {
+          if (isVertical) {
+            slide.style.marginBottom = `${gap}px`
+          } else {
+            slide.style.marginRight = `${gap}px`
+          }
+        }
+      })
+      
+      // Очищаем массив размеров (используем общий slideSize)
+      this.slideSizes = []
+    }
   }
 
   /**
@@ -237,10 +274,16 @@ export class Engine {
 
     this.slidePositions = []
 
-    for (let i = 0; i < slides.length; i++) {
-      // Позиция = index * (slideSize + gap)
-      const position = i * (this.slideSize + gap)
-      this.slidePositions.push(position)
+    if (this.slideSizes.length > 0) {
+      let pos = 0
+      for (let i = 0; i < slides.length; i++) {
+        this.slidePositions.push(pos)
+        pos += (this.slideSizes[i] ?? 0) + gap
+      }
+    } else {
+      for (let i = 0; i < slides.length; i++) {
+        this.slidePositions.push(i * (this.slideSize + gap))
+      }
     }
   }
 
@@ -260,21 +303,20 @@ export class Engine {
 
   /**
    * Вычисляет последний допустимый индекс для скролла
-   * Логика из Splide: endIndex = slideCount - perPage
-   * Это гарантирует, что всегда показывается perPage слайдов
-   * При center: true (аналог hasFocus в Splide) всегда slideCount - 1
+   * endIndex = slideCount - perPage
+   * При autoWidth/autoHeight эффективно perPage = 1
    */
   private getEndIndex(): number {
     const slideCount = this.tvist.slides.length
-    const perPage = this.options.perPage ?? 1
     const isLoop = this.options.loop === true
+    const isAutoSize =
+      this.options.autoWidth === true || this.options.autoHeight === true
 
-    if (isLoop || this.options.center || this.options.isNavigation) {
-      // В режиме loop, center или navigation можно скроллить к любому слайду
+    if (isLoop || this.options.center || this.options.isNavigation || isAutoSize) {
       return slideCount - 1
     }
 
-    // Логика Splide: endIndex = slideCount - perPage
+    const perPage = this.options.perPage ?? 1
     const end = slideCount - perPage
     return Math.max(0, Math.min(end, slideCount - 1))
   }
@@ -299,9 +341,9 @@ export class Engine {
   getMaxScrollPosition(): number {
     if (this.options.loop) return -Infinity
     
-    // Рассчитываем правую границу всего контента по последнему слайду
     const lastIndex = this.tvist.slides.length - 1
-    const lastPageRight = this.getSlidePosition(lastIndex) + this.slideSize
+    const lastPageRight =
+      this.getSlidePosition(lastIndex) + this.getSlideSize(lastIndex)
 
     const isVertical = this.options.direction === 'vertical'
     const rootSize = isVertical
@@ -501,9 +543,9 @@ export class Engine {
     const perPage = this.options.perPage ?? 1
     
     if (slideCount > perPage) {
-      // Проверяем физическую возможность скролла только если размеры установлены
-      // (slideSize = 0 означает что размеры не установлены, например в тестах)
-      if (this.slideSize > 0) {
+      const hasSizes =
+        this.slideSize > 0 || this.slideSizes.length === slideCount
+      if (hasSizes) {
         // Вычисляем границы скролла
         const minScroll = this.getMinScrollPosition()
         const maxScroll = this.getMaxScrollPosition()
@@ -530,9 +572,9 @@ export class Engine {
     // Добавляем небольшой допуск (1px) для избежания проблем с округлением
     const contentFits = contentSize <= containerSize + 1
     
-    // Дополнительная проверка: есть ли физическая возможность скролла?
-    // Только если размеры установлены
-    if (this.slideSize > 0) {
+    const hasSizes =
+      this.slideSize > 0 || this.slideSizes.length === this.tvist.slides.length
+    if (hasSizes) {
       const minScroll = this.getMinScrollPosition()
       const maxScroll = this.getMaxScrollPosition()
       
@@ -552,16 +594,15 @@ export class Engine {
    */
   private getContentSize(): number {
     const slides = this.tvist.slides
-    
+
     if (slides.length === 0) return 0
-    
+
     let minPos = Infinity
     let maxPos = -Infinity
-    
+
     for (let i = 0; i < slides.length; i++) {
       const pos = this.getSlidePosition(i)
-      const size = this.slideSizeValue
-      
+      const size = this.getSlideSize(i)
       if (pos < minPos) minPos = pos
       if (pos + size > maxPos) maxPos = pos + size
     }
@@ -597,10 +638,11 @@ export class Engine {
   }
 
   /**
-   * Получить размер слайда (ширина или высота)
+   * Получить размер слайда (ширина или высота).
+   * При autoWidth/autoHeight возвращает размер первого слайда для совместимости с модулями.
    */
   get slideSizeValue(): number {
-    return this.slideSize
+    return this.slideSizes.length > 0 ? this.getSlideSize(0) : this.slideSize
   }
 
   /**

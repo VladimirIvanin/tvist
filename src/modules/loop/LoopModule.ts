@@ -1,7 +1,6 @@
 /**
  * LoopModule - бесконечная прокрутка с клонированием
  * 
- * Подход как в Splide:
  * 1. Создаём клоны слайдов в начале и конце
  * 2. DOM не меняется во время работы
  * 3. loopFix - мгновенный прыжок когда достигаем клона
@@ -141,7 +140,7 @@ export class LoopModule extends Module {
    */
   private computeCloneCount(): number {
     const perPage = this.options.perPage ?? 1
-    // Как в Splide: умножаем на 2 для гарантии плавности
+    // умножаем на 2 для гарантии плавности
     return perPage * 2
   }
 

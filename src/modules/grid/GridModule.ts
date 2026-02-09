@@ -69,7 +69,7 @@ export class GridModule extends Module {
   }
 
   /**
-   * Создает grid структуру с вложенными элементами (как Splide Grid)
+   * Создает grid структуру с вложенными элементами 
    * Поддерживает как фиксированную сетку (rows + cols), так и dimensions
    */
   private buildGrid(): void {

@@ -28,7 +28,7 @@ export class ThumbsModule extends Module {
     const slides = this.tvist.slides
     const listeners: (() => void)[] = []
     const activeClass = TVIST_CLASSES.slideNavActive
-    const legacyActiveClass = 'is-active' // Как в Splide
+    const legacyActiveClass = 'is-active'
 
     // 1. Обработка кликов
     slides.forEach((slide, index) => {

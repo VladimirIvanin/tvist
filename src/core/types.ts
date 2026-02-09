@@ -27,6 +27,20 @@ export interface TvistOptions {
   perPage?: number
   
   /**
+   * Если true, ширина слайдов определяется их содержимым (не задаётся слайдером).
+   * Рекомендуется perPage: 1.
+   * @default false
+   */
+  autoWidth?: boolean
+  
+  /**
+   * Если true, высота слайдов определяется их содержимым (для вертикального направления).
+   * Рекомендуется perPage: 1. 
+   * @default false
+   */
+  autoHeight?: boolean
+  
+  /**
    * Минимальный размер слайда (ширина или высота) для автоматического расчета perPage
    * @default undefined
    */
@@ -77,7 +91,6 @@ export interface TvistOptions {
 
   /**
    * Центрирование активного слайда. При true активный слайд будет находиться по центру контейнера.
-   * Работает как опция focus: 'center' в Splide или centeredSlides в Swiper.
    * @default false
    */
   center?: boolean

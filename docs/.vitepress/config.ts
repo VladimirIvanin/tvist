@@ -65,6 +65,7 @@ export default defineConfig({
           { text: 'PerPage', link: '/examples/perpage' },
           { text: 'Peek', link: '/examples/peek' },
           { text: 'Center', link: '/examples/center' },
+          { text: 'Auto Width/Height', link: '/examples/auto-width' },
           { text: 'Responsive', link: '/examples/responsive' },
           { text: 'Карточки товаров', link: '/examples/product-cards' },
           { text: 'Update Options', link: '/examples/update-options' },

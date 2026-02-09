@@ -210,4 +210,41 @@ describe('Engine - endIndex logic', () => {
       expect(slider.activeIndex).toBe(2) // Должно остановиться на endIndex
     })
   })
+
+  describe('autoWidth', () => {
+    it('should set endIndex to slideCount - 1 when autoWidth: true', () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}" style="width: 200px">1</div>
+            <div class="${TVIST_CLASSES.slide}" style="width: 300px">2</div>
+            <div class="${TVIST_CLASSES.slide}" style="width: 250px">3</div>
+            <div class="${TVIST_CLASSES.slide}" style="width: 280px">4</div>
+          </div>
+        </div>
+      `
+
+      const root = container.querySelector(`.${TVIST_CLASSES.block}`) as HTMLElement
+      root.style.width = '800px'
+      Object.defineProperty(root, 'offsetWidth', { configurable: true, value: 800 })
+      const slideEls = root.querySelectorAll(`.${TVIST_CLASSES.slide}`)
+      slideEls.forEach((el, i) => {
+        const w = [200, 300, 250, 280][i]
+        Object.defineProperty(el, 'offsetWidth', { configurable: true, value: w })
+      })
+
+      const slider = new Tvist(root, {
+        autoWidth: true,
+        gap: 16,
+        perPage: 1,
+        speed: 0
+      })
+
+      slider.scrollTo(3)
+      expect(slider.activeIndex).toBe(3)
+
+      slider.scrollTo(10)
+      expect(slider.activeIndex).toBe(3)
+    })
+  })
 })

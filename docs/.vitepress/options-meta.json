@@ -13,6 +13,18 @@
       "description": "Минимальный размер слайда (ширина или высота) для автоматического расчета perPage"
     },
     {
+      "name": "autoWidth",
+      "type": "boolean",
+      "default": "false",
+      "description": "Ширина слайдов по содержимому (горизонтальный слайдер). Рекомендуется perPage: 1"
+    },
+    {
+      "name": "autoHeight",
+      "type": "boolean",
+      "default": "false",
+      "description": "Высота слайдов по содержимому (вертикальный слайдер). Рекомендуется perPage: 1"
+    },
+    {
       "name": "gap",
       "type": "number",
       "default": "0",

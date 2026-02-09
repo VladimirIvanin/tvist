@@ -24,6 +24,7 @@ import UpdateOptionsExample from './.vitepress/theme/examples/UpdateOptionsExamp
 import ScrollControlExample from './.vitepress/theme/examples/ScrollControlExample.vue'
 import ScrollbarExample from './.vitepress/theme/examples/ScrollbarExample.vue'
 import MarqueeExample from './.vitepress/theme/examples/MarqueeExample.vue'
+import AutoWidthExample from './.vitepress/theme/examples/AutoWidthExample.vue'
 </script>
 
 <div class="examples-page">
@@ -113,6 +114,10 @@ import MarqueeExample from './.vitepress/theme/examples/MarqueeExample.vue'
 ## 21. Scrollbar
 
 <ScrollbarExample detailsLink="./examples/scrollbar" />
+
+## 22. Auto Width / Auto Height
+
+<AutoWidthExample detailsLink="./examples/auto-width" />
 
 </div>
 

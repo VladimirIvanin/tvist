@@ -1,6 +1,5 @@
 /**
  * Простая система событий для внутренней коммуникации
- * Основана на паттернах из Splide EventInterface
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- event args are intentionally untyped */
