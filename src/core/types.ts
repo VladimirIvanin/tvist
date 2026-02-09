@@ -82,6 +82,12 @@ export interface TvistOptions {
    */
   center?: boolean
   
+  /**
+   * Режим отладки: вывод предупреждений в консоль (arrows not found, container not found и т.д.)
+   * @default false
+   */
+  debug?: boolean
+  
   // Начальные значения
   
   /**

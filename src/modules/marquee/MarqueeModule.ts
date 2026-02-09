@@ -62,7 +62,7 @@ export class MarqueeModule extends Module {
     if (!this.shouldBeActive()) return
 
     // Отключаем drag для marquee режима
-    if (this.options.drag !== false) {
+    if (this.options.drag !== false && this.options.debug) {
       console.warn('[Tvist Marquee] Drag is disabled in marquee mode')
     }
 

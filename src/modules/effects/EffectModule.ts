@@ -20,9 +20,11 @@ export class EffectModule extends Module {
 
     // Effects require perPage: 1
     if (this.options.perPage !== 1) {
-      console.warn(
-        'Tvist: Effects work only with perPage: 1. Automatically setting perPage: 1'
-      )
+      if (this.options.debug) {
+        console.warn(
+          'Tvist: Effects work only with perPage: 1. Automatically setting perPage: 1'
+        )
+      }
       this.options.perPage = 1
       this.tvist.update()
     }

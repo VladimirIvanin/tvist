@@ -33,7 +33,9 @@ export class NavigationModule extends Module {
     this.findOrCreateArrows()
 
     if (!this.prevButton || !this.nextButton) {
-      console.warn('Tvist Navigation: arrows not found')
+      if (this.options.debug) {
+        console.warn('Tvist Navigation: arrows not found')
+      }
       return
     }
 

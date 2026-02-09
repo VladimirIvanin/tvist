@@ -30,7 +30,9 @@ export class PaginationModule extends Module {
     this.findOrCreateContainer()
 
     if (!this.container) {
-      console.warn('Tvist Pagination: container not found')
+      if (this.options.debug) {
+        console.warn('Tvist Pagination: container not found')
+      }
       return
     }
 
