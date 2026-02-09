@@ -94,7 +94,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   color: white;
   font-weight: bold;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
