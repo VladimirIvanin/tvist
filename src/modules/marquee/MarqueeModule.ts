@@ -56,6 +56,13 @@ export class MarqueeModule extends Module {
   override init(): void {
     if (!this.shouldBeActive()) return
 
+    // ВАЖНО: Marquee требует loop для бесшовной прокрутки
+    // Автоматически включаем loop, если он не был включен
+    if (!this.options.loop) {
+      // Обновляем опции через updateOptions для корректной инициализации всех модулей
+      this.tvist.updateOptions({ loop: true })
+    }
+
     // Вычисляем общий размер
     this.calculateTotalSize()
 
@@ -225,23 +232,62 @@ export class MarqueeModule extends Module {
   private updatePosition(deltaTime: number): void {
     // Вычисляем смещение
     const distance = this.speed * deltaTime
+    const isHorizontal = this.options.direction !== 'vertical'
+    const gap = this.options.gap ?? 0
 
     // Обновляем позицию в зависимости от направления
     const isReverse = this.direction === 'right' || this.direction === 'down'
     
     if (isReverse) {
-      // Для right/down: уменьшаем позицию (движемся от totalSize к 0)
+      // Для right/down: уменьшаем позицию
       this.currentPosition -= distance
-      // Loop: когда достигаем 0, возвращаемся к totalSize
-      if (this.currentPosition <= 0) {
-        this.currentPosition = this.totalSize
+      
+      // Если ушли в минус (появилась пустота слева/сверху), переносим последний слайд в начало
+      // Используем while на случай большого скачка (lag spike)
+      while (this.currentPosition <= 0) {
+        const slides = this.tvist.slides
+        const lastSlide = slides[slides.length - 1]
+        
+        if (!lastSlide) break // Безопасность
+
+        const slideSize = isHorizontal ? lastSlide.offsetWidth : lastSlide.offsetHeight
+        const totalSlideSize = slideSize + gap
+
+        // Переносим последний слайд в начало
+        this.tvist.container.prepend(lastSlide)
+        this.tvist.updateSlidesList()
+
+        // Корректируем позицию, добавляя ширину перенесённого слайда
+        // Visual: translate(pos) -> translate(pos + width)
+        this.currentPosition += totalSlideSize
       }
+
     } else {
-      // Для left/up: увеличиваем позицию (движемся от 0 к totalSize)
+      // Для left/up: увеличиваем позицию
       this.currentPosition += distance
-      // Loop: когда достигаем totalSize, возвращаемся к 0
-      if (this.currentPosition >= this.totalSize) {
-        this.currentPosition = 0
+
+      // Если первый слайд ушёл за пределы видимости (currentPosition >= width), переносим его в конец
+      // Используем while для обработки лагов
+      while (true) {
+        const slides = this.tvist.slides
+        const firstSlide = slides[0]
+        
+        if (!firstSlide) break
+
+        const slideSize = isHorizontal ? firstSlide.offsetWidth : firstSlide.offsetHeight
+        const totalSlideSize = slideSize + gap
+
+        if (this.currentPosition >= totalSlideSize) {
+          // Переносим первый слайд в конец
+          this.tvist.container.appendChild(firstSlide)
+          this.tvist.updateSlidesList()
+
+          // Корректируем позицию
+          // Visual: translate(-pos) -> translate(-(pos - width))
+          this.currentPosition -= totalSlideSize
+        } else {
+          break
+        }
       }
     }
 
