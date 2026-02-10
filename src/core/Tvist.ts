@@ -85,6 +85,7 @@ export class Tvist {
     // Мёрджим опции с дефолтными
     this.options = {
       perPage: 1,
+      slidesPerGroup: 1,
       gap: 0,
       speed: 300,
       direction: 'horizontal',
@@ -194,23 +195,63 @@ export class Tvist {
   // ==================== ПУБЛИЧНОЕ API ====================
 
   /**
-   * Следующий слайд
+   * Следующий слайд (или страница при perPage > 1)
    */
   next(): this {
     if (!this._isEnabled) return this
     if (this.engine.canScrollNext()) {
-      this.engine.scrollBy(1)
+      // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
+      const step = this.options.slidesPerGroup ?? 1
+      const currentIndex = this.engine.index.get()
+      const targetIndex = currentIndex + step
+      
+      // В loop режиме вызываем loopFix ДО перехода
+      if (this.options.loop) {
+        const loopModule = this.modules.get('loop') as any
+        if (loopModule && typeof loopModule.fix === 'function') {
+          // loopFix возвращает скорректированный ТЕКУЩИЙ индекс после перестановки
+          const currentCorrectedIndex = loopModule.fix({ 
+            direction: 'next'
+          })
+          
+          // Переходим относительно скорректированного индекса
+          this.engine.scrollTo(currentCorrectedIndex + step)
+          return this
+        }
+      }
+      
+      this.engine.scrollBy(step)
     }
     return this
   }
 
   /**
-   * Предыдущий слайд
+   * Предыдущий слайд (или страница при perPage > 1)
    */
   prev(): this {
     if (!this._isEnabled) return this
     if (this.engine.canScrollPrev()) {
-      this.engine.scrollBy(-1)
+      // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
+      const step = this.options.slidesPerGroup ?? 1
+      const currentIndex = this.engine.index.get()
+      const targetIndex = currentIndex - step
+      
+      // В loop режиме вызываем loopFix ДО перехода
+      if (this.options.loop) {
+        const loopModule = this.modules.get('loop') as any
+        if (loopModule && typeof loopModule.fix === 'function') {
+          // loopFix возвращает скорректированный ТЕКУЩИЙ индекс после перестановки
+          const currentCorrectedIndex = loopModule.fix({ 
+            direction: 'prev'
+          })
+          
+          // Переходим относительно скорректированного индекса
+          this.engine.scrollTo(currentCorrectedIndex - step)
+          return this
+        }
+      }
+      
+      this.engine.scrollBy(-step)
     }
     return this
   }

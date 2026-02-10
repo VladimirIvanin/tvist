@@ -48,6 +48,10 @@ export class DragModule extends Module {
   private readonly MIN_DRAG_DISTANCE = 5
   private isPotentialDrag = false
   
+  // Флаги для loop
+  private loopFixed = false // Флаг, что loopFix уже был вызван в этом жесте
+  private isFirstMove = true // Флаг первого движения
+  
   // Для расчёта velocity
   private lastMoveTime = 0
   private baseEvent: DragPoint | null = null
@@ -68,12 +72,23 @@ export class DragModule extends Module {
 
     // Слушаем сдвиг позиций (от LoopModule)
     this.on('positionShifted', this.onPositionShifted)
+    
+    // Слушаем loopFix для обновления стартовой позиции
+    this.on('loopFix', this.onLoopFix)
+  }
+
+  private onLoopFix = (): void => {
+    // После loopFix обновляем стартовую позицию, если идёт драг
+    if (this.isDragging) {
+      this.startPosition = this.tvist.engine.location.get()
+    }
   }
 
   override destroy(): void {
     this.detachEvents()
     this.stopMomentum()
     this.off('positionShifted', this.onPositionShifted)
+    this.off('loopFix', this.onLoopFix)
   }
 
   private onPositionShifted = (delta: number): void => {
@@ -188,6 +203,10 @@ export class DragModule extends Module {
     this.baseEvent = null
     this.prevBaseEvent = null
     this.lastMoveTime = 0
+    
+    // Сбрасываем флаги для loop
+    this.loopFixed = false
+    this.isFirstMove = true
 
     // Останавливаем активную анимацию если была
     this.stopMomentum()
@@ -236,6 +255,16 @@ export class DragModule extends Module {
 
     const delta = isHorizontal ? deltaX : deltaY
 
+    // Вызываем loopFix при первом движении (как в Swiper)
+    if (this.options.loop && this.isFirstMove && !this.loopFixed) {
+      const loopModule = this.tvist.getModule('loop') as { fix?: (params: { direction?: 'next' | 'prev' }) => void }
+      if (loopModule?.fix) {
+        const direction = delta > 0 ? 'next' : 'prev'
+        loopModule.fix({ direction })
+        this.isFirstMove = false
+      }
+    }
+
     // Применяем dragSpeed
     const dragSpeed = this.options.dragSpeed ?? 1
     let distance = delta * dragSpeed
@@ -251,6 +280,46 @@ export class DragModule extends Module {
     
     // Применяем transform напрямую (без пересчёта размеров)
     this.tvist.engine.applyTransformPublic()
+
+    // Проверяем достижение границ для loopFix (как в Swiper onTouchMove строки 236-288)
+    if (this.options.loop && !this.loopFixed) {
+      const loopModule = this.tvist.getModule('loop') as { 
+        fix?: (params: { direction?: 'next' | 'prev'; setTranslate?: boolean; activeSlideIndex?: number }) => void 
+      }
+      if (loopModule?.fix) {
+        const slides = this.tvist.slides
+        const perPage = this.options.perPage ?? 1
+        const currentIndex = this.tvist.engine.index.get()
+        
+        // Вычисляем пороги (упрощенная версия из Swiper)
+        const slideSize = this.tvist.engine.getSlideSize(0)
+        const threshold = slideSize / 2
+        
+        // Движение к началу (prev)
+        if (delta > 0 && newPosition > -threshold && currentIndex === 0) {
+          loopModule.fix({ 
+            direction: 'prev', 
+            setTranslate: true, 
+            activeSlideIndex: 0 
+          })
+          this.loopFixed = true
+          this.startPosition = this.tvist.engine.location.get()
+        }
+        // Движение к концу (next)
+        else if (delta < 0 && currentIndex === slides.length - perPage) {
+          const maxPos = this.tvist.engine.getScrollPositionForIndex(slides.length - perPage)
+          if (newPosition < maxPos - threshold) {
+            loopModule.fix({ 
+              direction: 'next', 
+              setTranslate: true, 
+              activeSlideIndex: slides.length - perPage 
+            })
+            this.loopFixed = true
+            this.startPosition = this.tvist.engine.location.get()
+          }
+        }
+      }
+    }
 
     // Обновляем базовое событие если прошло достаточно времени
     const elapsed = now - this.lastMoveTime
