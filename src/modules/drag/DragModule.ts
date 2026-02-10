@@ -31,7 +31,6 @@ export class DragModule extends Module {
   private startY = 0
   private startPosition = 0
   private startIndex = 0 // Индекс слайда при начале драга (для center mode)
-  private startMarqueePosition = 0 // Позиция marquee при начале драга
   private currentX = 0 // Текущая позиция курсора
   private currentY = 0
   
@@ -55,9 +54,11 @@ export class DragModule extends Module {
   private isPotentialDrag = false
   
   // Флаги для loop
-  private loopFixed = false // Флаг, что loopFix уже был вызван в этом жесте
   private isFirstMove = true // Флаг первого движения
-  private lastDirection: 'prev' | 'next' | null = null // Последнее направление движения
+  // Frame-based cooldown для coverageFix: после любого loopFix (isFirstMove или
+  // coverageFix) пропускаем N pointermove событий. Это предотвращает каскадный
+  // ping-pong (PREV→NEXT→PREV...) при быстрых drag-ах в маленьких каруселях.
+  private coverageFixCooldown = 0
   
   // Для расчёта velocity
   private lastMoveTime = 0
@@ -171,6 +172,20 @@ export class DragModule extends Module {
       root.addEventListener('touchstart', this.onPointerDown, { passive: true })
       root.addEventListener('mousedown', this.onPointerDown)
     }
+
+    // Предотвращаем нативный drag-and-drop (браузер перехватывает pointer events
+    // при попытке перетащить изображение или выделенный текст внутри слайдов)
+    root.addEventListener('dragstart', this.onDragStart)
+
+    // Класс --draggable: user-select: none, cursor: grab, touch-action
+    root.classList.add(TVIST_CLASSES.draggable)
+  }
+
+  /**
+   * Предотвращение нативного drag-and-drop
+   */
+  private onDragStart = (e: Event): void => {
+    e.preventDefault()
   }
 
   /**
@@ -186,6 +201,8 @@ export class DragModule extends Module {
       root.removeEventListener('mousedown', this.onPointerDown)
     }
 
+    root.removeEventListener('dragstart', this.onDragStart)
+    root.classList.remove(TVIST_CLASSES.draggable)
     this.removeDocumentEvents()
   }
 
@@ -217,29 +234,25 @@ export class DragModule extends Module {
     this.currentY = point.y
     this.startIndex = this.tvist.engine.index.get()
     
-    // Сохраняем текущую позицию marquee если модуль активен
-    const marqueeModule = this.tvist.getModule('marquee') as { 
-      getCurrentPosition?: () => number
-      pause?: () => void
-    }
-    if (marqueeModule?.getCurrentPosition) {
-      this.startMarqueePosition = marqueeModule.getCurrentPosition()
-      // КРИТИЧНО: синхронизируем engine.location с визуальной позицией marquee.
-      // MarqueeModule управляет transform напрямую, engine.location может быть рассинхронизирован.
-      // Без этой синхронизации drag начинается с позиции 0 вместо реальной визуальной позиции,
-      // что вызывает резкий скачок трансформа и подстановку другого слайда.
-      const marqueeVisualPosition = -this.startMarqueePosition
-      this.tvist.engine.location.set(marqueeVisualPosition)
-      this.tvist.engine.target.set(marqueeVisualPosition)
-      // Приостанавливаем marquee при начале драга
-      marqueeModule.pause?.()
-    } else {
-      this.startMarqueePosition = 0
-    }
+    // Приостанавливаем marquee если активен.
+    // MarqueeModule.pause() сам синхронизирует engine.location с визуальной позицией.
+    const marqueeModule = this.tvist.getModule('marquee') as { pause?: () => void }
+    marqueeModule?.pause?.()
     
-    // ВАЖНО: startPosition читаем ПОСЛЕ синхронизации с marquee,
-    // чтобы получить актуальную визуальную позицию
+    // startPosition читаем ПОСЛЕ паузы marquee
+    // (если marquee активен, engine.location уже синхронизирован в pause())
     this.startPosition = this.tvist.engine.location.get()
+
+    // === DEBUG ===
+    console.log('%c[DRAG] pointerDown', 'color: blue; font-weight: bold', {
+      startX: this.startX,
+      startPosition: this.startPosition,
+      startIndex: this.startIndex,
+      activeIndex: this.tvist.engine.activeIndex,
+      realIndex: (this.tvist as any).realIndex,
+      location: this.tvist.engine.location.get(),
+      slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
+    })
     
     // Сбрасываем события для velocity tracking
     this.baseEvent = null
@@ -247,9 +260,7 @@ export class DragModule extends Module {
     this.lastMoveTime = 0
     
     // Сбрасываем флаги для loop
-    this.loopFixed = false
     this.isFirstMove = true
-    this.lastDirection = null
 
     // Запоминаем состояние анимации для возможного восстановления
     this.wasAnimating = this.tvist.engine.animator.isAnimating()
@@ -297,15 +308,13 @@ export class DragModule extends Module {
         this.tvist.engine.animator.stop()
         
         // КРИТИЧНО: вызываем loopFix ДО первого применения transform
-        if (this.options.loop && this.isFirstMove && !this.loopFixed) {
+        if (this.options.loop && this.isFirstMove) {
           const isMarqueeActiveDrag = this.options.marquee !== false && this.options.marquee !== undefined
           
           if (isMarqueeActiveDrag) {
             // В режиме marquee НЕ вызываем loopFix при драге.
-            // engine.location уже синхронизирован с визуальной позицией marquee в onPointerDown.
+            // engine.location уже синхронизирован с визуальной позицией в MarqueeModule.pause().
             // Слайды уже расставлены MarqueeModule для непрерывной прокрутки.
-            // loopFix мог бы вызвать перестановку слайдов и корректировку transform,
-            // что приводило к резкому визуальному скачку (подстановке другого слайда).
             this.isFirstMove = false
           } else {
             const loopModule = this.tvist.getModule('loop') as { 
@@ -318,10 +327,18 @@ export class DragModule extends Module {
               const delta = isHorizontal ? deltaX : deltaY
               const direction = delta > 0 ? 'prev' : 'next'
               
-              // Вызываем loopFix для подготовки слайдов
+              // === DEBUG ===
+              const _beforeFix = {
+                location: this.tvist.engine.location.get(),
+                activeIndex: this.tvist.engine.activeIndex,
+                slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
+              }
+              
+              // Передаём конкретное direction — loopFix подготовит слайды
+              // в этом направлении. coverageFix добавит слайды в противоположном
+              // направлении если пользователь сменит направление (но с cooldown).
               loopModule.fix({ direction })
               this.isFirstMove = false
-              this.loopFixed = true // Предотвращаем повторный вызов для этого направления
               
               // Для обычного режима: обновляем startPosition
               this.startPosition = this.tvist.engine.location.get()
@@ -330,6 +347,22 @@ export class DragModule extends Module {
               this.startY = point.y
               
               this.startIndex = this.tvist.engine.index.get()
+              
+              // Cooldown: пропускаем следующие N pointermove для coverageFix
+              this.coverageFixCooldown = 5
+
+              // === DEBUG ===
+              console.log('%c[DRAG] isFirstMove loopFix', 'color: orange; font-weight: bold', {
+                direction,
+                delta: isHorizontal ? deltaX : deltaY,
+                before: _beforeFix,
+                after: {
+                  location: this.startPosition,
+                  activeIndex: this.startIndex,
+                  slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
+                  realIndex: (this.tvist as any).realIndex,
+                },
+              })
             }
           }
         }
@@ -347,32 +380,13 @@ export class DragModule extends Module {
     }
 
     const delta = isHorizontal ? deltaX : deltaY
-    
-    // Определяем текущее направление движения
-    const currentDirection: 'prev' | 'next' = delta > 0 ? 'prev' : 'next'
-    
-    // Если направление изменилось, вызываем loopFix для нового направления
-    // В режиме marquee пропускаем loopFix (слайды уже расставлены MarqueeModule)
-    if (this.options.loop && this.lastDirection !== null && this.lastDirection !== currentDirection) {
-      const isMarqueeActiveDrag = this.options.marquee !== false && this.options.marquee !== undefined
-      
-      if (!isMarqueeActiveDrag) {
-        const loopModule = this.tvist.getModule('loop') as { 
-          fix?: (params: { direction?: 'next' | 'prev' }) => void 
-        }
-        if (loopModule?.fix) {
-          loopModule.fix({ direction: currentDirection })
-          
-          // Для обычного режима
-          this.startPosition = this.tvist.engine.location.get()
-          this.startX = point.x
-          this.startY = point.y
-          
-          this.startIndex = this.tvist.engine.index.get()
-        }
-      }
-    }
-    this.lastDirection = currentDirection
+
+    // direction change loopFix УДАЛЁН:
+    // Ранее при смене направления drag вызывался loopFix, но это создавало
+    // каскадные сбросы startX/startPosition. Каждый сброс давал dragDelta ≈ 0
+    // на следующем кадре, что провоцировало ложные coverageFix и новые direction change.
+    // Теперь покрытие viewport обеспечивается только через checkContentCoverageAndFix,
+    // который срабатывает по реальным пустотам (с проверкой направления и порога).
 
     // Применяем dragSpeed
     const dragSpeed = this.options.dragSpeed ?? 1
@@ -385,16 +399,9 @@ export class DragModule extends Module {
     const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
     
     if (isMarqueeActive) {
-      // При marquee с loop: используем обычную логику startPosition + distance
-      // startPosition уже корректируется в onLoopFix после перестановки слайдов
-      if (this.options.loop) {
-        newPosition = this.startPosition + distance
-      } else {
-        // При marquee без loop: учитываем начальную позицию marquee
-        // marquee применяет transform как translate3d(-currentPosition, 0, 0)
-        const marqueeOffset = -this.startMarqueePosition
-        newPosition = marqueeOffset + distance
-      }
+      // startPosition уже синхронизирован с визуальной позицией marquee (через pause() в onPointerDown)
+      // и корректируется в onLoopFix после перестановки слайдов
+      newPosition = this.startPosition + distance
       
       // В marquee с loop режимом не применяем rubberband
       if (this.options.rubberband !== false && !this.options.loop) {
@@ -425,45 +432,18 @@ export class DragModule extends Module {
     // Применяем transform напрямую (без пересчёта размеров)
     this.tvist.engine.applyTransformPublic()
 
-    // Проверяем достижение границ для loopFix (только для обычного режима, не marquee)
-    // В marquee режиме логика loop интегрирована в сам MarqueeModule
-    if (this.options.loop && !isMarqueeActive && !this.loopFixed) {
-      const loopModule = this.tvist.getModule('loop') as { 
-        fix?: (params: { direction?: 'next' | 'prev'; setTranslate?: boolean; activeSlideIndex?: number }) => void 
-      }
-      if (loopModule?.fix) {
-        const slides = this.tvist.slides
-        const perPage = this.options.perPage ?? 1
-        const currentIndex = this.tvist.engine.index.get()
-        
-        // Вычисляем пороги
-        const slideSize = this.tvist.engine.getSlideSize(0)
-        const threshold = slideSize / 2
-        
-        // Движение к началу (prev)
-        if (delta > 0 && newPosition > -threshold && currentIndex === 0) {
-          loopModule.fix({ 
-            direction: 'prev', 
-            setTranslate: true, 
-            activeSlideIndex: 0 
-          })
-          this.loopFixed = true
-          this.startPosition = this.tvist.engine.location.get()
-        }
-        // Движение к концу (next)
-        else if (delta < 0 && currentIndex === slides.length - perPage) {
-          const maxPos = this.tvist.engine.getScrollPositionForIndex(slides.length - perPage)
-          if (newPosition < maxPos - threshold) {
-            loopModule.fix({ 
-              direction: 'next', 
-              setTranslate: true, 
-              activeSlideIndex: slides.length - perPage 
-            })
-            this.loopFixed = true
-            this.startPosition = this.tvist.engine.location.get()
-          }
-        }
-      }
+    // === DEBUG: лог каждого pointermove ===
+    console.log('%c[DRAG] move', 'color: gray', {
+      x: Math.round(point.x),
+      delta: Math.round(delta),
+      pos: Math.round(newPosition),
+      order: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
+    })
+
+    // Проверяем покрытие viewport контентом и подставляем слайды при необходимости
+    // Работает для всех loop-режимов (обычный loop и marquee + loop)
+    if (this.options.loop) {
+      this.checkContentCoverageAndFix(newPosition, point)
     }
 
     // Обновляем базовое событие если прошло достаточно времени
@@ -520,39 +500,27 @@ export class DragModule extends Module {
       // Вычисляем velocity
       const velocity = this.calculateVelocity()
 
+      // === DEBUG ===
+      console.log('%c[DRAG] pointerUp', 'color: brown; font-weight: bold', {
+        location: this.tvist.engine.location.get(),
+        activeIndex: this.tvist.engine.activeIndex,
+        realIndex: (this.tvist as any).realIndex,
+        currentX: this.currentX,
+        startX: this.startX,
+        dragDist: this.currentX - this.startX,
+        slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
+      })
+
       // Emit события
       this.emit('dragEnd', e)
 
       // Проверяем активность marquee
       const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
-      const marqueeModule = this.tvist.getModule('marquee') as { 
-        resume?: () => void
-        setCurrentPosition?: (position: number) => void
-      }
       
       if (isMarqueeActive) {
-        // Для marquee режима не применяем snap, просто возобновляем marquee
-        if (this.options.loop) {
-          // При loop: синхронизируем позицию marquee с engine.location
-          // engine.location уже корректный после loopFix
-          const finalPosition = this.tvist.engine.location.get()
-          if (marqueeModule?.setCurrentPosition) {
-            // Marquee использует положительное значение currentPosition
-            // а engine.location - это transform offset (может быть отрицательным)
-            // Поэтому используем отрицательное значение
-            marqueeModule.setCurrentPosition(-finalPosition)
-          }
-        } else {
-          // При отсутствии loop: обновляем позицию marquee на основе финальной позиции engine
-          const finalPosition = this.tvist.engine.location.get()
-          if (marqueeModule?.setCurrentPosition) {
-            marqueeModule.setCurrentPosition(-finalPosition)
-          }
-        }
-        
-        if (marqueeModule?.resume) {
-          marqueeModule.resume()
-        }
+        // MarqueeModule сам подхватит позицию из engine.location через resume()
+        // при получении события dragEnd (уже emitted выше).
+        // Не делаем snap — marquee продолжит прокрутку.
       } else {
         // Применяем инерцию или snap для обычного режима
         if (this.options.drag === 'free') {
@@ -565,6 +533,13 @@ export class DragModule extends Module {
       // Если не было драга, но была анимация - возобновляем её
       // Используем scrollTo без immediate чтобы продолжить анимацию
       this.tvist.scrollTo(this.animationTarget, false)
+    }
+    
+    // Если не было реального drag (tap) — возобновляем marquee если был на паузе.
+    // MarqueeModule.resume() безопасен для вызова если не на паузе (проверка внутри).
+    if (!wasDragging) {
+      const mq = this.tvist.getModule('marquee') as { resume?: () => void }
+      mq?.resume?.()
     }
     
     // Сбрасываем флаги
@@ -634,6 +609,107 @@ export class DragModule extends Module {
       'input, textarea, select, button, a[href], [tabindex]'
     
     return element.matches(focusableSelectors)
+  }
+
+  /**
+   * Проверяет покрытие viewport контентом и вызывает loopFix при необходимости.
+   * Работает для всех loop-режимов (обычный loop и marquee + loop).
+   * Заменяет старую проверку по индексу — использует реальные позиции слайдов.
+   */
+  private checkContentCoverageAndFix(
+    currentPosition: number,
+    point: { x: number; y: number }
+  ): void {
+    const loopModule = this.tvist.getModule('loop') as { 
+      fix?: (params: { direction?: 'next' | 'prev'; activeSlideIndex?: number }) => void 
+    }
+    if (!loopModule?.fix) return
+
+    const isHorizontal = this.options.direction !== 'vertical'
+    const viewportSize = isHorizontal 
+      ? this.tvist.root.offsetWidth 
+      : this.tvist.root.offsetHeight
+
+    // Координаты viewport в пространстве контента
+    const vpStart = -currentPosition
+    const vpEnd = vpStart + viewportSize
+
+    // Границы контента
+    const slides = this.tvist.slides
+    if (slides.length === 0) return
+
+    const contentStart = this.tvist.engine.getSlidePosition(0)
+    const lastIdx = slides.length - 1
+    const contentEnd = this.tvist.engine.getSlidePosition(lastIdx) + this.tvist.engine.getSlideSize(lastIdx)
+
+    // Проверяем только ту сторону, в которую тянет пользователь.
+    // Это предотвращает пинг-понг: coverageFix PREV → viewport сдвигается →
+    // coverageFix NEXT → viewport сдвигается обратно → бесконечный цикл.
+    const isHoriz = this.options.direction !== 'vertical'
+    const dragDelta = isHoriz ? (point.x - this.startX) : (point.y - this.startY)
+
+    // Пропускаем проверку если |dragDelta| слишком мал — направление ненадёжно.
+    // После каждого loopFix startX сбрасывается к point.x, и на следующем кадре
+    // dragDelta ≈ 0.4px с произвольным знаком, что вызывает ложные срабатывания.
+    const MIN_COVERAGE_DRAG_DELTA = 10
+    if (Math.abs(dragDelta) < MIN_COVERAGE_DRAG_DELTA) return
+
+    // Frame-based cooldown: после любого loopFix (isFirstMove или coverageFix)
+    // пропускаем N pointermove событий. При быстрых drag-ах в маленьких каруселях
+    // coverageFix вызывает ping-pong (PREV→NEXT→PREV...) потому что каждый fix
+    // сдвигает viewport к противоположному краю контента. Пауза в N кадров
+    // даёт позиции стабилизироваться.
+    if (this.coverageFixCooldown > 0) {
+      this.coverageFixCooldown--
+      return
+    }
+
+    // Буфер = -5px: игнорируем субпиксельные зазоры от floating point,
+    // реагируем только на реальные видимые пустоты (> 5px).
+    const buffer = -5
+
+    let fixed = false
+
+    if (dragDelta > 0 && vpStart < contentStart + buffer) {
+      // === DEBUG ===
+      const _bef = { location: this.tvist.engine.location.get(), slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(',') }
+      
+      // Drag вправо → viewport уходит влево → подставляем слайды перед первым
+      loopModule.fix({ direction: 'prev', activeSlideIndex: 0 })
+      fixed = true
+
+      // === DEBUG ===
+      console.log('%c[DRAG] coverageFix PREV', 'color: purple; font-weight: bold', {
+        vpStart, vpEnd, contentStart, contentEnd, dragDelta,
+        before: _bef,
+        after: { location: this.tvist.engine.location.get(), slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','), realIndex: (this.tvist as any).realIndex },
+      })
+    } else if (dragDelta < 0 && vpEnd > contentEnd - buffer) {
+      // === DEBUG ===
+      const _bef = { location: this.tvist.engine.location.get(), slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(',') }
+      
+      // Drag влево → viewport уходит вправо → подставляем слайды после последнего
+      loopModule.fix({ direction: 'next', activeSlideIndex: lastIdx })
+      fixed = true
+
+      // === DEBUG ===
+      console.log('%c[DRAG] coverageFix NEXT', 'color: purple; font-weight: bold', {
+        vpStart, vpEnd, contentStart, contentEnd, dragDelta,
+        before: _bef,
+        after: { location: this.tvist.engine.location.get(), slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','), realIndex: (this.tvist as any).realIndex },
+      })
+    }
+
+    if (fixed) {
+      // После loopFix обновляем стартовые точки drag для корректного расчёта delta
+      this.startPosition = this.tvist.engine.location.get()
+      this.startX = point.x
+      this.startY = point.y
+      this.startIndex = this.tvist.engine.index.get()
+      
+      // Cooldown: пропускаем следующие N pointermove для стабилизации
+      this.coverageFixCooldown = 5
+    }
   }
 
   /**
@@ -917,6 +993,21 @@ export class DragModule extends Module {
         targetIndex = startIndex + 1
       }
     }
+
+    // === DEBUG ===
+    console.log('%c[DRAG] snapWithThreshold', 'color: green; font-weight: bold', {
+      startIndex,
+      currentX: this.currentX,
+      startX: this.startX,
+      dragDistance,
+      threshold,
+      absDistance: Math.abs(dragDistance),
+      belowThreshold: Math.abs(dragDistance) < threshold,
+      targetIndex,
+      realIndex: (this.tvist as any).realIndex,
+      location: engine.location.get(),
+      slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
+    })
     
     // Snap через scrollTo
     engine.scrollTo(targetIndex)

@@ -66,12 +66,29 @@
     }
   }
   
-  // Состояние dragging
+  // Drag включён: предотвращаем выделение текста и нативный drag
+  &--draggable {
+    .#{$tvist-block}__container {
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: grab;
+      // Горизонтальный слайдер: разрешаем вертикальный скролл страницы
+      touch-action: pan-y;
+    }
+  }
+
+  // Вертикальный + draggable: разрешаем горизонтальный скролл
+  &--vertical#{&}--draggable {
+    .#{$tvist-block}__container {
+      touch-action: pan-x;
+    }
+  }
+
+  // Состояние dragging (активный drag)
   &--dragging {
     .#{$tvist-block}__container {
       transition: none !important;
       cursor: grabbing;
-      user-select: none;
     }
     
     .#{$tvist-block}__slide {

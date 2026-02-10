@@ -383,6 +383,12 @@ export class MarqueeModule extends Module {
   pause(): void {
     if (!this.paused) {
       this.paused = true
+      // Синхронизируем engine.location с визуальной позицией marquee.
+      // MarqueeModule управляет transform напрямую, engine.location может быть рассинхронизирован.
+      // При паузе (например, для drag) нужно чтобы engine.location отражал реальную позицию.
+      const visualPosition = -this.currentPosition
+      this.tvist.engine.location.set(visualPosition)
+      this.tvist.engine.target.set(visualPosition)
       this.emit('marqueePause')
     }
   }
@@ -392,6 +398,9 @@ export class MarqueeModule extends Module {
    */
   resume(): void {
     if (this.paused && !this.stopped) {
+      // Синхронизируем currentPosition с engine.location
+      // (после drag/snap engine.location мог измениться)
+      this.currentPosition = -this.tvist.engine.location.get()
       this.paused = false
       this.lastTimestamp = null // Сбрасываем timestamp для корректного deltaTime
       this.emit('marqueeResume')

@@ -23,6 +23,7 @@ export const TVIST_CLASSES = {
   slide: `${P}__slide`,
   vertical: `${P}--vertical`,
   disabled: `${P}--disabled`,
+  draggable: `${P}--draggable`,
   dragging: `${P}--dragging`,
   locked: `${P}--locked`,
   nav: `${P}--nav`,
