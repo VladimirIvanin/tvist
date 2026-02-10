@@ -291,6 +291,326 @@ describe('DragModule', () => {
     })
   })
 
+  describe('Проблемы с кликом и анимацией', () => {
+    /**
+     * ПРОБЛЕМА 1: При клике во время анимации, анимация останавливается
+     * 
+     * Причина:
+     * - В onPointerDown вызывается this.tvist.engine.animator.stop()
+     * - Это происходит даже если пользователь сделал короткий клик (не драг)
+     * - В результате анимация останавливается и не продолжается
+     * 
+     * Ожидаемое поведение:
+     * - Если пользователь сделал короткий клик (не превысил MIN_DRAG_DISTANCE)
+     * - Анимация НЕ должна останавливаться, или должна возобновиться после отпускания
+     * 
+     * Текущее поведение:
+     * - animator.stop() вызывается в onPointerDown
+     * - Даже если isDragging не становится true (клик без движения)
+     * - Анимация не возобновляется в onPointerUp
+     */
+    
+    it('должен останавливать animator при mousedown но возобновлять при отпускании без драга', async () => {
+      slider.updateOptions({ speed: 500 })
+      
+      // Запускаем анимацию
+      slider.scrollTo(1)
+      await waitForAnimation(100)
+      
+      // Проверяем что animator активен
+      expect(slider.engine.animator.isAnimating()).toBe(true)
+      
+      // Делаем mousedown
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      
+      // Animator останавливается при mousedown (для возможности драга)
+      expect(slider.engine.animator.isAnimating()).toBe(false)
+      
+      // Отпускаем без движения (не было драга)
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 200, clientY: 100 })
+      )
+      
+      // Ждем
+      await waitForAnimation(100)
+      
+      // ИСПРАВЛЕНО: анимация возобновляется после отпускания
+      // Проверяем что animator снова активен
+      expect(slider.engine.animator.isAnimating()).toBe(true)
+    })
+    
+    it('должен продолжить анимацию после клика без движения', async () => {
+      slider.updateOptions({ speed: 500 })
+      
+      // Запускаем анимацию
+      slider.scrollTo(1)
+      await waitForAnimation(100)
+      
+      // Делаем клик без движения
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 200, clientY: 100 })
+      )
+      
+      // Ждем завершения анимации
+      await waitForAnimation(500)
+      
+      // ИСПРАВЛЕНО: анимация завершается, слайдер на втором слайде
+      expect(slider.activeIndex).toBe(1)
+      
+      // Позиция должна точно соответствовать слайду
+      const finalPosition = slider.engine.location.get()
+      const expectedPosition = slider.engine.getScrollPositionForIndex(1)
+      expect(Math.abs(finalPosition - expectedPosition)).toBeLessThan(1)
+    })
+    it('НЕ должен останавливать анимацию при коротком клике', async () => {
+      // Увеличиваем скорость анимации для теста
+      slider.updateOptions({ speed: 500 })
+      
+      // Запускаем анимацию перехода к следующему слайду
+      slider.scrollTo(1) // Без immediate, будет анимация
+      
+      // Ждем немного чтобы анимация началась, но не завершилась
+      await waitForAnimation(100)
+      
+      // Проверяем что анимация идет (позиция изменяется)
+      const positionDuringAnimation = slider.engine.location.get()
+      const initialPosition = 0
+      const targetPosition = slider.engine.getScrollPositionForIndex(1)
+      
+      // Позиция должна быть между начальной и конечной
+      expect(positionDuringAnimation).not.toBe(initialPosition)
+      expect(positionDuringAnimation).not.toBe(targetPosition)
+      
+      // Проверяем что animator активен
+      const isAnimating = slider.engine.animator.isAnimating()
+      expect(isAnimating).toBe(true)
+      
+      // Делаем короткий клик (mousedown + mouseup без движения)
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      
+      // ПРОБЛЕМА: после mousedown animator останавливается
+      // Проверяем что animator остановлен (это и есть баг)
+      const isAnimatingAfterMouseDown = slider.engine.animator.isAnimating()
+      
+      // Сразу отпускаем без движения
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 200, clientY: 100 })
+      )
+      
+      // Ждем завершения анимации
+      await waitForAnimation(500)
+      
+      // ОЖИДАНИЕ: анимация должна была продолжиться и завершиться
+      // Слайдер должен переключиться на второй слайд
+      // НО из-за бага анимация останавливается и слайдер остается на первом слайде
+      expect(slider.activeIndex).toBe(1)
+    })
+
+    it('НЕ должен останавливать анимацию при клике с минимальным движением', async () => {
+      // Увеличиваем скорость анимации для теста
+      slider.updateOptions({ speed: 500 })
+      
+      // Запускаем анимацию
+      slider.scrollTo(1)
+      await waitForAnimation(100)
+      
+      const positionBeforeClick = slider.engine.location.get()
+      
+      // Делаем клик с минимальным движением (меньше MIN_DRAG_DISTANCE = 5px)
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      
+      // Двигаем мышь на 2px (меньше порога)
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 202, clientY: 100 })
+      )
+      
+      // Отпускаем
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 202, clientY: 100 })
+      )
+      
+      // Ждем завершения анимации
+      await waitForAnimation(500)
+      
+      // Анимация должна была продолжиться
+      expect(slider.activeIndex).toBe(1)
+    })
+
+    /**
+     * ПРОБЛЕМА 2: onPointerDown срабатывает 2 раза при одном клике
+     * 
+     * Причина:
+     * - Подписка на несколько типов событий: mousedown, touchstart, pointerdown
+     * - В современных браузерах PointerEvent генерирует и pointer события и mouse события
+     * - Результат: обработчик вызывается дважды для одного физического клика
+     * 
+     * Ожидаемое поведение:
+     * - При одном клике onPointerDown должен вызваться только один раз
+     */
+    it('НЕ должен вызывать onPointerDown дважды при одном клике', () => {
+      // Создаем spy для отслеживания вызовов
+      const dragStartSpy = vi.fn()
+      slider.on('dragStart', dragStartSpy)
+      
+      // Симулируем реальное поведение браузера: при клике мышью генерируются
+      // и pointerdown и mousedown события
+      
+      // Сначала pointerdown
+      if ('PointerEvent' in window) {
+        const pointerDownEvent = new PointerEvent('pointerdown', {
+          clientX: 200,
+          clientY: 100,
+          bubbles: true,
+          cancelable: true,
+          pointerType: 'mouse',
+          isPrimary: true,
+        })
+        fixture.container.dispatchEvent(pointerDownEvent)
+      }
+      
+      // Затем mousedown (как в реальном браузере)
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      
+      // Двигаем для начала драга (достаточно далеко для превышения threshold)
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 150, clientY: 100 })
+      )
+      
+      // dragStart должен быть вызван только 1 раз, не дважды
+      // Если onPointerDown срабатывает дважды, то dragStart тоже будет дважды
+      expect(dragStartSpy).toHaveBeenCalledOnce()
+      
+      // Отпускаем
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 150, clientY: 100 })
+      )
+    })
+
+    it('НЕ должен дублировать события при использовании pointer events', () => {
+      // Проверяем поддержку PointerEvent
+      if (!('PointerEvent' in window)) {
+        console.log('PointerEvent не поддерживается, пропускаем тест')
+        return
+      }
+      
+      const dragStartSpy = vi.fn()
+      slider.on('dragStart', dragStartSpy)
+      
+      // Симулируем реальное поведение браузера:
+      // При клике мышью генерируются ОБА события: pointerdown И mousedown
+      
+      // 1. Сначала pointerdown
+      const pointerDownEvent = new PointerEvent('pointerdown', {
+        clientX: 200,
+        clientY: 100,
+        bubbles: true,
+        cancelable: true,
+        pointerType: 'mouse',
+        isPrimary: true,
+      })
+      fixture.container.dispatchEvent(pointerDownEvent)
+      
+      // 2. Затем mousedown (автоматически генерируется браузером)
+      const mouseDownEvent = createMouseEvent('mousedown', {
+        clientX: 200,
+        clientY: 100,
+      })
+      fixture.container.dispatchEvent(mouseDownEvent)
+      
+      // Двигаем для начала драга
+      const pointerMoveEvent = new PointerEvent('pointermove', {
+        clientX: 150,
+        clientY: 100,
+        bubbles: true,
+        cancelable: true,
+        pointerType: 'mouse',
+        isPrimary: true,
+      })
+      document.dispatchEvent(pointerMoveEvent)
+      
+      // dragStart должен быть вызван только 1 раз, не дважды
+      // FAILING: если onPointerDown вызывается дважды, dragStart будет дважды
+      expect(dragStartSpy).toHaveBeenCalledOnce()
+      
+      // Отпускаем
+      const pointerUpEvent = new PointerEvent('pointerup', {
+        clientX: 150,
+        clientY: 100,
+        bubbles: true,
+        cancelable: true,
+        pointerType: 'mouse',
+        isPrimary: true,
+      })
+      document.dispatchEvent(pointerUpEvent)
+    })
+    
+    it('должен игнорировать дублирующиеся события от разных типов', () => {
+      if (!('PointerEvent' in window)) {
+        return
+      }
+      
+      // Подсчитываем сколько раз вызывается stopMomentum
+      // (вызывается в onPointerDown)
+      let stopMomentumCallCount = 0
+      const dragModule = slider.getModule('drag') as any
+      const originalStopMomentum = dragModule.stopMomentum
+      dragModule.stopMomentum = function() {
+        stopMomentumCallCount++
+        return originalStopMomentum.call(this)
+      }
+      
+      // Симулируем реальное поведение: pointerdown + mousedown
+      // Но теперь DragModule подписан только на pointerdown (если PointerEvent поддерживается)
+      fixture.container.dispatchEvent(
+        new PointerEvent('pointerdown', {
+          clientX: 200,
+          clientY: 100,
+          bubbles: true,
+          cancelable: true,
+          pointerType: 'mouse',
+          isPrimary: true,
+        })
+      )
+      
+      // Отправляем mousedown (как делает браузер), но он должен игнорироваться
+      // потому что мы подписаны только на pointerdown
+      const mouseEvent = new MouseEvent('mousedown', {
+        clientX: 200,
+        clientY: 100,
+        bubbles: true,
+        cancelable: true,
+      })
+      fixture.container.dispatchEvent(mouseEvent)
+      
+      // ОЖИДАНИЕ: stopMomentum должен быть вызван только 1 раз
+      // ИСПРАВЛЕНО: теперь мы подписаны только на pointerdown
+      expect(stopMomentumCallCount).toBe(1)
+      
+      // Cleanup
+      document.dispatchEvent(
+        new PointerEvent('pointerup', {
+          clientX: 200,
+          clientY: 100,
+          bubbles: true,
+          cancelable: true,
+          pointerType: 'mouse',
+          isPrimary: true,
+        })
+      )
+    })
+  })
+
   describe('Center mode', () => {
     /**
      * ПРОБЛЕМА: При center: true + drag происходит резкое смещение трансформа при первом взаимодействии

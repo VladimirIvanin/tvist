@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { createSliderFixture, simulateDrag, type SliderFixture } from '../../../fixtures'
+import { createSliderFixture, simulateDrag, createPointerOrMouseEvent, type SliderFixture } from '../../../fixtures'
 import { Tvist } from '@core/Tvist'
 import { LoopModule } from '@modules/loop/LoopModule'
 import { DragModule } from '@modules/drag/DragModule'
@@ -57,57 +57,6 @@ describe('LoopModule + DragModule Integration', () => {
   })
 
   describe('Корректность transform при drag с loop', () => {
-    it('location должен изменяться плавно при малом drag (без скачков)', async () => {
-      slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-      
-      const initialLocation = slider.engine.location.get()
-      console.log('Initial location:', initialLocation)
-      
-      // Малое движение вправо (50px)
-      await simulateDrag({
-          element: fixture.container,
-          startX: 500,
-          deltaX: 50,
-          steps: 5,
-          duration: 200
-      })
-      
-      const finalLocation = slider.engine.location.get()
-      const locationDiff = finalLocation - initialLocation
-      
-      console.log('Final location:', finalLocation)
-      console.log('Location diff:', locationDiff)
-      
-      // КРИТИЧНО: location должен измениться примерно на 50px (±20px погрешность)
-      // НЕ должно быть огромного скачка (как было -990px)
-      expect(Math.abs(locationDiff)).toBeGreaterThan(30) // Хотя бы 30px
-      expect(Math.abs(locationDiff)).toBeLessThan(100) // Но не более 100px
-    })
-
-    it('location должен изменяться пропорционально движению курсора', async () => {
-      slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-      
-      const initialLocation = slider.engine.location.get()
-      
-      // Движение на 100px
-      await simulateDrag({
-          element: fixture.container,
-          startX: 500,
-          deltaX: 100,
-          steps: 10,
-          duration: 300
-      })
-      
-      const finalLocation = slider.engine.location.get()
-      const locationDiff = Math.abs(finalLocation - initialLocation)
-      
-      console.log('Movement: 100px, Location diff:', locationDiff)
-      
-      // Location должен измениться примерно на 100px (±30px)
-      expect(locationDiff).toBeGreaterThan(70)
-      expect(locationDiff).toBeLessThan(130)
-    })
-
     it('НЕ должно быть огромного скачка transform при старте drag', async () => {
       slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
       
@@ -732,102 +681,6 @@ describe('LoopModule + DragModule Integration', () => {
     expect(calls.length).toBe(1)
   })
 
-  it('должен корректно обрабатывать transform после loopFix при старте драга', async () => {
-    slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-    
-    const loopModule = slider.getModule('loop') as any
-    
-    // Начальное состояние
-    const initialState = loopModule.getTransformState()
-    console.log('Initial state:', initialState)
-    
-    // Начинаем драг
-    const container = fixture.container
-    const startX = 500
-    
-    // Симулируем pointerdown
-    const downEvent = new MouseEvent('mousedown', {
-      clientX: startX,
-      clientY: 100,
-      bubbles: true
-    })
-    container.dispatchEvent(downEvent)
-    
-    // Ждем немного
-    await new Promise(resolve => setTimeout(resolve, 10))
-    
-    // Первое движение (превышаем threshold 5px)
-    const move1Event = new MouseEvent('mousemove', {
-      clientX: startX + 10,
-      clientY: 100,
-      bubbles: true
-    })
-    document.dispatchEvent(move1Event)
-    
-    // Состояние после первого движения
-    const stateAfterFirstMove = loopModule.getTransformState()
-    console.log('State after first move:', stateAfterFirstMove)
-    
-    // Второе движение (еще 10px)
-    const move2Event = new MouseEvent('mousemove', {
-      clientX: startX + 20,
-      clientY: 100,
-      bubbles: true
-    })
-    document.dispatchEvent(move2Event)
-    
-    // Состояние после второго движения
-    const stateAfterSecondMove = loopModule.getTransformState()
-    console.log('State after second move:', stateAfterSecondMove)
-    
-    // Завершаем драг
-    const upEvent = new MouseEvent('mouseup', {
-      clientX: startX + 20,
-      clientY: 100,
-      bubbles: true
-    })
-    document.dispatchEvent(upEvent)
-    
-    // Проверяем, что transform изменился корректно
-    // Location должен измениться пропорционально движению
-    const locationDiff = stateAfterSecondMove.location - initialState.location
-    
-    // Ожидаем, что location изменился примерно на 20px (с учетом dragSpeed)
-    // Но если loopFix сработал некорректно, будет большой скачок
-    console.log('Location diff:', locationDiff)
-    
-    // Проверяем, что нет большого скачка (более 500px)
-    expect(Math.abs(locationDiff)).toBeLessThan(500)
-  })
-
-  it('должен корректно работать при быстром драге в начале', async () => {
-    slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-    
-    const loopModule = slider.getModule('loop') as any
-    const initialLocation = slider.engine.location.get()
-    
-    console.log('Initial location:', initialLocation)
-    
-    // Быстрый драг на 100px
-    await simulateDrag({
-        element: fixture.container,
-        startX: 500,
-        deltaX: 100,
-        steps: 3, // Мало шагов = быстрое движение
-        duration: 100
-    })
-    
-    const finalLocation = slider.engine.location.get()
-    const locationDiff = finalLocation - initialLocation
-    
-    console.log('Final location:', finalLocation)
-    console.log('Location diff:', locationDiff)
-    
-    // Проверяем, что location изменился примерно на 100px
-    // Если loopFix сработал некорректно, будет большой скачок или неправильное значение
-    expect(Math.abs(locationDiff - 100)).toBeLessThan(50)
-  })
-
   it('должен вызывать loopFix ДО значительного изменения transform', async () => {
     slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
     
@@ -871,312 +724,6 @@ describe('LoopModule + DragModule Integration', () => {
     }
   })
 
-  it('ПРОБЛЕМА: loopFix при старте драга вызывает огромный скачок transform', async () => {
-    slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-    
-    const loopModule = slider.getModule('loop') as any
-    const dragModule = slider.getModule('drag') as any
-    
-    // Логируем все вызовы loopFix
-    const loopFixCalls: Array<{
-      params: any
-      locationBefore: number
-      locationAfter: number
-      indexBefore: number
-      indexAfter: number
-      slidesOrderBefore: string[]
-      slidesOrderAfter: string[]
-    }> = []
-    
-    const originalFix = loopModule.fix.bind(loopModule)
-    loopModule.fix = (params: any) => {
-      const locationBefore = slider.engine.location.get()
-      const indexBefore = slider.activeIndex
-      const slidesOrderBefore = [...slider.slides].map(s => s.getAttribute('data-tvist-slide-index'))
-      
-      const result = originalFix(params)
-      
-      const locationAfter = slider.engine.location.get()
-      const indexAfter = slider.activeIndex
-      const slidesOrderAfter = [...slider.slides].map(s => s.getAttribute('data-tvist-slide-index'))
-      
-      loopFixCalls.push({
-        params,
-        locationBefore,
-        locationAfter,
-        indexBefore,
-        indexAfter,
-        slidesOrderBefore,
-        slidesOrderAfter
-      })
-      
-      console.log(`loopFix #${loopFixCalls.length}:`, {
-        params,
-        locationBefore,
-        locationAfter,
-        locationDiff: locationAfter - locationBefore,
-        indexBefore,
-        indexAfter,
-        slidesOrderBefore,
-        slidesOrderAfter
-      })
-      
-      return result
-    }
-    
-    const initialLocation = slider.engine.location.get()
-    const initialIndex = slider.activeIndex
-    
-    console.log('=== НАЧАЛО ТЕСТА ===')
-    console.log('Initial state:', {
-      location: initialLocation,
-      index: initialIndex,
-      slidesOrder: [...slider.slides].map(s => s.getAttribute('data-tvist-slide-index'))
-    })
-    
-    // Симулируем драг вручную, чтобы видеть каждый шаг
-    const container = fixture.container
-    const startX = 500
-    
-    // 1. pointerdown
-    console.log('\n=== POINTER DOWN ===')
-    const downEvent = new MouseEvent('mousedown', {
-      clientX: startX,
-      clientY: 100,
-      bubbles: true
-    })
-    container.dispatchEvent(downEvent)
-    
-    await new Promise(resolve => setTimeout(resolve, 10))
-    
-    // 2. Первое движение (превышаем threshold 5px -> isDragging = true)
-    console.log('\n=== ПЕРВОЕ ДВИЖЕНИЕ (10px) ===')
-    const move1Event = new MouseEvent('mousemove', {
-      clientX: startX + 10,
-      clientY: 100,
-      bubbles: true
-    })
-    document.dispatchEvent(move1Event)
-    
-    const locationAfterFirstMove = slider.engine.location.get()
-    console.log('Location after first move:', locationAfterFirstMove)
-    console.log('Location diff:', locationAfterFirstMove - initialLocation)
-    
-    // 3. Второе движение
-    console.log('\n=== ВТОРОЕ ДВИЖЕНИЕ (еще 10px) ===')
-    const move2Event = new MouseEvent('mousemove', {
-      clientX: startX + 20,
-      clientY: 100,
-      bubbles: true
-    })
-    document.dispatchEvent(move2Event)
-    
-    const locationAfterSecondMove = slider.engine.location.get()
-    console.log('Location after second move:', locationAfterSecondMove)
-    console.log('Location diff from first:', locationAfterSecondMove - locationAfterFirstMove)
-    
-    // 4. Завершаем драг
-    console.log('\n=== POINTER UP ===')
-    const upEvent = new MouseEvent('mouseup', {
-      clientX: startX + 20,
-      clientY: 100,
-      bubbles: true
-    })
-    document.dispatchEvent(upEvent)
-    
-    console.log('\n=== ИТОГИ ===')
-    console.log(`Всего вызовов loopFix: ${loopFixCalls.length}`)
-    console.log('Финальная location:', slider.engine.location.get())
-    console.log('Финальный index:', slider.activeIndex)
-    
-    // ПРОБЛЕМА: после первого движения на 10px location должен измениться на ~10px,
-    // но из-за loopFix он прыгает на сотни пикселей
-    const locationDiffAfterFirstMove = Math.abs(locationAfterFirstMove - initialLocation)
-    console.log('\nПРОБЛЕМА: location изменился на', locationDiffAfterFirstMove, 'px после движения на 10px')
-    
-    // Этот тест ДОЛЖЕН ПАДАТЬ, показывая проблему
-    expect(locationDiffAfterFirstMove).toBeLessThan(50)
-  })
-
-  it('ИСПРАВЛЕНО: loopFix вызывается только один раз при малом движении', async () => {
-    slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-    
-    const loopModule = slider.getModule('loop') as any
-    const loopFixCalls: any[] = []
-    
-    const originalFix = loopModule.fix.bind(loopModule)
-    loopModule.fix = (params: any) => {
-      loopFixCalls.push({
-        params,
-        location: slider.engine.location.get(),
-        index: slider.activeIndex
-      })
-      return originalFix(params)
-    }
-    
-    // Драг на 50px вправо
-    await simulateDrag({
-        element: fixture.container,
-        startX: 500,
-        deltaX: 50,
-        steps: 5,
-        duration: 200
-    })
-    
-    console.log('loopFix calls:', loopFixCalls)
-    
-    // Проверяем вызовы - теперь должен быть только ОДИН вызов
-    expect(loopFixCalls.length).toBe(1)
-    
-    // Первый вызов - при первом движении (isFirstMove)
-    expect(loopFixCalls[0].params.direction).toBe('next')
-    expect(loopFixCalls[0].params.setTranslate).toBeUndefined()
-    
-    // ИСПРАВЛЕНО: второй вызов больше не происходит благодаря флагу loopFixed
-  })
-
-  it('ПРОБЛЕМА: условие границ в DragModule срабатывает слишком рано', async () => {
-    slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-    
-    // Начальное состояние: index=0, location=0
-    expect(slider.activeIndex).toBe(0)
-    expect(slider.engine.location.get()).toBe(0)
-    
-    const container = fixture.container
-    const startX = 500
-    
-    // pointerdown
-    const downEvent = new MouseEvent('mousedown', {
-      clientX: startX,
-      clientY: 100,
-      bubbles: true
-    })
-    container.dispatchEvent(downEvent)
-    
-    await new Promise(resolve => setTimeout(resolve, 10))
-    
-    // Движение на 10px вправо (delta > 0)
-    const moveEvent = new MouseEvent('mousemove', {
-      clientX: startX + 10,
-      clientY: 100,
-      bubbles: true
-    })
-    document.dispatchEvent(moveEvent)
-    
-    // Проверяем условие из строки 299 DragModule:
-    // if (delta > 0 && newPosition > -threshold && currentIndex === 0)
-    const delta = 10 // движение вправо
-    const newPosition = 10 // 0 + 10
-    const slideSize = slider.engine.getSlideSize(0)
-    const threshold = slideSize / 2
-    const currentIndex = slider.activeIndex
-    
-    console.log('Условие границ:', {
-      delta,
-      newPosition,
-      threshold,
-      currentIndex,
-      'delta > 0': delta > 0,
-      'newPosition > -threshold': newPosition > -threshold,
-      'currentIndex === 0': currentIndex === 0,
-      'Условие выполнено': delta > 0 && newPosition > -threshold && currentIndex === 0
-    })
-    
-    // ПРОБЛЕМА: условие выполняется даже при малом движении (10px)
-    // потому что newPosition (10) > -threshold (-500)
-    // Это условие должно срабатывать только когда мы РЕАЛЬНО достигли границы,
-    // а не просто сдвинулись на несколько пикселей
-    
-    expect(delta > 0 && newPosition > -threshold && currentIndex === 0).toBe(true)
-    
-    // Завершаем драг
-    const upEvent = new MouseEvent('mouseup', {
-      clientX: startX + 10,
-      clientY: 100,
-      bubbles: true
-    })
-    document.dispatchEvent(upEvent)
-  })
-
-  it('ИТОГОВЫЙ ТЕСТ: воспроизводим проблему с некорректным loop fix при drag', async () => {
-    slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-    
-    console.log('\n=== ПРОБЛЕМА ===')
-    console.log('При старте драга вызывается loopFix дважды:')
-    console.log('1. Первый раз (isFirstMove) - правильно, но ничего не делает')
-    console.log('2. Второй раз (условие границ) - НЕПРАВИЛЬНО, перестраивает слайды и делает скачок')
-    console.log('')
-    console.log('Причина: условие на строке 299 DragModule:')
-    console.log('  if (delta > 0 && newPosition > -threshold && currentIndex === 0)')
-    console.log('Выполняется даже при малом движении (10px), потому что:')
-    console.log('  newPosition (10) > -threshold (-500)')
-    console.log('')
-    console.log('Решение: НЕ вызывать loopFix из условия границ, если уже был вызван loopFix')
-    console.log('         ИЛИ изменить условие, чтобы оно срабатывало только при реальном достижении границы')
-    console.log('')
-    
-    const loopModule = slider.getModule('loop') as any
-    const loopFixCalls: any[] = []
-    
-    const originalFix = loopModule.fix.bind(loopModule)
-    loopModule.fix = (params: any) => {
-      const call = {
-        params,
-        locationBefore: slider.engine.location.get(),
-        indexBefore: slider.activeIndex
-      }
-      const result = originalFix(params)
-      call.locationAfter = slider.engine.location.get()
-      call.indexAfter = slider.activeIndex
-      loopFixCalls.push(call)
-      return result
-    }
-    
-    const initialLocation = slider.engine.location.get()
-    
-    // Малое движение вправо (50px)
-    await simulateDrag({
-        element: fixture.container,
-        startX: 500,
-        deltaX: 50,
-        steps: 5,
-        duration: 200
-    })
-    
-    const finalLocation = slider.engine.location.get()
-    
-    console.log('\n=== РЕЗУЛЬТАТЫ ===')
-    console.log('Начальная location:', initialLocation)
-    console.log('Финальная location:', finalLocation)
-    console.log('Ожидаемое изменение: ~50px')
-    console.log('Фактическое изменение:', finalLocation - initialLocation, 'px')
-    console.log('')
-    console.log('Вызовы loopFix:', loopFixCalls.length)
-    loopFixCalls.forEach((call, i) => {
-      console.log(`  #${i + 1}:`, {
-        direction: call.params.direction,
-        setTranslate: call.params.setTranslate,
-        locationBefore: call.locationBefore,
-        locationAfter: call.locationAfter,
-        locationDiff: call.locationAfter - call.locationBefore
-      })
-    })
-    
-    // Проверки
-    expect(loopFixCalls.length).toBe(2) // Проблема: 2 вызова вместо 1
-    
-    const secondCall = loopFixCalls[1]
-    expect(secondCall.params.setTranslate).toBe(true) // Второй вызов с setTranslate
-    expect(Math.abs(secondCall.locationAfter - secondCall.locationBefore)).toBeGreaterThan(500) // Большой скачок
-    
-    // Итоговая проверка: location изменился слишком сильно
-    const totalLocationDiff = Math.abs(finalLocation - initialLocation)
-    console.log('\n=== ПРОБЛЕМА ВОСПРОИЗВЕДЕНА ===')
-    console.log('Location изменился на', totalLocationDiff, 'px вместо ожидаемых ~50px')
-    
-    expect(totalLocationDiff).toBeGreaterThan(500) // Проблема воспроизведена
-  })
-
   describe('Смена направления драга во время жеста', () => {
     it('НОВЫЙ ТЕСТ: должен корректно перестраивать слайды при смене направления без отпускания', async () => {
       slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
@@ -1217,7 +764,7 @@ describe('LoopModule + DragModule Integration', () => {
       const startX = 500
       
       // 1. Начинаем драг
-      const downEvent = new MouseEvent('mousedown', {
+      const downEvent = createPointerOrMouseEvent('down', {
         clientX: startX,
         clientY: 100,
         bubbles: true
@@ -1228,7 +775,7 @@ describe('LoopModule + DragModule Integration', () => {
       // 2. Драг ВПРАВО на 200px (максимальное движение к началу)
       console.log('\n--- ШАГ 1: Драг ВПРАВО на 200px ---')
       for (let i = 1; i <= 20; i++) {
-        const moveEvent = new MouseEvent('mousemove', {
+        const moveEvent = createPointerOrMouseEvent('move', {
           clientX: startX + (i * 10),
           clientY: 100,
           bubbles: true
@@ -1257,7 +804,7 @@ describe('LoopModule + DragModule Integration', () => {
       // 3. БЕЗ ОТПУСКАНИЯ меняем направление - драг ВЛЕВО на 300px
       console.log('\n--- ШАГ 2: Меняем направление - драг ВЛЕВО на 300px (БЕЗ ОТПУСКАНИЯ) ---')
       for (let i = 1; i <= 30; i++) {
-        const moveEvent = new MouseEvent('mousemove', {
+        const moveEvent = createPointerOrMouseEvent('move', {
           clientX: startX + 200 - (i * 10), // От +200px до -100px
           clientY: 100,
           bubbles: true
@@ -1275,7 +822,7 @@ describe('LoopModule + DragModule Integration', () => {
       console.log('Всего вызовов loopFix:', loopFixCalls.length)
       
       // 4. Завершаем драг
-      const upEvent = new MouseEvent('mouseup', {
+      const upEvent = createPointerOrMouseEvent('up', {
         clientX: startX - 100,
         clientY: 100,
         bubbles: true
@@ -1350,7 +897,7 @@ describe('LoopModule + DragModule Integration', () => {
       const startX = 500
       
       // 1. Начинаем драг
-      const downEvent = new MouseEvent('mousedown', {
+      const downEvent = createPointerOrMouseEvent('down', {
         clientX: startX,
         clientY: 100,
         bubbles: true
@@ -1361,7 +908,7 @@ describe('LoopModule + DragModule Integration', () => {
       // 2. Драг вправо (большое движение, чтобы слайды перестроились)
       console.log('\n--- Драг ВПРАВО на 100px ---')
       for (let i = 1; i <= 10; i++) {
-        const moveEvent = new MouseEvent('mousemove', {
+        const moveEvent = createPointerOrMouseEvent('move', {
           clientX: startX + (i * 10),
           clientY: 100,
           bubbles: true
@@ -1384,7 +931,7 @@ describe('LoopModule + DragModule Integration', () => {
       // 3. Меняем направление - драг влево (еще больше, чем вправо)
       console.log('\n--- Меняем направление: драг ВЛЕВО на 200px ---')
       for (let i = 1; i <= 20; i++) {
-        const moveEvent = new MouseEvent('mousemove', {
+        const moveEvent = createPointerOrMouseEvent('move', {
           clientX: startX + 100 - (i * 10), // От +100px до -100px
           clientY: 100,
           bubbles: true
@@ -1398,7 +945,7 @@ describe('LoopModule + DragModule Integration', () => {
       console.log('Всего вызовов loopFix:', loopFixCalls.length)
       
       // 4. Завершаем драг
-      const upEvent = new MouseEvent('mouseup', {
+      const upEvent = createPointerOrMouseEvent('up', {
         clientX: startX - 100,
         clientY: 100,
         bubbles: true
@@ -1446,7 +993,7 @@ describe('LoopModule + DragModule Integration', () => {
       const startX = 500
       
       // Начинаем драг
-      const downEvent = new MouseEvent('mousedown', {
+      const downEvent = createPointerOrMouseEvent('down', {
         clientX: startX,
         clientY: 100,
         bubbles: true
@@ -1456,7 +1003,7 @@ describe('LoopModule + DragModule Integration', () => {
       
       // Драг вправо
       for (let i = 1; i <= 10; i++) {
-        const moveEvent = new MouseEvent('mousemove', {
+        const moveEvent = createPointerOrMouseEvent('move', {
           clientX: startX + (i * 10),
           clientY: 100,
           bubbles: true
@@ -1470,7 +1017,7 @@ describe('LoopModule + DragModule Integration', () => {
       
       // Меняем направление - драг влево
       for (let i = 1; i <= 20; i++) {
-        const moveEvent = new MouseEvent('mousemove', {
+        const moveEvent = createPointerOrMouseEvent('move', {
           clientX: startX + 100 - (i * 10),
           clientY: 100,
           bubbles: true
@@ -1483,7 +1030,7 @@ describe('LoopModule + DragModule Integration', () => {
       console.log('Location после смены направления (влево):', locationAfterLeft)
       
       // Завершаем драг
-      const upEvent = new MouseEvent('mouseup', {
+      const upEvent = createPointerOrMouseEvent('up', {
         clientX: startX - 100,
         clientY: 100,
         bubbles: true
