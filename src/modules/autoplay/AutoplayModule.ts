@@ -187,10 +187,14 @@ export class AutoplayModule extends Module {
 
   /**
    * Возобновление autoplay
+   * Перезапускает таймер, чтобы избежать немедленного автоперелистывания
    */
   resume(): void {
     if (this.paused && !this.stopped) {
       this.paused = false
+      // Перезапускаем таймер, чтобы отсчёт начался заново
+      // Это предотвращает ситуацию, когда после драга сразу срабатывает автоплей
+      this.start()
       this.emit('autoplayResume')
     }
   }

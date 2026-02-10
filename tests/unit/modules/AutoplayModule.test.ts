@@ -211,6 +211,51 @@ describe('AutoplayModule', () => {
       slider.destroy()
     })
 
+    it('should reset timer after drag to prevent immediate autoplay', () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+          </div>
+        </div>
+      `
+
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+        autoplay: 1000,
+        pauseOnInteraction: true,
+        drag: true
+      })
+
+      expect(slider.activeIndex).toBe(0)
+
+      // Ждём 800мс из 1000мс интервала
+      vi.advanceTimersByTime(800)
+      expect(slider.activeIndex).toBe(0)
+
+      // Начинаем перетаскивание (осталось 200мс до автоперелистывания)
+      slider.emit('dragStart')
+
+      // Ждём 100мс во время драга
+      vi.advanceTimersByTime(100)
+
+      // Заканчиваем перетаскивание
+      slider.emit('dragEnd')
+
+      // После dragEnd таймер должен сброситься!
+      // Если таймер НЕ сбросился, то через 200мс произойдёт автоперелистывание
+      // Это баг - пользователь только что перелистнул, а слайдер сразу перелистывает ещё раз
+      vi.advanceTimersByTime(200)
+      expect(slider.activeIndex).toBe(0) // НЕ должен перелистнуться!
+
+      // Должен перелистнуться только через полный интервал (1000мс) после dragEnd
+      vi.advanceTimersByTime(800) // 200 + 800 = 1000мс
+      expect(slider.activeIndex).toBe(1)
+
+      slider.destroy()
+    })
+
     it('should stop on interaction when disableOnInteraction is true', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
