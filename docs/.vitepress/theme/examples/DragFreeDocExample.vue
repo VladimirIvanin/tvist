@@ -43,9 +43,9 @@
       </div>
     </div>
 
-    <div ref="sliderRef" class="tvist-v0 drag-free-slider">
-      <div class="tvist-v0__container">
-        <div v-for="i in 10" :key="i" class="tvist-v0__slide">
+    <div ref="sliderRef" class="tvist-v1 drag-free-slider">
+      <div class="tvist-v1__container">
+        <div v-for="i in 10" :key="i" class="tvist-v1__slide">
           <div class="slide-card">
             <div class="slide-number">{{ i }}</div>
             <div class="slide-title">Слайд {{ i }}</div>
@@ -65,9 +65,9 @@
 
     <!-- Пример с peek -->
     <h3 style="margin-top: 40px;">Free mode с Peek</h3>
-    <div ref="peekSliderRef" class="tvist-v0 drag-free-peek-slider">
-      <div class="tvist-v0__container">
-        <div v-for="i in 8" :key="i" class="tvist-v0__slide">
+    <div ref="peekSliderRef" class="tvist-v1 drag-free-peek-slider">
+      <div class="tvist-v1__container">
+        <div v-for="i in 8" :key="i" class="tvist-v1__slide">
           <div class="peek-card">
             <div class="peek-icon">🎨</div>
             <div class="peek-title">Карточка {{ i }}</div>
@@ -374,7 +374,7 @@ function updateSettings() {
     width: 100%;
   }
 
-  .drag-free-slider :deep(.tvist-v0__slide) {
+  .drag-free-slider :deep(.tvist-v1__slide) {
     min-width: 80%;
   }
 }

@@ -24,18 +24,18 @@ h1 {
   margin: 0 auto 40px;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   overflow: hidden;
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
-.tvist-v0__container {
+.tvist-v1__container {
   display: flex;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -47,10 +47,10 @@ h1 {
   user-select: none;
 }
 
-.tvist-v0__slide:nth-child(4n+1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v0__slide:nth-child(4n+2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v0__slide:nth-child(4n+3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v0__slide:nth-child(4n+4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v1__slide:nth-child(4n+1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v1__slide:nth-child(4n+2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v1__slide:nth-child(4n+3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v1__slide:nth-child(4n+4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 
 .controls {
   display: flex;

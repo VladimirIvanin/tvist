@@ -1,11 +1,11 @@
 <template>
   <div class="center-loop-example">
-    <div class="tvist-v0" ref="slider">
-      <div class="tvist-v0__container">
+    <div class="tvist-v1" ref="slider">
+      <div class="tvist-v1__container">
         <div 
           v-for="i in 7" 
           :key="i" 
-          class="tvist-v0__slide"
+          class="tvist-v1__slide"
         >
           <div class="slide-content">
             <span class="slide-number">{{ i }}</span>
@@ -74,7 +74,7 @@ onBeforeUnmount(() => {
   margin: 0 auto;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   margin-bottom: 20px;
   background: #f5f5f5;
   border-radius: 8px;
@@ -99,7 +99,7 @@ onBeforeUnmount(() => {
 }
 
 /* Стили для активного слайда */
-.tvist-v0__slide--active .slide-content {
+.tvist-v1__slide--active .slide-content {
   transform: scale(1.1);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -107,14 +107,14 @@ onBeforeUnmount(() => {
 }
 
 /* Стили для предыдущего и следующего слайдов */
-.tvist-v0__slide--prev .slide-content,
-.tvist-v0__slide--next .slide-content {
+.tvist-v1__slide--prev .slide-content,
+.tvist-v1__slide--next .slide-content {
   opacity: 0.6;
   transform: scale(0.9);
 }
 
 /* Стили для невидимых слайдов */
-.tvist-v0__slide:not(.tvist-v0__slide--visible) .slide-content {
+.tvist-v1__slide:not(.tvist-v1__slide--visible) .slide-content {
   opacity: 0.3;
 }
 

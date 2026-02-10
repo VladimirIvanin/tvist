@@ -1,8 +1,8 @@
 <template>
   <div class="example">
-    <div ref="sliderRef" class="tvist-v0 peek-vertical">
-      <div class="tvist-v0__container">
-        <div v-for="i in 5" :key="i" class="tvist-v0__slide">
+    <div ref="sliderRef" class="tvist-v1 peek-vertical">
+      <div class="tvist-v1__container">
+        <div v-for="i in 5" :key="i" class="tvist-v1__slide">
           <div class="slide-content">
             {{ i }}
           </div>
@@ -41,7 +41,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.tvist-v0 {
+.tvist-v1 {
   width: 100%;
   height: 400px;
   background: #f5f5f5;
@@ -49,11 +49,11 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-.tvist-v0__container {
+.tvist-v1__container {
   height: 100%;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   height: 100%;
   display: flex;
   align-items: center;

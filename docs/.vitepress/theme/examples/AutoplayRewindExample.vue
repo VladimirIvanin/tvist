@@ -1,40 +1,40 @@
 <template>
   <ExampleCard title="Autoplay с Rewind" description="Автоматический возврат к первому слайду после последнего">
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist-v0">
-        <div class="tvist-v0__container">
-          <div class="tvist-v0__slide">
+      <div ref="sliderEl" class="tvist-v1">
+        <div class="tvist-v1__container">
+          <div class="tvist-v1__slide">
             <div class="slide-content">
               <div class="slide-number">1</div>
               <div class="slide-text">Первый</div>
             </div>
           </div>
-          <div class="tvist-v0__slide">
+          <div class="tvist-v1__slide">
             <div class="slide-content">
               <div class="slide-number">2</div>
               <div class="slide-text">Второй</div>
             </div>
           </div>
-          <div class="tvist-v0__slide">
+          <div class="tvist-v1__slide">
             <div class="slide-content">
               <div class="slide-number">3</div>
               <div class="slide-text">Третий</div>
             </div>
           </div>
-          <div class="tvist-v0__slide">
+          <div class="tvist-v1__slide">
             <div class="slide-content">
               <div class="slide-number">4</div>
               <div class="slide-text">Последний</div>
             </div>
           </div>
         </div>
-        <div class="tvist-v0__pagination"></div>
-        <button class="tvist-v0__arrow tvist-v0__arrow--prev">
+        <div class="tvist-v1__pagination"></div>
+        <button class="tvist-v1__arrow tvist-v1__arrow--prev">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
         </button>
-        <button class="tvist-v0__arrow tvist-v0__arrow--next">
+        <button class="tvist-v1__arrow tvist-v1__arrow--next">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
@@ -88,7 +88,7 @@ onUnmounted(() => {
   border-radius: 12px;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -96,7 +96,7 @@ onUnmounted(() => {
   position: relative;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   height: 300px;
   display: flex;
   align-items: center;
@@ -119,10 +119,10 @@ onUnmounted(() => {
   opacity: 0.9;
 }
 
-.tvist-v0__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v0__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v0__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v0__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 
 .info {
   text-align: center;

@@ -1,27 +1,27 @@
 <template>
   <div class="scroll-control-doc">
-    <div v-if="show !== 'vertical'" ref="horizontalRef" class="tvist-v0 tvist--horizontal" style="margin-bottom: 2rem; height: 300px;">
-      <div class="tvist-v0__container">
-        <div class="tvist-v0__slide slide-1">
+    <div v-if="show !== 'vertical'" ref="horizontalRef" class="tvist-v1 tvist--horizontal" style="margin-bottom: 2rem; height: 300px;">
+      <div class="tvist-v1__container">
+        <div class="tvist-v1__slide slide-1">
           <span class="slide-title">Слайд 1</span>
           <span class="slide-hint">Используйте колесико мыши или свайп</span>
         </div>
-        <div class="tvist-v0__slide slide-2"><span class="slide-title">Слайд 2</span></div>
-        <div class="tvist-v0__slide slide-3"><span class="slide-title">Слайд 3</span></div>
-        <div class="tvist-v0__slide slide-4"><span class="slide-title">Слайд 4</span></div>
-        <div class="tvist-v0__slide slide-5"><span class="slide-title">Слайд 5</span></div>
+        <div class="tvist-v1__slide slide-2"><span class="slide-title">Слайд 2</span></div>
+        <div class="tvist-v1__slide slide-3"><span class="slide-title">Слайд 3</span></div>
+        <div class="tvist-v1__slide slide-4"><span class="slide-title">Слайд 4</span></div>
+        <div class="tvist-v1__slide slide-5"><span class="slide-title">Слайд 5</span></div>
       </div>
     </div>
 
-    <div v-if="show !== 'horizontal'" ref="verticalRef" class="tvist-v0 tvist--vertical" style="height: 400px; margin-bottom: 2rem;">
-      <div class="tvist-v0__container">
-        <div class="tvist-v0__slide slide-1">
+    <div v-if="show !== 'horizontal'" ref="verticalRef" class="tvist-v1 tvist--vertical" style="height: 400px; margin-bottom: 2rem;">
+      <div class="tvist-v1__container">
+        <div class="tvist-v1__slide slide-1">
           <span class="slide-title">Слайд 1</span>
           <span class="slide-hint">Скроллите вертикально</span>
         </div>
-        <div class="tvist-v0__slide slide-2"><span class="slide-title">Слайд 2</span></div>
-        <div class="tvist-v0__slide slide-3"><span class="slide-title">Слайд 3</span></div>
-        <div class="tvist-v0__slide slide-4"><span class="slide-title">Слайд 4</span></div>
+        <div class="tvist-v1__slide slide-2"><span class="slide-title">Слайд 2</span></div>
+        <div class="tvist-v1__slide slide-3"><span class="slide-title">Слайд 3</span></div>
+        <div class="tvist-v1__slide slide-4"><span class="slide-title">Слайд 4</span></div>
       </div>
     </div>
   </div>
@@ -75,7 +75,7 @@ onUnmounted(() => {
   margin: 0;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   height: 300px;
   min-height: 300px;
   flex-shrink: 0;
@@ -89,7 +89,7 @@ onUnmounted(() => {
   position: relative;
 }
 
-.tvist-v0--vertical .tvist-v0__slide {
+.tvist-v1--vertical .tvist-v1__slide {
   height: 400px;
   min-height: 400px;
 }

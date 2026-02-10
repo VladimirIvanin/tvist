@@ -169,10 +169,10 @@ peekTrim: false  // зазор справа на последнем слайде
 
 ## Стилизация
 
-Peek применяется к контейнеру `.tvist-v0__container` через CSS padding:
+Peek применяется к контейнеру `.tvist-v1__container` через CSS padding:
 
 ```css
-.tvist-v0__container {
+.tvist-v1__container {
   padding-left: 50px;
   padding-right: 50px;
 }

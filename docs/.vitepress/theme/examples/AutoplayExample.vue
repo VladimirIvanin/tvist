@@ -1,14 +1,14 @@
 <template>
   <ExampleCard title="Автопрокрутка" description="Автоматическая смена слайдов + пагинация">
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist-v0">
-        <div class="tvist-v0__container">
-          <div class="tvist-v0__slide">A</div>
-          <div class="tvist-v0__slide">B</div>
-          <div class="tvist-v0__slide">C</div>
-          <div class="tvist-v0__slide">D</div>
+      <div ref="sliderEl" class="tvist-v1">
+        <div class="tvist-v1__container">
+          <div class="tvist-v1__slide">A</div>
+          <div class="tvist-v1__slide">B</div>
+          <div class="tvist-v1__slide">C</div>
+          <div class="tvist-v1__slide">D</div>
         </div>
-        <div class="tvist-v0__pagination"></div>
+        <div class="tvist-v1__pagination"></div>
       </div>
       <div class="controls">
         <button @click="slider?.getModule('autoplay')?.getAutoplay().start()">▶ Start</button>
@@ -54,7 +54,7 @@ onUnmounted(() => {
   border-radius: 12px;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -63,7 +63,7 @@ onUnmounted(() => {
   position: relative;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   height: 300px;
   display: flex;
   align-items: center;
@@ -73,10 +73,10 @@ onUnmounted(() => {
   color: white;
 }
 
-.tvist-v0__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v0__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v0__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v0__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 
 .controls {
   display: flex;

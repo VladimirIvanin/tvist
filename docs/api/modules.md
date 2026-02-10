@@ -66,12 +66,12 @@ Tvist.registerModule('navigation', NavigationModule)
 
 ```html
 <!-- SVG добавится автоматически -->
-<button class="tvist-v0__arrow tvist-v0__arrow--prev"></button>
-<button class="tvist-v0__arrow tvist-v0__arrow--next"></button>
+<button class="tvist-v1__arrow tvist-v1__arrow--prev"></button>
+<button class="tvist-v1__arrow tvist-v1__arrow--next"></button>
 ```
 
 ```css
-.tvist-v0__arrow {
+.tvist-v1__arrow {
   color: #000; /* Цвет иконки */
 }
 ```
@@ -80,8 +80,8 @@ Tvist.registerModule('navigation', NavigationModule)
 
 ```html
 <!-- SVG НЕ добавится - есть текстовое содержимое -->
-<button class="tvist-v0__arrow tvist-v0__arrow--prev">‹</button>
-<button class="tvist-v0__arrow tvist-v0__arrow--next">›</button>
+<button class="tvist-v1__arrow tvist-v1__arrow--prev">‹</button>
+<button class="tvist-v1__arrow tvist-v1__arrow--next">›</button>
 ```
 
 Отключение автоматических иконок:
@@ -189,10 +189,10 @@ Tvist.registerModule('slide-states', SlideStatesModule)
 Управление классами состояния слайдов (active, prev, next, visible).
 
 **Автоматически применяет классы:**
-- `.tvist-v0__slide--active` - активный слайд
-- `.tvist-v0__slide--prev` - предыдущий слайд
-- `.tvist-v0__slide--next` - следующий слайд
-- `.tvist-v0__slide--visible` - видимый слайд
+- `.tvist-v1__slide--active` - активный слайд
+- `.tvist-v1__slide--prev` - предыдущий слайд
+- `.tvist-v1__slide--next` - следующий слайд
+- `.tvist-v1__slide--visible` - видимый слайд
 
 ### Автоматизация
 
@@ -445,7 +445,7 @@ const slider = new Tvist('.slider', {
 **HTML разметка:**
 
 ```html
-<div class="tvist-v0__slide">
+<div class="tvist-v1__slide">
   <img 
     data-src="image.jpg" 
     data-srcset="image-400.jpg 400w, image-800.jpg 800w"
@@ -469,10 +469,10 @@ lazyModule.loadSlide(5)
 **CSS переменные:**
 
 ```css
-.tvist-v0 {
-  --tvist-v0-spinner-size: 50px;
-  --tvist-v0-spinner-color: rgba(0, 0, 0, 0.3);
-  --tvist-v0-loading-overlay: rgba(255, 255, 255, 0.7);
+.tvist-v1 {
+  --tvist-v1-spinner-size: 50px;
+  --tvist-v1-spinner-color: rgba(0, 0, 0, 0.3);
+  --tvist-v1-loading-overlay: rgba(255, 255, 255, 0.7);
 }
 ```
 

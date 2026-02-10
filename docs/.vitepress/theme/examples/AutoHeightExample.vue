@@ -5,12 +5,12 @@
     :detailsLink="detailsLink"
   >
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist-v0 tvist-v0--vertical">
-        <div class="tvist-v0__container">
+      <div ref="sliderEl" class="tvist-v1 tvist-v1--vertical">
+        <div class="tvist-v1__container">
           <div
             v-for="(item, i) in slides"
             :key="i"
-            class="tvist-v0__slide"
+            class="tvist-v1__slide"
             :style="{ minHeight: item.height }"
           >
             <span class="slide-label">{{ item.label }}</span>
@@ -80,7 +80,7 @@ onBeforeUnmount(() => {
   border-radius: 12px;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -88,11 +88,11 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-.tvist-v0--vertical {
+.tvist-v1--vertical {
   height: 320px;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -105,19 +105,19 @@ onBeforeUnmount(() => {
   width: 100%;
 }
 
-.tvist-v0__slide:nth-child(5n + 1) {
+.tvist-v1__slide:nth-child(5n + 1) {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
-.tvist-v0__slide:nth-child(5n + 2) {
+.tvist-v1__slide:nth-child(5n + 2) {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
-.tvist-v0__slide:nth-child(5n + 3) {
+.tvist-v1__slide:nth-child(5n + 3) {
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
-.tvist-v0__slide:nth-child(5n + 4) {
+.tvist-v1__slide:nth-child(5n + 4) {
   background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
-.tvist-v0__slide:nth-child(5n + 5) {
+.tvist-v1__slide:nth-child(5n + 5) {
   background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
 }
 

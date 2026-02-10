@@ -1,8 +1,11 @@
 import { defineConfig } from 'vite';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readFileSync } from 'node:fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')) as { version: string };
+const versionMajor = parseInt(pkg.version.split('.')[0], 10) || 0;
 
 export default defineConfig({
   root: resolve(__dirname, 'sandbox'),
@@ -27,6 +30,7 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         api: 'modern-compiler',
+        additionalData: `$tvist-block: 'tvist-v${versionMajor}';`,
       },
     },
   },

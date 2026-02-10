@@ -2,24 +2,24 @@
   <ExampleCard title="Вертикальные миниатюры (Gallery)" description="Вертикальная лента миниатюр слева синхронизирована с основным горизонтальным слайдером. У миниатюр включен slideMinSize для адаптивности">
     <div class="demo-wrapper">
       <div class="gallery-wrapper">
-        <div ref="thumbsVerticalEl" class="tvist-v0 tvist-thumbs">
-          <div class="tvist-v0__container">
-            <div class="tvist-v0__slide">1</div>
-            <div class="tvist-v0__slide">2</div>
-            <div class="tvist-v0__slide">3</div>
-            <div class="tvist-v0__slide">4</div>
-            <div class="tvist-v0__slide">5</div>
-            <div class="tvist-v0__slide">6</div>
+        <div ref="thumbsVerticalEl" class="tvist-v1 tvist-thumbs">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">1</div>
+            <div class="tvist-v1__slide">2</div>
+            <div class="tvist-v1__slide">3</div>
+            <div class="tvist-v1__slide">4</div>
+            <div class="tvist-v1__slide">5</div>
+            <div class="tvist-v1__slide">6</div>
           </div>
         </div>
-        <div ref="mainHorizontalEl" class="tvist-v0 tvist-main">
-          <div class="tvist-v0__container">
-            <div class="tvist-v0__slide">Slide 1</div>
-            <div class="tvist-v0__slide">Slide 2</div>
-            <div class="tvist-v0__slide">Slide 3</div>
-            <div class="tvist-v0__slide">Slide 4</div>
-            <div class="tvist-v0__slide">Slide 5</div>
-            <div class="tvist-v0__slide">Slide 6</div>
+        <div ref="mainHorizontalEl" class="tvist-v1 tvist-main">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">Slide 1</div>
+            <div class="tvist-v1__slide">Slide 2</div>
+            <div class="tvist-v1__slide">Slide 3</div>
+            <div class="tvist-v1__slide">Slide 4</div>
+            <div class="tvist-v1__slide">Slide 5</div>
+            <div class="tvist-v1__slide">Slide 6</div>
           </div>
         </div>
       </div>
@@ -33,26 +33,26 @@
 ```html
 <div class="gallery-wrapper">
   <!-- Vertical Thumbnails (left) -->
-  <div class="tvist-v0 tvist-thumbs">
-    <div class="tvist-v0__container">
-      <div class="tvist-v0__slide">1</div>
-      <div class="tvist-v0__slide">2</div>
-      <div class="tvist-v0__slide">3</div>
-      <div class="tvist-v0__slide">4</div>
-      <div class="tvist-v0__slide">5</div>
-      <div class="tvist-v0__slide">6</div>
+  <div class="tvist-v1 tvist-thumbs">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">1</div>
+      <div class="tvist-v1__slide">2</div>
+      <div class="tvist-v1__slide">3</div>
+      <div class="tvist-v1__slide">4</div>
+      <div class="tvist-v1__slide">5</div>
+      <div class="tvist-v1__slide">6</div>
     </div>
   </div>
   
   <!-- Main Horizontal Slider (right) -->
-  <div class="tvist-v0 tvist-main">
-    <div class="tvist-v0__container">
-      <div class="tvist-v0__slide">Slide 1</div>
-      <div class="tvist-v0__slide">Slide 2</div>
-      <div class="tvist-v0__slide">Slide 3</div>
-      <div class="tvist-v0__slide">Slide 4</div>
-      <div class="tvist-v0__slide">Slide 5</div>
-      <div class="tvist-v0__slide">Slide 6</div>
+  <div class="tvist-v1 tvist-main">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">Slide 1</div>
+      <div class="tvist-v1__slide">Slide 2</div>
+      <div class="tvist-v1__slide">Slide 3</div>
+      <div class="tvist-v1__slide">Slide 4</div>
+      <div class="tvist-v1__slide">Slide 5</div>
+      <div class="tvist-v1__slide">Slide 6</div>
     </div>
   </div>
 </div>
@@ -94,7 +94,7 @@ mainHorizontal.sync(thumbsVertical);
   height: 100%;
 }
 
-.tvist-thumbs .tvist-v0__slide {
+.tvist-thumbs .tvist-v1__slide {
   cursor: pointer;
   opacity: 0.6;
   transition: opacity 0.3s, border-color 0.3s;
@@ -107,8 +107,8 @@ mainHorizontal.sync(thumbsVertical);
   font-weight: bold;
 }
 
-.tvist-thumbs .tvist-v0__slide.is-active,
-.tvist-thumbs .tvist-v0__slide--nav-active {
+.tvist-thumbs .tvist-v1__slide.is-active,
+.tvist-thumbs .tvist-v1__slide--nav-active {
   opacity: 1;
   border-color: #333;
 }
@@ -119,7 +119,7 @@ mainHorizontal.sync(thumbsVertical);
   height: 100%;
 }
 
-.tvist-main .tvist-v0__slide {
+.tvist-main .tvist-v1__slide {
   font-size: 3rem;
   display: flex;
   align-items: center;
@@ -129,12 +129,12 @@ mainHorizontal.sync(thumbsVertical);
 }
 
 /* Цвета */
-.tvist-v0__slide:nth-child(1) { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
-.tvist-v0__slide:nth-child(2) { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); }
-.tvist-v0__slide:nth-child(3) { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
-.tvist-v0__slide:nth-child(4) { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); }
-.tvist-v0__slide:nth-child(5) { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
-.tvist-v0__slide:nth-child(6) { background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); }
+.tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+.tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); }
+.tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
+.tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); }
+.tvist-v1__slide:nth-child(5) { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
+.tvist-v1__slide:nth-child(6) { background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); }
 ```
       </details>
     </template>
@@ -204,7 +204,7 @@ onUnmounted(() => {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.tvist-thumbs :deep(.tvist-v0__slide) {
+.tvist-thumbs :deep(.tvist-v1__slide) {
   cursor: pointer;
   opacity: 0.6;
   transition: opacity 0.3s, border-color 0.3s;
@@ -217,8 +217,8 @@ onUnmounted(() => {
   font-weight: bold;
 }
 
-.tvist-thumbs :deep(.tvist-v0__slide.is-active),
-.tvist-thumbs :deep(.tvist-v0__slide--nav-active) {
+.tvist-thumbs :deep(.tvist-v1__slide.is-active),
+.tvist-thumbs :deep(.tvist-v1__slide--nav-active) {
   opacity: 1;
   border-color: #333;
 }
@@ -233,11 +233,11 @@ onUnmounted(() => {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.tvist-main .tvist-v0__container {
+.tvist-main .tvist-v1__container {
   height: 100%;
 }
 
-.tvist-main :deep(.tvist-v0__slide) {
+.tvist-main :deep(.tvist-v1__slide) {
   font-size: 3rem;
   display: flex;
   align-items: center;
@@ -247,10 +247,10 @@ onUnmounted(() => {
 }
 
 /* Цвета слайдов */
-.tvist-v0__slide:nth-child(1) { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
-.tvist-v0__slide:nth-child(2) { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); }
-.tvist-v0__slide:nth-child(3) { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
-.tvist-v0__slide:nth-child(4) { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); }
-.tvist-v0__slide:nth-child(5) { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
-.tvist-v0__slide:nth-child(6) { background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); }
+.tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+.tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); }
+.tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%); }
+.tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%); }
+.tvist-v1__slide:nth-child(5) { background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); }
+.tvist-v1__slide:nth-child(6) { background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); }
 </style>

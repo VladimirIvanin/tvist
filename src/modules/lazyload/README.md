@@ -23,7 +23,7 @@ const slider = new Tvist('.slider', {
 HTML разметка:
 
 ```html
-<div class="tvist-v0__slide">
+<div class="tvist-v1__slide">
   <img data-src="image.jpg" data-srcset="image-400.jpg 400w, image-800.jpg 800w" alt="Description">
 </div>
 ```
@@ -83,18 +83,18 @@ lazyModule.loadSlide(5)
 
 ## CSS классы
 
-- `.tvist-v0__spinner` - индикатор загрузки
-- `.tvist-v0__slide--loading` - класс слайда во время загрузки
+- `.tvist-v1__spinner` - индикатор загрузки
+- `.tvist-v1__slide--loading` - класс слайда во время загрузки
 
 ## Кастомизация
 
 CSS переменные:
 
 ```css
-.tvist-v0 {
-  --tvist-v0-spinner-size: 50px;
-  --tvist-v0-spinner-color: rgba(0, 0, 0, 0.3);
-  --tvist-v0-loading-overlay: rgba(255, 255, 255, 0.7);
+.tvist-v1 {
+  --tvist-v1-spinner-size: 50px;
+  --tvist-v1-spinner-color: rgba(0, 0, 0, 0.3);
+  --tvist-v1-loading-overlay: rgba(255, 255, 255, 0.7);
 }
 ```
 

@@ -5,9 +5,9 @@
       <div class="row">
         <div class="col">
           <div class="label">peekTrim: true — конец прижат к краю</div>
-          <div ref="sliderTrimRef" class="tvist-v0">
-            <div class="tvist-v0__container">
-              <div v-for="i in 5" :key="i" class="tvist-v0__slide">
+          <div ref="sliderTrimRef" class="tvist-v1">
+            <div class="tvist-v1__container">
+              <div v-for="i in 5" :key="i" class="tvist-v1__slide">
                 <div class="slide-content">{{ i }}</div>
               </div>
             </div>
@@ -15,9 +15,9 @@
         </div>
         <div class="col">
           <div class="label">peekTrim: false — справа остаётся зазор</div>
-          <div ref="sliderNoTrimRef" class="tvist-v0">
-            <div class="tvist-v0__container">
-              <div v-for="i in 5" :key="i" class="tvist-v0__slide">
+          <div ref="sliderNoTrimRef" class="tvist-v1">
+            <div class="tvist-v1__container">
+              <div v-for="i in 5" :key="i" class="tvist-v1__slide">
                 <div class="slide-content">{{ i }}</div>
               </div>
             </div>
@@ -30,9 +30,9 @@
       <div class="row">
         <div class="col">
           <div class="label">loop: true, peek: 40</div>
-          <div ref="sliderLoopRef" class="tvist-v0">
-            <div class="tvist-v0__container">
-              <div v-for="i in 5" :key="i" class="tvist-v0__slide">
+          <div ref="sliderLoopRef" class="tvist-v1">
+            <div class="tvist-v1__container">
+              <div v-for="i in 5" :key="i" class="tvist-v1__slide">
                 <div class="slide-content">{{ i }}</div>
               </div>
             </div>
@@ -40,9 +40,9 @@
         </div>
         <div class="col">
           <div class="label">loop: true, peek: 60, perPage: 2</div>
-          <div ref="sliderLoopPerPageRef" class="tvist-v0">
-            <div class="tvist-v0__container">
-              <div v-for="i in 6" :key="i" class="tvist-v0__slide">
+          <div ref="sliderLoopPerPageRef" class="tvist-v1">
+            <div class="tvist-v1__container">
+              <div v-for="i in 6" :key="i" class="tvist-v1__slide">
                 <div class="slide-content">{{ i }}</div>
               </div>
             </div>
@@ -155,7 +155,7 @@ onBeforeUnmount(() => {
   margin-bottom: 8px;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   width: 100%;
   height: 260px;
   background: #f5f5f5;
@@ -163,11 +163,11 @@ onBeforeUnmount(() => {
   overflow: hidden;
 }
 
-.tvist-v0__container {
+.tvist-v1__container {
   height: 100%;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   height: 100%;
   display: flex;
   align-items: center;

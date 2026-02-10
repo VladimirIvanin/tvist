@@ -13,12 +13,12 @@
         </p>
         
         <div ref="containerRef" class="products-container">
-          <div class="tvist-v0">
-            <div class="tvist-v0__container">
+          <div class="tvist-v1">
+            <div class="tvist-v1__container">
               <div 
                 v-for="product in products" 
                 :key="product.id" 
-                class="tvist-v0__slide product-card"
+                class="tvist-v1__slide product-card"
               >
                 <div class="product-image" :style="{ background: product.color }">
                   <div class="product-badge" v-if="product.badge">{{ product.badge }}</div>
@@ -123,7 +123,7 @@ const updateSlideInfo = () => {
 onMounted(() => {
   if (!containerRef.value) return
   
-  const sliderEl = containerRef.value.querySelector('.tvist-v0')
+  const sliderEl = containerRef.value.querySelector('.tvist-v1')
   if (!sliderEl) return
 
   // Инициализируем слайдер с breakpoints
@@ -201,7 +201,7 @@ onUnmounted(() => {
 }
 
 /* Контейнер слайдера */
-.tvist-v0 {
+.tvist-v1 {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -209,7 +209,7 @@ onUnmounted(() => {
 }
 
 /* Когда слайдер отключен (десктоп) - показываем как сетку */
-.tvist-v0.tvist-v0--disabled .tvist-v0__container {
+.tvist-v1.tvist-v1--disabled .tvist-v1__container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
@@ -217,7 +217,7 @@ onUnmounted(() => {
   transform: none !important;
 }
 
-.tvist-v0.tvist-v0--disabled .tvist-v0__slide {
+.tvist-v1.tvist-v1--disabled .tvist-v1__slide {
   width: auto !important;
   margin: 0 !important;
 }
@@ -232,11 +232,11 @@ onUnmounted(() => {
 }
 
 /* В режиме сетки (disabled) - добавляем тень и hover */
-.tvist-v0.tvist-v0--disabled .product-card {
+.tvist-v1.tvist-v1--disabled .product-card {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.tvist-v0.tvist-v0--disabled .product-card:hover {
+.tvist-v1.tvist-v1--disabled .product-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
@@ -389,7 +389,7 @@ onUnmounted(() => {
 
 /* Адаптивность для планшетов */
 @media (max-width: 1024px) and (min-width: 768px) {
-  .tvist-v0.tvist-v0--disabled .tvist-v0__container {
+  .tvist-v1.tvist-v1--disabled .tvist-v1__container {
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }

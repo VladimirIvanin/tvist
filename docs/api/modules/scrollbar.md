@@ -115,38 +115,38 @@ const slider = new Tvist('.tvist', {
 
 ### Базовые классы
 
-- `.tvist-v0__scrollbar` - контейнер скроллбара
-- `.tvist-v0__scrollbar-track` - трек скроллбара
-- `.tvist-v0__scrollbar-thumb` - ползунок
+- `.tvist-v1__scrollbar` - контейнер скроллбара
+- `.tvist-v1__scrollbar-track` - трек скроллбара
+- `.tvist-v1__scrollbar-thumb` - ползунок
 
 ### Модификаторы
 
-- `.tvist-v0__scrollbar--horizontal` - горизонтальное направление
-- `.tvist-v0__scrollbar--vertical` - вертикальное направление
-- `.tvist-v0__scrollbar--hidden` - скрытое состояние
-- `.tvist-v0__scrollbar--dragging` - состояние при перетаскивании
+- `.tvist-v1__scrollbar--horizontal` - горизонтальное направление
+- `.tvist-v1__scrollbar--vertical` - вертикальное направление
+- `.tvist-v1__scrollbar--hidden` - скрытое состояние
+- `.tvist-v1__scrollbar--dragging` - состояние при перетаскивании
 
 ## Кастомизация стилей
 
 ```css
 /* Контейнер */
-.tvist-v0__scrollbar {
+.tvist-v1__scrollbar {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 8px;
 }
 
 /* Ползунок */
-.tvist-v0__scrollbar-thumb {
+.tvist-v1__scrollbar-thumb {
   background: #667eea;
   border-radius: 8px;
 }
 
-.tvist-v0__scrollbar-thumb:hover {
+.tvist-v1__scrollbar-thumb:hover {
   background: #5568d3;
 }
 
 /* При перетаскивании */
-.tvist-v0__scrollbar--dragging .tvist-v0__scrollbar-thumb {
+.tvist-v1__scrollbar--dragging .tvist-v1__scrollbar-thumb {
   background: #4451b8;
 }
 ```

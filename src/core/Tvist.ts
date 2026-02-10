@@ -3,6 +3,7 @@
  * Точка входа для пользователя
  */
 
+import pkg from '../../package.json' with { type: 'json' }
 import { Engine } from './Engine'
 import { EventEmitter } from './EventEmitter'
 import { getElement, children } from '../utils/dom'
@@ -12,11 +13,11 @@ import type { Module, ModuleConstructor } from '../modules/Module'
 import { throttle } from './Animator'
 
 export class Tvist {
-  static readonly VERSION = '1.0.0'
+  static readonly VERSION = pkg.version ?? '0.0.0'
 
-  /** Карта BEM-классов (tvist-v0, tvist-v0__container, …). Для использования нескольких версий на одной странице */
+  /** Карта BEM-классов (префикс из package.json: tvist-v1, tvist-v1__container, …). Для использования нескольких версий на одной странице */
   static readonly CLASSES = TVIST_CLASSES
-  /** Префикс BEM-блока для CSS (tvist-v0). @deprecated Используйте Tvist.CLASSES.block */
+  /** Префикс BEM-блока для CSS. @deprecated Используйте Tvist.CLASSES.block */
   static readonly CSS_PREFIX = TVIST_CLASSES.block
 
   // Реестр модулей (статический)

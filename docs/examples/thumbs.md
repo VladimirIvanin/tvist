@@ -13,25 +13,25 @@ import ThumbsExample from '../.vitepress/theme/examples/ThumbsExample.vue'
 **HTML:**
 ```html
 <!-- Main Slider -->
-<div class="tvist-v0 main-slider">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">1</div>
-    <div class="tvist-v0__slide">2</div>
-    <div class="tvist-v0__slide">3</div>
+<div class="tvist-v1 main-slider">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">1</div>
+    <div class="tvist-v1__slide">2</div>
+    <div class="tvist-v1__slide">3</div>
     <!-- ... -->
   </div>
 </div>
 
 <!-- Thumbnail Slider -->
-<div class="tvist-v0 thumb-slider">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">1</div>
-    <div class="tvist-v0__slide">2</div>
-    <div class="tvist-v0__slide">3</div>
+<div class="tvist-v1 thumb-slider">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">1</div>
+    <div class="tvist-v1__slide">2</div>
+    <div class="tvist-v1__slide">3</div>
     <!-- ... -->
   </div>
-  <button class="tvist-v0__arrow tvist-v0__arrow--prev">‹</button>
-  <button class="tvist-v0__arrow tvist-v0__arrow--next">›</button>
+  <button class="tvist-v1__arrow tvist-v1__arrow--prev">‹</button>
+  <button class="tvist-v1__arrow tvist-v1__arrow--next">›</button>
 </div>
 ```
 

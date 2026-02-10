@@ -14,7 +14,7 @@ npm install tvist
 
 ### Скачать для браузера (без npm)
 
-Минифицированная сборка для подключения через `<script>` лежит в папке [browser-build/](browser-build/) в репозитории (после `npm run build:browser`). В браузере глобальная переменная — **TvistV0** (версионированное имя, чтобы на одной странице можно было использовать несколько версий Tvist без конфликтов).
+Минифицированная сборка для подключения через `<script>` лежит в папке [browser-build/](browser-build/) в репозитории (после `npm run build:browser`). В браузере глобальная переменная — **TvistV1** (версионированное имя, чтобы на одной странице можно было использовать несколько версий Tvist без конфликтов).
 
 - **JS:** [tvist.min.js](https://raw.githubusercontent.com/VladimirIvanin/tvist/main/browser-build/tvist.min.js) · [jsDelivr CDN](https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.min.js)
 - **CSS:** [tvist.css](https://raw.githubusercontent.com/VladimirIvanin/tvist/main/browser-build/tvist.css) · [jsDelivr CDN](https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.css)
@@ -23,7 +23,7 @@ npm install tvist
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.css">
 <script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.min.js"></script>
 <script>
-  const slider = new TvistV0('#slider', { perPage: 1, drag: true });
+  const slider = new TvistV1('#slider', { perPage: 1, drag: true });
 </script>
 ```
 
@@ -49,11 +49,11 @@ npm install tvist
 Разметка:
 
 ```html
-<div id="slider" class="tvist-v0">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">Слайд 1</div>
-    <div class="tvist-v0__slide">Слайд 2</div>
-    <div class="tvist-v0__slide">Слайд 3</div>
+<div id="slider" class="tvist-v1">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">Слайд 1</div>
+    <div class="tvist-v1__slide">Слайд 2</div>
+    <div class="tvist-v1__slide">Слайд 3</div>
   </div>
 </div>
 ```

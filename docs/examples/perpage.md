@@ -76,16 +76,16 @@ const slider = new Tvist('.tvist', {
 ## HTML разметка
 
 ```html
-<div class="tvist-v0">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">1</div>
-    <div class="tvist-v0__slide">2</div>
-    <div class="tvist-v0__slide">3</div>
-    <div class="tvist-v0__slide">4</div>
-    <div class="tvist-v0__slide">5</div>
-    <div class="tvist-v0__slide">6</div>
-    <div class="tvist-v0__slide">7</div>
-    <div class="tvist-v0__slide">8</div>
+<div class="tvist-v1">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">1</div>
+    <div class="tvist-v1__slide">2</div>
+    <div class="tvist-v1__slide">3</div>
+    <div class="tvist-v1__slide">4</div>
+    <div class="tvist-v1__slide">5</div>
+    <div class="tvist-v1__slide">6</div>
+    <div class="tvist-v1__slide">7</div>
+    <div class="tvist-v1__slide">8</div>
   </div>
 </div>
 ```
@@ -93,7 +93,7 @@ const slider = new Tvist('.tvist', {
 ## CSS стили
 
 ```css
-.tvist-v0__slide {
+.tvist-v1__slide {
   display: flex;
   align-items: center;
   justify-content: center;

@@ -184,25 +184,25 @@ describe('Cube Effect Performance', () => {
         
         // Добавляем новый слайд
         const newSlide = document.createElement('div')
-        newSlide.className = 'tvist-v0__slide'
+        newSlide.className = 'tvist-v1__slide'
         newSlide.style.width = '300px'
         newSlide.textContent = 'New Slide'
         
-        const container = root.querySelector('.tvist-v0__container')!
+        const container = root.querySelector('.tvist-v1__container')!
         container.appendChild(newSlide)
         
         // Обновляем Tvist
         tvist.update()
         
         // Проверяем, что новый слайд учитывается
-        const slidesCount = root.querySelectorAll('.tvist-v0__slide').length
+        const slidesCount = root.querySelectorAll('.tvist-v1__slide').length
         expect(slidesCount).toBe(11)
         
         // Рендер должен работать с обновлённым списком
         tvist.engine.applyTransformPublic(-300)
         
         // Новый слайд должен быть виден при прокрутке
-        const allSlides = Array.from(root.querySelectorAll<HTMLElement>('.tvist-v0__slide'))
+        const allSlides = Array.from(root.querySelectorAll<HTMLElement>('.tvist-v1__slide'))
         const visibleSlides = allSlides.filter(s => 
             s.style.visibility === 'visible' || !s.style.visibility
         )

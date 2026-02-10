@@ -27,11 +27,11 @@ import AutoHeightExample from '../.vitepress/theme/examples/AutoHeightExample.vu
 **HTML:** у каждого слайда своя ширина через стиль или класс.
 
 ```html
-<div class="tvist-v0">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide" style="width: 180px">Узкий</div>
-    <div class="tvist-v0__slide" style="width: 280px">Средний</div>
-    <div class="tvist-v0__slide" style="width: 380px">Широкий</div>
+<div class="tvist-v1">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide" style="width: 180px">Узкий</div>
+    <div class="tvist-v1__slide" style="width: 280px">Средний</div>
+    <div class="tvist-v1__slide" style="width: 380px">Широкий</div>
     <!-- ... -->
   </div>
 </div>
@@ -40,7 +40,7 @@ import AutoHeightExample from '../.vitepress/theme/examples/AutoHeightExample.vu
 **JavaScript:**
 
 ```javascript
-new Tvist('.tvist-v0', {
+new Tvist('.tvist-v1', {
   autoWidth: true,
   gap: 16,
   perPage: 1,
@@ -58,7 +58,7 @@ new Tvist('.tvist-v0', {
 ### Код примера (Auto Height)
 
 ```javascript
-new Tvist('.tvist-v0', {
+new Tvist('.tvist-v1', {
   direction: 'vertical',
   autoHeight: true,
   gap: 12,

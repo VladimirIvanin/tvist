@@ -5,9 +5,9 @@
     :detailsLink="detailsLink"
   >
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist-v0">
-        <div class="tvist-v0__container">
-          <div class="tvist-v0__slide slide-1">
+      <div ref="sliderEl" class="tvist-v1">
+        <div class="tvist-v1__container">
+          <div class="tvist-v1__slide slide-1">
             <div class="slide-content">
               <div class="slide-title">Слайд 1</div>
               <div class="slide-hint">
@@ -15,22 +15,22 @@
               </div>
             </div>
           </div>
-          <div class="tvist-v0__slide slide-2">
+          <div class="tvist-v1__slide slide-2">
             <div class="slide-content">
               <div class="slide-title">Слайд 2</div>
             </div>
           </div>
-          <div class="tvist-v0__slide slide-3">
+          <div class="tvist-v1__slide slide-3">
             <div class="slide-content">
               <div class="slide-title">Слайд 3</div>
             </div>
           </div>
-          <div class="tvist-v0__slide slide-4">
+          <div class="tvist-v1__slide slide-4">
             <div class="slide-content">
               <div class="slide-title">Слайд 4</div>
             </div>
           </div>
-          <div class="tvist-v0__slide slide-5">
+          <div class="tvist-v1__slide slide-5">
             <div class="slide-content">
               <div class="slide-title">Слайд 5</div>
             </div>
@@ -146,7 +146,7 @@ onUnmounted(() => {
   border-radius: 12px;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -158,7 +158,7 @@ onUnmounted(() => {
   height: 400px;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -166,7 +166,7 @@ onUnmounted(() => {
   position: relative;
 }
 
-.tvist-v0--vertical .tvist-v0__slide {
+.tvist-v1--vertical .tvist-v1__slide {
   height: 400px;
 }
 

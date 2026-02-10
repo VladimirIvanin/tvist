@@ -12,7 +12,7 @@ import AutoplayRewindExample from '../.vitepress/theme/examples/AutoplayRewindEx
 <AutoplayBasicExample />
 
 ```js
-const slider = new Tvist('.tvist-v0', {
+const slider = new Tvist('.tvist-v1', {
   autoplay: 3000, // задержка в миллисекундах
   pauseOnHover: true, // пауза при наведении
   pauseOnInteraction: true, // пауза при взаимодействии
@@ -30,7 +30,7 @@ const slider = new Tvist('.tvist-v0', {
 <AutoplayRewindExample />
 
 ```js
-const slider = new Tvist('.tvist-v0', {
+const slider = new Tvist('.tvist-v1', {
   autoplay: 2000,
   rewind: true, // автоматический возврат к началу
   loop: false, // rewind работает без loop
@@ -41,7 +41,7 @@ const slider = new Tvist('.tvist-v0', {
 ## Управление через API
 
 ```js
-const slider = new Tvist('.tvist-v0', {
+const slider = new Tvist('.tvist-v1', {
   autoplay: 3000
 })
 
@@ -112,7 +112,7 @@ slider.on('autoplayResume', () => {
 ### С динамическим изменением задержки
 
 ```js
-const slider = new Tvist('.tvist-v0', {
+const slider = new Tvist('.tvist-v1', {
   autoplay: 3000
 })
 
@@ -123,7 +123,7 @@ slider.updateOptions({ autoplay: 1000 })
 ### С отключением после взаимодействия
 
 ```js
-const slider = new Tvist('.tvist-v0', {
+const slider = new Tvist('.tvist-v1', {
   autoplay: 3000,
   disableOnInteraction: true // остановится после первого drag/click
 })
@@ -132,7 +132,7 @@ const slider = new Tvist('.tvist-v0', {
 ### Rewind с ручной навигацией
 
 ```js
-const slider = new Tvist('.tvist-v0', {
+const slider = new Tvist('.tvist-v1', {
   rewind: true,
   arrows: true
 })

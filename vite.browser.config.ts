@@ -9,6 +9,8 @@ const pkg = JSON.parse(
 ) as { version: string; repository?: { url?: string }; homepage?: string };
 const repoUrl = pkg.repository?.url?.replace(/\.git$/, '') || pkg.homepage?.replace(/#.*$/, '') || 'https://github.com/VladimirIvanin/tvist';
 const banner = `/*! Tvist v${pkg.version} | ${repoUrl} */\n`;
+const versionMajor = parseInt(pkg.version.split('.')[0], 10) || 0;
+const umdName = `TvistV${versionMajor}`;
 
 /** Плагин: дописывает баннер в самое начало итогового JS после сборки (после minify). */
 function bannerFirstPlugin(): { name: string; closeBundle(): void } {
@@ -31,7 +33,7 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'TvistV0',
+      name: umdName,
       formats: ['umd'],
       fileName: () => 'tvist.min.js',
     },
@@ -43,8 +45,8 @@ export default defineConfig({
           return assetInfo.name || '';
         },
         exports: 'named',
-        // В браузере глобал TvistV0 = конструктор, чтобы можно было писать new TvistV0(...) при нескольких версиях на странице
-        outro: `(function(){try{var g=typeof window!=='undefined'?window:typeof globalThis!=='undefined'?globalThis:this;if(g.TvistV0&&g.TvistV0.default)g.TvistV0=g.TvistV0.default;}catch(e){}})();`,
+        // В браузере глобал TvistV{N} = конструктор (N = major из package.json)
+        outro: `(function(){try{var g=typeof window!=='undefined'?window:typeof globalThis!=='undefined'?globalThis:this;if(g.${umdName}&&g.${umdName}.default)g.${umdName}=g.${umdName}.default;}catch(e){}})();`,
       },
     },
     minify: 'terser',
@@ -77,6 +79,7 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         api: 'modern-compiler',
+        additionalData: `$tvist-block: 'tvist-v${versionMajor}';`,
       },
     },
   },

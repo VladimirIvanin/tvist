@@ -1,16 +1,16 @@
 <template>
   <ExampleCard title="Драг и стрелки" description="Перетаскивание мышью/тачем + стрелки навигации">
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist-v0">
-        <div class="tvist-v0__container">
-          <div class="tvist-v0__slide">1</div>
-          <div class="tvist-v0__slide">2</div>
-          <div class="tvist-v0__slide">3</div>
-          <div class="tvist-v0__slide">4</div>
-          <div class="tvist-v0__slide">5</div>
+      <div ref="sliderEl" class="tvist-v1">
+        <div class="tvist-v1__container">
+          <div class="tvist-v1__slide">1</div>
+          <div class="tvist-v1__slide">2</div>
+          <div class="tvist-v1__slide">3</div>
+          <div class="tvist-v1__slide">4</div>
+          <div class="tvist-v1__slide">5</div>
         </div>
-        <button class="tvist-v0__arrow tvist-v0__arrow--prev"></button>
-        <button class="tvist-v0__arrow tvist-v0__arrow--next"></button>
+        <button class="tvist-v1__arrow tvist-v1__arrow--prev"></button>
+        <button class="tvist-v1__arrow tvist-v1__arrow--next"></button>
       </div>
     </div>
 
@@ -20,17 +20,17 @@
 
 **HTML:**
 ```html
-<div class="tvist-v0">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">1</div>
-    <div class="tvist-v0__slide">2</div>
-    <div class="tvist-v0__slide">3</div>
-    <div class="tvist-v0__slide">4</div>
-    <div class="tvist-v0__slide">5</div>
+<div class="tvist-v1">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">1</div>
+    <div class="tvist-v1__slide">2</div>
+    <div class="tvist-v1__slide">3</div>
+    <div class="tvist-v1__slide">4</div>
+    <div class="tvist-v1__slide">5</div>
   </div>
   <!-- SVG иконки добавляются автоматически -->
-  <button class="tvist-v0__arrow tvist-v0__arrow--prev"></button>
-  <button class="tvist-v0__arrow tvist-v0__arrow--next"></button>
+  <button class="tvist-v1__arrow tvist-v1__arrow--prev"></button>
+  <button class="tvist-v1__arrow tvist-v1__arrow--next"></button>
 </div>
 ```
 
@@ -48,7 +48,7 @@ const slider = new Tvist('.tvist', {
 
 **CSS:**
 ```css
-.tvist-v0__slide {
+.tvist-v1__slide {
   height: 300px;
   display: flex;
   align-items: center;
@@ -58,11 +58,11 @@ const slider = new Tvist('.tvist', {
   color: white;
 }
 
-.tvist-v0__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v0__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v0__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v0__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-.tvist-v0__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v1__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
 ```
       </details>
     </template>
@@ -103,7 +103,7 @@ onUnmounted(() => {
   border-radius: 12px;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -111,7 +111,7 @@ onUnmounted(() => {
   position: relative;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   height: 300px;
   display: flex;
   align-items: center;
@@ -121,9 +121,9 @@ onUnmounted(() => {
   color: white;
 }
 
-.tvist-v0__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v0__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v0__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v0__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-.tvist-v0__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v1__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
 </style>

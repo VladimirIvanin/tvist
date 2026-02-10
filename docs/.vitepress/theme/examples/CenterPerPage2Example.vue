@@ -7,12 +7,12 @@
       </p>
     </div>
 
-    <div class="tvist-v0" ref="slider">
-      <div class="tvist-v0__container">
+    <div class="tvist-v1" ref="slider">
+      <div class="tvist-v1__container">
         <div 
           v-for="i in 9" 
           :key="i" 
-          class="tvist-v0__slide"
+          class="tvist-v1__slide"
         >
           <div class="slide-content">
             <span class="slide-label">Slide</span>
@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
   line-height: 1.6;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   margin-bottom: 24px;
   background: #fafafa;
   border-radius: 12px;
@@ -139,7 +139,7 @@ onBeforeUnmount(() => {
 }
 
 /* Активный слайд - выделяется */
-.tvist-v0__slide--active .slide-content {
+.tvist-v1__slide--active .slide-content {
   transform: scale(1.05);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
@@ -147,20 +147,20 @@ onBeforeUnmount(() => {
 }
 
 /* Предыдущий и следующий - полупрозрачные */
-.tvist-v0__slide--prev .slide-content,
-.tvist-v0__slide--next .slide-content {
+.tvist-v1__slide--prev .slide-content,
+.tvist-v1__slide--next .slide-content {
   opacity: 0.7;
   transform: scale(0.95);
 }
 
 /* Видимые, но не активные/prev/next */
-.tvist-v0__slide--visible:not(.tvist-v0__slide--active):not(.tvist-v0__slide--prev):not(.tvist-v0__slide--next) .slide-content {
+.tvist-v1__slide--visible:not(.tvist-v1__slide--active):not(.tvist-v1__slide--prev):not(.tvist-v1__slide--next) .slide-content {
   opacity: 0.4;
   transform: scale(0.9);
 }
 
 /* Невидимые слайды */
-.tvist-v0__slide:not(.tvist-v0__slide--visible) .slide-content {
+.tvist-v1__slide:not(.tvist-v1__slide--visible) .slide-content {
   opacity: 0.2;
 }
 

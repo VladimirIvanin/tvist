@@ -7,9 +7,9 @@
       <!-- perPage: 1 -->
       <div class="demo-section">
         <h3>perPage: 1 (по умолчанию)</h3>
-        <div ref="slider1El" class="tvist-v0">
-          <div class="tvist-v0__container">
-            <div v-for="i in 8" :key="i" class="tvist-v0__slide">
+        <div ref="slider1El" class="tvist-v1">
+          <div class="tvist-v1__container">
+            <div v-for="i in 8" :key="i" class="tvist-v1__slide">
               <span>{{ i }}</span>
             </div>
           </div>
@@ -19,9 +19,9 @@
       <!-- perPage: 2 -->
       <div class="demo-section">
         <h3>perPage: 2</h3>
-        <div ref="slider2El" class="tvist-v0">
-          <div class="tvist-v0__container">
-            <div v-for="i in 8" :key="i" class="tvist-v0__slide">
+        <div ref="slider2El" class="tvist-v1">
+          <div class="tvist-v1__container">
+            <div v-for="i in 8" :key="i" class="tvist-v1__slide">
               <span>{{ i }}</span>
             </div>
           </div>
@@ -36,9 +36,9 @@
       <!-- perPage: 3 -->
       <div class="demo-section">
         <h3>perPage: 3 с зазором</h3>
-        <div ref="slider3El" class="tvist-v0">
-          <div class="tvist-v0__container">
-            <div v-for="i in 8" :key="i" class="tvist-v0__slide">
+        <div ref="slider3El" class="tvist-v1">
+          <div class="tvist-v1__container">
+            <div v-for="i in 8" :key="i" class="tvist-v1__slide">
               <span>{{ i }}</span>
             </div>
           </div>
@@ -53,9 +53,9 @@
       <!-- perPage: 4 -->
       <div class="demo-section">
         <h3>perPage: 4 (grid-style)</h3>
-        <div ref="slider4El" class="tvist-v0">
-          <div class="tvist-v0__container">
-            <div v-for="i in 12" :key="i" class="tvist-v0__slide">
+        <div ref="slider4El" class="tvist-v1">
+          <div class="tvist-v1__container">
+            <div v-for="i in 12" :key="i" class="tvist-v1__slide">
               <span>{{ i }}</span>
             </div>
           </div>
@@ -181,7 +181,7 @@ onUnmounted(() => {
   color: #333;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -189,7 +189,7 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -201,24 +201,24 @@ onUnmounted(() => {
   user-select: none;
 }
 
-.tvist-v0__slide span {
+.tvist-v1__slide span {
   position: relative;
   z-index: 1;
 }
 
 /* Градиенты для слайдов - используем nth-child для повторяющегося паттерна */
-.tvist-v0__slide:nth-child(12n+1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v0__slide:nth-child(12n+2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v0__slide:nth-child(12n+3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v0__slide:nth-child(12n+4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-.tvist-v0__slide:nth-child(12n+5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
-.tvist-v0__slide:nth-child(12n+6) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
-.tvist-v0__slide:nth-child(12n+7) { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
-.tvist-v0__slide:nth-child(12n+8) { background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); }
-.tvist-v0__slide:nth-child(12n+9) { background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%); }
-.tvist-v0__slide:nth-child(12n+10) { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
-.tvist-v0__slide:nth-child(12n+11) { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
-.tvist-v0__slide:nth-child(12n+12) { background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%); }
+.tvist-v1__slide:nth-child(12n+1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v1__slide:nth-child(12n+2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v1__slide:nth-child(12n+3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v1__slide:nth-child(12n+4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v1__slide:nth-child(12n+5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.tvist-v1__slide:nth-child(12n+6) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+.tvist-v1__slide:nth-child(12n+7) { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+.tvist-v1__slide:nth-child(12n+8) { background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); }
+.tvist-v1__slide:nth-child(12n+9) { background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%); }
+.tvist-v1__slide:nth-child(12n+10) { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+.tvist-v1__slide:nth-child(12n+11) { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+.tvist-v1__slide:nth-child(12n+12) { background: linear-gradient(135deg, #ff6e7f 0%, #bfe9ff 100%); }
 
 .controls {
   display: flex;

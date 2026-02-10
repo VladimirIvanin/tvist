@@ -1,12 +1,12 @@
 <template>
   <ExampleCard title="Бесконечная прокрутка" description="Слайдер с бесконечным циклом и 2 слайдами на странице">
     <div class="demo-wrapper">
-      <div class="tvist-v0" ref="sliderEl">
-        <div class="tvist-v0__container">
-          <div class="tvist-v0__slide">1</div>
-          <div class="tvist-v0__slide">2</div>
-          <div class="tvist-v0__slide">3</div>
-          <div class="tvist-v0__slide">4</div>
+      <div class="tvist-v1" ref="sliderEl">
+        <div class="tvist-v1__container">
+          <div class="tvist-v1__slide">1</div>
+          <div class="tvist-v1__slide">2</div>
+          <div class="tvist-v1__slide">3</div>
+          <div class="tvist-v1__slide">4</div>
         </div>
       </div>
 
@@ -66,7 +66,7 @@ onUnmounted(() => {
   border-radius: 12px;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -74,7 +74,7 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   height: 250px;
   display: flex;
   align-items: center;
@@ -85,10 +85,10 @@ onUnmounted(() => {
   user-select: none;
 }
 
-.tvist-v0__slide[data-tvist-slide-index="0"] { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v0__slide[data-tvist-slide-index="1"] { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v0__slide[data-tvist-slide-index="2"] { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v0__slide[data-tvist-slide-index="3"] { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v1__slide[data-tvist-slide-index="0"] { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v1__slide[data-tvist-slide-index="1"] { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v1__slide[data-tvist-slide-index="2"] { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v1__slide[data-tvist-slide-index="3"] { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 
 .controls {
   display: flex;

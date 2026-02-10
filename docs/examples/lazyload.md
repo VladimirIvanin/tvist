@@ -21,15 +21,15 @@
 2. Заменить атрибуты `src` и `srcset` на `data-src` и `data-srcset`
 
 ```html
-<div class="tvist-v0">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">
+<div class="tvist-v1">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">
       <img data-src="image1.jpg" alt="Slide 1">
     </div>
-    <div class="tvist-v0__slide">
+    <div class="tvist-v1__slide">
       <img data-src="image2.jpg" alt="Slide 2">
     </div>
-    <div class="tvist-v0__slide">
+    <div class="tvist-v1__slide">
       <img data-src="image3.jpg" alt="Slide 3">
     </div>
   </div>
@@ -37,7 +37,7 @@
 ```
 
 ```javascript
-const slider = new Tvist('.tvist-v0', {
+const slider = new Tvist('.tvist-v1', {
   lazy: true
 })
 ```
@@ -45,7 +45,7 @@ const slider = new Tvist('.tvist-v0', {
 ### С адаптивными изображениями (srcset)
 
 ```html
-<div class="tvist-v0__slide">
+<div class="tvist-v1__slide">
   <img 
     data-src="image-800.jpg" 
     data-srcset="image-400.jpg 400w, image-800.jpg 800w, image-1200.jpg 1200w"
@@ -57,7 +57,7 @@ const slider = new Tvist('.tvist-v0', {
 ### Расширенные настройки
 
 ```javascript
-const slider = new Tvist('.tvist-v0', {
+const slider = new Tvist('.tvist-v1', {
   lazy: {
     // Количество слайдов для предзагрузки с каждой стороны
     preloadPrevNext: 2
@@ -144,11 +144,11 @@ lazyModule.loadSlide(5) // Загрузить изображения 5-го сл
 
 ## CSS-классы
 
-### `.tvist-v0__spinner`
+### `.tvist-v1__spinner`
 
 Индикатор загрузки (spinner), отображается во время загрузки изображения.
 
-### `.tvist-v0__slide--loading`
+### `.tvist-v1__slide--loading`
 
 Класс применяется к слайду во время загрузки изображения.
 
@@ -157,26 +157,26 @@ lazyModule.loadSlide(5) // Загрузить изображения 5-го сл
 Вы можете настроить внешний вид спиннера и состояния загрузки через CSS-переменные:
 
 ```css
-.tvist-v0 {
+.tvist-v1 {
   /* Размер спиннера */
-  --tvist-v0-spinner-size: 50px;
+  --tvist-v1-spinner-size: 50px;
   
   /* Цвет спиннера */
-  --tvist-v0-spinner-color: rgba(0, 0, 0, 0.3);
+  --tvist-v1-spinner-color: rgba(0, 0, 0, 0.3);
   
   /* Оверлей во время загрузки */
-  --tvist-v0-loading-overlay: rgba(255, 255, 255, 0.7);
+  --tvist-v1-loading-overlay: rgba(255, 255, 255, 0.7);
 }
 ```
 
 Или переопределить стили напрямую:
 
 ```css
-.tvist-v0__spinner {
+.tvist-v1__spinner {
   /* Ваши стили для спиннера */
 }
 
-.tvist-v0__slide--loading {
+.tvist-v1__slide--loading {
   /* Ваши стили для слайда в процессе загрузки */
   opacity: 0.5;
 }
@@ -187,7 +187,7 @@ lazyModule.loadSlide(5) // Загрузить изображения 5-го сл
 ### С autoplay
 
 ```javascript
-const slider = new Tvist('.tvist-v0', {
+const slider = new Tvist('.tvist-v1', {
   lazy: true,
   autoplay: 3000,
   loop: true
@@ -218,7 +218,7 @@ mainSlider.updateOptions({
 ### Обработка ошибок загрузки
 
 ```javascript
-const slider = new Tvist('.tvist-v0', {
+const slider = new Tvist('.tvist-v1', {
   lazy: true,
   on: {
     lazyLoadError: (img, slideIndex) => {

@@ -228,7 +228,7 @@ export class GridModule extends Module {
    * Оборачивает оригинальный слайд в колонку
    */
   private wrapSlide(originalSlide: HTMLElement, colWrapper: HTMLElement): void {
-    // Убираем класс tvist-v0__slide, чтобы updateSlidesList не находил его
+    // Убираем класс tvist-v1__slide, чтобы updateSlidesList не находил его
 originalSlide.classList.remove(TVIST_CLASSES.slide)
         originalSlide.classList.add(TVIST_CLASSES.gridItem)
     originalSlide.style.width = '100%'
@@ -269,7 +269,7 @@ originalSlide.classList.remove(TVIST_CLASSES.slide)
       container.innerHTML = ''
       
       this.originalSlides.forEach(slide => {
-        // Восстанавливаем класс tvist-v0__slide
+        // Восстанавливаем класс tvist-v1__slide
         slide.classList.remove(TVIST_CLASSES.gridItem)
         slide.classList.add(TVIST_CLASSES.slide)
         slide.style.width = ''

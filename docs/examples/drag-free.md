@@ -197,15 +197,15 @@ new Tvist('.slider', {
 
 ```html
 <div class="gallery">
-  <div class="tvist-v0">
-    <div class="tvist-v0__container">
-      <div class="tvist-v0__slide">
+  <div class="tvist-v1">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">
         <img src="photo1.jpg" alt="Photo 1">
       </div>
-      <div class="tvist-v0__slide">
+      <div class="tvist-v1__slide">
         <img src="photo2.jpg" alt="Photo 2">
       </div>
-      <div class="tvist-v0__slide">
+      <div class="tvist-v1__slide">
         <img src="photo3.jpg" alt="Photo 3">
       </div>
       <!-- ... -->

@@ -48,24 +48,24 @@ onMounted(() => {
 
 ### Горизонтальный слайдер
 
-<div ref="basicRef" class="tvist-v0" style="margin-bottom: 2rem; position: relative; height: 300px;">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+<div ref="basicRef" class="tvist-v1" style="margin-bottom: 2rem; position: relative; height: 300px;">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 1
       <div style="position: absolute; bottom: 60px; font-size: 14px; opacity: 0.8;">
         Используйте скроллбар внизу
       </div>
     </div>
-    <div class="tvist-v0__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+    <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 2
     </div>
-    <div class="tvist-v0__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+    <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 3
     </div>
-    <div class="tvist-v0__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+    <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 4
     </div>
-    <div class="tvist-v0__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+    <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 5
     </div>
   </div>
@@ -81,21 +81,21 @@ const slider = new Tvist('.tvist', {
 
 ### Вертикальный слайдер
 
-<div ref="verticalRef" class="tvist-v0 tvist--vertical" style="height: 400px; margin-bottom: 2rem; position: relative;">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+<div ref="verticalRef" class="tvist-v1 tvist--vertical" style="height: 400px; margin-bottom: 2rem; position: relative;">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 1
       <div style="position: absolute; left: 20px; font-size: 14px; opacity: 0.8;">
         Скроллбар справа →
       </div>
     </div>
-    <div class="tvist-v0__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+    <div class="tvist-v1__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 2
     </div>
-    <div class="tvist-v0__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+    <div class="tvist-v1__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 3
     </div>
-    <div class="tvist-v0__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+    <div class="tvist-v1__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 4
     </div>
   </div>
@@ -114,18 +114,18 @@ const slider = new Tvist('.tvist', {
 
 Скроллбар автоматически скрывается при бездействии.
 
-<div ref="hiddenRef" class="tvist-v0" style="margin-bottom: 2rem; position: relative; height: 300px;">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+<div ref="hiddenRef" class="tvist-v1" style="margin-bottom: 2rem; position: relative; height: 300px;">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 1
       <div style="position: absolute; bottom: 60px; font-size: 14px; opacity: 0.8;">
         Наведите курсор, чтобы увидеть скроллбар
       </div>
     </div>
-    <div class="tvist-v0__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+    <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 2
     </div>
-    <div class="tvist-v0__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
+    <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 3
     </div>
   </div>
@@ -197,40 +197,40 @@ const slider = new Tvist('.tvist', {
 
 ```css
 /* Контейнер скроллбара */
-.tvist-v0__scrollbar {
+.tvist-v1__scrollbar {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 8px;
 }
 
 /* Горизонтальный скроллбар */
-.tvist-v0__scrollbar--horizontal {
+.tvist-v1__scrollbar--horizontal {
   height: 8px;
   bottom: 15px;
 }
 
 /* Вертикальный скроллбар */
-.tvist-v0__scrollbar--vertical {
+.tvist-v1__scrollbar--vertical {
   width: 8px;
   right: 15px;
 }
 
 /* Ползунок */
-.tvist-v0__scrollbar-thumb {
+.tvist-v1__scrollbar-thumb {
   background: #667eea;
   border-radius: 8px;
 }
 
-.tvist-v0__scrollbar-thumb:hover {
+.tvist-v1__scrollbar-thumb:hover {
   background: #5568d3;
 }
 
 /* Состояние при перетаскивании */
-.tvist-v0__scrollbar--dragging .tvist-v0__scrollbar-thumb {
+.tvist-v1__scrollbar--dragging .tvist-v1__scrollbar-thumb {
   background: #4451b8;
 }
 
 /* Скрытое состояние */
-.tvist-v0__scrollbar--hidden {
+.tvist-v1__scrollbar--hidden {
   opacity: 0;
   pointer-events: none;
 }
@@ -242,8 +242,8 @@ const slider = new Tvist('.tvist', {
 
 **HTML:**
 ```html
-<div class="tvist-v0">
-  <div class="tvist-v0__container">
+<div class="tvist-v1">
+  <div class="tvist-v1__container">
     <!-- слайды -->
   </div>
 </div>
@@ -281,9 +281,9 @@ const slider = new Tvist('.tvist', {
 | `scrollbar.container` | `string \| HTMLElement` | `undefined` | Кастомный контейнер |
 | `scrollbar.hide` | `boolean` | `false` | Автоскрытие при бездействии |
 | `scrollbar.hideDelay` | `number` | `1000` | Задержка перед скрытием (мс) |
-| `scrollbar.scrollbarClass` | `string` | `'tvist-v0__scrollbar'` | CSS класс скроллбара |
-| `scrollbar.trackClass` | `string` | `'tvist-v0__scrollbar-track'` | CSS класс трека |
-| `scrollbar.thumbClass` | `string` | `'tvist-v0__scrollbar-thumb'` | CSS класс ползунка |
+| `scrollbar.scrollbarClass` | `string` | `'tvist-v1__scrollbar'` | CSS класс скроллбара |
+| `scrollbar.trackClass` | `string` | `'tvist-v1__scrollbar-track'` | CSS класс трека |
+| `scrollbar.thumbClass` | `string` | `'tvist-v1__scrollbar-thumb'` | CSS класс ползунка |
 | `scrollbar.draggable` | `boolean` | `true` | Возможность перетаскивания |
 
 ### Примеры использования

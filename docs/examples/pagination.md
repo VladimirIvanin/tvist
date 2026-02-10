@@ -66,17 +66,17 @@ onUnmounted(() => {
 
 Классические кликабельные точки. Опция `clickable: true` включает переход по клику.
 
-<div ref="bulletsRef" class="tvist-v0 pagination-demo-slider">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">1</div>
-    <div class="tvist-v0__slide">2</div>
-    <div class="tvist-v0__slide">3</div>
-    <div class="tvist-v0__slide">4</div>
-    <div class="tvist-v0__slide">5</div>
+<div ref="bulletsRef" class="tvist-v1 pagination-demo-slider">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">1</div>
+    <div class="tvist-v1__slide">2</div>
+    <div class="tvist-v1__slide">3</div>
+    <div class="tvist-v1__slide">4</div>
+    <div class="tvist-v1__slide">5</div>
   </div>
-  <button class="tvist-v0__arrow--prev" aria-label="Предыдущий"></button>
-  <button class="tvist-v0__arrow--next" aria-label="Следующий"></button>
-  <div class="tvist-v0__pagination"></div>
+  <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
+  <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
+  <div class="tvist-v1__pagination"></div>
 </div>
 
 ```javascript
@@ -92,17 +92,17 @@ pagination: {
 
 Отображение в виде «текущий / всего» (например, 2 / 5). Можно переопределить разметку через `renderFraction(current, total)`.
 
-<div ref="fractionRef" class="tvist-v0 pagination-demo-slider">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">1</div>
-    <div class="tvist-v0__slide">2</div>
-    <div class="tvist-v0__slide">3</div>
-    <div class="tvist-v0__slide">4</div>
-    <div class="tvist-v0__slide">5</div>
+<div ref="fractionRef" class="tvist-v1 pagination-demo-slider">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">1</div>
+    <div class="tvist-v1__slide">2</div>
+    <div class="tvist-v1__slide">3</div>
+    <div class="tvist-v1__slide">4</div>
+    <div class="tvist-v1__slide">5</div>
   </div>
-  <button class="tvist-v0__arrow--prev" aria-label="Предыдущий"></button>
-  <button class="tvist-v0__arrow--next" aria-label="Следующий"></button>
-  <div class="tvist-v0__pagination"></div>
+  <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
+  <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
+  <div class="tvist-v1__pagination"></div>
 </div>
 
 ```javascript
@@ -117,17 +117,17 @@ pagination: {
 
 Горизонтальная полоса, заполняющаяся по мере перехода к последнему слайду.
 
-<div ref="progressRef" class="tvist-v0 pagination-demo-slider">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">1</div>
-    <div class="tvist-v0__slide">2</div>
-    <div class="tvist-v0__slide">3</div>
-    <div class="tvist-v0__slide">4</div>
-    <div class="tvist-v0__slide">5</div>
+<div ref="progressRef" class="tvist-v1 pagination-demo-slider">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">1</div>
+    <div class="tvist-v1__slide">2</div>
+    <div class="tvist-v1__slide">3</div>
+    <div class="tvist-v1__slide">4</div>
+    <div class="tvist-v1__slide">5</div>
   </div>
-  <button class="tvist-v0__arrow--prev" aria-label="Предыдущий"></button>
-  <button class="tvist-v0__arrow--next" aria-label="Следующий"></button>
-  <div class="tvist-v0__pagination"></div>
+  <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
+  <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
+  <div class="tvist-v1__pagination"></div>
 </div>
 
 ```javascript
@@ -142,17 +142,17 @@ pagination: {
 
 Тип `custom` с функцией `renderCustom(current, total)` — вы возвращаете произвольный HTML (например, текст «Слайд 3 из 6» или свою разметку).
 
-<div ref="customRef" class="tvist-v0 pagination-demo-slider">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">1</div>
-    <div class="tvist-v0__slide">2</div>
-    <div class="tvist-v0__slide">3</div>
-    <div class="tvist-v0__slide">4</div>
-    <div class="tvist-v0__slide">5</div>
+<div ref="customRef" class="tvist-v1 pagination-demo-slider">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">1</div>
+    <div class="tvist-v1__slide">2</div>
+    <div class="tvist-v1__slide">3</div>
+    <div class="tvist-v1__slide">4</div>
+    <div class="tvist-v1__slide">5</div>
   </div>
-  <button class="tvist-v0__arrow--prev" aria-label="Предыдущий"></button>
-  <button class="tvist-v0__arrow--next" aria-label="Следующий"></button>
-  <div class="tvist-v0__pagination"></div>
+  <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
+  <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
+  <div class="tvist-v1__pagination"></div>
 </div>
 
 ```javascript
@@ -173,11 +173,11 @@ pagination: {
   min-height: 200px;
 }
 
-.pagination-demo-slider .tvist-v0__container {
+.pagination-demo-slider .tvist-v1__container {
   display: flex;
 }
 
-.pagination-demo-slider .tvist-v0__slide {
+.pagination-demo-slider .tvist-v1__slide {
   height: 200px;
   min-height: 200px;
   flex-shrink: 0;
@@ -189,15 +189,15 @@ pagination: {
   color: white;
 }
 
-.pagination-demo-slider .tvist-v0__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.pagination-demo-slider .tvist-v0__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.pagination-demo-slider .tvist-v0__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.pagination-demo-slider .tvist-v0__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-.pagination-demo-slider .tvist-v0__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.pagination-demo-slider .tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.pagination-demo-slider .tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.pagination-demo-slider .tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.pagination-demo-slider .tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.pagination-demo-slider .tvist-v1__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
 
 /* Стрелки — позиция поверх слайда */
-.pagination-demo-slider :deep(.tvist-v0__arrow--prev),
-.pagination-demo-slider :deep(.tvist-v0__arrow--next) {
+.pagination-demo-slider :deep(.tvist-v1__arrow--prev),
+.pagination-demo-slider :deep(.tvist-v1__arrow--next) {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -213,11 +213,11 @@ pagination: {
   border-radius: 8px;
   cursor: pointer;
 }
-.pagination-demo-slider :deep(.tvist-v0__arrow--prev) { left: 10px; }
-.pagination-demo-slider :deep(.tvist-v0__arrow--next) { right: 10px; }
+.pagination-demo-slider :deep(.tvist-v1__arrow--prev) { left: 10px; }
+.pagination-demo-slider :deep(.tvist-v1__arrow--next) { right: 10px; }
 
 /* Пагинация — внизу по центру, поверх слайда */
-.pagination-demo-slider .tvist-v0__pagination {
+.pagination-demo-slider .tvist-v1__pagination {
   position: absolute;
   bottom: 12px;
   left: 50%;
@@ -233,7 +233,7 @@ pagination: {
 }
 
 /* Bullets: круги, без маркеров темы */
-.pagination-demo-slider :deep(.tvist-v0__bullet) {
+.pagination-demo-slider :deep(.tvist-v1__bullet) {
   display: inline-block;
   width: 10px;
   height: 10px;
@@ -245,20 +245,20 @@ pagination: {
   border: none;
   box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
-.pagination-demo-slider :deep(.tvist-v0__bullet::before),
-.pagination-demo-slider :deep(.tvist-v0__bullet::after) {
+.pagination-demo-slider :deep(.tvist-v1__bullet::before),
+.pagination-demo-slider :deep(.tvist-v1__bullet::after) {
   display: none !important;
 }
-.pagination-demo-slider :deep(.tvist-v0__bullet.active) {
+.pagination-demo-slider :deep(.tvist-v1__bullet.active) {
   background: #fff;
   width: 24px;
   border-radius: 4px;
 }
 
 /* Fraction — читаемый текст на градиенте */
-.pagination-demo-slider :deep(.tvist-v0__pagination-current),
-.pagination-demo-slider :deep(.tvist-v0__pagination-separator),
-.pagination-demo-slider :deep(.tvist-v0__pagination-total) {
+.pagination-demo-slider :deep(.tvist-v1__pagination-current),
+.pagination-demo-slider :deep(.tvist-v1__pagination-separator),
+.pagination-demo-slider :deep(.tvist-v1__pagination-total) {
   font-size: 14px;
   font-weight: 600;
   color: rgba(255,255,255,0.95);
@@ -266,7 +266,7 @@ pagination: {
 }
 
 /* Progress bar */
-.pagination-demo-slider :deep(.tvist-v0__pagination-progress) {
+.pagination-demo-slider :deep(.tvist-v1__pagination-progress) {
   width: 120px;
   max-width: 200px;
   height: 4px;
@@ -275,7 +275,7 @@ pagination: {
   overflow: hidden;
 }
 
-.pagination-demo-slider :deep(.tvist-v0__pagination-progress-bar) {
+.pagination-demo-slider :deep(.tvist-v1__pagination-progress-bar) {
   height: 100%;
   background: #fff;
   border-radius: 2px;
@@ -304,4 +304,4 @@ pagination: {
 | `renderFraction` | `(current, total) => string` | Кастомный HTML для fraction |
 | `renderCustom` | `(current, total) => string` | Кастомный HTML для типа `custom` |
 
-Контейнер по умолчанию — элемент с классом `.tvist-v0__pagination` внутри корня слайдера.
+Контейнер по умолчанию — элемент с классом `.tvist-v1__pagination` внутри корня слайдера.

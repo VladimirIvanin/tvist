@@ -7,15 +7,15 @@
 Создайте HTML структуру для слайдера:
 
 ```html
-<div class="tvist-v0">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">
+<div class="tvist-v1">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">
       <img src="slide-1.jpg" alt="Slide 1">
     </div>
-    <div class="tvist-v0__slide">
+    <div class="tvist-v1__slide">
       <img src="slide-2.jpg" alt="Slide 2">
     </div>
-    <div class="tvist-v0__slide">
+    <div class="tvist-v1__slide">
       <img src="slide-3.jpg" alt="Slide 3">
     </div>
   </div>
@@ -80,11 +80,11 @@ const slider = new Tvist('.tvist', {
 HTML с элементами навигации:
 
 ```html
-<div class="tvist-v0">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">Slide 1</div>
-    <div class="tvist-v0__slide">Slide 2</div>
-    <div class="tvist-v0__slide">Slide 3</div>
+<div class="tvist-v1">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">Slide 1</div>
+    <div class="tvist-v1__slide">Slide 2</div>
+    <div class="tvist-v1__slide">Slide 3</div>
   </div>
   
   <!-- Стрелки навигации -->
@@ -176,11 +176,11 @@ console.log(slider.slides.length); // Количество слайдов
   <title>Мой первый Tvist слайдер</title>
   <link rel="stylesheet" href="node_modules/tvist/dist/tvist.css">
   <style>
-    .tvist-v0 {
+    .tvist-v1 {
       max-width: 800px;
       margin: 0 auto;
     }
-    .tvist-v0__slide {
+    .tvist-v1__slide {
       height: 400px;
       display: flex;
       align-items: center;
@@ -191,11 +191,11 @@ console.log(slider.slides.length); // Количество слайдов
   </style>
 </head>
 <body>
-  <div class="tvist-v0">
-    <div class="tvist-v0__container">
-      <div class="tvist-v0__slide">Слайд 1</div>
-      <div class="tvist-v0__slide">Слайд 2</div>
-      <div class="tvist-v0__slide">Слайд 3</div>
+  <div class="tvist-v1">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">Слайд 1</div>
+      <div class="tvist-v1__slide">Слайд 2</div>
+      <div class="tvist-v1__slide">Слайд 3</div>
     </div>
     <div class="tvist-button-prev">←</div>
     <div class="tvist-button-next">→</div>

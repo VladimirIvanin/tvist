@@ -64,36 +64,36 @@ new Tvist('.tvist', {
 
 ### CSS классы
 
-- `.tvist-v0__slide--active` - активный слайд (по центру)
-- `.tvist-v0__slide--prev` - предыдущий слайд
-- `.tvist-v0__slide--next` - следующий слайд
-- `.tvist-v0__slide--visible` - видимые слайды (полностью или частично)
+- `.tvist-v1__slide--active` - активный слайд (по центру)
+- `.tvist-v1__slide--prev` - предыдущий слайд
+- `.tvist-v1__slide--next` - следующий слайд
+- `.tvist-v1__slide--visible` - видимые слайды (полностью или частично)
 
 ### Пример стилизации
 
 ```css
 /* Активный слайд - увеличен и выделен */
-.tvist-v0__slide--active .slide-content {
+.tvist-v1__slide--active .slide-content {
   transform: scale(1.1);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   z-index: 10;
 }
 
 /* Предыдущий и следующий - слегка уменьшены */
-.tvist-v0__slide--prev .slide-content,
-.tvist-v0__slide--next .slide-content {
+.tvist-v1__slide--prev .slide-content,
+.tvist-v1__slide--next .slide-content {
   opacity: 0.7;
   transform: scale(0.95);
 }
 
 /* Видимые, но не активные - еще более уменьшены */
-.tvist-v0__slide--visible:not(.tvist-v0__slide--active):not(.tvist-v0__slide--prev):not(.tvist-v0__slide--next) .slide-content {
+.tvist-v1__slide--visible:not(.tvist-v1__slide--active):not(.tvist-v1__slide--prev):not(.tvist-v1__slide--next) .slide-content {
   opacity: 0.4;
   transform: scale(0.9);
 }
 
 /* Невидимые слайды */
-.tvist-v0__slide:not(.tvist-v0__slide--visible) .slide-content {
+.tvist-v1__slide:not(.tvist-v1__slide--visible) .slide-content {
   opacity: 0.2;
 }
 ```
@@ -257,4 +257,4 @@ tvist.scrollTo(5)   // К конкретному слайду
 
 Убедитесь, что:
 - Модуль `SlideStatesModule` зарегистрирован (автоматически при импорте Tvist)
-- Нет CSS конфликтов с классами `.tvist-v0__slide--*`
+- Нет CSS конфликтов с классами `.tvist-v1__slide--*`

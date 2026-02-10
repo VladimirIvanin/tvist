@@ -5,9 +5,9 @@
     :detailsLink="detailsLink"
   >
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist-v0">
-        <div class="tvist-v0__container">
-          <div v-for="i in 10" :key="i" class="tvist-v0__slide">
+      <div ref="sliderEl" class="tvist-v1">
+        <div class="tvist-v1__container">
+          <div v-for="i in 10" :key="i" class="tvist-v1__slide">
             <img 
               :data-src="`https://picsum.photos/800/600?random=${i}`"
               :alt="`Slide ${i}`"
@@ -165,7 +165,7 @@ onUnmounted(() => {
   border-radius: 12px;
 }
 
-.tvist-v0 {
+.tvist-v1 {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -174,7 +174,7 @@ onUnmounted(() => {
   position: relative;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   position: relative;
   height: 400px;
   background: #f0f0f0;
@@ -366,17 +366,17 @@ button.load-all:hover {
 }
 
 /* Кастомизация спиннера */
-:deep(.tvist-v0__spinner) {
-  --tvist-v0-spinner-size: 50px;
-  --tvist-v0-spinner-color: #667eea;
+:deep(.tvist-v1__spinner) {
+  --tvist-v1-spinner-size: 50px;
+  --tvist-v1-spinner-color: #667eea;
 }
 
-:deep(.tvist-v0__slide--loading) {
-  --tvist-v0-loading-overlay: rgba(255, 255, 255, 0.8);
+:deep(.tvist-v1__slide--loading) {
+  --tvist-v1-loading-overlay: rgba(255, 255, 255, 0.8);
 }
 
 @media (max-width: 768px) {
-  .tvist-v0__slide {
+  .tvist-v1__slide {
     height: 300px;
   }
 

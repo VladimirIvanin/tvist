@@ -1,12 +1,12 @@
 <template>
   <ExampleCard title="Вертикальный слайдер" description="Скролл сверху вниз">
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist-v0 tvist-vertical">
-        <div class="tvist-v0__container">
-          <div class="tvist-v0__slide">1</div>
-          <div class="tvist-v0__slide">2</div>
-          <div class="tvist-v0__slide">3</div>
-          <div class="tvist-v0__slide">4</div>
+      <div ref="sliderEl" class="tvist-v1 tvist-vertical">
+        <div class="tvist-v1__container">
+          <div class="tvist-v1__slide">1</div>
+          <div class="tvist-v1__slide">2</div>
+          <div class="tvist-v1__slide">3</div>
+          <div class="tvist-v1__slide">4</div>
         </div>
       </div>
       
@@ -22,12 +22,12 @@
 
 **HTML:**
 ```html
-<div class="tvist-v0">
-  <div class="tvist-v0__container">
-    <div class="tvist-v0__slide">1</div>
-    <div class="tvist-v0__slide">2</div>
-    <div class="tvist-v0__slide">3</div>
-    <div class="tvist-v0__slide">4</div>
+<div class="tvist-v1">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide">1</div>
+    <div class="tvist-v1__slide">2</div>
+    <div class="tvist-v1__slide">3</div>
+    <div class="tvist-v1__slide">4</div>
   </div>
 </div>
 ```
@@ -44,11 +44,11 @@ const slider = new Tvist('.tvist', {
 
 **CSS:**
 ```css
-.tvist-v0 {
+.tvist-v1 {
   height: 400px;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -57,10 +57,10 @@ const slider = new Tvist('.tvist', {
   color: white;
 }
 
-.tvist-v0__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v0__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v0__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v0__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 ```
       </details>
     </template>
@@ -108,7 +108,7 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
-.tvist-v0__slide {
+.tvist-v1__slide {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -117,10 +117,10 @@ onUnmounted(() => {
   color: white;
 }
 
-.tvist-v0__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v0__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v0__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v0__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 
 .controls {
   display: flex;

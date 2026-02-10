@@ -3,10 +3,13 @@
  * Версия в имени класса/переменной позволяет использовать несколько версий в одной странице (браузер, без модулей)
  */
 
-/** Основная версия из semver (major). Используется для префикса CSS и имени глобальной переменной в браузере */
-export const TVIST_VERSION_MAJOR = 0
+import pkg from '../../package.json' with { type: 'json' }
 
-/** Префикс BEM-блока для CSS: tvist-v0 → .tvist-v0, .tvist-v0__container, .tvist-v0__slide */
+/** Основная версия из semver (major). Используется для префикса CSS и имени глобальной переменной в браузере */
+const versionStr = String(pkg?.version ?? '0.0.0')
+export const TVIST_VERSION_MAJOR = parseInt(versionStr.split('.')[0] ?? '0', 10) || 0
+
+/** Префикс BEM-блока для CSS: tvist-v1 → .tvist-v1, .tvist-v1__container, .tvist-v1__slide */
 export const TVIST_CSS_PREFIX = `tvist-v${TVIST_VERSION_MAJOR}` as const
 
 const P = TVIST_CSS_PREFIX

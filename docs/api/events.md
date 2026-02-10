@@ -780,7 +780,7 @@ lazyModule.loadSlide(5)
 **HTML разметка:**
 
 ```html
-<div class="tvist-v0__slide">
+<div class="tvist-v1__slide">
   <img 
     data-src="image.jpg" 
     data-srcset="image-400.jpg 400w, image-800.jpg 800w"
