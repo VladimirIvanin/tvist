@@ -1178,6 +1178,146 @@ describe('LoopModule + DragModule Integration', () => {
   })
 
   describe('Смена направления драга во время жеста', () => {
+    it('НОВЫЙ ТЕСТ: должен корректно перестраивать слайды при смене направления без отпускания', async () => {
+      slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
+      
+      const loopModule = slider.getModule('loop') as any
+      const loopFixCalls: any[] = []
+      
+      const originalFix = loopModule.fix.bind(loopModule)
+      loopModule.fix = (params: any) => {
+        const stateBefore = {
+          location: slider.engine.location.get(),
+          activeIndex: slider.engine.index.get(),
+          slidesOrder: [...slider.slides].map(s => s.getAttribute('data-tvist-slide-index'))
+        }
+        
+        const result = originalFix(params)
+        
+        const stateAfter = {
+          location: slider.engine.location.get(),
+          activeIndex: slider.engine.index.get(),
+          slidesOrder: [...slider.slides].map(s => s.getAttribute('data-tvist-slide-index'))
+        }
+        
+        loopFixCalls.push({
+          params,
+          before: stateBefore,
+          after: stateAfter,
+          reordered: stateBefore.slidesOrder.join(',') !== stateAfter.slidesOrder.join(',')
+        })
+        
+        return result
+      }
+      
+      console.log('\n=== НОВЫЙ ТЕСТ: СМЕНА НАПРАВЛЕНИЯ БЕЗ ОТПУСКАНИЯ ===')
+      console.log('Начальное состояние:', loopModule.getTransformState())
+      
+      const container = fixture.container
+      const startX = 500
+      
+      // 1. Начинаем драг
+      const downEvent = new MouseEvent('mousedown', {
+        clientX: startX,
+        clientY: 100,
+        bubbles: true
+      })
+      container.dispatchEvent(downEvent)
+      await new Promise(resolve => setTimeout(resolve, 10))
+      
+      // 2. Драг ВПРАВО на 200px (максимальное движение к началу)
+      console.log('\n--- ШАГ 1: Драг ВПРАВО на 200px ---')
+      for (let i = 1; i <= 20; i++) {
+        const moveEvent = new MouseEvent('mousemove', {
+          clientX: startX + (i * 10),
+          clientY: 100,
+          bubbles: true
+        })
+        document.dispatchEvent(moveEvent)
+        await new Promise(resolve => setTimeout(resolve, 5))
+      }
+      
+      const stateAfterRight = loopModule.getTransformState()
+      console.log('Состояние после драга ВПРАВО:', {
+        location: stateAfterRight.location,
+        activeIndex: stateAfterRight.activeIndex,
+        slidesOrder: stateAfterRight.slidesOrder.join(', ')
+      })
+      console.log('Вызовов loopFix после движения вправо:', loopFixCalls.length)
+      
+      if (loopFixCalls.length > 0) {
+        const lastCall = loopFixCalls[loopFixCalls.length - 1]
+        console.log('Последний loopFix (вправо):')
+        console.log('  Direction:', lastCall.params.direction)
+        console.log('  Slides BEFORE:', lastCall.before.slidesOrder.join(', '))
+        console.log('  Slides AFTER:', lastCall.after.slidesOrder.join(', '))
+        console.log('  Reordered:', lastCall.reordered)
+      }
+      
+      // 3. БЕЗ ОТПУСКАНИЯ меняем направление - драг ВЛЕВО на 300px
+      console.log('\n--- ШАГ 2: Меняем направление - драг ВЛЕВО на 300px (БЕЗ ОТПУСКАНИЯ) ---')
+      for (let i = 1; i <= 30; i++) {
+        const moveEvent = new MouseEvent('mousemove', {
+          clientX: startX + 200 - (i * 10), // От +200px до -100px
+          clientY: 100,
+          bubbles: true
+        })
+        document.dispatchEvent(moveEvent)
+        await new Promise(resolve => setTimeout(resolve, 5))
+      }
+      
+      const stateAfterLeft = loopModule.getTransformState()
+      console.log('\nСостояние после смены направления (влево):', {
+        location: stateAfterLeft.location,
+        activeIndex: stateAfterLeft.activeIndex,
+        slidesOrder: stateAfterLeft.slidesOrder.join(', ')
+      })
+      console.log('Всего вызовов loopFix:', loopFixCalls.length)
+      
+      // 4. Завершаем драг
+      const upEvent = new MouseEvent('mouseup', {
+        clientX: startX - 100,
+        clientY: 100,
+        bubbles: true
+      })
+      document.dispatchEvent(upEvent)
+      
+      console.log('\n=== АНАЛИЗ ВЫЗОВОВ LOOPFIX ===')
+      loopFixCalls.forEach((call, i) => {
+        console.log(`\nВызов #${i + 1}:`)
+        console.log('  Direction:', call.params.direction)
+        console.log('  Slides BEFORE:', call.before.slidesOrder.join(', '))
+        console.log('  Slides AFTER:', call.after.slidesOrder.join(', '))
+        console.log('  Location BEFORE:', call.before.location)
+        console.log('  Location AFTER:', call.after.location)
+        console.log('  Reordered:', call.reordered)
+      })
+      
+      // ПРОВЕРКИ:
+      console.log('\n=== ОЖИДАНИЯ ===')
+      console.log('Должно быть минимум 2 вызова loopFix:')
+      console.log('  - 1-й вызов: direction=prev (движение вправо)')
+      console.log('  - 2-й вызов: direction=next (движение влево после смены направления)')
+      
+      // 1. Должно быть минимум 2 вызова loopFix
+      expect(loopFixCalls.length).toBeGreaterThanOrEqual(2)
+      
+      // 2. Первый вызов должен быть с direction='prev' (движение вправо)
+      expect(loopFixCalls[0].params.direction).toBe('prev')
+      expect(loopFixCalls[0].reordered).toBe(true)
+      
+      // 3. Должен быть вызов с direction='next' (движение влево)
+      const hasNextDirection = loopFixCalls.some(call => call.params.direction === 'next')
+      expect(hasNextDirection).toBe(true)
+      
+      // 4. Вызов с direction='next' должен быть ПОСЛЕ вызова с direction='prev'
+      const prevIndex = loopFixCalls.findIndex(call => call.params.direction === 'prev')
+      const nextIndex = loopFixCalls.findIndex(call => call.params.direction === 'next')
+      expect(nextIndex).toBeGreaterThan(prevIndex)
+      
+      console.log('\n✅ ТЕСТ ПРОЙДЕН: при смене направления вызывается новый loopFix')
+    })
+
     it('должен перестраивать слайды при смене направления драга', async () => {
       slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
       
