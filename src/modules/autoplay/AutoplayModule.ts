@@ -184,13 +184,11 @@ export class AutoplayModule extends Module {
    * Очищаем таймер, чтобы callback не сработал во время паузы
    */
   pause(): void {
-    console.log('[Autoplay] pause called', { paused: this.paused, timer: this.timer })
     if (!this.paused) {
       this.paused = true
       // Очищаем таймер — иначе callback может сработать между pause() и resume()
       // и вызвать next() сразу после resume() (баг с пагинацией после драга)
       if (this.timer !== null) {
-        console.log('[Autoplay] clearing timer in pause()')
         window.clearInterval(this.timer)
         this.timer = null
       }
@@ -203,7 +201,6 @@ export class AutoplayModule extends Module {
    * Перезапускает таймер, чтобы избежать немедленного автоперелистывания
    */
   resume(): void {
-    console.log('[Autoplay] resume called', { paused: this.paused, stopped: this.stopped, timer: this.timer })
     if (this.paused && !this.stopped) {
       this.paused = false
       // Перезапускаем таймер, чтобы отсчёт начался заново

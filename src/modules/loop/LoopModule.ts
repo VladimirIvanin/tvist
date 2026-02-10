@@ -11,12 +11,10 @@ import { Module } from '../Module'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
-const LOOP_DEBUG = true
-const log = (msg: string, data?: unknown) => {
+const LOOP_DEBUG = false
+const log = (_msg: string, _data?: unknown) => {
   if (LOOP_DEBUG) {
-    const prefix = '[Loop]'
-    if (data !== undefined) console.warn(prefix, msg, data)
-    else console.warn(prefix, msg)
+    // debug logging
   }
 }
 
@@ -153,11 +151,11 @@ export class LoopModule extends Module {
   public pause(label?: string): void {
     // Останавливаем анимацию
     this.tvist.engine.animator.stop()
-    
-    // Логируем состояние
-    const state = this.getTransformState()
-    const prefix = label ? `[Loop Pause: ${label}]` : '[Loop Pause]'
-    console.warn(prefix, state)
+    if (LOOP_DEBUG) {
+      const state = this.getTransformState()
+      const prefix = label ? `[Loop Pause: ${label}]` : '[Loop Pause]'
+      log(prefix, state)
+    }
   }
 
   /**

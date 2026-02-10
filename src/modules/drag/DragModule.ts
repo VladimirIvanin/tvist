@@ -17,10 +17,10 @@ import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
-const DRAG_DEBUG = true
-const dragLog = (...args: unknown[]) => {
+const DRAG_DEBUG = false
+const dragLog = (..._args: unknown[]) => {
   if (DRAG_DEBUG) {
-    console.warn('[Drag]', ...args)
+    // debug logging
   }
 }
 

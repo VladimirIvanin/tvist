@@ -11,10 +11,10 @@ import type { TvistOptions } from './types'
 import { getOuterWidth, getOuterHeight } from '../utils/dom'
 import { applyPeek, getPeekValue, getPeekValueFromOptions } from '../utils/peek'
 
-const ENGINE_DEBUG = true
-const engineLog = (label: string, data?: Record<string, unknown>) => {
+const ENGINE_DEBUG = false
+const engineLog = (_label: string, _data?: Record<string, unknown>) => {
   if (ENGINE_DEBUG) {
-    console.log(`[Engine] ${label}`, data ?? '')
+    // debug logging
   }
 }
 

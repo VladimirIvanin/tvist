@@ -203,6 +203,8 @@ describe('AutoplayModule', () => {
 
       // Заканчиваем перетаскивание
       slider.emit('dragEnd')
+      // Snap-анимация завершается transitionEnd — resume автоплея
+      slider.emit('transitionEnd', 0)
 
       // Теперь должен переключиться
       vi.advanceTimersByTime(1000)
@@ -242,14 +244,16 @@ describe('AutoplayModule', () => {
 
       // Заканчиваем перетаскивание
       slider.emit('dragEnd')
+      // Snap-анимация завершается transitionEnd — resume автоплея
+      slider.emit('transitionEnd', 0)
 
-      // После dragEnd таймер должен сброситься!
+      // После transitionEnd таймер должен сброситься!
       // Если таймер НЕ сбросился, то через 200мс произойдёт автоперелистывание
       // Это баг - пользователь только что перелистнул, а слайдер сразу перелистывает ещё раз
       vi.advanceTimersByTime(200)
       expect(slider.activeIndex).toBe(0) // НЕ должен перелистнуться!
 
-      // Должен перелистнуться только через полный интервал (1000мс) после dragEnd
+      // Должен перелистнуться только через полный интервал (1000мс) после transitionEnd
       vi.advanceTimersByTime(800) // 200 + 800 = 1000мс
       expect(slider.activeIndex).toBe(1)
 

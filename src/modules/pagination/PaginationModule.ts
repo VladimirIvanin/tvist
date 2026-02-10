@@ -13,12 +13,22 @@ import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
+const PAGINATION_DEBUG = false
+const log = (..._args: unknown[]) => {
+  if (PAGINATION_DEBUG) {
+    // debug logging
+  }
+}
+
 export class PaginationModule extends Module {
   readonly name = 'pagination'
 
   private container: HTMLElement | null = null
   private bullets: HTMLElement[] = []
   private clickHandlers = new Map<HTMLElement, () => void>()
+  
+  // Счётчик обновлений для отладки
+  private updateCounter = 0
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
@@ -36,13 +46,62 @@ export class PaginationModule extends Module {
       return
     }
 
+    log('Init', {
+      loop: this.options.loop,
+      perPage: this.options.perPage,
+      slidesCount: this.tvist.slides.length,
+      hasRealIndexGetter: 'realIndex' in this.tvist
+    })
+
     this.render()
     this.updateActive()
     this.emit('pagination:mounted')
 
-    // Обновляем при изменении слайда
-    this.on('slideChanged', () => this.updateActive())
+    // Обновляем при изменении слайда СИНХРОННО (slideChange эмитится ДО анимации),
+    // чтобы к моменту slideChanged (после анимации) bullet'ы были уже актуальны.
+    // Также слушаем slideChanged для instant-переходов (scrollTo с instant=true).
+    this.on('slideChange', (index) => {
+      log('slideChange event received', { index })
+      this.updateActive()
+    })
+    
+    this.on('slideChanged', (index) => {
+      log('slideChanged event received', { index })
+      this.updateActive()
+      if (this.options.loop) this.scheduleUpdateActive()
+    })
+    
+    // Для loop режима нужны дополнительные события
+    if (this.options.loop) {
+      this.on('loopFix', () => {
+        log('loopFix event received', {
+          hasRealIndexGetter: 'realIndex' in this.tvist,
+          realIndex: this.tvist.realIndex,
+          activeIndex: this.tvist.activeIndex
+        })
+        this.updateActive()
+        this.scheduleUpdateActive()
+      })
+      
+      this.on('transitionEnd', () => {
+        log('transitionEnd event received')
+        this.updateActive()
+        this.scheduleUpdateActive()
+      })
+    }
   }
+  
+  /** Дополнительное отложенное обновление (для loop: после применения DOM/индекса) */
+  private scheduleUpdateActive(): void {
+    if (this.updateScheduled) return
+    this.updateScheduled = true
+    requestAnimationFrame(() => {
+      this.updateActive()
+      this.updateScheduled = false
+    })
+  }
+  
+  private updateScheduled = false
 
   override destroy(): void {
     this.detachClickHandlers()
@@ -85,6 +144,55 @@ export class PaginationModule extends Module {
       return pagination.type ?? 'bullets'
     }
     return 'bullets'
+  }
+
+  /**
+   * Получить текущий индекс слайда с учётом loop режима
+   * В loop режиме используем realIndex, иначе activeIndex
+   */
+  private getCurrentSlideIndex(): number {
+    const activeIndex = this.tvist.activeIndex
+    
+    if (!this.options.loop) {
+      return activeIndex
+    }
+    
+    // В loop режиме всегда пытаемся получить realIndex
+    // Сначала проверяем геттер (если LoopModule установил его)
+    const hasRealIndexGetter = 'realIndex' in this.tvist
+    const realIndexFromGetter = hasRealIndexGetter ? this.tvist.realIndex : undefined
+    
+    // Если геттер вернул число, используем его
+    if (typeof realIndexFromGetter === 'number') {
+      return realIndexFromGetter
+    }
+    
+    // Fallback: вычисляем realIndex из data-tvist-slide-index
+    const activeSlide = this.tvist.slides[activeIndex]
+    if (activeSlide) {
+      const dataIndex = activeSlide.getAttribute('data-tvist-slide-index')
+      if (dataIndex !== null && dataIndex !== '') {
+        const calculatedRealIndex = parseInt(dataIndex, 10)
+        if (!isNaN(calculatedRealIndex)) {
+          log('getCurrentSlideIndex (calculated from data-attr)', {
+            activeIndex,
+            calculatedRealIndex,
+            hasGetter: hasRealIndexGetter,
+            getterValue: realIndexFromGetter
+          })
+          return calculatedRealIndex
+        }
+      }
+    }
+    
+    // Последний fallback: activeIndex
+    log('getCurrentSlideIndex (fallback to activeIndex)', {
+      activeIndex,
+      hasGetter: hasRealIndexGetter,
+      getterValue: realIndexFromGetter,
+      slideHasDataAttr: activeSlide?.hasAttribute('data-tvist-slide-index')
+    })
+    return activeIndex
   }
 
   /**
@@ -183,7 +291,7 @@ export class PaginationModule extends Module {
     const isLoop = this.options.loop === true
     const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
     
-    const currentPage = this.tvist.activeIndex + 1
+    const currentPage = this.getCurrentSlideIndex() + 1
     const totalPages = slideCount === 0 ? 0 : endIndex + 1
     
     let html: string
@@ -213,7 +321,7 @@ export class PaginationModule extends Module {
     const isLoop = this.options.loop === true
     const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
 
-    const currentPage = this.tvist.activeIndex + 1
+    const currentPage = this.getCurrentSlideIndex() + 1
     const totalPages = slideCount === 0 ? 0 : endIndex + 1
     const progress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0
 
@@ -234,7 +342,7 @@ export class PaginationModule extends Module {
 
     if (typeof pagination === 'object' && pagination?.renderCustom) {
       const html = pagination.renderCustom(
-        this.tvist.activeIndex + 1,
+        this.getCurrentSlideIndex() + 1,
         this.tvist.slides.length
       )
       this.container.innerHTML = html
@@ -246,6 +354,15 @@ export class PaginationModule extends Module {
    */
   private updateActive(): void {
     if (!this.container) return
+
+    this.updateCounter++
+    
+    log(`updateActive #${this.updateCounter}`, {
+      activeIndex: this.tvist.activeIndex,
+      realIndex: this.options.loop ? this.tvist.realIndex : undefined,
+      currentSlideIndex: this.getCurrentSlideIndex(),
+      type: this.getType()
+    })
 
     const type = this.getType()
 
@@ -274,8 +391,15 @@ export class PaginationModule extends Module {
       ? pagination.bulletActiveClass ?? 'active'
       : 'active'
 
-    // Текущая страница соответствует индексу
-    const currentPage = this.tvist.activeIndex
+    // Текущая страница соответствует индексу (в loop режиме используем realIndex)
+    const currentPage = this.getCurrentSlideIndex()
+
+    log('updateBulletsActive', {
+      currentPage,
+      bulletsCount: this.bullets.length,
+      activeIndex: this.tvist.activeIndex,
+      realIndex: this.options.loop ? this.tvist.realIndex : undefined
+    })
 
     this.bullets.forEach((bullet, pageIndex) => {
       if (pageIndex === currentPage) {
@@ -300,7 +424,7 @@ export class PaginationModule extends Module {
       const isLoop = this.options.loop === true
       const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
 
-      const currentPage = this.tvist.activeIndex + 1
+      const currentPage = this.getCurrentSlideIndex() + 1
       const totalPages = slideCount === 0 ? 0 : endIndex + 1
       const progress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0
       progressBar.style.width = `${progress}%`
