@@ -7,6 +7,18 @@
       "description": "Количество слайдов на странице"
     },
     {
+      "name": "slidesPerGroup",
+      "type": "number",
+      "default": "1",
+      "description": "Количество слайдов, пролистываемых за один раз (next/prev)"
+    },
+    {
+      "name": "center",
+      "type": "boolean",
+      "default": "false",
+      "description": "Центрирование активного слайда в контейнере"
+    },
+    {
       "name": "slideMinSize",
       "type": "number",
       "default": "undefined",
@@ -61,6 +73,12 @@
       "description": "Индекс начального слайда"
     },
     {
+      "name": "debug",
+      "type": "boolean",
+      "default": "false",
+      "description": "Режим отладки: предупреждения в консоль"
+    },
+    {
       "name": "drag",
       "type": "boolean | 'free'",
       "default": "true",
@@ -77,6 +95,12 @@
       "type": "boolean",
       "default": "true",
       "description": "Эффект \"резинки\" при перетаскивании за границы"
+    },
+    {
+      "name": "freeSnap",
+      "type": "boolean",
+      "default": "false",
+      "description": "Привязка к слайдам в drag: 'free' после остановки"
     },
     {
       "name": "focusableElements",
@@ -189,6 +213,12 @@
       "type": "boolean | 'auto'",
       "default": "false",
       "description": "Бесконечная прокрутка. 'auto' - определяется автоматически на основе количества слайдов"
+    },
+    {
+      "name": "rewind",
+      "type": "boolean",
+      "default": "false",
+      "description": "Возврат к первому слайду после последнего (без loop)"
     },
     {
       "name": "lazy",
@@ -347,6 +377,80 @@
       ]
     },
     {
+      "name": "scrollbar",
+      "type": "boolean | object",
+      "default": "false",
+      "description": "Кастомный скроллбар для навигации",
+      "nested": [
+        {
+          "name": "container",
+          "type": "string | HTMLElement",
+          "description": "Селектор или элемент контейнера скроллбара"
+        },
+        {
+          "name": "hide",
+          "type": "boolean",
+          "description": "Скрывать скроллбар при бездействии"
+        },
+        {
+          "name": "draggable",
+          "type": "boolean",
+          "description": "Перетаскивание ползунка"
+        }
+      ]
+    },
+    {
+      "name": "grid",
+      "type": "object",
+      "default": "undefined",
+      "description": "Сетка слайдов (ряды и колонки)",
+      "nested": [
+        {
+          "name": "rows",
+          "type": "number",
+          "description": "Количество рядов"
+        },
+        {
+          "name": "cols",
+          "type": "number",
+          "description": "Количество колонок"
+        },
+        {
+          "name": "gap",
+          "type": "object | number | string",
+          "description": "Отступы сетки"
+        },
+        {
+          "name": "dimensions",
+          "type": "[number, number][]",
+          "description": "Размеры ячеек [colSpan, rowSpan]"
+        }
+      ]
+    },
+    {
+      "name": "marquee",
+      "type": "boolean | object",
+      "default": "false",
+      "description": "Режим бегущей строки (непрерывная прокрутка)",
+      "nested": [
+        {
+          "name": "speed",
+          "type": "number",
+          "description": "Скорость в пикселях в секунду"
+        },
+        {
+          "name": "direction",
+          "type": "'left' | 'right' | 'up' | 'down'",
+          "description": "Направление прокрутки"
+        },
+        {
+          "name": "pauseOnHover",
+          "type": "boolean",
+          "description": "Пауза при наведении"
+        }
+      ]
+    },
+    {
       "name": "breakpoints",
       "type": "object",
       "default": "undefined",
@@ -357,6 +461,12 @@
       "type": "'window' | 'container'",
       "default": "'window'",
       "description": "База для расчёта breakpoints"
+    },
+    {
+      "name": "enabled",
+      "type": "boolean",
+      "default": "true",
+      "description": "Включить/выключить слайдер (при false — статичный контент)"
     },
     {
       "name": "on",
@@ -370,9 +480,14 @@
           "description": "Вызывается после создания слайдера"
         },
         {
+          "name": "beforeDestroy",
+          "type": "(tvist: Tvist) => void",
+          "description": "Перед уничтожением слайдера"
+        },
+        {
           "name": "destroyed",
           "type": "(tvist: Tvist) => void",
-          "description": "Вызывается перед уничтожением слайдера"
+          "description": "При уничтожении слайдера"
         },
         {
           "name": "beforeSlideChange",
@@ -410,14 +525,74 @@
           "description": "Вызывается при прокрутке"
         },
         {
-          "name": "resize",
+          "name": "resized",
           "type": "() => void",
-          "description": "Вызывается при изменении размера"
+          "description": "Завершилось изменение размера контейнера"
         },
         {
           "name": "breakpoint",
           "type": "(breakpoint: number | null) => void",
-          "description": "Вызывается при смене breakpoint"
+          "description": "Смена breakpoint"
+        },
+        {
+          "name": "lock",
+          "type": "() => void",
+          "description": "Слайдер заблокирован"
+        },
+        {
+          "name": "unlock",
+          "type": "() => void",
+          "description": "Слайдер разблокирован"
+        },
+        {
+          "name": "optionsUpdated",
+          "type": "(tvist: Tvist, newOptions) => void",
+          "description": "Обновлены опции через updateOptions()"
+        },
+        {
+          "name": "refresh",
+          "type": "() => void",
+          "description": "Вызван update()"
+        },
+        {
+          "name": "click",
+          "type": "(index, slide, event) => void",
+          "description": "Клик по слайду"
+        },
+        {
+          "name": "transitionStart",
+          "type": "(index: number) => void",
+          "description": "Начало анимации перехода"
+        },
+        {
+          "name": "transitionEnd",
+          "type": "(index: number) => void",
+          "description": "Конец анимации перехода"
+        },
+        {
+          "name": "visible",
+          "type": "(slide, index) => void",
+          "description": "Слайд вошёл в видимую область"
+        },
+        {
+          "name": "hidden",
+          "type": "(slide, index) => void",
+          "description": "Слайд вышел из видимой области"
+        },
+        {
+          "name": "progress",
+          "type": "(progress: number) => void",
+          "description": "Прогресс прокрутки 0..1 (при !loop)"
+        },
+        {
+          "name": "reachBeginning",
+          "type": "() => void",
+          "description": "Достигнут первый слайд"
+        },
+        {
+          "name": "reachEnd",
+          "type": "() => void",
+          "description": "Достигнут последний слайд"
         }
       ]
     }

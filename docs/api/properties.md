@@ -340,7 +340,7 @@ slider.on('slideChange', (index) => {
 ### Адаптивное поведение на основе размеров
 
 ```javascript
-slider.on('resize', () => {
+slider.on('resized', () => {
   const width = slider.root.offsetWidth
   
   if (width < 768) {

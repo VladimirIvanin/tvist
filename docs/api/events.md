@@ -17,6 +17,7 @@
 - [`beforeSlideChange`](#beforeslidechange) — перед сменой слайда
 - [`slideChange`](#slidechange) — начало смены (старт анимации)
 - [`slideChanged`](#slidechanged) — смена завершена
+- [`beforeTransitionStart`](#beforetransitionstart) — перед началом анимации перехода (для loop)
 - [`transitionStart`](#transitionstart) — начало анимации перехода
 - [`transitionEnd`](#transitionend) — конец анимации перехода
 - [`scroll`](#scroll) — во время прокрутки (тики анимации / драг)
@@ -400,6 +401,14 @@ refresh: () => void
 ```
 
 Вызывается при вызове `update()` — пересчитаны размеры и позиции.
+
+### beforeTransitionStart
+
+```typescript
+beforeTransitionStart: (data: { index: number; direction: 'next' | 'prev' }) => void
+```
+
+Вызывается перед началом анимации перехода. Используется внутренне для loop (коррекция индекса). Полезно для синхронизации с другими слайдерами или кастомной логики по направлению.
 
 ### transitionStart / transitionEnd
 
