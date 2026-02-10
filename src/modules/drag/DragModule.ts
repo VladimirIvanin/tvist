@@ -20,7 +20,7 @@ import type { TvistOptions } from '../../core/types'
 const DRAG_DEBUG = false
 const dragLog = (..._args: unknown[]) => {
   if (DRAG_DEBUG) {
-    console.log(..._args)
+    console.warn(..._args)
   }
 }
 
@@ -995,8 +995,6 @@ export class DragModule extends Module {
     
     const threshold = Math.max(slideSize * 0.2, 80)
     
-    let targetIndex: number
-    
     // Вычисляем количество слайдов для перемещения
     const exactSlidesMoved = -dragDistance / slideWithGap
     let slidesMoved = Math.round(exactSlidesMoved)
@@ -1013,7 +1011,7 @@ export class DragModule extends Module {
       }
     }
     
-    targetIndex = startIndex + slidesMoved
+    const targetIndex = startIndex + slidesMoved
 
     dragLog('snapWithThreshold', {
       startIndex,
