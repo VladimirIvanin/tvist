@@ -30,6 +30,7 @@ export class DragModule extends Module {
   private startX = 0
   private startY = 0
   private startPosition = 0
+  private startIndex = 0 // Индекс слайда при начале драга (для center mode)
   private currentX = 0 // Текущая позиция курсора
   private currentY = 0
 
@@ -111,6 +112,7 @@ export class DragModule extends Module {
   /**
    * Обновление границ для rubberband.
    * При loop границ нет. Без loop: peekTrim — min/max без левого/правого peek.
+   * При center: true используем getScrollPositionForIndex для корректного учета centerOffset.
    */
   private updateBounds(): void {
     const { engine, slides } = this.tvist
@@ -120,11 +122,17 @@ export class DragModule extends Module {
       this.minPosition = Infinity
       this.maxPosition = -Infinity
     } else {
-      const usePeekTrim = this.options.peekTrim !== false
-      this.minPosition = usePeekTrim ? engine.getMinScrollPosition() : 0
-      this.maxPosition = usePeekTrim
-        ? engine.getMaxScrollPosition()
-        : -engine.getSlidePosition(slides.length - perPage)
+      // При center: true используем getScrollPositionForIndex, который уже учитывает centerOffset
+      if (this.options.center) {
+        this.minPosition = engine.getScrollPositionForIndex(0)
+        this.maxPosition = engine.getScrollPositionForIndex(slides.length - 1)
+      } else {
+        const usePeekTrim = this.options.peekTrim !== false
+        this.minPosition = usePeekTrim ? engine.getMinScrollPosition() : 0
+        this.maxPosition = usePeekTrim
+          ? engine.getMaxScrollPosition()
+          : -engine.getSlidePosition(slides.length - perPage)
+      }
     }
     
     // Отладка границ
@@ -133,6 +141,7 @@ export class DragModule extends Module {
         minPosition: this.minPosition,
         maxPosition: this.maxPosition,
         loop: this.options.loop,
+        center: this.options.center,
         peekTrim: this.options.peekTrim !== false,
         slidesCount: slides.length,
         perPage
@@ -199,6 +208,7 @@ export class DragModule extends Module {
     this.currentX = point.x
     this.currentY = point.y
     this.startPosition = this.tvist.engine.location.get()
+    this.startIndex = this.tvist.engine.index.get()
     
     // Сбрасываем события для velocity tracking
     this.baseEvent = null
@@ -299,13 +309,28 @@ export class DragModule extends Module {
     const dragSpeed = this.options.dragSpeed ?? 1
     let distance = delta * dragSpeed
 
-    // Применяем rubberband на границах (только если включен)
-    if (this.options.rubberband !== false) {
-      distance = this.applyRubberband(distance)
-    }
-
     // Устанавливаем позицию
-    const newPosition = this.startPosition + distance
+    // При center: true нужно учитывать centerOffset для корректного расчета
+    let newPosition: number
+    if (this.options.center) {
+      // Получаем базовую позицию слайда без centerOffset
+      const basePosition = -this.tvist.engine.getSlidePosition(this.startIndex)
+      // Получаем centerOffset для текущего слайда
+      const centerOffset = this.tvist.engine.getCenterOffset(this.startIndex)
+      // Рассчитываем новую позицию: базовая позиция + центрирование + смещение от драга
+      newPosition = basePosition + centerOffset + distance
+      
+      // Применяем rubberband на границах (только если включен)
+      if (this.options.rubberband !== false) {
+        newPosition = this.applyRubberbandToPosition(newPosition)
+      }
+    } else {
+      // Применяем rubberband на границах (только если включен)
+      if (this.options.rubberband !== false) {
+        distance = this.applyRubberband(distance)
+      }
+      newPosition = this.startPosition + distance
+    }
     this.tvist.engine.location.set(newPosition)
     
     // Применяем transform напрямую (без пересчёта размеров)
@@ -512,6 +537,30 @@ export class DragModule extends Module {
     
     // Часть внутри границ движется нормально, часть за границей - с трением
     return inBounds + outOfBounds / FRICTION
+  }
+
+  /**
+   * Rubberband эффект для абсолютной позиции (используется в center режиме)
+   */
+  private applyRubberbandToPosition(position: number): number {
+    // Внутри границ - возвращаем позицию как есть
+    if (position >= this.maxPosition && position <= this.minPosition) {
+      return position
+    }
+
+    const FRICTION = 5
+    
+    if (position > this.minPosition) {
+      // Вышли за правую границу
+      const overflow = position - this.minPosition
+      return this.minPosition + overflow / FRICTION
+    } else if (position < this.maxPosition) {
+      // Вышли за левую границу
+      const overflow = this.maxPosition - position
+      return this.maxPosition - overflow / FRICTION
+    }
+    
+    return position
   }
 
   /**

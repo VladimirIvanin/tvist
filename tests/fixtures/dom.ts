@@ -15,6 +15,10 @@ export interface SliderFixtureConfig {
   width?: number
   /** Высота root элемента */
   height?: number
+  /** Ширина слайда (если не указана, равна width) */
+  slideWidth?: number
+  /** Высота слайда (если не указана, равна height) */
+  slideHeight?: number
   /** ID элемента */
   id?: string
   /** Дополнительные классы для root */
@@ -51,11 +55,17 @@ export function createSliderFixture(config: SliderFixtureConfig = {}): SliderFix
     slidesCount = 5,
     width = 1000,
     height = 400,
+    slideWidth,
+    slideHeight,
     id,
     rootClasses = [],
     slideContents,
     slideClasses = [],
   } = config
+
+  // Если не указаны размеры слайдов, используем размеры контейнера
+  const actualSlideWidth = slideWidth ?? width
+  const actualSlideHeight = slideHeight ?? height
 
   // Создаём root
   const root = document.createElement('div')
@@ -74,8 +84,8 @@ export function createSliderFixture(config: SliderFixtureConfig = {}): SliderFix
     const slide = document.createElement('div')
     slide.className = [TVIST_CLASSES.slide, ...slideClasses].join(' ')
     slide.textContent = slideContents?.[i] ?? `Slide ${i + 1}`
-    slide.style.width = `${width}px`
-    slide.style.height = `${height}px`
+    slide.style.width = `${actualSlideWidth}px`
+    slide.style.height = `${actualSlideHeight}px`
     container.appendChild(slide)
     slides.push(slide)
   }
@@ -117,11 +127,11 @@ export function createSliderFixture(config: SliderFixtureConfig = {}): SliderFix
   slides.forEach(slide => {
     Object.defineProperty(slide, 'offsetWidth', {
       configurable: true,
-      value: width,
+      value: actualSlideWidth,
     })
     Object.defineProperty(slide, 'offsetHeight', {
       configurable: true,
-      value: height,
+      value: actualSlideHeight,
     })
   })
 
