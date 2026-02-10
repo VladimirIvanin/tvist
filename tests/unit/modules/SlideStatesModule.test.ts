@@ -118,17 +118,6 @@ describe('SlideStatesModule', () => {
     })
   })
 
-  describe('Visible class', () => {
-    it.skip('должен применять класс visible к видимым слайдам (требует работающий getBoundingClientRect)', () => {
-      // В тестовой среде happy-dom getBoundingClientRect возвращает нули
-      // Этот тест будет работать в реальном браузере или с более полным моком
-    })
-
-    it.skip('должен обновлять visible классы при прокрутке (требует работающий getBoundingClientRect)', async () => {
-      // В тестовой среде happy-dom getBoundingClientRect возвращает нули
-    })
-  })
-
   describe('Center mode', () => {
     it('должен корректно применять классы в центрированном режиме', async () => {
       tvist = new Tvist(root, {
@@ -144,10 +133,6 @@ describe('SlideStatesModule', () => {
       expect(slides[1].classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`)).toBe(true)
       expect(slides[2].classList.contains(`${TVIST_CSS_PREFIX}__slide--active`)).toBe(true)
       expect(slides[3].classList.contains(`${TVIST_CSS_PREFIX}__slide--next`)).toBe(true)
-    })
-
-    it.skip('должен применять visible к видимым слайдам в центрированном режиме (требует getBoundingClientRect)', () => {
-      // Требует правильно работающий getBoundingClientRect в тестовой среде
     })
   })
 

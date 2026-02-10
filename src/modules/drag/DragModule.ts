@@ -243,17 +243,6 @@ export class DragModule extends Module {
     // (если marquee активен, engine.location уже синхронизирован в pause())
     this.startPosition = this.tvist.engine.location.get()
 
-    // === DEBUG ===
-    console.log('%c[DRAG] pointerDown', 'color: blue; font-weight: bold', {
-      startX: this.startX,
-      startPosition: this.startPosition,
-      startIndex: this.startIndex,
-      activeIndex: this.tvist.engine.activeIndex,
-      realIndex: (this.tvist as any).realIndex,
-      location: this.tvist.engine.location.get(),
-      slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
-    })
-    
     // Сбрасываем события для velocity tracking
     this.baseEvent = null
     this.prevBaseEvent = null
@@ -328,12 +317,6 @@ export class DragModule extends Module {
               const direction = delta > 0 ? 'prev' : 'next'
               
               // === DEBUG ===
-              const _beforeFix = {
-                location: this.tvist.engine.location.get(),
-                activeIndex: this.tvist.engine.activeIndex,
-                slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
-              }
-              
               // Передаём конкретное direction — loopFix подготовит слайды
               // в этом направлении. coverageFix добавит слайды в противоположном
               // направлении если пользователь сменит направление (но с cooldown).
@@ -350,19 +333,6 @@ export class DragModule extends Module {
               
               // Cooldown: пропускаем следующие N pointermove для coverageFix
               this.coverageFixCooldown = 5
-
-              // === DEBUG ===
-              console.log('%c[DRAG] isFirstMove loopFix', 'color: orange; font-weight: bold', {
-                direction,
-                delta: isHorizontal ? deltaX : deltaY,
-                before: _beforeFix,
-                after: {
-                  location: this.startPosition,
-                  activeIndex: this.startIndex,
-                  slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
-                  realIndex: (this.tvist as any).realIndex,
-                },
-              })
             }
           }
         }
@@ -432,14 +402,6 @@ export class DragModule extends Module {
     // Применяем transform напрямую (без пересчёта размеров)
     this.tvist.engine.applyTransformPublic()
 
-    // === DEBUG: лог каждого pointermove ===
-    console.log('%c[DRAG] move', 'color: gray', {
-      x: Math.round(point.x),
-      delta: Math.round(delta),
-      pos: Math.round(newPosition),
-      order: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
-    })
-
     // Проверяем покрытие viewport контентом и подставляем слайды при необходимости
     // Работает для всех loop-режимов (обычный loop и marquee + loop)
     if (this.options.loop) {
@@ -499,17 +461,6 @@ export class DragModule extends Module {
 
       // Вычисляем velocity
       const velocity = this.calculateVelocity()
-
-      // === DEBUG ===
-      console.log('%c[DRAG] pointerUp', 'color: brown; font-weight: bold', {
-        location: this.tvist.engine.location.get(),
-        activeIndex: this.tvist.engine.activeIndex,
-        realIndex: (this.tvist as any).realIndex,
-        currentX: this.currentX,
-        startX: this.startX,
-        dragDist: this.currentX - this.startX,
-        slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
-      })
 
       // Emit события
       this.emit('dragEnd', e)
@@ -653,15 +604,6 @@ export class DragModule extends Module {
     // dragDelta ≈ 0.4px с произвольным знаком, что вызывает ложные срабатывания.
     const MIN_COVERAGE_DRAG_DELTA = 10
     if (Math.abs(dragDelta) < MIN_COVERAGE_DRAG_DELTA) {
-      // === DEBUG: пропуск из-за малого dragDelta ===
-      const needsFix = (dragDelta > 0 && vpStart < contentStart - 5) || (dragDelta < 0 && vpEnd > contentEnd + 5)
-      if (needsFix) {
-        console.log('%c[DRAG] coverageCheck SKIP (small delta)', 'color: orange', {
-          dragDelta: Math.round(dragDelta * 10) / 10,
-          vpStart: Math.round(vpStart), vpEnd: Math.round(vpEnd),
-          contentStart, contentEnd,
-        })
-      }
       return
     }
 
@@ -672,12 +614,6 @@ export class DragModule extends Module {
     // даёт позиции стабилизироваться.
     if (this.coverageFixCooldown > 0) {
       this.coverageFixCooldown--
-      // === DEBUG: пропуск из-за cooldown ===
-      console.log('%c[DRAG] coverageCheck SKIP (cooldown)', 'color: orange', {
-        cooldown: this.coverageFixCooldown + 1,
-        vpStart: Math.round(vpStart), vpEnd: Math.round(vpEnd),
-        contentStart, contentEnd,
-      })
       return
     }
 
@@ -688,22 +624,10 @@ export class DragModule extends Module {
     let fixed = false
 
     if (dragDelta > 0 && vpStart < contentStart + buffer) {
-      // === DEBUG ===
-      const _bef = { location: this.tvist.engine.location.get(), slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(',') }
-      
       // Drag вправо → viewport уходит влево → подставляем слайды перед первым
       loopModule.fix({ direction: 'prev', activeSlideIndex: 0 })
       fixed = true
-
-      // === DEBUG ===
-      console.log('%c[DRAG] coverageFix PREV', 'color: purple; font-weight: bold', {
-        vpStart, vpEnd, contentStart, contentEnd, dragDelta,
-        before: _bef,
-        after: { location: this.tvist.engine.location.get(), slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','), realIndex: (this.tvist as any).realIndex },
-      })
     } else if (dragDelta < 0 && vpEnd > contentEnd - buffer) {
-      // === DEBUG ===
-      const _bef = { location: this.tvist.engine.location.get(), slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(',') }
       
       // Вычисляем activeSlideIndex из фактической позиции viewport.
       // Используем слайд, ближайший к ЛЕВОМУ краю viewport — он виден пользователю
@@ -715,13 +639,6 @@ export class DragModule extends Module {
       // Drag влево → viewport уходит вправо → подставляем слайды после последнего
       loopModule.fix({ direction: 'next', activeSlideIndex: coverageActiveIdx })
       fixed = true
-
-      // === DEBUG ===
-      console.log('%c[DRAG] coverageFix NEXT', 'color: purple; font-weight: bold', {
-        vpStart, vpEnd, contentStart, contentEnd, dragDelta, coverageActiveIdx,
-        before: _bef,
-        after: { location: this.tvist.engine.location.get(), slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','), realIndex: (this.tvist as any).realIndex },
-      })
     }
 
     if (fixed) {
@@ -1048,21 +965,6 @@ export class DragModule extends Module {
       }
     }
 
-    // === DEBUG ===
-    console.log('%c[DRAG] snapWithThreshold', 'color: green; font-weight: bold', {
-      startIndex,
-      currentX: this.currentX,
-      startX: this.startX,
-      dragDistance,
-      threshold,
-      absDistance: Math.abs(dragDistance),
-      belowThreshold: Math.abs(dragDistance) < threshold,
-      targetIndex,
-      realIndex: (this.tvist as any).realIndex,
-      location: engine.location.get(),
-      slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','),
-    })
-    
     // Snap через scrollTo
     engine.scrollTo(targetIndex)
   }
