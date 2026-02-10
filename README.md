@@ -84,9 +84,10 @@ const slider = new Tvist('#slider', {
 
 ### 📚 Примеры
 
-- **[Basic](https://vladimirivanin.github.io/tvist/basic)** - базовый пример с основными функциями
-- **[Modules Demo](https://vladimirivanin.github.io/tvist/modules-demo)** - демонстрация всех модулей
-- **[Loop Mode](https://vladimirivanin.github.io/tvist/loop-demo)** - бесконечная прокрутка
+- **[Все примеры](https://vladimirivanin.github.io/tvist/examples-list.html)** - интерактивные примеры на одной странице
+- **[Basic](https://vladimirivanin.github.io/tvist/examples/basic.html)** - базовый пример с основными функциями
+- **[Modules Demo](https://vladimirivanin.github.io/tvist/examples/modules.html)** - демонстрация всех модулей
+- **[Loop Mode](https://vladimirivanin.github.io/tvist/examples/loop.html)** - бесконечная прокрутка
 
 ### 💻 Локальная разработка
 
