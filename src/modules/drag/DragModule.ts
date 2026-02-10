@@ -31,6 +31,7 @@ export class DragModule extends Module {
   private startY = 0
   private startPosition = 0
   private startIndex = 0 // Индекс слайда при начале драга (для center mode)
+  private startMarqueePosition = 0 // Позиция marquee при начале драга
   private currentX = 0 // Текущая позиция курсора
   private currentY = 0
   
@@ -213,6 +214,19 @@ export class DragModule extends Module {
     this.startPosition = this.tvist.engine.location.get()
     this.startIndex = this.tvist.engine.index.get()
     
+    // Сохраняем текущую позицию marquee если модуль активен
+    const marqueeModule = this.tvist.getModule('marquee') as { 
+      getCurrentPosition?: () => number
+      pause?: () => void
+    }
+    if (marqueeModule?.getCurrentPosition) {
+      this.startMarqueePosition = marqueeModule.getCurrentPosition()
+      // Приостанавливаем marquee при начале драга
+      marqueeModule.pause?.()
+    } else {
+      this.startMarqueePosition = 0
+    }
+    
     // Сбрасываем события для velocity tracking
     this.baseEvent = null
     this.prevBaseEvent = null
@@ -326,9 +340,24 @@ export class DragModule extends Module {
     let distance = delta * dragSpeed
 
     // Устанавливаем позицию
-    // При center: true (без loop) нужно учитывать centerOffset для корректного расчета
     let newPosition: number
-    if (this.options.center && !this.options.loop) {
+    
+    // Проверяем активность marquee
+    const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
+    
+    if (isMarqueeActive) {
+      // При marquee: учитываем начальную позицию marquee аналогично center mode
+      // marquee применяет transform как translate3d(-currentPosition, 0, 0)
+      // поэтому для корректного расчета используем отрицательное значение
+      const marqueeOffset = -this.startMarqueePosition
+      newPosition = marqueeOffset + distance
+      
+      // В marquee с loop режимом не применяем rubberband
+      if (this.options.rubberband !== false && !this.options.loop) {
+        newPosition = this.applyRubberbandToPosition(newPosition)
+      }
+    } else if (this.options.center && !this.options.loop) {
+      // При center: true (без loop) нужно учитывать centerOffset для корректного расчета
       // Получаем базовую позицию слайда без centerOffset
       const basePosition = -this.tvist.engine.getSlidePosition(this.startIndex)
       // Получаем centerOffset для текущего слайда
@@ -449,11 +478,31 @@ export class DragModule extends Module {
       // Emit события
       this.emit('dragEnd', e)
 
-      // Применяем инерцию или snap
-      if (this.options.drag === 'free') {
-        this.startMomentum(velocity)
+      // Проверяем активность marquee
+      const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
+      const marqueeModule = this.tvist.getModule('marquee') as { 
+        resume?: () => void
+        setCurrentPosition?: (position: number) => void
+      }
+      
+      if (isMarqueeActive) {
+        // Для marquee режима не применяем snap, просто возобновляем marquee
+        // Обновляем позицию marquee на основе финальной позиции engine
+        // Используем отрицательное значение location так как marquee применяет -currentPosition
+        const finalPosition = this.tvist.engine.location.get()
+        if (marqueeModule?.setCurrentPosition) {
+          marqueeModule.setCurrentPosition(-finalPosition)
+        }
+        if (marqueeModule?.resume) {
+          marqueeModule.resume()
+        }
       } else {
-        this.snapToNearest(velocity)
+        // Применяем инерцию или snap для обычного режима
+        if (this.options.drag === 'free') {
+          this.startMomentum(velocity)
+        } else {
+          this.snapToNearest(velocity)
+        }
       }
     } else if (!wasDragging && this.wasAnimating && this.animationTarget !== null) {
       // Если не было драга, но была анимация - возобновляем её

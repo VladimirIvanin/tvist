@@ -56,11 +56,6 @@ export class MarqueeModule extends Module {
   override init(): void {
     if (!this.shouldBeActive()) return
 
-    // Отключаем drag для marquee режима
-    if (this.options.drag !== false && this.options.debug) {
-      console.warn('[Tvist Marquee] Drag is disabled in marquee mode')
-    }
-
     // Вычисляем общий размер
     this.calculateTotalSize()
 
@@ -69,6 +64,10 @@ export class MarqueeModule extends Module {
 
     // Настраиваем события
     this.setupEvents()
+    
+    // Подписываемся на события драга для паузы/возобновления
+    this.on('dragStart', () => this.pause())
+    this.on('dragEnd', () => this.resume())
 
     // Запускаем marquee
     this.start()
@@ -77,6 +76,8 @@ export class MarqueeModule extends Module {
   override destroy(): void {
     this.stop()
     this.detachHoverEvents()
+    this.off('dragStart')
+    this.off('dragEnd')
   }
 
   protected override shouldBeActive(): boolean {
@@ -304,6 +305,20 @@ export class MarqueeModule extends Module {
     if (this.shouldBeActive()) {
       this.calculateTotalSize()
     }
+  }
+
+  /**
+   * Получить текущую позицию прокрутки marquee (для интеграции с DragModule)
+   */
+  getCurrentPosition(): number {
+    return this.currentPosition
+  }
+
+  /**
+   * Установить текущую позицию прокрутки marquee (для интеграции с DragModule)
+   */
+  setCurrentPosition(position: number): void {
+    this.currentPosition = position
   }
 
   /**
