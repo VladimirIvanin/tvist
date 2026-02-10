@@ -11,7 +11,7 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'Tvist',
+      name: 'TvistV0',
       formats: ['umd'],
       fileName: () => 'tvist.min.js',
     },
@@ -22,6 +22,8 @@ export default defineConfig({
           return assetInfo.name || '';
         },
         exports: 'named',
+        // В браузере глобал TvistV0 = конструктор, чтобы можно было писать new TvistV0(...) при нескольких версиях на странице
+        outro: `(function(){try{var g=typeof window!=='undefined'?window:typeof globalThis!=='undefined'?globalThis:this;if(g.TvistV0&&g.TvistV0.default)g.TvistV0=g.TvistV0.default;}catch(e){}})();`,
       },
     },
     minify: 'terser',

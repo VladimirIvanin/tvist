@@ -14,7 +14,7 @@ npm install tvist
 
 ### Скачать для браузера (без npm)
 
-Минифицированная сборка для подключения через `<script>` лежит в папке [browser-build/](browser-build/) в репозитории (после `npm run build:browser`):
+Минифицированная сборка для подключения через `<script>` лежит в папке [browser-build/](browser-build/) в репозитории (после `npm run build:browser`). В браузере глобальная переменная — **TvistV0** (версионированное имя, чтобы на одной странице можно было использовать несколько версий Tvist без конфликтов).
 
 - **JS:** [tvist.min.js](https://raw.githubusercontent.com/VladimirIvanin/tvist/main/browser-build/tvist.min.js) · [jsDelivr CDN](https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.min.js)
 - **CSS:** [tvist.css](https://raw.githubusercontent.com/VladimirIvanin/tvist/main/browser-build/tvist.css) · [jsDelivr CDN](https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.css)
@@ -23,7 +23,7 @@ npm install tvist
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.css">
 <script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.min.js"></script>
 <script>
-  const slider = new Tvist('#slider', { perPage: 1, drag: true });
+  const slider = new TvistV0('#slider', { perPage: 1, drag: true });
 </script>
 ```
 
