@@ -24,7 +24,7 @@
           type="range"
           v-model.number="dragSpeed"
           min="0.5"
-          max="2"
+          max="5"
           step="0.1"
           @input="updateSettings"
         />
@@ -301,6 +301,7 @@ function updateSettings() {
   align-items: flex-start;
   padding: 20px;
   margin-top: 20px;
+  margin-bottom: 20px;
   background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
   border-radius: 12px;
   border: 2px solid #90caf9;
