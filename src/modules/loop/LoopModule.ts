@@ -287,23 +287,12 @@ export class LoopModule extends Module {
       }
       log('Append needed', { slidesAppended, indexes: appendSlidesIndexes })
     } else {
-      log('No rearrangement needed', {
-        currentLocation: this.tvist.engine.location.get(),
-        currentTarget: this.tvist.engine.target.get()
-      })
+      log('No rearrangement needed')
     }
 
     // Запоминаем текущие позиции ДО изменения DOM (как в Swiper)
     const currentTranslate = this.tvist.engine.location.get()
     const oldSlidePositions: number[] = []
-    
-    log('Before DOM changes:', {
-      currentTranslate,
-      activeIndex,
-      slideTo,
-      prependCount: prependSlidesIndexes.length,
-      appendCount: appendSlidesIndexes.length
-    })
     
     if (slideTo) {
       // Сохраняем старые позиции слайдов
@@ -344,16 +333,14 @@ export class LoopModule extends Module {
     
     this.tvist.update()
     
-    // Если не было перестановки, восстанавливаем location
-    // (update() сбрасывает location на позицию текущего индекса)
+    // КРИТИЧНО: Если не было перестановки, восстанавливаем location
+    // update() всегда сбрасывает location на позицию текущего индекса,
+    // но при быстрой смене направления во время анимации это вызывает визуальный скачок
     if (prependSlidesIndexes.length === 0 && appendSlidesIndexes.length === 0) {
-      log('Restoring location after update', {
-        locationBefore: locationBeforeUpdate,
-        locationAfter: this.tvist.engine.location.get()
-      })
       this.tvist.engine.location.set(locationBeforeUpdate)
       this.tvist.engine.target.set(targetBeforeUpdate)
       this.tvist.engine.applyTransformPublic()
+      log('Location restored after update (no rearrangement)')
     }
 
     // Корректируем позицию, чтобы избежать визуального прыжка
