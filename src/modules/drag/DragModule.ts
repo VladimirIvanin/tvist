@@ -971,33 +971,12 @@ export class DragModule extends Module {
     engine.scrollTo(nearestIndex)
   }
 
-  private findClosestIndex(position: number): number {
-    const { engine, slides } = this.tvist
-    let nearestIndex = 0
-    let minDistance = Infinity
-    
-    for (let i = 0; i < slides.length; i++) {
-      const slidePosition = engine.getScrollPositionForIndex(i)
-      const distance = Math.abs(position - slidePosition)
-      if (distance < minDistance) {
-        minDistance = distance
-        nearestIndex = i
-      }
-    }
-    return nearestIndex
-  }
-
   /**
    * Обычный snap: используем threshold от начальной позиции drag
    */
   private snapWithThreshold(): void {
     const { engine } = this.tvist
     const startIndex = engine.activeIndex
-    
-    // Определяем эффективный стартовый индекс на основе позиции при начале драга
-    // Это важно, когда активный индекс рассинхронизирован с визуальной позицией 
-    // (например, при isNavigation, когда выбран слайд за пределами области видимости)
-    const effectiveStartIndex = this.findClosestIndex(this.startPosition)
     
     const slideSize = engine.slideSizeValue
     const gap = this.options.gap ?? 0
@@ -1024,7 +1003,7 @@ export class DragModule extends Module {
     
     // Применяем порог (threshold)
     if (Math.abs(dragDistance) < threshold) {
-      // Если драг меньше порога, остаемся на месте (на эффективном старте)
+      // Если драг меньше порога, остаемся на месте
       slidesMoved = 0
     } else {
       // Если превысили порог, но round дал 0 (маленький драг),
@@ -1034,19 +1013,23 @@ export class DragModule extends Module {
       }
     }
     
-    // Используем effectiveStartIndex вместо startIndex
-    targetIndex = effectiveStartIndex + slidesMoved
+    targetIndex = startIndex + slidesMoved
 
     dragLog('snapWithThreshold', {
       startIndex,
-      effectiveStartIndex,
+      startIndexFromEngine: this.startIndex,
       targetIndex,
       slidesMoved,
       dragDistance,
+      currentLocation: engine.location.get(),
       startPosition: this.startPosition,
-      threshold
+      threshold,
+      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
+      loop: this.options.loop,
+      rewind: this.options.rewind
     })
     
+    dragLog('>>> CALLING engine.scrollTo', targetIndex)
     engine.scrollTo(targetIndex)
   }
 
