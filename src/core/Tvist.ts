@@ -199,14 +199,20 @@ export class Tvist {
    */
   next(): this {
     if (!this._isEnabled) return this
+    
+    // Если включён rewind и мы на последнем слайде, возвращаемся к первому
+    if (this.options.rewind && !this.options.loop && !this.engine.canScrollNext()) {
+      this.scrollTo(0)
+      return this
+    }
+    
     if (this.engine.canScrollNext()) {
       // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
       const step = this.options.slidesPerGroup ?? 1
-      const currentIndex = this.engine.index.get()
-      const targetIndex = currentIndex + step
       
       // В loop режиме вызываем loopFix ДО перехода
       if (this.options.loop) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const loopModule = this.modules.get('loop') as any
         if (loopModule && typeof loopModule.fix === 'function') {
           // КРИТИЧНО: останавливаем анимацию перед loopFix
@@ -244,11 +250,10 @@ export class Tvist {
     if (this.engine.canScrollPrev()) {
       // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
       const step = this.options.slidesPerGroup ?? 1
-      const currentIndex = this.engine.index.get()
-      const targetIndex = currentIndex - step
       
       // В loop режиме вызываем loopFix ДО перехода
       if (this.options.loop) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const loopModule = this.modules.get('loop') as any
         if (loopModule && typeof loopModule.fix === 'function') {
           // КРИТИЧНО: останавливаем анимацию перед loopFix
@@ -542,6 +547,19 @@ export class Tvist {
    */
   get canScrollPrev(): boolean {
     return this.engine.canScrollPrev()
+  }
+
+  /**
+   * Получить публичное API autoplay модуля
+   */
+  get autoplay() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const module = this.modules.get('autoplay') as any
+    if (module && typeof module.getAutoplay === 'function') {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return module.getAutoplay()
+    }
+    return undefined
   }
 
   // ==================== СОБЫТИЯ ====================

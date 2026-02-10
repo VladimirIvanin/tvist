@@ -237,6 +237,13 @@ export interface TvistOptions {
    */
   loop?: boolean | 'auto'
   
+  /**
+   * Автоматически возвращаться к первому слайду после достижения последнего (работает без loop)
+   * Применяется к навигации, autoplay и другим способам перехода между слайдами
+   * @default false
+   */
+  rewind?: boolean
+  
   // Lazy loading
   
   /**

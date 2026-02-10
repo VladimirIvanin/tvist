@@ -150,18 +150,6 @@ export class LoopModule extends Module {
   }
 
   /**
-   * Обработчик события beforeTransitionStart
-   */
-  private handleBeforeTransition = (data: { index: number; direction: 'next' | 'prev' }): void => {
-    log('beforeTransitionStart', data)
-    // Вызываем loopFix всегда 
-    // Используем ЦЕЛЕВОЙ индекс, т.к. loopFix должен подготовить слайды
-    // для перехода на этот индекс
-    // slideTo: false - не вызываем scrollTo, т.к. переход уже запланирован в Engine
-    this.loopFix({ direction: data.direction, slideTo: false, activeSlideIndex: data.index })
-  }
-
-  /**
    * Основная логика loop: перестановка слайдов и коррекция позиции
    * Возвращает скорректированный активный индекс
    */
