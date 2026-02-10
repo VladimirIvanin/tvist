@@ -259,9 +259,15 @@ export class DragModule extends Module {
     if (this.options.loop && this.isFirstMove && !this.loopFixed) {
       const loopModule = this.tvist.getModule('loop') as { fix?: (params: { direction?: 'next' | 'prev' }) => void }
       if (loopModule?.fix) {
-        const direction = delta > 0 ? 'next' : 'prev'
+        // ИСПРАВЛЕНО: движение вправо (delta > 0) = движение к началу = 'prev'
+        // движение влево (delta < 0) = движение к концу = 'next'
+        const direction = delta > 0 ? 'prev' : 'next'
         loopModule.fix({ direction })
         this.isFirstMove = false
+        this.loopFixed = true // Предотвращаем второй вызов loopFix в этом жесте
+        // КРИТИЧНО: обновляем startPosition сразу после loopFix
+        // т.к. loopFix изменил location для корректного отображения слайдов
+        this.startPosition = this.tvist.engine.location.get()
       }
     }
 
