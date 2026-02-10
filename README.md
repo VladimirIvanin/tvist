@@ -12,6 +12,21 @@
 npm install tvist
 ```
 
+### Скачать для браузера (без npm)
+
+Минифицированная сборка для подключения через `<script>` лежит в папке [browser-build/](browser-build/) в репозитории (после `npm run build:browser`):
+
+- **JS:** [tvist.min.js](https://raw.githubusercontent.com/VladimirIvanin/tvist/main/browser-build/tvist.min.js) · [jsDelivr CDN](https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.min.js)
+- **CSS:** [tvist.css](https://raw.githubusercontent.com/VladimirIvanin/tvist/main/browser-build/tvist.css) · [jsDelivr CDN](https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.css)
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.css">
+<script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build/tvist.min.js"></script>
+<script>
+  const slider = new Tvist('#slider', { perPage: 1, drag: true });
+</script>
+```
+
 ## ✨ Возможности
 
 - 📖 **Широкое API** — десятки опций, методы, события и подключаемые модули под полный контроль
@@ -118,6 +133,7 @@ npm run dev              # Запуск песочницы (sandbox)
 npm run docs:dev         # Запуск документации и примеров
 npm run dev:watch        # Dev + проверка типов
 npm run build            # Production сборка библиотеки
+npm run build:browser    # Только минифицированная сборка для браузера (browser-build/)
 npm run build:docs       # Сборка документации и примеров
 npm run test             # Запуск тестов
 npm run test:ui          # UI для тестов

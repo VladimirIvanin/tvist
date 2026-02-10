@@ -24,6 +24,7 @@
     "dev": "vite --config vite.sandbox.config.ts",
     "dev:watch": "concurrently \"npm run dev\" \"npm run typecheck -- --watch\"",
     "build": "tsc && vite build",
+    "build:browser": "tsc && vite build --config vite.browser.config.ts",
     "build:watch": "tsc --watch",
     "docs:dev": "vitepress dev docs",
     "docs:build": "npm run docs:generate-meta && vitepress build docs",
