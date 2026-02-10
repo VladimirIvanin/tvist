@@ -137,9 +137,9 @@ describe('PaginationModule', () => {
       expect(bullets[0].classList.contains('active')).toBe(true)
       expect(bullets[1].classList.contains('active')).toBe(false)
 
-      // Переходим к слайду 1 (вторая позиция)
+      // Переходим к слайду 1 (вторая позиция). Ждём slideChange (эмитится сразу при scrollTo)
       await new Promise<void>(resolve => {
-        slider.on('slideChanged', () => resolve())
+        slider.on('slideChange', () => resolve())
         slider.scrollTo(1)
       })
       
@@ -244,9 +244,9 @@ describe('PaginationModule', () => {
       // Первая позиция (1/4) = 25% (6-3+1=4 позиции: 0,1,2,3)
       expect(progressBar?.style.width).toBe('25%')
 
-      // Переходим к слайду 3 (последняя позиция, 4/4) = 100%
+      // Переходим к слайду 3 (последняя позиция, 4/4) = 100%. Ждём slideChange (эмитится сразу при scrollTo)
       await new Promise<void>(resolve => {
-        slider.on('slideChanged', () => resolve())
+        slider.on('slideChange', () => resolve())
         slider.scrollTo(3)
       })
       
@@ -281,9 +281,9 @@ describe('PaginationModule', () => {
       })
 
       // endIndex должен быть 2 (6 - 4 = 2)
-      // Попытка перейти к индексу 5 должна ограничиться до 2
+      // Попытка перейти к индексу 5 должна ограничиться до 2. Ждём slideChange (эмитится сразу при scrollTo)
       await new Promise<void>(resolve => {
-        slider.on('slideChanged', () => resolve())
+        slider.on('slideChange', () => resolve())
         slider.scrollTo(5)
       })
 
