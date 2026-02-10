@@ -1,8 +1,28 @@
 import { defineConfig } from 'vite';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(
+  readFileSync(resolve(__dirname, 'package.json'), 'utf-8')
+) as { version: string; repository?: { url?: string }; homepage?: string };
+const repoUrl = pkg.repository?.url?.replace(/\.git$/, '') || pkg.homepage?.replace(/#.*$/, '') || 'https://github.com/VladimirIvanin/tvist';
+const banner = `/*! Tvist v${pkg.version} | ${repoUrl} */\n`;
+
+/** Плагин: дописывает баннер в самое начало итогового JS после сборки (после minify). */
+function bannerFirstPlugin(): { name: string; closeBundle(): void } {
+  return {
+    name: 'banner-first',
+    closeBundle() {
+      const path = resolve(__dirname, 'browser-build/tvist.min.js');
+      const code = readFileSync(path, 'utf-8');
+      if (!code.startsWith('/*!')) {
+        writeFileSync(path, banner + code, 'utf-8');
+      }
+    },
+  };
+}
 
 /** Сборка только минифицированной версии для браузера (UMD). Результат в browser-build/ для коммита и скачивания. */
 export default defineConfig({
@@ -16,6 +36,7 @@ export default defineConfig({
       fileName: () => 'tvist.min.js',
     },
     rollupOptions: {
+      plugins: [bannerFirstPlugin()],
       output: {
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css') return 'tvist.css';
