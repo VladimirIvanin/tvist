@@ -197,8 +197,8 @@ export class NavigationModule extends Module {
       return
     }
 
-    // С loop всегда можно листать (если не заблокирован)
-    if (this.options.loop) {
+    // С loop или rewind всегда можно листать (если не заблокирован)
+    if (this.options.loop || this.options.rewind) {
       this.enableArrow(this.prevButton, disabledClass)
       this.enableArrow(this.nextButton, disabledClass)
       this.showArrow(this.prevButton, hiddenClass)
@@ -206,7 +206,7 @@ export class NavigationModule extends Module {
       return
     }
 
-    // Без loop проверяем границы
+    // Без loop и rewind проверяем границы
     if (canScrollPrev) {
       this.enableArrow(this.prevButton, disabledClass)
       this.showArrow(this.prevButton, hiddenClass)
