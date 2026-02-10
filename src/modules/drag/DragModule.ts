@@ -244,7 +244,7 @@ export class DragModule extends Module {
       if (absDelta > this.MIN_DRAG_DISTANCE) {
         this.isDragging = true
         
-        // КРИТИЧНО: вызываем loopFix ДО первого применения transform (как в Swiper)
+        // КРИТИЧНО: вызываем loopFix ДО первого применения transform
         if (this.options.loop && this.isFirstMove && !this.loopFixed) {
           const loopModule = this.tvist.getModule('loop') as { 
             fix?: (params: { direction?: 'next' | 'prev'; slideTo?: boolean; setTranslate?: boolean }) => void 
@@ -311,7 +311,7 @@ export class DragModule extends Module {
     // Применяем transform напрямую (без пересчёта размеров)
     this.tvist.engine.applyTransformPublic()
 
-    // Проверяем достижение границ для loopFix (как в Swiper onTouchMove строки 236-288)
+    // Проверяем достижение границ для loopFix
     if (this.options.loop && !this.loopFixed) {
       const loopModule = this.tvist.getModule('loop') as { 
         fix?: (params: { direction?: 'next' | 'prev'; setTranslate?: boolean; activeSlideIndex?: number }) => void 
@@ -321,7 +321,7 @@ export class DragModule extends Module {
         const perPage = this.options.perPage ?? 1
         const currentIndex = this.tvist.engine.index.get()
         
-        // Вычисляем пороги (упрощенная версия из Swiper)
+        // Вычисляем пороги
         const slideSize = this.tvist.engine.getSlideSize(0)
         const threshold = slideSize / 2
         

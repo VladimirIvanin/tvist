@@ -84,7 +84,7 @@ describe('Cube Effect Performance', () => {
         // Переходим ко второму слайду чтобы появились тени (при повороте куба)
         tvist.engine.applyTransformPublic(-100)
         
-        // Проверяем, что тени созданы у видимых слайдов (Swiper-style: 2 тени на слайд)
+        // Проверяем, что тени созданы у видимых слайдов
         const slides = root.querySelectorAll<HTMLElement>(`.${TVIST_CLASSES.slide}`)
         const originalSlides = Array.from(slides).filter(s => !s.dataset.tvistClone)
         

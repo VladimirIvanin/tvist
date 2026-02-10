@@ -443,7 +443,7 @@ describe('LoopModule + DragModule Integration', () => {
         console.log('  Reordered:', call.reordered)
       })
       
-      // ОЖИДАЕМОЕ ПОВЕДЕНИЕ (как в Swiper):
+      // ОЖИДАЕМОЕ ПОВЕДЕНИЕ
       // 1. При drag вправо (к началу) должен вызваться loopFix с direction='prev'
       // 2. loopFix должен сделать prepend последних слайдов в начало
       // 3. Location должен быть скорректирован, чтобы визуально ничего не изменилось

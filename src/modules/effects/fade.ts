@@ -41,7 +41,6 @@ export function setFadeEffect(
   // Z-Index
   // Active slide (progress 0) should be on top.
   // Slide with progress 1 should be below?
-  // Swiper logic: 
   // Custom z-index management might be needed.
   // Usually fade effect implies stacking.
   const zIndex = Math.max(1, 100 - Math.abs(progress * 10))

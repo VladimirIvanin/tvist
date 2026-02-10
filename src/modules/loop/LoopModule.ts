@@ -1,7 +1,6 @@
 /**
  * LoopModule - бесконечная прокрутка (метод перестановки слайдов)
  * 
- * Подход: как в Swiper (v11+)
  * 1. Проставляем data-tvist-slide-index всем слайдам для идентификации.
  * 2. При прокрутке переставляем реальные DOM-узлы (prepend/append).
  * 3. Мгновенно корректируем позицию, чтобы избежать визуальных прыжков.
@@ -155,7 +154,7 @@ export class LoopModule extends Module {
    */
   private handleBeforeTransition = (data: { index: number; direction: 'next' | 'prev' }): void => {
     log('beforeTransitionStart', data)
-    // Вызываем loopFix всегда (как в Swiper slideNext/slidePrev)
+    // Вызываем loopFix всегда 
     // Используем ЦЕЛЕВОЙ индекс, т.к. loopFix должен подготовить слайды
     // для перехода на этот индекс
     // slideTo: false - не вызываем scrollTo, т.к. переход уже запланирован в Engine
@@ -211,7 +210,7 @@ export class LoopModule extends Module {
     let loopedSlides = bothDirections
       ? Math.max(slidesPerGroup, Math.ceil(slidesPerView / 2))
       : slidesPerView // Используем slidesPerView по умолчанию, если slidesPerGroup < slidesPerView? 
-                      // Swiper logic: loopedSlides = params.loopedSlides || params.slidesPerView
+                      // loopedSlides = params.loopedSlides || params.slidesPerView
     
     // Если loopedSlides явно не задан (у нас нет опции loopedSlides), используем slidesPerView для надежности
     // Но если slidesPerGroup > slidesPerView (редко), то берем его
@@ -290,7 +289,7 @@ export class LoopModule extends Module {
       log('No rearrangement needed')
     }
 
-    // Запоминаем текущие позиции ДО изменения DOM (как в Swiper)
+    // Запоминаем текущие позиции ДО изменения DOM 
     const currentTranslate = this.tvist.engine.location.get()
     const oldSlidePositions: number[] = []
     
@@ -320,7 +319,7 @@ export class LoopModule extends Module {
       })
     }
 
-    // Принудительный reflow для синхронизации DOM (как в Swiper)
+    // Принудительный reflow для синхронизации DOM 
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     container.offsetLeft
 
@@ -366,7 +365,7 @@ export class LoopModule extends Module {
         this.tvist.engine.index.set(activeIndex + Math.ceil(slidesPrepended))
       }
 
-      // Корректируем translate мгновенно (как в Swiper)
+      // Корректируем translate мгновенно
       const newTranslate = currentTranslate - diff
       this.tvist.engine.location.set(newTranslate)
       this.tvist.engine.target.set(newTranslate)
@@ -396,7 +395,7 @@ export class LoopModule extends Module {
         this.tvist.engine.index.set(activeIndex - slidesAppended)
       }
 
-      // Корректируем translate мгновенно (как в Swiper)
+      // Корректируем translate мгновенно 
       const newTranslate = currentTranslate - diff
       this.tvist.engine.location.set(newTranslate)
       this.tvist.engine.target.set(newTranslate)
