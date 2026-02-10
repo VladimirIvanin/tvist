@@ -20,7 +20,7 @@ import type { TvistOptions } from '../../core/types'
 const DRAG_DEBUG = false
 const dragLog = (..._args: unknown[]) => {
   if (DRAG_DEBUG) {
-    // debug logging
+    console.log(..._args)
   }
 }
 
@@ -971,12 +971,33 @@ export class DragModule extends Module {
     engine.scrollTo(nearestIndex)
   }
 
+  private findClosestIndex(position: number): number {
+    const { engine, slides } = this.tvist
+    let nearestIndex = 0
+    let minDistance = Infinity
+    
+    for (let i = 0; i < slides.length; i++) {
+      const slidePosition = engine.getScrollPositionForIndex(i)
+      const distance = Math.abs(position - slidePosition)
+      if (distance < minDistance) {
+        minDistance = distance
+        nearestIndex = i
+      }
+    }
+    return nearestIndex
+  }
+
   /**
    * Обычный snap: используем threshold от начальной позиции drag
    */
   private snapWithThreshold(): void {
     const { engine } = this.tvist
     const startIndex = engine.activeIndex
+    
+    // Определяем эффективный стартовый индекс на основе позиции при начале драга
+    // Это важно, когда активный индекс рассинхронизирован с визуальной позицией 
+    // (например, при isNavigation, когда выбран слайд за пределами области видимости)
+    const effectiveStartIndex = this.findClosestIndex(this.startPosition)
     
     const slideSize = engine.slideSizeValue
     const gap = this.options.gap ?? 0
@@ -997,30 +1018,35 @@ export class DragModule extends Module {
     
     let targetIndex: number
     
+    // Вычисляем количество слайдов для перемещения
+    const exactSlidesMoved = -dragDistance / slideWithGap
+    let slidesMoved = Math.round(exactSlidesMoved)
+    
+    // Применяем порог (threshold)
     if (Math.abs(dragDistance) < threshold) {
-      targetIndex = startIndex
+      // Если драг меньше порога, остаемся на месте (на эффективном старте)
+      slidesMoved = 0
     } else {
-      if (dragDistance > 0) {
-        targetIndex = startIndex - 1
-      } else {
-        targetIndex = startIndex + 1
+      // Если превысили порог, но round дал 0 (маленький драг),
+      // форсируем перемещение на 1 слайд
+      if (slidesMoved === 0) {
+        slidesMoved = dragDistance > 0 ? -1 : 1
       }
     }
+    
+    // Используем effectiveStartIndex вместо startIndex
+    targetIndex = effectiveStartIndex + slidesMoved
 
     dragLog('snapWithThreshold', {
       startIndex,
-      startIndexFromEngine: this.startIndex,
+      effectiveStartIndex,
       targetIndex,
+      slidesMoved,
       dragDistance,
-      currentLocation: engine.location.get(),
       startPosition: this.startPosition,
-      threshold,
-      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-      loop: this.options.loop,
-      rewind: this.options.rewind
+      threshold
     })
     
-    dragLog('>>> CALLING engine.scrollTo', targetIndex)
     engine.scrollTo(targetIndex)
   }
 
