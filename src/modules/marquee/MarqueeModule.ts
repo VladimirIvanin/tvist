@@ -342,10 +342,26 @@ export class MarqueeModule extends Module {
       getSpeed: () => this.speed,
       setDirection: (direction: 'left' | 'right' | 'up' | 'down') => {
         if (this.direction !== direction) {
+          // Сохраняем текущую визуальную позицию (transform offset)
+          // Для всех направлений transform = -currentPosition
+          const currentVisualOffset = this.currentPosition
+          
           this.direction = direction
           this.calculateTotalSize()
-          const isReverse = direction === 'right' || direction === 'down'
-          this.currentPosition = isReverse ? this.totalSize : 0
+          
+          // Восстанавливаем визуальную позицию
+          // Независимо от направления, визуальный offset остаётся тем же
+          // currentPosition всегда напрямую определяет transform offset
+          this.currentPosition = currentVisualOffset
+          
+          // Нормализуем позицию в пределах [0, totalSize]
+          if (this.totalSize > 0) {
+            this.currentPosition = this.currentPosition % this.totalSize
+            if (this.currentPosition < 0) {
+              this.currentPosition += this.totalSize
+            }
+          }
+          
           this.lastTimestamp = null
           this.applyTransform()
         }

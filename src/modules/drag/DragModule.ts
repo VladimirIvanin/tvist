@@ -118,12 +118,15 @@ export class DragModule extends Module {
    * Обновление границ для rubberband.
    * При loop границ нет. Без loop: peekTrim — min/max без левого/правого peek.
    * При center: true (без loop) используем getScrollPositionForIndex для корректного учета centerOffset.
+   * При marquee границ нет (свободная прокрутка).
    */
   private updateBounds(): void {
     const { engine, slides } = this.tvist
     const perPage = this.options.perPage ?? 1
+    const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
 
-    if (this.options.loop) {
+    if (this.options.loop || isMarqueeActive) {
+      // При loop или marquee границ нет (бесконечная прокрутка)
       this.minPosition = Infinity
       this.maxPosition = -Infinity
     } else if (this.options.center) {

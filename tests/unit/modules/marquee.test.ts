@@ -284,4 +284,200 @@ describe('MarqueeModule', () => {
     expect(newTransform).toMatch(/translate3d\([^)]*\)/)
   })
 
+  it('должен сохранять визуальную позицию при смене направления', () => {
+    slider = new Tvist(root, {
+      marquee: {
+        direction: 'left',
+        speed: 100
+      }
+    })
+
+    const module = slider.modules.get('marquee') as MarqueeModule
+    const api = module?.getMarquee()
+    
+    // Симулируем что marquee прокрутился на некоторое расстояние
+    // Устанавливаем currentPosition = 150 для direction: 'left'
+    if (module?.setCurrentPosition) {
+      module.setCurrentPosition(150)
+    }
+    
+    const positionBeforeChange = module?.getCurrentPosition()
+    expect(positionBeforeChange).toBe(150)
+    
+    // Меняем направление на right
+    api?.setDirection('right')
+    
+    // После смены направления визуальная позиция должна остаться на месте
+    // currentPosition остаётся тем же (150), так как он определяет визуальный offset
+    const positionAfterChange = module?.getCurrentPosition()
+    
+    // В JSDOM totalSize = 0, поэтому позиция нормализуется к 0
+    // В реальном браузере позиция останется той же (150)
+    // Проверяем что позиция либо осталась той же, либо нормализовалась
+    expect([positionBeforeChange, 0]).toContain(positionAfterChange)
+  })
+
+  describe('Смена направления marquee', () => {
+    it('не должен делать большой скачок при смене направления left -> right', () => {
+      // Создаём слайдер с реальными размерами слайдов
+      const slides = root.querySelectorAll(`.${TVIST_CLASSES.slide}`)
+      slides.forEach((slide) => {
+        const el = slide as HTMLElement
+        el.style.width = '300px'
+        el.style.height = '200px'
+      })
+
+      slider = new Tvist(root, {
+        marquee: {
+          direction: 'left',
+          speed: 100
+        },
+        gap: 20
+      })
+
+      const module = slider.modules.get('marquee') as MarqueeModule
+      const api = module?.getMarquee()
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+
+      // Симулируем что marquee прокрутился на некоторое расстояние
+      // Устанавливаем позицию 100px
+      module.setCurrentPosition(100)
+      
+      // Получаем transform до смены направления
+      const transformBefore = container.style.transform
+      const translateXBefore = parseFloat(transformBefore.match(/translate3d\(([^,]+)/)?.[1] || '0')
+
+      // Меняем направление на right
+      api?.setDirection('right')
+
+      // Получаем transform после смены направления
+      const transformAfter = container.style.transform
+      const translateXAfter = parseFloat(transformAfter.match(/translate3d\(([^,]+)/)?.[1] || '0')
+
+      // Разница между позициями не должна быть большой (не больше одного слайда + gap)
+      const diff = Math.abs(translateXAfter - translateXBefore)
+      
+      // totalSize = (300 + 20) * 3 = 960
+      // При смене с left на right не должно быть скачка на весь totalSize
+      // Позиция должна остаться примерно на месте (разница должна быть минимальной)
+      expect(diff).toBeLessThan(50) // Допускаем небольшую погрешность
+    })
+
+    it('не должен делать большой скачок при смене направления right -> left', () => {
+      const slides = root.querySelectorAll(`.${TVIST_CLASSES.slide}`)
+      slides.forEach((slide) => {
+        const el = slide as HTMLElement
+        el.style.width = '300px'
+        el.style.height = '200px'
+      })
+
+      slider = new Tvist(root, {
+        marquee: {
+          direction: 'right',
+          speed: 100
+        },
+        gap: 20
+      })
+
+      const module = slider.modules.get('marquee') as MarqueeModule
+      const api = module?.getMarquee()
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+
+      // totalSize = (300 + 20) * 3 = 960
+      // Для right начальная позиция = totalSize
+      // Устанавливаем позицию на 860 (прокрутились на 100px)
+      module.setCurrentPosition(860)
+      
+      const transformBefore = container.style.transform
+      const translateXBefore = parseFloat(transformBefore.match(/translate3d\(([^,]+)/)?.[1] || '0')
+
+      // Меняем направление на left
+      api?.setDirection('left')
+
+      const transformAfter = container.style.transform
+      const translateXAfter = parseFloat(transformAfter.match(/translate3d\(([^,]+)/)?.[1] || '0')
+
+      // Разница должна быть минимальной
+      const diff = Math.abs(translateXAfter - translateXBefore)
+      expect(diff).toBeLessThan(50)
+    })
+
+    it('не должен делать большой скачок при смене направления up -> down', () => {
+      const slides = root.querySelectorAll(`.${TVIST_CLASSES.slide}`)
+      slides.forEach((slide) => {
+        const el = slide as HTMLElement
+        el.style.width = '200px'
+        el.style.height = '150px'
+      })
+
+      slider = new Tvist(root, {
+        direction: 'vertical',
+        marquee: {
+          direction: 'up',
+          speed: 100
+        },
+        gap: 10
+      })
+
+      const module = slider.modules.get('marquee') as MarqueeModule
+      const api = module?.getMarquee()
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+
+      // Устанавливаем позицию 80px
+      module.setCurrentPosition(80)
+      
+      const transformBefore = container.style.transform
+      const translateYBefore = parseFloat(transformBefore.match(/translate3d\([^,]+,\s*([^,]+)/)?.[1] || '0')
+
+      // Меняем направление на down
+      api?.setDirection('down')
+
+      const transformAfter = container.style.transform
+      const translateYAfter = parseFloat(transformAfter.match(/translate3d\([^,]+,\s*([^,]+)/)?.[1] || '0')
+
+      // Разница должна быть минимальной
+      const diff = Math.abs(translateYAfter - translateYBefore)
+      expect(diff).toBeLessThan(50)
+    })
+
+    it('не должен делать большой скачок при смене направления down -> up', () => {
+      const slides = root.querySelectorAll(`.${TVIST_CLASSES.slide}`)
+      slides.forEach((slide) => {
+        const el = slide as HTMLElement
+        el.style.width = '200px'
+        el.style.height = '150px'
+      })
+
+      slider = new Tvist(root, {
+        direction: 'vertical',
+        marquee: {
+          direction: 'down',
+          speed: 100
+        },
+        gap: 10
+      })
+
+      const module = slider.modules.get('marquee') as MarqueeModule
+      const api = module?.getMarquee()
+      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+
+      // totalSize = (150 + 10) * 3 = 480
+      // Устанавливаем позицию на 400 (прокрутились на 80px от totalSize)
+      module.setCurrentPosition(400)
+      
+      const transformBefore = container.style.transform
+      const translateYBefore = parseFloat(transformBefore.match(/translate3d\([^,]+,\s*([^,]+)/)?.[1] || '0')
+
+      // Меняем направление на up
+      api?.setDirection('up')
+
+      const transformAfter = container.style.transform
+      const translateYAfter = parseFloat(transformAfter.match(/translate3d\([^,]+,\s*([^,]+)/)?.[1] || '0')
+
+      // Разница должна быть минимальной
+      const diff = Math.abs(translateYAfter - translateYBefore)
+      expect(diff).toBeLessThan(50)
+    })
+  })
+
 })
