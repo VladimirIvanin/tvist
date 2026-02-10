@@ -60,12 +60,12 @@ export class PaginationModule extends Module {
     // Обновляем при изменении слайда СИНХРОННО (slideChange эмитится ДО анимации),
     // чтобы к моменту slideChanged (после анимации) bullet'ы были уже актуальны.
     // Также слушаем slideChanged для instant-переходов (scrollTo с instant=true).
-    this.on('slideChange', (index) => {
+    this.on('slideChange', (index: number) => {
       log('slideChange event received', { index })
       this.updateActive()
     })
     
-    this.on('slideChanged', (index) => {
+    this.on('slideChanged', (index: number) => {
       log('slideChanged event received', { index })
       this.updateActive()
       if (this.options.loop) this.scheduleUpdateActive()
