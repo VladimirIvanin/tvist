@@ -247,6 +247,7 @@ onMounted(() => {
     slider.value = new Tvist(sliderEl.value, {
       ...options.value,
       drag: true,
+      rewind: true,
       on: {
         slideChange: (index: number) => {
           currentIndex.value = index
