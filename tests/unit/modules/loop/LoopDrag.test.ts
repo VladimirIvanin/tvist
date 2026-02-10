@@ -841,28 +841,22 @@ describe('LoopModule + DragModule Integration', () => {
       })
       
       // ПРОВЕРКИ:
-      console.log('\n=== ОЖИДАНИЯ ===')
-      console.log('Должно быть минимум 2 вызова loopFix:')
-      console.log('  - 1-й вызов: direction=prev (движение вправо)')
-      console.log('  - 2-й вызов: direction=next (движение влево после смены направления)')
+      // После удаления "direction change loopFix" — при смене направления
+      // дополнительный loopFix НЕ вызывается. Покрытие viewport обеспечивается
+      // через coverageFix (checkContentCoverageAndFix) при реальных пустотах.
+      // Важно: isFirstMove loopFix должен вызваться, и пустот быть не должно.
       
-      // 1. Должно быть минимум 2 вызова loopFix
-      expect(loopFixCalls.length).toBeGreaterThanOrEqual(2)
+      // 1. Хотя бы 1 вызов loopFix (isFirstMove)
+      expect(loopFixCalls.length).toBeGreaterThanOrEqual(1)
       
-      // 2. Первый вызов должен быть с direction='prev' (движение вправо)
+      // 2. Первый вызов — isFirstMove с direction='prev' (движение вправо)
       expect(loopFixCalls[0].params.direction).toBe('prev')
       expect(loopFixCalls[0].reordered).toBe(true)
       
-      // 3. Должен быть вызов с direction='next' (движение влево)
-      const hasNextDirection = loopFixCalls.some(call => call.params.direction === 'next')
-      expect(hasNextDirection).toBe(true)
+      // 3. Состояние после смены направления корректное (location валиден)
+      expect(Number.isFinite(stateAfterLeft.location)).toBe(true)
       
-      // 4. Вызов с direction='next' должен быть ПОСЛЕ вызова с direction='prev'
-      const prevIndex = loopFixCalls.findIndex(call => call.params.direction === 'prev')
-      const nextIndex = loopFixCalls.findIndex(call => call.params.direction === 'next')
-      expect(nextIndex).toBeGreaterThan(prevIndex)
-      
-      console.log('\n✅ ТЕСТ ПРОЙДЕН: при смене направления вызывается новый loopFix')
+      console.log('\n✅ ТЕСТ ПРОЙДЕН: смена направления работает корректно')
     })
 
     it('должен перестраивать слайды при смене направления драга', async () => {
@@ -964,23 +958,21 @@ describe('LoopModule + DragModule Integration', () => {
       })
       
       // ПРОВЕРКИ:
-      // 1. Должно быть минимум 2 вызова loopFix (для каждого направления)
-      console.log('\n=== ОЖИДАНИЯ ===')
-      console.log('Должно быть минимум 2 вызова loopFix:')
-      console.log('  - 1-й вызов: direction=prev (движение вправо)')
-      console.log('  - 2-й вызов: direction=next (движение влево)')
+      // После удаления "direction change loopFix" — покрытие viewport
+      // обеспечивается через coverageFix при реальных пустотах, а не
+      // при каждой смене направления. Проверяем базовое поведение.
       
-      expect(loopFixCalls.length).toBeGreaterThanOrEqual(2)
+      // 1. Хотя бы 1 вызов loopFix (isFirstMove)
+      expect(loopFixCalls.length).toBeGreaterThanOrEqual(1)
       
-      // 2. Первый вызов должен быть с direction='prev' (движение вправо)
+      // 2. Первый вызов — direction='prev' (движение вправо)
       expect(loopFixCalls[0].params.direction).toBe('prev')
       expect(loopFixCalls[0].reordered).toBe(true)
       
-      // 3. Должен быть вызов с direction='next' (движение влево)
-      const hasNextDirection = loopFixCalls.some(call => call.params.direction === 'next')
-      expect(hasNextDirection).toBe(true)
+      // 3. Состояние валидно после смены направления
+      expect(Number.isFinite(stateAfterLeft.location)).toBe(true)
       
-      console.log('\n✅ ТЕСТ ПОКАЗЫВАЕТ: при смене направления нужен новый loopFix')
+      console.log('\n✅ ТЕСТ ПОКАЗЫВАЕТ: смена направления работает стабильно')
     })
 
     it('НЕ должно быть дырки при смене направления драга', async () => {
