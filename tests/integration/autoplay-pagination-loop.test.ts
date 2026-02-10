@@ -22,12 +22,20 @@ describe('Autoplay + Pagination + Loop integration', () => {
     container = document.createElement('div')
     document.body.appendChild(container)
     vi.useFakeTimers()
+    // Мокаем размеры, чтобы переходы и slideChanged срабатывали
+    Object.defineProperties(HTMLElement.prototype, {
+      clientWidth: { get: () => 800 },
+      offsetWidth: { get: () => 800 }
+    })
+    // @ts-expect-error мок для расчёта позиций
+    HTMLElement.prototype.getBoundingClientRect = () => ({ width: 800 } as DOMRect)
   })
 
   afterEach(() => {
     document.body.innerHTML = ''
     vi.restoreAllMocks()
     vi.useRealTimers()
+    delete (HTMLElement.prototype as any).getBoundingClientRect
   })
 
   /**

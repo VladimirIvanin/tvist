@@ -2,7 +2,7 @@
  * @vitest-environment happy-dom
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { TVIST_CLASSES, NAVIGATION_ARROW_SVG } from '@core/constants'
 import { Tvist } from '@core/Tvist'
 // Импортируем модуль через index для автоматической регистрации
@@ -14,10 +14,18 @@ describe('NavigationModule', () => {
   beforeEach(() => {
     container = document.createElement('div')
     document.body.appendChild(container)
+    // Мокаем размеры, чтобы анимация (и slideChanged) срабатывали при speed: 0
+    Object.defineProperties(HTMLElement.prototype, {
+      clientWidth: { get: () => 800 },
+      offsetWidth: { get: () => 800 }
+    })
+    // @ts-expect-error мок для расчёта позиций
+    HTMLElement.prototype.getBoundingClientRect = () => ({ width: 800 } as DOMRect)
   })
 
   afterEach(() => {
     document.body.innerHTML = ''
+    vi.restoreAllMocks()
   })
 
   describe('SVG Icon Injection', () => {
@@ -243,11 +251,9 @@ describe('NavigationModule', () => {
         speed: 0
       })
 
-      // Переходим на последний слайд
-      await new Promise<void>(resolve => {
-        slider.on('slideChanged', () => resolve())
-        slider.scrollTo(2)
-      })
+      // Переходим на последний слайд (instant, чтобы slideChanged гарантированно сработал)
+      slider.scrollTo(2, true)
+      await Promise.resolve()
 
       const prevButton = container.querySelector(`.${TVIST_CLASSES.arrowPrev}`)
       const nextButton = container.querySelector(`.${TVIST_CLASSES.arrowNext}`)
@@ -364,10 +370,8 @@ describe('NavigationModule', () => {
 
       expect(slider.activeIndex).toBe(0)
 
-      await new Promise<void>(resolve => {
-        slider.on('slideChanged', () => resolve())
-        nextButton?.click()
-      })
+      nextButton?.click()
+      await Promise.resolve()
 
       expect(slider.activeIndex).toBe(1)
     })
@@ -395,10 +399,8 @@ describe('NavigationModule', () => {
 
       expect(slider.activeIndex).toBe(1)
 
-      await new Promise<void>(resolve => {
-        slider.on('slideChanged', () => resolve())
-        prevButton?.click()
-      })
+      prevButton?.click()
+      await Promise.resolve()
 
       expect(slider.activeIndex).toBe(0)
     })
@@ -490,10 +492,8 @@ describe('NavigationModule', () => {
       expect(prevButton?.classList.contains('disabled')).toBe(false)
 
       // Переходим на следующий слайд
-      await new Promise<void>(resolve => {
-        slider.on('slideChanged', () => resolve())
-        slider.next()
-      })
+      slider.next()
+      await Promise.resolve()
 
       // Теперь prev не должна иметь кастомный класс
       expect(prevButton?.classList.contains('my-disabled')).toBe(false)
