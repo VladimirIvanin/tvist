@@ -1,6 +1,6 @@
 # Быстрый старт
 
-Создадим базовый слайдер за несколько минут.
+Создадим базовый слайдер за несколько минут. Все примеры ниже — для использования в браузере через CDN (без сборки и импортов).
 
 ## HTML разметка
 
@@ -22,18 +22,13 @@
 </div>
 ```
 
-## CSS
+## Подключение через CDN
 
-Подключите стили Tvist:
-
-```css
-@import 'tvist/dist/tvist.css';
-```
-
-Или через `<link>` в HTML:
+Подключите стили и скрипт Tvist (после загрузки скрипта доступна глобальная переменная `TvistV1`):
 
 ```html
-<link rel="stylesheet" href="node_modules/tvist/dist/tvist.css">
+<link rel="stylesheet" href="https://unpkg.com/tvist@1.0.0/dist/tvist.css">
+<script src="https://unpkg.com/tvist@1.0.0/dist/tvist.umd.js"></script>
 ```
 
 ## JavaScript
@@ -41,39 +36,29 @@
 ### Базовая инициализация
 
 ```javascript
-import { Tvist } from 'tvist';
-
-const slider = new Tvist('.tvist', {
-  slidesPerView: 1,
-  spaceBetween: 20
+var slider = new TvistV1('.tvist-v1', {
+  perPage: 1,
+  gap: 20
 });
 ```
 
-### С модулями
+### С навигацией и пагинацией
 
-Добавим навигацию, пагинацию и автоплей:
+Добавим стрелки, пагинацию и автопрокрутку. Модули уже входят в сборку:
 
 ```javascript
-import { Tvist } from 'tvist';
-import { NavigationModule } from 'tvist/modules/navigation';
-import { PaginationModule } from 'tvist/modules/pagination';
-import { AutoplayModule } from 'tvist/modules/autoplay';
-
-const slider = new Tvist('.tvist', {
-  slidesPerView: 1,
-  spaceBetween: 20,
-  modules: [NavigationModule, PaginationModule, AutoplayModule],
-  navigation: {
-    nextEl: '.tvist-button-next',
-    prevEl: '.tvist-button-prev'
+var slider = new TvistV1('.tvist-v1', {
+  perPage: 1,
+  gap: 20,
+  arrows: {
+    next: '.tvist-button-next',
+    prev: '.tvist-button-prev'
   },
   pagination: {
-    el: '.tvist-pagination',
+    container: '.tvist-pagination',
     clickable: true
   },
-  autoplay: {
-    delay: 3000
-  }
+  autoplay: 3000
 });
 ```
 
@@ -101,10 +86,10 @@ HTML с элементами навигации:
 Основные опции для настройки слайдера:
 
 ```javascript
-const slider = new Tvist('.tvist', {
+var slider = new TvistV1('.tvist-v1', {
   // Базовые настройки
-  slidesPerView: 1,           // Количество слайдов на экране
-  spaceBetween: 20,           // Отступ между слайдами (px)
+  perPage: 1,                 // Количество слайдов на экране
+  gap: 20,                    // Отступ между слайдами (px)
   direction: 'horizontal',    // 'horizontal' или 'vertical'
   speed: 300,                 // Скорость анимации (ms)
   
@@ -114,10 +99,10 @@ const slider = new Tvist('.tvist', {
   // Responsive
   breakpoints: {
     640: {
-      slidesPerView: 2
+      perPage: 2
     },
     1024: {
-      slidesPerView: 3
+      perPage: 3
     }
   }
 });
@@ -128,22 +113,22 @@ const slider = new Tvist('.tvist', {
 Подписка на события слайдера:
 
 ```javascript
-const slider = new Tvist('.tvist', {
-  slidesPerView: 1
+var slider = new TvistV1('.tvist-v1', {
+  perPage: 1
 });
 
 // Смена слайда
-slider.on('slideChange', () => {
+slider.on('slideChange', function () {
   console.log('Активный слайд:', slider.activeIndex);
 });
 
 // Инициализация завершена
-slider.on('init', () => {
+slider.on('init', function () {
   console.log('Слайдер готов!');
 });
 
 // Достигнут конец
-slider.on('reachEnd', () => {
+slider.on('reachEnd', function () {
   console.log('Последний слайд');
 });
 ```
@@ -174,7 +159,7 @@ console.log(slider.slides.length); // Количество слайдов
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Мой первый Tvist слайдер</title>
-  <link rel="stylesheet" href="node_modules/tvist/dist/tvist.css">
+  <link rel="stylesheet" href="https://unpkg.com/tvist@1.0.0/dist/tvist.css">
   <style>
     .tvist-v1 {
       max-width: 800px;
@@ -202,26 +187,23 @@ console.log(slider.slides.length); // Количество слайдов
     <div class="tvist-pagination"></div>
   </div>
 
-  <script type="module">
-    import { Tvist } from './node_modules/tvist/dist/tvist.js';
-    import { NavigationModule } from './node_modules/tvist/dist/tvist.js';
-    import { PaginationModule } from './node_modules/tvist/dist/tvist.js';
-
-    const slider = new Tvist('.tvist', {
-      slidesPerView: 1,
-      spaceBetween: 20,
-      modules: [NavigationModule, PaginationModule],
-      navigation: {
-        nextEl: '.tvist-button-next',
-        prevEl: '.tvist-button-prev'
+  <script src="https://unpkg.com/tvist@1.0.0/dist/tvist.umd.js"></script>
+  <script>
+    var TvistV1 = window.TvistV1 || (window.Tvist && (window.Tvist.TvistV1 || window.Tvist.default || window.Tvist));
+    var slider = new TvistV1('.tvist-v1', {
+      perPage: 1,
+      gap: 20,
+      arrows: {
+        next: '.tvist-button-next',
+        prev: '.tvist-button-prev'
       },
       pagination: {
-        el: '.tvist-pagination',
+        container: '.tvist-pagination',
         clickable: true
       }
     });
 
-    slider.on('slideChange', () => {
+    slider.on('slideChange', function () {
       console.log('Активный слайд:', slider.activeIndex);
     });
   </script>
