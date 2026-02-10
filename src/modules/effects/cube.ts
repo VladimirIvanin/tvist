@@ -2,49 +2,34 @@ import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
-// Кэш для разделения original/clone слайдов и теней
+// Кэш для теней и списка слайдов
 interface SlideShadows {
     left: HTMLElement
     right: HTMLElement
 }
 
 interface CubeCache {
-    originalSlides: HTMLElement[]
-    cloneSlides: HTMLElement[]
+    slides: HTMLElement[]
     shadows: WeakMap<HTMLElement, SlideShadows>
     lastSlidesList: HTMLElement[]
 }
 
 const cubeCache = new WeakMap<Tvist, CubeCache>()
 
-function getCachedSlides(tvist: Tvist): { originalSlides: HTMLElement[], cloneSlides: HTMLElement[] } {
+function getCachedSlides(tvist: Tvist): HTMLElement[] {
     const { slides } = tvist
     let cache = cubeCache.get(tvist)
-    
-    // Если кэш отсутствует или список слайдов изменился — пересоздаём
+
     if (!cache?.lastSlidesList || cache.lastSlidesList !== slides) {
-        const originalSlides: HTMLElement[] = []
-        const cloneSlides: HTMLElement[] = []
-        
-        // Один проход вместо двух filter
-        for (const slide of slides) {
-            if (slide.dataset.tvistClone === 'true') {
-                cloneSlides.push(slide)
-            } else {
-                originalSlides.push(slide)
-            }
-        }
-        
         cache = {
-            originalSlides,
-            cloneSlides,
+            slides: Array.from(slides),
             shadows: cache?.shadows ?? new WeakMap(),
             lastSlidesList: slides
         }
         cubeCache.set(tvist, cache)
     }
-    
-    return { originalSlides: cache.originalSlides, cloneSlides: cache.cloneSlides }
+
+    return cache.slides
 }
 
 export function setCubeEffect(
@@ -85,15 +70,8 @@ export function setCubeEffect(
     container.style.transformStyle = 'preserve-3d'
     container.style.webkitTransformStyle = 'preserve-3d'
     
-    // Используем кэшированные массивы вместо двух filter на каждом кадре
-    const { originalSlides, cloneSlides } = getCachedSlides(tvist)
-    
-    // Hide all clones - cube is inherently cyclic and doesn't need them
-    cloneSlides.forEach(clone => {
-        clone.style.display = 'none'
-    })
-    
-    const numOriginalSlides = originalSlides.length
+    const slidesList = getCachedSlides(tvist)
+    const numSlides = slidesList.length
     
     // Calculate wrapper rotation
     // translate corresponds to linear movement.
@@ -110,8 +88,7 @@ export function setCubeEffect(
     // Move the whole cube back by zOffset so the front face aligns with the screen plane (Z=0)
     container.style.transform = `translate3d(0,0,-${zOffset}px) rotateY(${wrapperRotate}deg)`
     
-    // Process only original slides for cube faces
-    originalSlides.forEach((slide, i) => {
+    slidesList.forEach((slide, i) => {
         const slideAngle = i * 90
         
         // Fix for horizontal scroll and layout issues:
@@ -144,8 +121,8 @@ export function setCubeEffect(
         // Calculate progress (distance from current position)
         // Fix for loop mode: normalize diff to be within half of the slide count range.
         let slideProgress = i - progressTotal
-        if (Math.abs(slideProgress) > numOriginalSlides / 2) {
-             slideProgress -= numOriginalSlides * Math.round(slideProgress / numOriginalSlides)
+        if (Math.abs(slideProgress) > numSlides / 2) {
+             slideProgress -= numSlides * Math.round(slideProgress / numSlides)
         }
         
         // Fix: Hide slides that are out of bounds (preventing them from flying around screen)

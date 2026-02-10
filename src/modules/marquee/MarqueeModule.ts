@@ -1,17 +1,15 @@
 /**
  * Marquee Module
- * 
+ *
  * Возможности:
  * - Непрерывная прокрутка (бегущая строка)
  * - Настраиваемая скорость в пикселях в секунду
  * - Поддержка направлений: left, right (horizontal), up, down (vertical)
  * - Пауза при наведении курсора
- * - Автоматическое клонирование контента для бесшовного loop
  * - Публичное API: start, stop, pause, resume
  */
 
 import { Module } from '../Module'
-import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -24,11 +22,8 @@ export class MarqueeModule extends Module {
   private speed: number // пикселей в секунду
   private direction: 'left' | 'right' | 'up' | 'down'
   private lastTimestamp: number | null = null
-  
-  /** Клонированные элементы для бесшовного loop */
-  private clones: HTMLElement[] = []
-  
-  /** Общая ширина/высота всех оригинальных слайдов */
+
+  /** Общая ширина/высота всех слайдов */
   private totalSize = 0
   
   /** Текущая позиция прокрутки */
@@ -66,9 +61,6 @@ export class MarqueeModule extends Module {
       console.warn('[Tvist Marquee] Drag is disabled in marquee mode')
     }
 
-    // Создаём клоны для бесшовного loop
-    this.createClones()
-
     // Вычисляем общий размер
     this.calculateTotalSize()
 
@@ -84,7 +76,6 @@ export class MarqueeModule extends Module {
 
   override destroy(): void {
     this.stop()
-    this.removeClones()
     this.detachHoverEvents()
   }
 
@@ -113,7 +104,6 @@ export class MarqueeModule extends Module {
       // Если marquee был выключен, а теперь включен
       if (!wasActive && isNowActive) {
         this.stopped = false
-        this.createClones()
         this.calculateTotalSize()
         this.setupEvents()
         this.start()
@@ -121,16 +111,12 @@ export class MarqueeModule extends Module {
       // Если marquee был включен, а теперь выключен
       else if (wasActive && !isNowActive) {
         this.stop()
-        this.removeClones()
         this.detachHoverEvents()
         this.stopped = true
       }
       // Если marquee остается включенным (но изменились параметры)
       else if (wasActive && isNowActive) {
-        // Пересоздаём клоны если изменилось направление
         if (newOptions.marquee && typeof newOptions.marquee === 'object' && newOptions.marquee.direction) {
-          this.removeClones()
-          this.createClones()
           this.calculateTotalSize()
           this.currentPosition = 0
         }
@@ -147,78 +133,22 @@ export class MarqueeModule extends Module {
   }
 
   /**
-   * Создаёт клоны слайдов для бесшовного loop
-   */
-  private createClones(): void {
-    const container = this.tvist.container
-    const originalSlides = Array.from(this.tvist.slides)
-    const isReverse = this.direction === 'right' || this.direction === 'down'
-
-    if (isReverse) {
-      // Для right/down: клоны добавляем В НАЧАЛО
-      originalSlides.reverse().forEach((slide, index) => {
-        const clone = slide.cloneNode(true) as HTMLElement
-        
-        // Маркируем как клон
-        clone.setAttribute('data-tvist-marquee-clone', 'true')
-        clone.setAttribute('data-tvist-slide-index', String(originalSlides.length - 1 - index))
-        clone.classList.add(TVIST_CLASSES.slideMarqueeClone)
-        
-        // Удаляем id
-        clone.removeAttribute('id')
-        
-        container.insertBefore(clone, container.firstChild)
-        this.clones.unshift(clone)
-      })
-    } else {
-      // Для left/up: клоны добавляем В КОНЕЦ
-      originalSlides.forEach((slide, index) => {
-        const clone = slide.cloneNode(true) as HTMLElement
-        
-        // Маркируем как клон
-        clone.setAttribute('data-tvist-marquee-clone', 'true')
-        clone.setAttribute('data-tvist-slide-index', String(index))
-        clone.classList.add(TVIST_CLASSES.slideMarqueeClone)
-        
-        // Удаляем id
-        clone.removeAttribute('id')
-        
-        container.appendChild(clone)
-        this.clones.push(clone)
-      })
-    }
-
-    // Обновляем список слайдов
-    this.tvist.updateSlidesList()
-  }
-
-  /**
-   * Удаляет клоны
-   */
-  private removeClones(): void {
-    this.clones.forEach(clone => clone.remove())
-    this.clones = []
-    this.tvist.updateSlidesList()
-  }
-
-  /**
-   * Вычисляет общий размер всех оригинальных слайдов
+   * Вычисляет общий размер всех слайдов
    */
   private calculateTotalSize(): void {
     const isHorizontal = this.options.direction !== 'vertical'
     const gap = this.options.gap ?? 0
-    
-    // Количество оригинальных слайдов (без клонов)
-    const originalCount = Math.floor(this.tvist.slides.length / 2)
-    
+    const count = this.tvist.slides.length
+    if (count === 0) {
+      this.totalSize = 0
+      return
+    }
     if (isHorizontal) {
-      // Ширина одного слайда + gap
       const slideWidth = this.tvist.slides[0]?.offsetWidth ?? 0
-      this.totalSize = (slideWidth + gap) * originalCount
+      this.totalSize = (slideWidth + gap) * count
     } else {
-      // Высота одного слайда + gap
       const slideHeight = this.tvist.slides[0]?.offsetHeight ?? 0
-      this.totalSize = (slideHeight + gap) * originalCount
+      this.totalSize = (slideHeight + gap) * count
     }
   }
 
@@ -398,15 +328,10 @@ export class MarqueeModule extends Module {
       setDirection: (direction: 'left' | 'right' | 'up' | 'down') => {
         if (this.direction !== direction) {
           this.direction = direction
-          this.removeClones()
-          this.createClones()
           this.calculateTotalSize()
-          // Для right/down начинаем с totalSize (клоны слева, показываем оригиналы)
-          // Для left/up начинаем с 0
           const isReverse = direction === 'right' || direction === 'down'
           this.currentPosition = isReverse ? this.totalSize : 0
-          this.lastTimestamp = null // Сбрасываем timestamp для корректного deltaTime
-          // Сразу применяем transform для корректного отображения
+          this.lastTimestamp = null
           this.applyTransform()
         }
       },

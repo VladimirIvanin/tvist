@@ -264,10 +264,8 @@ describe('Lock functionality', () => {
     })
 
     // 5 slides, width 1000.
-    // perPage 5 -> slideSize 200. Total 1000. Fits perfectly -> Locked?
-    // With loop: clones are added (2 * perPage = 10 clones).
-    // Total 15 slides. Total size 3000.
-    // 3000 > 1000 -> Not Locked.
+    // perPage 5 -> slideSize 200. Total 1000. With loop контент не расширяется.
+    // Loop не создаёт клонов — размер контента как без loop. Lock не применяется к loop.
     const slider1 = new Tvist(fixture.root, {
       perPage: 5,
       loop: true,
@@ -282,10 +280,7 @@ describe('Lock functionality', () => {
     
     slider1.destroy()
 
-    // Now make content larger
-    // perPage 2 -> slideSize 500. Total 2500 (originals).
-    // With loop: +4 clones. Total 9 + 4 = 13 slides. 13 * 500 = 6500.
-    // 6500 > 1000 -> Not Locked.
+    // perPage 2 -> slideSize 500. Total 2500. 2500 > 1000 -> Not Locked.
     const slider2 = new Tvist(fixture.root, {
       perPage: 2,
       loop: true,

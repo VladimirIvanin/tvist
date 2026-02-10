@@ -40,10 +40,10 @@ describe('Cube Effect Performance', () => {
         document.body.innerHTML = ''
     })
 
-    it('должен кэшировать разделение original/clone слайдов', () => {
+    it('должен кэшировать список слайдов', () => {
         tvist = new Tvist(root, {
             effect: 'cube',
-            loop: true, // Создаст клоны
+            loop: true,
         })
 
         const effect = tvist.getModule('effect') as EffectModule
@@ -86,10 +86,9 @@ describe('Cube Effect Performance', () => {
         
         // Проверяем, что тени созданы у видимых слайдов
         const slides = root.querySelectorAll<HTMLElement>(`.${TVIST_CLASSES.slide}`)
-        const originalSlides = Array.from(slides).filter(s => !s.dataset.tvistClone)
-        
-        // Должны быть тени у видимых слайдов
-        const slidesWithShadows = originalSlides.filter(s => 
+        const slidesList = Array.from(slides)
+
+        const slidesWithShadows = slidesList.filter(s => 
             s.querySelector(`.${TVIST_CLASSES.block}-slide-shadow-cube`)
         )
         expect(slidesWithShadows.length).toBeGreaterThan(0)
@@ -128,8 +127,8 @@ describe('Cube Effect Performance', () => {
         tvist.engine.applyTransformPublic(-150)
         
         const slides = root.querySelectorAll<HTMLElement>(`.${TVIST_CLASSES.slide}`)
-        const slidesArray = Array.from(slides).filter(s => !s.dataset.tvistClone)
-        
+        const slidesArray = Array.from(slides)
+
         // Находим слайд с тенями
         let shadowLeft: HTMLElement | null = null
         let shadowRight: HTMLElement | null = null
