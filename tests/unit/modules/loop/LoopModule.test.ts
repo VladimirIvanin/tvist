@@ -328,4 +328,56 @@ describe('LoopModule', () => {
 
     fixture4.cleanup()
   })
+
+  it('should handle prev() from start correctly (reproduction case)', () => {
+    const fixtureRepro = createSliderFixture({
+      slidesCount: 4,
+      width: 314,
+      height: 300
+    })
+    
+    slider = new Tvist(fixtureRepro.root, {
+      perPage: 2,
+      // slidesPerGroup: 1 is now default
+      gap: 20,
+      loop: true,
+      speed: 0
+    })
+
+    // Initial state
+    expect(slider.activeIndex).toBe(0)
+    expect(slider.slides[0].textContent).toBe('Slide 1')
+
+    // Call prev
+    slider.prev()
+
+    // Expectation:
+    // With step = 1 (slidesPerGroup: 1).
+    // prev -> Slide 4 (index 3).
+    // Real index should be 3.
+    expect(slider.realIndex).toBe(3)
+    
+    // The DOM should have been rearranged.
+    // Slides [1, 2, 3, 4]. Prepend [3, 4].
+    // New DOM: [3, 4, 1, 2].
+    // Active index (pointing to Slide 4) should be 1.
+    // Slide 4 is at index 1.
+    
+    const activeSlide = slider.slides[slider.activeIndex]
+    expect(activeSlide.textContent).toBe('Slide 4')
+    expect(slider.activeIndex).toBe(1)
+    
+    // Check DOM order via text
+    const slidesText = Array.from(slider.slides).map(s => s.textContent)
+    // Expect [3, 4, 1, 2]
+    expect(slidesText).toEqual(['Slide 3', 'Slide 4', 'Slide 1', 'Slide 2'])
+
+    // Check transform
+    // Expect -334px because we moved back by 1 step (1 slide).
+    // Slide width 314 + gap 20 = 334.
+    const transform = slider.container.style.transform
+    expect(transform).toBe('translate3d(-334px, 0, 0)')
+    
+    fixtureRepro.cleanup()
+  })
 })
