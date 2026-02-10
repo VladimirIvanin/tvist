@@ -26,7 +26,7 @@
           type="range" 
           v-model.number="speed" 
           min="20" 
-          max="150" 
+          max="1000" 
           step="10"
           @input="updateSpeed"
           class="speed-slider"
