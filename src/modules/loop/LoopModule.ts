@@ -112,6 +112,45 @@ export class LoopModule extends Module {
   }
 
   /**
+   * Получить текущее состояние transform для отладки и тестирования
+   */
+  public getTransformState(): {
+    location: number
+    target: number
+    activeIndex: number
+    realIndex: number
+    transform: string
+    slidesOrder: string[]
+    slidesText: string[]
+    loopedSlides: number
+  } {
+    const slides = this.tvist.slides
+    return {
+      location: this.tvist.engine.location.get(),
+      target: this.tvist.engine.target.get(),
+      activeIndex: this.tvist.engine.index.get(),
+      realIndex: this.getRealIndex(),
+      transform: this.tvist.container.style.transform,
+      slidesOrder: slides.map(s => s.getAttribute('data-tvist-slide-index') || '?'),
+      slidesText: slides.map(s => s.textContent?.trim() || '?'),
+      loopedSlides: this.loopedSlides
+    }
+  }
+
+  /**
+   * Остановить анимацию и залогировать текущее состояние (для тестирования)
+   */
+  public pause(label?: string): void {
+    // Останавливаем анимацию
+    this.tvist.engine.animator.stop()
+    
+    // Логируем состояние
+    const state = this.getTransformState()
+    const prefix = label ? `[Loop Pause: ${label}]` : '[Loop Pause]'
+    console.warn(prefix, state)
+  }
+
+  /**
    * Обработчик события beforeTransitionStart
    */
   private handleBeforeTransition = (data: { index: number; direction: 'next' | 'prev' }): void => {
@@ -137,7 +176,19 @@ export class LoopModule extends Module {
       initial = false
     } = params
 
-    if (!this.options.loop) return
+    if (!this.options.loop) return this.tvist.engine.index.get()
+
+    log('LoopFix called', {
+      slideRealIndex,
+      slideTo,
+      direction,
+      setTranslate,
+      activeSlideIndex,
+      initial,
+      currentIndex: this.tvist.engine.index.get(),
+      currentLocation: this.tvist.engine.location.get(),
+      currentTarget: this.tvist.engine.target.get()
+    })
 
     this.emit('beforeLoopFix')
 
@@ -202,6 +253,18 @@ export class LoopModule extends Module {
       activeIndex +
       (bothDirections && typeof setTranslate === 'undefined' ? -slidesPerView / 2 + 0.5 : 0)
 
+    log('Loop check', {
+      activeIndex,
+      activeColIndexWithShift,
+      loopedSlides,
+      slidesPerView,
+      slidesCount,
+      isPrev,
+      isNext,
+      needPrepend: activeColIndexWithShift < loopedSlides,
+      needAppend: activeColIndexWithShift + slidesPerView > slidesCount - loopedSlides
+    })
+
     // Prepend: если активный слайд слишком близко к началу
     // Используем slidesPerGroup для определения порога
     if (activeColIndexWithShift < loopedSlides && isPrev) {
@@ -210,6 +273,7 @@ export class LoopModule extends Module {
         const index = i - Math.floor(i / slidesCount) * slidesCount
         prependSlidesIndexes.push(slidesCount - index - 1)
       }
+      log('Prepend needed', { slidesPrepended, indexes: prependSlidesIndexes })
     }
     // Append: если активный слайд слишком близко к концу
     else if (activeColIndexWithShift + slidesPerView > slidesCount - loopedSlides && isNext) {
@@ -221,29 +285,25 @@ export class LoopModule extends Module {
         const index = i - Math.floor(i / slidesCount) * slidesCount
         appendSlidesIndexes.push(index)
       }
-    }
-    if (activeColIndexWithShift < loopedSlides && isPrev) {
-      slidesPrepended = Math.max(loopedSlides - activeColIndexWithShift, slidesPerGroup)
-      for (let i = 0; i < loopedSlides - activeColIndexWithShift; i += 1) {
-        const index = i - Math.floor(i / slidesCount) * slidesCount
-        prependSlidesIndexes.push(slidesCount - index - 1)
-      }
-    }
-    // Append: если активный слайд слишком близко к концу
-    else if (activeColIndexWithShift + slidesPerView > slidesCount - loopedSlides && isNext) {
-      slidesAppended = Math.max(
-        activeColIndexWithShift - (slidesCount - loopedSlides * 2),
-        slidesPerGroup
-      )
-      for (let i = 0; i < slidesAppended; i += 1) {
-        const index = i - Math.floor(i / slidesCount) * slidesCount
-        appendSlidesIndexes.push(index)
-      }
+      log('Append needed', { slidesAppended, indexes: appendSlidesIndexes })
+    } else {
+      log('No rearrangement needed', {
+        currentLocation: this.tvist.engine.location.get(),
+        currentTarget: this.tvist.engine.target.get()
+      })
     }
 
     // Запоминаем текущие позиции ДО изменения DOM (как в Swiper)
     const currentTranslate = this.tvist.engine.location.get()
     const oldSlidePositions: number[] = []
+    
+    log('Before DOM changes:', {
+      currentTranslate,
+      activeIndex,
+      slideTo,
+      prependCount: prependSlidesIndexes.length,
+      appendCount: appendSlidesIndexes.length
+    })
     
     if (slideTo) {
       // Сохраняем старые позиции слайдов
@@ -277,7 +337,24 @@ export class LoopModule extends Module {
 
     // Обновляем список слайдов после перемещения
     this.tvist.updateSlidesList()
+    
+    // Сохраняем текущий location перед update (чтобы не было скачка)
+    const locationBeforeUpdate = this.tvist.engine.location.get()
+    const targetBeforeUpdate = this.tvist.engine.target.get()
+    
     this.tvist.update()
+    
+    // Если не было перестановки, восстанавливаем location
+    // (update() сбрасывает location на позицию текущего индекса)
+    if (prependSlidesIndexes.length === 0 && appendSlidesIndexes.length === 0) {
+      log('Restoring location after update', {
+        locationBefore: locationBeforeUpdate,
+        locationAfter: this.tvist.engine.location.get()
+      })
+      this.tvist.engine.location.set(locationBeforeUpdate)
+      this.tvist.engine.target.set(targetBeforeUpdate)
+      this.tvist.engine.applyTransformPublic()
+    }
 
     // Корректируем позицию, чтобы избежать визуального прыжка
     if (prependSlidesIndexes.length > 0) {
