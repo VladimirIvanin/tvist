@@ -1,7 +1,7 @@
 {
   "name": "tvist",
   "version": "0.0.1",
-  "description": "Модульный и легковесный слайдер для современного веба",
+  "description": "Слайдер с широким API для современного веба",
   "type": "module",
   "main": "./dist/tvist.cjs.js",
   "module": "./dist/tvist.esm.js",

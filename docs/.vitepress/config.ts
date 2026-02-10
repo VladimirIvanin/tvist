@@ -6,7 +6,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
   title: "Tvist",
-  description: "Модульный и легковесный слайдер для современного веба",
+  description: "Слайдер с широким API для современного веба",
   lang: 'ru-RU',
   base: '/tvist/',
   

@@ -1,32 +1,10 @@
 # Tvist
 
-> Модульный и легковесный слайдер для современного веба
+> Слайдер с широким API для современного веба
 
 [![npm version](https://img.shields.io/npm/v/tvist.svg)](https://www.npmjs.com/package/tvist)
 [![Bundle Size](https://img.shields.io/bundlephobia/minzip/tvist)](https://bundlephobia.com/package/tvist)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-## ✅ Статус разработки
-
-### Завершено
-
-- [x] **ЭТАП 1: MVP Core** - Engine, Animator, Vector1D, Counter, EventEmitter
-- [x] **ЭТАП 2: Essential Modules** - Drag, Navigation, Pagination, Autoplay, Breakpoints
-
-### В процессе
-
-- [x] **ЭТАП 3: Advanced Features** - Loop ✅, LazyLoad ✅, Effects, Thumbs ✅
-  - [x] Loop - бесконечная прокрутка
-  - [x] LazyLoad - ленивая загрузка изображений
-  - [x] Effects - эффекты переходов (fade, cube)
-  - [x] Thumbs - связь с миниатюрами
-  - [x] Grid - сеточная раскладка
-  - [x] Marquee - режим бегущей строки
-  - [x] Scrollbar - кастомный скроллбар
-  
-### Roadmap
-
-- [ ] **ЭТАП 4: Polish & Production** - Документация, тесты, оптимизация
 
 ## 📦 Установка
 
@@ -36,25 +14,36 @@ npm install tvist
 
 ## ✨ Возможности
 
-- ⚡ **Легковесный** - всего 6.3kb gzip (с модулями!)
-- 🎯 **Модульный** - Engine + Modules архитектура
-- 🖱️ **Drag & Drop** - touch/mouse с rubberband эффектом, free mode с momentum scroll
-- 🎨 **Navigation** - стрелки с disabled состояниями
-- 📊 **Pagination** - bullets, fraction, progress
-- ⏰ **Autoplay** - с паузами и остановками
-- 📱 **Responsive** - container-first: размеры и perPage от контейнера, breakpoints по окну или контейнеру
-- 🔄 **Loop** - бесконечная прокрутка
-- 🖼️ **LazyLoad** - ленивая загрузка изображений
-- ✨ **Effects** - fade, cube эффекты переходов
-- 🔗 **Thumbs** - связь основного слайдера с миниатюрами
-- 📐 **Grid** - сеточная раскладка слайдов
-- 🎬 **Marquee** - режим бегущей строки
-- 📜 **Scrollbar** - кастомный скроллбар для навигации
-- 🚀 **60 FPS** - производительность на первом месте
-- 💎 **TypeScript** - strict mode, полные типы
-- 0️⃣ **Zero deps** - нет внешних зависимостей
+- 📖 **Широкое API** — десятки опций, методы, события и подключаемые модули под полный контроль
+- 🖱️ **Drag & Drop** — touch/mouse с rubberband эффектом, free mode с momentum scroll
+- 🎨 **Navigation** — стрелки с disabled состояниями
+- 📊 **Pagination** — bullets, fraction, progress
+- ⏰ **Autoplay** — с паузами и остановками
+- 📱 **Responsive** — container-first: размеры и perPage от контейнера, breakpoints по окну или контейнеру
+- 🔄 **Loop** — бесконечная прокрутка
+- 🖼️ **LazyLoad** — ленивая загрузка изображений
+- ✨ **Effects** — fade, cube эффекты переходов
+- 🔗 **Thumbs** — связь основного слайдера с миниатюрами
+- 📐 **Grid** — сеточная раскладка слайдов
+- 🎬 **Marquee** — режим бегущей строки
+- 📜 **Scrollbar** — кастомный скроллбар для навигации
+- 0️⃣ **Zero deps** — нет внешних зависимостей
 
 ## 🚀 Быстрый старт
+
+Разметка:
+
+```html
+<div id="slider" class="tvist-v0">
+  <div class="tvist-v0__container">
+    <div class="tvist-v0__slide">Слайд 1</div>
+    <div class="tvist-v0__slide">Слайд 2</div>
+    <div class="tvist-v0__slide">Слайд 3</div>
+  </div>
+</div>
+```
+
+Подключение и инициализация:
 
 ```typescript
 import Tvist from 'tvist';
