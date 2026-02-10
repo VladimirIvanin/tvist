@@ -4,7 +4,7 @@ layout: home
 hero:
   name: "Tvist"
   text: "Слайдер с широким API"
-  tagline: Опции на любой случай. Методы, события и модули под полный контроль.
+  tagline: Drag, loop, autoplay, pagination, navigation, scrollbar, scroll-control, marquee, grid, thumbs, effects, lazyload, breakpoints 
   actions:
     - theme: brand
       text: Быстрый старт
