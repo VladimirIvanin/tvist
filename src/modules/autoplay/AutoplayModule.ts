@@ -5,6 +5,7 @@
  * - Автопрокрутка с настраиваемой задержкой
  * - Пауза при hover
  * - Пауза при взаимодействии (drag, click)
+ * - Пауза при потере видимости вкладки (visibilitychange)
  * - Полная остановка при взаимодействии (опционально)
  * - Публичное API: start, stop, pause, resume
  */
@@ -23,11 +24,14 @@ export class AutoplayModule extends Module {
 
   private mouseEnterHandler?: () => void
   private mouseLeaveHandler?: () => void
+  private visibilityChangeHandler?: () => void
 
   // Флаг для отслеживания состояния drag
   private isDragging = false
   // Таймаут для fallback resume после drag (если transitionEnd не сработает)
   private dragEndTimeout: number | null = null
+  // Флаг для отслеживания паузы из-за потери видимости вкладки
+  private pausedByVisibility = false
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
@@ -41,6 +45,7 @@ export class AutoplayModule extends Module {
     if (!this.shouldBeActive()) return
 
     this.setupEvents()
+    this.attachVisibilityEvents()
     this.start()
   }
 
@@ -48,6 +53,7 @@ export class AutoplayModule extends Module {
     this.stop()
     this.clearDragEndTimeout()
     this.detachHoverEvents()
+    this.detachVisibilityEvents()
   }
 
   protected override shouldBeActive(): boolean {
@@ -77,12 +83,14 @@ export class AutoplayModule extends Module {
       if (!wasActive && isNowActive) {
         this.stopped = false
         this.setupEvents()
+        this.attachVisibilityEvents()
         this.start()
       }
       // Если autoplay был включен, а теперь выключен
       else if (wasActive && !isNowActive) {
         this.stop()
         this.detachHoverEvents()
+        this.detachVisibilityEvents()
         this.stopped = true
       }
       // Если autoplay был включен и остается включен (но изменилась задержка)
@@ -204,6 +212,36 @@ export class AutoplayModule extends Module {
   }
 
   /**
+   * Подключение события visibilitychange
+   * Ставит автоплей на паузу при скрытии вкладки
+   */
+  private attachVisibilityEvents(): void {
+    this.visibilityChangeHandler = () => {
+      if (document.visibilityState === 'hidden') {
+        this.pausedByVisibility = true
+        this.pause()
+      } else if (document.visibilityState === 'visible') {
+        if (this.pausedByVisibility) {
+          this.pausedByVisibility = false
+          this.resume()
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', this.visibilityChangeHandler)
+  }
+
+  /**
+   * Отключение события visibilitychange
+   */
+  private detachVisibilityEvents(): void {
+    if (this.visibilityChangeHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityChangeHandler)
+      this.visibilityChangeHandler = undefined
+    }
+  }
+
+  /**
    * Старт autoplay
    */
   start(): void {
@@ -254,6 +292,11 @@ export class AutoplayModule extends Module {
    * Перезапускает таймер, чтобы избежать немедленного автоперелистывания
    */
   resume(): void {
+    // Не возобновляем, если вкладка скрыта
+    if (this.pausedByVisibility) {
+      return
+    }
+    
     if (this.paused && !this.stopped) {
       this.paused = false
       // Перезапускаем таймер, чтобы отсчёт начался заново
