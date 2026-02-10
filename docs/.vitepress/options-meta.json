@@ -502,12 +502,17 @@
         {
           "name": "slideChanged",
           "type": "(index: number) => void",
-          "description": "Вызывается после завершения смены слайда"
+          "description": "Смена слайда завершена"
+        },
+        {
+          "name": "beforeTransitionStart",
+          "type": "(data: { index: number; direction: 'next' | 'prev' }) => void",
+          "description": "Перед началом анимации перехода (для loop)"
         },
         {
           "name": "dragStart",
           "type": "() => void",
-          "description": "Вызывается при начале перетаскивания"
+          "description": "Начало перетаскивания"
         },
         {
           "name": "drag",
