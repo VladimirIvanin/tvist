@@ -290,5 +290,222 @@ describe('DragModule', () => {
       expect(slider.activeIndex).toBe(initialIndex)
     })
   })
+
+  describe('Center mode', () => {
+    /**
+     * ПРОБЛЕМА: При center: true + drag происходит резкое смещение трансформа при первом взаимодействии
+     * 
+     * Причина:
+     * - При center: true начальная позиция включает centerOffset (например, 150px)
+     * - При mousedown DragModule сохраняет startPosition = 150
+     * - При mousemove DragModule вычисляет: newPosition = startPosition + delta
+     * - Но delta рассчитывается от координат мыши, а не учитывает что startPosition уже включает centerOffset
+     * - В результате происходит резкий скачок ближе к нулю
+     * 
+     * Ожидаемое поведение:
+     * - При движении мыши на -10px позиция должна измениться на -10px (с 150 до 140)
+     * - Фактическое поведение: позиция меняется на -122px (с 150 до 28)
+     * 
+     * Эти тесты воспроизводят проблему и должны падать до исправления.
+     */
+    let centerSlider: Tvist
+    let centerFixture: SliderFixture
+
+    beforeEach(() => {
+      // Создаём новую фикстуру для center режима
+      // Контейнер 600px, слайды по 300px каждый
+      centerFixture = createSliderFixture({
+        slidesCount: 5,
+        width: 600,
+        height: 400,
+        slideWidth: 300, // Слайды меньше контейнера для центрирования
+      })
+
+      // Инициализируем слайдер с center: true и autoWidth: true
+      // autoWidth нужен чтобы Engine брал реальные размеры слайдов из DOM
+      centerSlider = new Tvist(centerFixture.root, {
+        drag: true,
+        center: true,
+        autoWidth: true,
+        perPage: 1,
+        speed: 300,
+      })
+    })
+
+    afterEach(() => {
+      centerSlider.destroy()
+      centerFixture.cleanup()
+    })
+
+    it('НЕ должен резко смещать позицию при первом клике (center: true)', () => {
+      // Запоминаем начальную позицию (с учетом centerOffset)
+      const initialPosition = centerSlider.engine.location.get()
+      const centerOffset = centerSlider.engine.getCenterOffset(0)
+
+      // Проверяем что centerOffset не равен нулю (иначе тест бессмысленен)
+      expect(centerOffset).toBeGreaterThan(0)
+      // Проверяем что начальная позиция включает centerOffset
+      expect(initialPosition).toBe(centerOffset)
+
+      // Начинаем drag
+      const mouseDownEvent = createMouseEvent('mousedown', {
+        clientX: 300,
+        clientY: 200,
+      })
+      centerFixture.container.dispatchEvent(mouseDownEvent)
+
+      // Позиция НЕ должна измениться сразу после mousedown
+      const positionAfterMouseDown = centerSlider.engine.location.get()
+      expect(positionAfterMouseDown).toBe(initialPosition)
+
+      // Двигаем мышь на небольшое расстояние (10px влево)
+      const mouseMoveEvent = createMouseEvent('mousemove', {
+        clientX: 290,
+        clientY: 200,
+      })
+      document.dispatchEvent(mouseMoveEvent)
+
+      // Позиция должна измениться плавно, примерно на -10px (с учетом dragSpeed)
+      const positionAfterMove = centerSlider.engine.location.get()
+      const delta = positionAfterMove - initialPosition
+      
+      // Проверяем что смещение соответствует движению мыши (примерно -10px)
+      // Допускаем погрешность ±2px
+      expect(Math.abs(delta - (-10))).toBeLessThan(2)
+      
+      // НЕ должно быть резкого скачка к нулю или другой позиции
+      expect(Math.abs(delta)).toBeLessThan(20)
+
+      // Отпускаем
+      const mouseUpEvent = createMouseEvent('mouseup', {
+        clientX: 290,
+        clientY: 200,
+      })
+      document.dispatchEvent(mouseUpEvent)
+    })
+
+    it('должен плавно следовать за мышью без скачков при center: true', () => {
+      // Переходим на второй слайд (индекс 1)
+      centerSlider.scrollTo(1, true)
+      
+      const initialPosition = centerSlider.engine.location.get()
+      const centerOffset = centerSlider.engine.getCenterOffset(1)
+
+      // Проверяем что centerOffset применен
+      expect(centerOffset).toBeGreaterThan(0)
+
+      // Начинаем drag
+      centerFixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 300, clientY: 200 })
+      )
+
+      // Двигаем мышь влево на 20px
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 280, clientY: 200 })
+      )
+
+      const position1 = centerSlider.engine.location.get()
+      const delta1 = position1 - initialPosition
+      
+      // Смещение должно быть примерно -20px
+      expect(Math.abs(delta1 - (-20))).toBeLessThan(2)
+
+      // Двигаем ещё на 20px влево (всего -40px от начала)
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 260, clientY: 200 })
+      )
+
+      const position2 = centerSlider.engine.location.get()
+      const delta2 = position2 - initialPosition
+      
+      // Смещение должно быть примерно -40px
+      expect(Math.abs(delta2 - (-40))).toBeLessThan(2)
+
+      // Двигаем обратно вправо на 10px (всего -30px от начала)
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 270, clientY: 200 })
+      )
+
+      const position3 = centerSlider.engine.location.get()
+      const delta3 = position3 - initialPosition
+      
+      // Смещение должно быть примерно -30px
+      expect(Math.abs(delta3 - (-30))).toBeLessThan(2)
+
+      // Отпускаем
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 270, clientY: 200 })
+      )
+    })
+
+    it('должен корректно работать при драге на последнем слайде (center: true)', () => {
+      // Переходим на последний слайд
+      centerSlider.scrollTo(4, true)
+      
+      const initialPosition = centerSlider.engine.location.get()
+
+      // Начинаем drag
+      centerFixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 300, clientY: 200 })
+      )
+
+      // Двигаем мышь вправо на 30px
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 330, clientY: 200 })
+      )
+
+      const positionAfterMove = centerSlider.engine.location.get()
+      const delta = positionAfterMove - initialPosition
+      
+      // Смещение должно быть примерно +30px
+      expect(Math.abs(delta - 30)).toBeLessThan(2)
+      
+      // НЕ должно быть резкого скачка
+      expect(Math.abs(delta)).toBeLessThan(50)
+
+      // Отпускаем
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 330, clientY: 200 })
+      )
+    })
+
+    it('должен сохранять плавность при быстром движении туда-сюда (center: true)', () => {
+      const initialPosition = centerSlider.engine.location.get()
+
+      // Начинаем drag
+      centerFixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 300, clientY: 200 })
+      )
+
+      // Быстро двигаем влево
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 250, clientY: 200 })
+      )
+      const pos1 = centerSlider.engine.location.get()
+      expect(pos1 - initialPosition).toBeLessThan(0) // Двинулись влево
+
+      // Быстро двигаем вправо
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 350, clientY: 200 })
+      )
+      const pos2 = centerSlider.engine.location.get()
+      expect(pos2 - initialPosition).toBeGreaterThan(0) // Двинулись вправо
+
+      // Снова влево
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 280, clientY: 200 })
+      )
+      const pos3 = centerSlider.engine.location.get()
+      const delta3 = pos3 - initialPosition
+      
+      // Финальное смещение должно быть примерно -20px
+      expect(Math.abs(delta3 - (-20))).toBeLessThan(5)
+
+      // Отпускаем
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 280, clientY: 200 })
+      )
+    })
+  })
 })
 

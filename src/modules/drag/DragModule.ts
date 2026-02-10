@@ -30,6 +30,7 @@ export class DragModule extends Module {
   private startX = 0
   private startY = 0
   private startPosition = 0
+  private startIndex = 0 // Индекс слайда при начале драга (для center mode)
   private currentX = 0 // Текущая позиция курсора
   private currentY = 0
 
@@ -47,6 +48,11 @@ export class DragModule extends Module {
   
   private readonly MIN_DRAG_DISTANCE = 5
   private isPotentialDrag = false
+  
+  // Флаги для loop
+  private loopFixed = false // Флаг, что loopFix уже был вызван в этом жесте
+  private isFirstMove = true // Флаг первого движения
+  private lastDirection: 'prev' | 'next' | null = null // Последнее направление движения
   
   // Для расчёта velocity
   private lastMoveTime = 0
@@ -68,12 +74,23 @@ export class DragModule extends Module {
 
     // Слушаем сдвиг позиций (от LoopModule)
     this.on('positionShifted', this.onPositionShifted)
+    
+    // Слушаем loopFix для обновления стартовой позиции
+    this.on('loopFix', this.onLoopFix)
+  }
+
+  private onLoopFix = (): void => {
+    // После loopFix обновляем стартовую позицию, если идёт драг
+    if (this.isDragging) {
+      this.startPosition = this.tvist.engine.location.get()
+    }
   }
 
   override destroy(): void {
     this.detachEvents()
     this.stopMomentum()
     this.off('positionShifted', this.onPositionShifted)
+    this.off('loopFix', this.onLoopFix)
   }
 
   private onPositionShifted = (delta: number): void => {
@@ -95,6 +112,7 @@ export class DragModule extends Module {
   /**
    * Обновление границ для rubberband.
    * При loop границ нет. Без loop: peekTrim — min/max без левого/правого peek.
+   * При center: true (без loop) используем getScrollPositionForIndex для корректного учета centerOffset.
    */
   private updateBounds(): void {
     const { engine, slides } = this.tvist
@@ -103,6 +121,10 @@ export class DragModule extends Module {
     if (this.options.loop) {
       this.minPosition = Infinity
       this.maxPosition = -Infinity
+    } else if (this.options.center) {
+      // При center: true (без loop) используем getScrollPositionForIndex, который уже учитывает centerOffset
+      this.minPosition = engine.getScrollPositionForIndex(0)
+      this.maxPosition = engine.getScrollPositionForIndex(slides.length - 1)
     } else {
       const usePeekTrim = this.options.peekTrim !== false
       this.minPosition = usePeekTrim ? engine.getMinScrollPosition() : 0
@@ -117,6 +139,7 @@ export class DragModule extends Module {
         minPosition: this.minPosition,
         maxPosition: this.maxPosition,
         loop: this.options.loop,
+        center: this.options.center,
         peekTrim: this.options.peekTrim !== false,
         slidesCount: slides.length,
         perPage
@@ -183,11 +206,17 @@ export class DragModule extends Module {
     this.currentX = point.x
     this.currentY = point.y
     this.startPosition = this.tvist.engine.location.get()
+    this.startIndex = this.tvist.engine.index.get()
     
     // Сбрасываем события для velocity tracking
     this.baseEvent = null
     this.prevBaseEvent = null
     this.lastMoveTime = 0
+    
+    // Сбрасываем флаги для loop
+    this.loopFixed = false
+    this.isFirstMove = true
+    this.lastDirection = null
 
     // Останавливаем активную анимацию если была
     this.stopMomentum()
@@ -222,6 +251,29 @@ export class DragModule extends Module {
     if (!this.isDragging) {
       if (absDelta > this.MIN_DRAG_DISTANCE) {
         this.isDragging = true
+        
+        // КРИТИЧНО: вызываем loopFix ДО первого применения transform
+        if (this.options.loop && this.isFirstMove && !this.loopFixed) {
+          const loopModule = this.tvist.getModule('loop') as { 
+            fix?: (params: { direction?: 'next' | 'prev'; slideTo?: boolean; setTranslate?: boolean }) => void 
+          }
+          if (loopModule?.fix) {
+            // Определяем направление движения:
+            // Движение вправо (delta > 0) = движение к началу = 'prev'
+            // Движение влево (delta < 0) = движение к концу = 'next'
+            const delta = isHorizontal ? deltaX : deltaY
+            const direction = delta > 0 ? 'prev' : 'next'
+            
+            // Вызываем loopFix для подготовки слайдов
+            loopModule.fix({ direction })
+            this.isFirstMove = false
+            this.loopFixed = true // Предотвращаем повторный вызов для этого направления
+            // КРИТИЧНО: обновляем startPosition и startIndex после loopFix
+            this.startPosition = this.tvist.engine.location.get()
+            this.startIndex = this.tvist.engine.index.get()
+          }
+        }
+        
         // Инициализируем базовое событие
         this.baseEvent = { x: point.x, y: point.y, time: now }
         this.lastMoveTime = now
@@ -235,22 +287,94 @@ export class DragModule extends Module {
     }
 
     const delta = isHorizontal ? deltaX : deltaY
+    
+    // Определяем текущее направление движения
+    const currentDirection: 'prev' | 'next' = delta > 0 ? 'prev' : 'next'
+    
+    // Если направление изменилось, вызываем loopFix для нового направления
+    if (this.options.loop && this.lastDirection !== null && this.lastDirection !== currentDirection) {
+      const loopModule = this.tvist.getModule('loop') as { 
+        fix?: (params: { direction?: 'next' | 'prev' }) => void 
+      }
+      if (loopModule?.fix) {
+        loopModule.fix({ direction: currentDirection })
+        // КРИТИЧНО: обновляем startPosition и startIndex после loopFix
+        this.startPosition = this.tvist.engine.location.get()
+        this.startIndex = this.tvist.engine.index.get()
+      }
+    }
+    this.lastDirection = currentDirection
 
     // Применяем dragSpeed
     const dragSpeed = this.options.dragSpeed ?? 1
     let distance = delta * dragSpeed
 
-    // Применяем rubberband на границах (только если включен)
-    if (this.options.rubberband !== false) {
-      distance = this.applyRubberband(distance)
-    }
-
     // Устанавливаем позицию
-    const newPosition = this.startPosition + distance
+    // При center: true (без loop) нужно учитывать centerOffset для корректного расчета
+    let newPosition: number
+    if (this.options.center && !this.options.loop) {
+      // Получаем базовую позицию слайда без centerOffset
+      const basePosition = -this.tvist.engine.getSlidePosition(this.startIndex)
+      // Получаем centerOffset для текущего слайда
+      const centerOffset = this.tvist.engine.getCenterOffset(this.startIndex)
+      // Рассчитываем новую позицию: базовая позиция + центрирование + смещение от драга
+      newPosition = basePosition + centerOffset + distance
+      
+      // Применяем rubberband на границах (только если включен)
+      if (this.options.rubberband !== false) {
+        newPosition = this.applyRubberbandToPosition(newPosition)
+      }
+    } else {
+      // Применяем rubberband на границах (только если включен)
+      if (this.options.rubberband !== false) {
+        distance = this.applyRubberband(distance)
+      }
+      newPosition = this.startPosition + distance
+    }
     this.tvist.engine.location.set(newPosition)
     
     // Применяем transform напрямую (без пересчёта размеров)
     this.tvist.engine.applyTransformPublic()
+
+    // Проверяем достижение границ для loopFix
+    if (this.options.loop && !this.loopFixed) {
+      const loopModule = this.tvist.getModule('loop') as { 
+        fix?: (params: { direction?: 'next' | 'prev'; setTranslate?: boolean; activeSlideIndex?: number }) => void 
+      }
+      if (loopModule?.fix) {
+        const slides = this.tvist.slides
+        const perPage = this.options.perPage ?? 1
+        const currentIndex = this.tvist.engine.index.get()
+        
+        // Вычисляем пороги
+        const slideSize = this.tvist.engine.getSlideSize(0)
+        const threshold = slideSize / 2
+        
+        // Движение к началу (prev)
+        if (delta > 0 && newPosition > -threshold && currentIndex === 0) {
+          loopModule.fix({ 
+            direction: 'prev', 
+            setTranslate: true, 
+            activeSlideIndex: 0 
+          })
+          this.loopFixed = true
+          this.startPosition = this.tvist.engine.location.get()
+        }
+        // Движение к концу (next)
+        else if (delta < 0 && currentIndex === slides.length - perPage) {
+          const maxPos = this.tvist.engine.getScrollPositionForIndex(slides.length - perPage)
+          if (newPosition < maxPos - threshold) {
+            loopModule.fix({ 
+              direction: 'next', 
+              setTranslate: true, 
+              activeSlideIndex: slides.length - perPage 
+            })
+            this.loopFixed = true
+            this.startPosition = this.tvist.engine.location.get()
+          }
+        }
+      }
+    }
 
     // Обновляем базовое событие если прошло достаточно времени
     const elapsed = now - this.lastMoveTime
@@ -413,6 +537,30 @@ export class DragModule extends Module {
     
     // Часть внутри границ движется нормально, часть за границей - с трением
     return inBounds + outOfBounds / FRICTION
+  }
+
+  /**
+   * Rubberband эффект для абсолютной позиции (используется в center режиме)
+   */
+  private applyRubberbandToPosition(position: number): number {
+    // Внутри границ - возвращаем позицию как есть
+    if (position >= this.maxPosition && position <= this.minPosition) {
+      return position
+    }
+
+    const FRICTION = 5
+    
+    if (position > this.minPosition) {
+      // Вышли за правую границу
+      const overflow = position - this.minPosition
+      return this.minPosition + overflow / FRICTION
+    } else if (position < this.maxPosition) {
+      // Вышли за левую границу
+      const overflow = this.maxPosition - position
+      return this.maxPosition - overflow / FRICTION
+    }
+    
+    return position
   }
 
   /**

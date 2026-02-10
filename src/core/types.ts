@@ -21,10 +21,16 @@ export interface TvistOptions {
   // Базовые настройки
   
   /**
-   * Количество слайдов на странице
+   * Количество слайдов на странице (видимых одновременно).
    * @default 1
    */
   perPage?: number
+
+  /**
+   * Количество слайдов, пролистываемых за один раз.
+   * @default 1
+   */
+  slidesPerGroup?: number
   
   /**
    * Если true, ширина слайдов определяется их содержимым (не задаётся слайдером).
@@ -230,6 +236,13 @@ export interface TvistOptions {
    * @default false
    */
   loop?: boolean | 'auto'
+  
+  /**
+   * Автоматически возвращаться к первому слайду после достижения последнего (работает без loop)
+   * Применяется к навигации, autoplay и другим способам перехода между слайдами
+   * @default false
+   */
+  rewind?: boolean
   
   // Lazy loading
   
@@ -446,6 +459,8 @@ export interface TvistOptions {
     slideChange?: (index: number) => void
     /** Смена слайда завершена */
     slideChanged?: (index: number) => void
+    /** Перед началом анимации перехода (для loop fix) */
+    beforeTransitionStart?: (data: { index: number; direction: 'next' | 'prev' }) => void
     /** Начало анимации перехода */
     transitionStart?: (index: number) => void
     /** Конец анимации перехода */

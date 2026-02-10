@@ -71,6 +71,7 @@ export default defineConfig({
           { text: 'Update Options', link: '/examples/update-options' },
           { text: 'Loop', link: '/examples/loop' },
           { text: 'Marquee', link: '/examples/marquee' },
+          { text: 'Autoplay', link: '/examples/autoplay' },
           { text: 'Fade Effect', link: '/examples/effect-fade' },
           { text: 'Cube Effect', link: '/examples/effect-cube' },
           { text: 'Vertical', link: '/examples/vertical' },

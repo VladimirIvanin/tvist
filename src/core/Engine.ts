@@ -440,6 +440,18 @@ export class Engine {
         this.emitReachEdge(normalizedIndex, endIndex)
       }
     } else {
+      // Событие ПЕРЕД началом анимации (для loopFix)
+      if (indexChanged) {
+        // Используем сохраненное направление из scrollBy, если есть
+        const savedDirection = (this.tvist as any)._scrollDirection
+        const direction = savedDirection || (normalizedIndex > previousIndex ? 'next' : 'prev')
+        
+        // Очищаем сохраненное направление
+        delete (this.tvist as any)._scrollDirection
+        
+        this.tvist.emit('beforeTransitionStart', { index: normalizedIndex, direction })
+      }
+
       this.target.set(targetPosition)
       const speed = this.options.speed ?? 300
 
@@ -497,7 +509,18 @@ export class Engine {
    */
   scrollBy(delta: number): void {
     const currentIndex = this.index.get()
-    this.scrollTo(currentIndex + delta)
+    const targetIndex = currentIndex + delta
+    
+    // Определяем направление для loop
+    // Важно: в loop режиме направление определяется по знаку delta, а не по сравнению индексов
+    const direction = delta > 0 ? 'next' : delta < 0 ? 'prev' : undefined
+    
+    // Сохраняем направление для beforeTransitionStart
+    if (direction) {
+      (this.tvist as any)._scrollDirection = direction
+    }
+    
+    this.scrollTo(targetIndex)
   }
 
   /**

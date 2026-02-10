@@ -164,7 +164,7 @@ export function setCubeEffect(
         // Show only slides in range
         slide.style.visibility = isInRange ? 'visible' : 'hidden'
         
-        // Shadows (Swiper-style: две тени на слайд)
+        // Shadows 
         if (slideShadows && isInRange) {
              // Вычисляем progress на основе угла поворота грани относительно фронтальной позиции
              // Нормализуем угол в диапазон -180 до 180
@@ -181,7 +181,7 @@ export function setCubeEffect(
 }
 
 /**
- * Создаёт и обновляет тени на слайде по образцу Swiper
+ * Создаёт и обновляет тени на слайде
  * Две тени: left (видна при повороте влево) и right (видна при повороте вправо)
  */
 function createSlideShadows(slide: HTMLElement, progress: number, tvist: Tvist) {
@@ -195,7 +195,6 @@ function createSlideShadows(slide: HTMLElement, progress: number, tvist: Tvist) 
         const shadowLeft = document.createElement('div')
         const shadowRight = document.createElement('div')
         
-        // Используем классы как в Swiper (определены в _cube.scss)
         const prefix = TVIST_CLASSES.block
         shadowLeft.className = `${prefix}-slide-shadow-cube ${prefix}-slide-shadow-left`
         shadowRight.className = `${prefix}-slide-shadow-cube ${prefix}-slide-shadow-right`
@@ -208,7 +207,7 @@ function createSlideShadows(slide: HTMLElement, progress: number, tvist: Tvist) 
         cache.shadows.set(slide, shadows)
     }
     
-    // Обновляем opacity по логике Swiper:
+    // Обновляем opacity:
     // - Левая тень видна когда progress < 0 (слайд поворачивается влево/приходит)
     // - Правая тень видна когда progress > 0 (слайд поворачивается вправо/уходит)
     const leftOpacity = Math.max(-progress, 0)

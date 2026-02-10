@@ -84,10 +84,10 @@ onUnmounted(() => {
   color: white;
 }
 
-.tvist-v0__slide:nth-child(4n+1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v0__slide:nth-child(4n+2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v0__slide:nth-child(4n+3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v0__slide:nth-child(4n+4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v0__slide[data-tvist-slide-index="0"] { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v0__slide[data-tvist-slide-index="1"] { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v0__slide[data-tvist-slide-index="2"] { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v0__slide[data-tvist-slide-index="3"] { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 
 .controls {
   display: flex;

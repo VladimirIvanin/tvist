@@ -85,6 +85,7 @@ export class Tvist {
     // Мёрджим опции с дефолтными
     this.options = {
       perPage: 1,
+      slidesPerGroup: 1,
       gap: 0,
       speed: 300,
       direction: 'horizontal',
@@ -194,23 +195,89 @@ export class Tvist {
   // ==================== ПУБЛИЧНОЕ API ====================
 
   /**
-   * Следующий слайд
+   * Следующий слайд (или страница при perPage > 1)
    */
   next(): this {
     if (!this._isEnabled) return this
+    
+    // Если включён rewind и мы на последнем слайде, возвращаемся к первому
+    if (this.options.rewind && !this.options.loop && !this.engine.canScrollNext()) {
+      this.scrollTo(0)
+      return this
+    }
+    
     if (this.engine.canScrollNext()) {
-      this.engine.scrollBy(1)
+      // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
+      const step = this.options.slidesPerGroup ?? 1
+      
+      // В loop режиме вызываем loopFix ДО перехода
+      if (this.options.loop) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const loopModule = this.modules.get('loop') as any
+        if (loopModule && typeof loopModule.fix === 'function') {
+          // КРИТИЧНО: останавливаем анимацию перед loopFix
+          this.engine.animator.stop()
+          
+          // Запоминаем текущую позицию во время анимации
+          const currentLocation = this.engine.location.get()
+          
+          // Синхронизируем target с location (останавливаем анимацию)
+          this.engine.target.set(currentLocation)
+          this.engine.location.set(currentLocation)
+          
+          // loopFix возвращает скорректированный ТЕКУЩИЙ индекс после перестановки
+          const currentCorrectedIndex = loopModule.fix({ 
+            direction: 'next'
+          })
+          
+          // Переходим относительно скорректированного индекса
+          this.engine.scrollTo(currentCorrectedIndex + step)
+          
+          return this
+        }
+      }
+      
+      this.engine.scrollBy(step)
     }
     return this
   }
 
   /**
-   * Предыдущий слайд
+   * Предыдущий слайд (или страница при perPage > 1)
    */
   prev(): this {
     if (!this._isEnabled) return this
     if (this.engine.canScrollPrev()) {
-      this.engine.scrollBy(-1)
+      // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
+      const step = this.options.slidesPerGroup ?? 1
+      
+      // В loop режиме вызываем loopFix ДО перехода
+      if (this.options.loop) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const loopModule = this.modules.get('loop') as any
+        if (loopModule && typeof loopModule.fix === 'function') {
+          // КРИТИЧНО: останавливаем анимацию перед loopFix
+          this.engine.animator.stop()
+          
+          // Запоминаем текущую позицию во время анимации
+          const currentLocation = this.engine.location.get()
+          
+          // Синхронизируем target с location (останавливаем анимацию)
+          this.engine.target.set(currentLocation)
+          this.engine.location.set(currentLocation)
+          
+          // loopFix возвращает скорректированный ТЕКУЩИЙ индекс после перестановки
+          const currentCorrectedIndex = loopModule.fix({ 
+            direction: 'prev'
+          })
+          
+          // Переходим относительно скорректированного индекса
+          this.engine.scrollTo(currentCorrectedIndex - step)
+          return this
+        }
+      }
+      
+      this.engine.scrollBy(-step)
     }
     return this
   }
@@ -480,6 +547,19 @@ export class Tvist {
    */
   get canScrollPrev(): boolean {
     return this.engine.canScrollPrev()
+  }
+
+  /**
+   * Получить публичное API autoplay модуля
+   */
+  get autoplay() {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const module = this.modules.get('autoplay') as any
+    if (module && typeof module.getAutoplay === 'function') {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return module.getAutoplay()
+    }
+    return undefined
   }
 
   // ==================== СОБЫТИЯ ====================

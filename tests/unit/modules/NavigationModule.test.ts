@@ -288,6 +288,32 @@ describe('NavigationModule', () => {
       expect(nextButton?.hasAttribute('disabled')).toBe(false)
     })
 
+    it('should keep arrows enabled with rewind mode', () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+          </div>
+          <button class="${TVIST_CLASSES.arrowPrev}"></button>
+          <button class="${TVIST_CLASSES.arrowNext}"></button>
+        </div>
+      `
+
+      new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+        arrows: true,
+        rewind: true
+      })
+
+      const prevButton = container.querySelector(`.${TVIST_CLASSES.arrowPrev}`)
+      const nextButton = container.querySelector(`.${TVIST_CLASSES.arrowNext}`)
+
+      // Обе стрелки должны быть enabled в rewind режиме
+      expect(prevButton?.hasAttribute('disabled')).toBe(false)
+      expect(nextButton?.hasAttribute('disabled')).toBe(false)
+    })
+
     it('should hide arrows when there are too few slides', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">

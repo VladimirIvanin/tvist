@@ -56,10 +56,6 @@ onMounted(() => {
     speed: 400,
   })
 
-  // В loop режиме количество слайдов берется из оригинала
-  // @ts-ignore
-  slideCount.value = tvist.getModule('loop')?.getOriginalSlidesCount() || 7
-
   updateState()
 
   tvist.on('slideChange', updateState)
