@@ -443,11 +443,11 @@ export class Engine {
       // Событие ПЕРЕД началом анимации (для loopFix)
       if (indexChanged) {
         // Используем сохраненное направление из scrollBy, если есть
-        const savedDirection = (this.tvist as any)._scrollDirection
-        const direction = savedDirection || (normalizedIndex > previousIndex ? 'next' : 'prev')
+        const savedDirection = this.tvist._scrollDirection
+        const direction = savedDirection ?? (normalizedIndex > previousIndex ? 'next' : 'prev')
         
         // Очищаем сохраненное направление
-        delete (this.tvist as any)._scrollDirection
+        this.tvist._scrollDirection = undefined
         
         this.tvist.emit('beforeTransitionStart', { index: normalizedIndex, direction })
       }
@@ -517,7 +517,7 @@ export class Engine {
     
     // Сохраняем направление для beforeTransitionStart
     if (direction) {
-      (this.tvist as any)._scrollDirection = direction
+      this.tvist._scrollDirection = direction
     }
     
     this.scrollTo(targetIndex)

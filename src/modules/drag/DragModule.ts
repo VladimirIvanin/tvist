@@ -135,7 +135,7 @@ export class DragModule extends Module {
     
     // Отладка границ
     if (this.options.debug) {
-      console.log('[DragModule] Границы обновлены:', {
+      console.warn('[DragModule] Границы обновлены:', {
         minPosition: this.minPosition,
         maxPosition: this.maxPosition,
         loop: this.options.loop,
@@ -580,7 +580,7 @@ export class DragModule extends Module {
     const currentPoint = { x: this.currentX, y: this.currentY, time: now }
     
     // Используем prevBaseEvent если baseEvent совпадает с текущим
-    const basePoint = (this.baseEvent && this.baseEvent.time === now && this.prevBaseEvent)
+    const basePoint = (this.baseEvent?.time === now && this.prevBaseEvent)
       ? this.prevBaseEvent
       : this.baseEvent
     
@@ -611,7 +611,7 @@ export class DragModule extends Module {
     const isLoop = this.options.loop
     
     if (this.options.debug) {
-      console.log('[DragModule] startMomentum:', {
+      console.warn('[DragModule] startMomentum:', {
         currentPosition,
         initialVelocity,
         minPosition: this.minPosition,
@@ -626,7 +626,7 @@ export class DragModule extends Module {
       // Если за границами - не применяем momentum, сразу snap
       if (isOutOfBounds) {
         if (this.options.debug) {
-          console.log('[DragModule] Out of bounds, skipping momentum')
+          console.warn('[DragModule] Out of bounds, skipping momentum')
         }
         if (this.options.drag !== 'free' || this.options.freeSnap) {
           this.snapToNearest(initialVelocity)
@@ -732,7 +732,7 @@ export class DragModule extends Module {
     }
     
     if (this.options.debug) {
-      console.log('[DragModule] snapToNearestSlide:', {
+      console.warn('[DragModule] snapToNearestSlide:', {
         currentPosition,
         nearestIndex,
         minDistance

@@ -130,7 +130,7 @@ export class LoopModule extends Module {
       activeIndex: this.tvist.engine.index.get(),
       realIndex: this.getRealIndex(),
       transform: this.tvist.container.style.transform,
-      slidesOrder: slides.map(s => s.getAttribute('data-tvist-slide-index') || '?'),
+      slidesOrder: slides.map(s => s.getAttribute('data-tvist-slide-index') ?? '?'),
       slidesText: slides.map(s => s.textContent?.trim() || '?'),
       loopedSlides: this.loopedSlides
     }

@@ -11,6 +11,26 @@ declare module './Tvist' {
   interface Tvist {
     /** Логический индекс текущего слайда (для loop режима) */
     realIndex?: number
+    /** Направление прокрутки (внутреннее, для beforeTransitionStart) */
+    _scrollDirection?: 'next' | 'prev'
+  }
+}
+
+/** API модуля loop для вызова fix из Tvist */
+export interface LoopModuleAPI {
+  fix(params: { direction?: 'next' | 'prev' }): number
+}
+
+/** API модуля autoplay для публичного геттера */
+export interface AutoplayModuleAPI {
+  getAutoplay(): {
+    start(): void
+    stop(): void
+    pause(): void
+    resume(): void
+    isRunning(): boolean
+    isPaused(): boolean
+    isStopped(): boolean
   }
 }
 

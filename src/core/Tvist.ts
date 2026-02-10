@@ -7,7 +7,7 @@ import { Engine } from './Engine'
 import { EventEmitter } from './EventEmitter'
 import { getElement, children } from '../utils/dom'
 import { TVIST_CLASSES } from './constants'
-import type { TvistOptions } from './types'
+import type { TvistOptions, LoopModuleAPI, AutoplayModuleAPI } from './types'
 import type { Module, ModuleConstructor } from '../modules/Module'
 import { throttle } from './Animator'
 
@@ -212,8 +212,7 @@ export class Tvist {
       
       // В loop режиме вызываем loopFix ДО перехода
       if (this.options.loop) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const loopModule = this.modules.get('loop') as any
+        const loopModule = this.modules.get('loop') as LoopModuleAPI | undefined
         if (loopModule && typeof loopModule.fix === 'function') {
           // КРИТИЧНО: останавливаем анимацию перед loopFix
           this.engine.animator.stop()
@@ -226,7 +225,7 @@ export class Tvist {
           this.engine.location.set(currentLocation)
           
           // loopFix возвращает скорректированный ТЕКУЩИЙ индекс после перестановки
-          const currentCorrectedIndex = loopModule.fix({ 
+          const currentCorrectedIndex = loopModule.fix({
             direction: 'next'
           })
           
@@ -253,8 +252,7 @@ export class Tvist {
       
       // В loop режиме вызываем loopFix ДО перехода
       if (this.options.loop) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const loopModule = this.modules.get('loop') as any
+        const loopModule = this.modules.get('loop') as LoopModuleAPI | undefined
         if (loopModule && typeof loopModule.fix === 'function') {
           // КРИТИЧНО: останавливаем анимацию перед loopFix
           this.engine.animator.stop()
@@ -267,7 +265,7 @@ export class Tvist {
           this.engine.location.set(currentLocation)
           
           // loopFix возвращает скорректированный ТЕКУЩИЙ индекс после перестановки
-          const currentCorrectedIndex = loopModule.fix({ 
+          const currentCorrectedIndex = loopModule.fix({
             direction: 'prev'
           })
           
@@ -553,10 +551,8 @@ export class Tvist {
    * Получить публичное API autoplay модуля
    */
   get autoplay() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const module = this.modules.get('autoplay') as any
+    const module = this.modules.get('autoplay') as AutoplayModuleAPI | undefined
     if (module && typeof module.getAutoplay === 'function') {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return module.getAutoplay()
     }
     return undefined
