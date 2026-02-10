@@ -200,12 +200,6 @@ export class Tvist {
   next(): this {
     if (!this._isEnabled) return this
     
-    // Если включён rewind и мы на последнем слайде, возвращаемся к первому
-    if (this.options.rewind && !this.options.loop && !this.engine.canScrollNext()) {
-      this.scrollTo(0)
-      return this
-    }
-    
     if (this.engine.canScrollNext()) {
       // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
       const step = this.options.slidesPerGroup ?? 1

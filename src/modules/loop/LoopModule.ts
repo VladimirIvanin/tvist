@@ -11,7 +11,7 @@ import { Module } from '../Module'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
-const LOOP_DEBUG = false
+const LOOP_DEBUG = true
 const log = (msg: string, data?: unknown) => {
   if (LOOP_DEBUG) {
     const prefix = '[Loop]'
@@ -75,8 +75,19 @@ export class LoopModule extends Module {
     
     // Патчим геттер realIndex
     Object.defineProperty(this.tvist, 'realIndex', {
-      get: () => this.getRealIndex(),
+      get: () => {
+        const result = this.getRealIndex()
+        if (LOOP_DEBUG) {
+          log('realIndex getter called', { result, activeIndex: this.tvist.engine.index.get() })
+        }
+        return result
+      },
       configurable: true
+    })
+    
+    log('realIndex getter installed', {
+      hasGetter: 'realIndex' in this.tvist,
+      testValue: this.tvist.realIndex
     })
   }
 

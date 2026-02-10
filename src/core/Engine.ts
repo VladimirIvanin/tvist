@@ -11,6 +11,13 @@ import type { TvistOptions } from './types'
 import { getOuterWidth, getOuterHeight } from '../utils/dom'
 import { applyPeek, getPeekValue, getPeekValueFromOptions } from '../utils/peek'
 
+const ENGINE_DEBUG = true
+const engineLog = (label: string, data?: Record<string, unknown>) => {
+  if (ENGINE_DEBUG) {
+    console.log(`[Engine] ${label}`, data ?? '')
+  }
+}
+
 export class Engine {
   // Позиции
   readonly location: Vector1D // Текущая позиция
@@ -401,9 +408,18 @@ export class Engine {
     const isNavigation = this.options.isNavigation
 
     // Если включен режим навигации или center, разрешаем выбор слайдов за пределами endIndex
-    const clampedIndex = this.options.loop || isNavigation || this.options.center
+    let clampedIndex = this.options.loop || isNavigation || this.options.center
       ? index 
       : Math.max(0, Math.min(index, endIndex))
+
+    // Rewind: если индекс вышел за пределы и включён rewind — перематываем
+    if (this.options.rewind && !this.options.loop) {
+      if (index > endIndex) {
+        clampedIndex = 0
+      } else if (index < 0) {
+        clampedIndex = endIndex
+      }
+    }
 
     // Сохраняем текущий индекс ДО изменения
     const previousIndex = this.index.get()
@@ -413,6 +429,18 @@ export class Engine {
     
     // Проверяем, действительно ли индекс изменился
     const indexChanged = normalizedIndex !== previousIndex
+
+    engineLog('scrollTo', {
+      inputIndex: index,
+      clampedIndex,
+      normalizedIndex,
+      previousIndex,
+      indexChanged,
+      instant,
+      loop: this.options.loop,
+      endIndex,
+      stack: new Error().stack?.split('\n').slice(2, 6).join(' <- ')
+    })
 
     let targetPosition = this.getScrollPositionForIndex(normalizedIndex)
 
@@ -471,8 +499,11 @@ export class Engine {
           this.tvist.emit('scroll')
         },
         () => {
+          // transitionEnd эмитим ВСЕГДА по завершении анимации,
+          // чтобы модули (AutoplayModule и др.) могли корректно реагировать
+          this.tvist.emit('transitionEnd', normalizedIndex)
+
           if (indexChanged) {
-            this.tvist.emit('transitionEnd', normalizedIndex)
             this.tvist.emit('slideChanged', normalizedIndex)
             this.emitReachEdge(normalizedIndex, endIndex)
           }
@@ -717,7 +748,7 @@ export class Engine {
    * Проверить, можно ли листать вперёд
    */
   canScrollNext(): boolean {
-    if (this.options.loop) return true
+    if (this.options.loop || this.options.rewind) return true
     if (this.isLocked) return false
     
     // В режиме навигации лимит - это последний слайд
@@ -732,7 +763,7 @@ export class Engine {
    * Проверить, можно ли листать назад
    */
   canScrollPrev(): boolean {
-    if (this.options.loop) return true
+    if (this.options.loop || this.options.rewind) return true
     if (this.isLocked) return false
     return this.index.get() > 0
   }

@@ -99,28 +99,32 @@ export class AutoplayModule extends Module {
    * Настройка событий
    */
   private setupEvents(): void {
-    // Пауза при hover
     if (this.options.pauseOnHover) {
       this.attachHoverEvents()
     }
 
-    // Пауза при взаимодействии
-    if (this.options.pauseOnInteraction) {
-      this.on('dragStart', () => {
-        if (this.options.disableOnInteraction) {
-          this.stop()
-          this.stopped = true
-        } else {
-          this.pause()
-        }
-      })
-
-      this.on('dragEnd', () => {
-        if (!this.options.disableOnInteraction && !this.stopped) {
-          this.resume()
-        }
-      })
-    }
+    // Всегда ставим на паузу при драге (не только при pauseOnInteraction),
+    // иначе таймер может вызвать next() во время/сразу после драга (rewind к 0)
+    // и перебить snap к нужному слайду — пагинация тогда расходится с кадром
+    this.on('dragStart', () => {
+      if (this.options.disableOnInteraction) {
+        this.stop()
+        this.stopped = true
+      } else {
+        this.pause()
+      }
+    })
+    
+    // ВАЖНО: resume() вызываем НЕ на dragEnd, а на transitionEnd.
+    // Причина: dragEnd срабатывает ДО завершения snap-анимации.
+    // Если вызвать resume() сразу, setInterval начнёт отсчёт,
+    // и next() может сработать во время или сразу после snap,
+    // что приводит к багу с пагинацией (activeBullet != activeIndex).
+    this.on('transitionEnd', () => {
+      if (!this.options.disableOnInteraction && !this.stopped && this.paused) {
+        this.resume()
+      }
+    })
   }
 
   /**
@@ -177,10 +181,19 @@ export class AutoplayModule extends Module {
 
   /**
    * Пауза autoplay
+   * Очищаем таймер, чтобы callback не сработал во время паузы
    */
   pause(): void {
+    console.log('[Autoplay] pause called', { paused: this.paused, timer: this.timer })
     if (!this.paused) {
       this.paused = true
+      // Очищаем таймер — иначе callback может сработать между pause() и resume()
+      // и вызвать next() сразу после resume() (баг с пагинацией после драга)
+      if (this.timer !== null) {
+        console.log('[Autoplay] clearing timer in pause()')
+        window.clearInterval(this.timer)
+        this.timer = null
+      }
       this.emit('autoplayPause')
     }
   }
@@ -190,6 +203,7 @@ export class AutoplayModule extends Module {
    * Перезапускает таймер, чтобы избежать немедленного автоперелистывания
    */
   resume(): void {
+    console.log('[Autoplay] resume called', { paused: this.paused, stopped: this.stopped, timer: this.timer })
     if (this.paused && !this.stopped) {
       this.paused = false
       // Перезапускаем таймер, чтобы отсчёт начался заново

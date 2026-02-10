@@ -17,6 +17,13 @@ import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
+const DRAG_DEBUG = true
+const dragLog = (...args: unknown[]) => {
+  if (DRAG_DEBUG) {
+    console.warn('[Drag]', ...args)
+  }
+}
+
 interface DragPoint {
   x: number
   y: number
@@ -86,10 +93,15 @@ export class DragModule extends Module {
   }
 
   private onLoopFix = (): void => {
-    // После loopFix обновляем стартовую позицию, если идёт драг
-    // (loopFix во время драга вызывается только в обычном режиме, не marquee)
     if (this.isDragging) {
+      const before = this.startPosition
       this.startPosition = this.tvist.engine.location.get()
+      dragLog('onLoopFix (during drag)', {
+        activeIndex: this.tvist.engine.index.get(),
+        realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
+        startPositionBefore: before,
+        startPositionAfter: this.startPosition
+      })
     }
   }
 
@@ -258,6 +270,15 @@ export class DragModule extends Module {
       this.animationTarget = this.tvist.engine.activeIndex
     }
 
+    dragLog('pointerDown', {
+      activeIndex: this.tvist.engine.index.get(),
+      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
+      location: this.tvist.engine.location.get(),
+      wasAnimating: this.wasAnimating,
+      animationTarget: this.animationTarget,
+      loop: this.options.loop
+    })
+
     // Останавливаем активную анимацию если была
     this.stopMomentum()
     this.tvist.engine.animator.stop()
@@ -316,31 +337,41 @@ export class DragModule extends Module {
               const delta = isHorizontal ? deltaX : deltaY
               const direction = delta > 0 ? 'prev' : 'next'
               
-              // === DEBUG ===
-              // Передаём конкретное direction — loopFix подготовит слайды
-              // в этом направлении. coverageFix добавит слайды в противоположном
-              // направлении если пользователь сменит направление (но с cooldown).
+              dragLog('firstMove loopFix (before)', {
+                direction,
+                activeIndex: this.tvist.engine.index.get(),
+                realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
+                location: this.tvist.engine.location.get()
+              })
+              
               loopModule.fix({ direction })
               this.isFirstMove = false
               
               // Для обычного режима: обновляем startPosition
               this.startPosition = this.tvist.engine.location.get()
-              // Текущая позиция курсора становится новой стартовой точкой
               this.startX = point.x
               this.startY = point.y
-              
               this.startIndex = this.tvist.engine.index.get()
-              
-              // Cooldown: пропускаем следующие N pointermove для coverageFix
               this.coverageFixCooldown = 5
+              
+              dragLog('firstMove loopFix (after)', {
+                activeIndex: this.tvist.engine.index.get(),
+                realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
+                startPosition: this.startPosition,
+                startIndex: this.startIndex
+              })
             }
           }
         }
         
-        // Инициализируем базовое событие
         this.baseEvent = { x: point.x, y: point.y, time: now }
         this.lastMoveTime = now
-        // Emit события
+        dragLog('dragStart', {
+          activeIndex: this.tvist.engine.index.get(),
+          realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
+          startIndex: this.startIndex,
+          startPosition: this.startPosition
+        })
         this.emit('dragStart', e)
         // Добавляем класс dragging (отключает transition)
         this.tvist.root.classList.add(TVIST_CLASSES.dragging)
@@ -459,13 +490,17 @@ export class DragModule extends Module {
         }
       }
 
-      // Вычисляем velocity
       const velocity = this.calculateVelocity()
 
-      // Emit события
+      dragLog('dragEnd', {
+        activeIndex: this.tvist.engine.index.get(),
+        realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
+        location: this.tvist.engine.location.get(),
+        willSnap: !(this.options.marquee !== false && this.options.marquee !== undefined),
+        dragMode: this.options.drag
+      })
       this.emit('dragEnd', e)
 
-      // Проверяем активность marquee
       const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
       
       if (isMarqueeActive) {
@@ -624,19 +659,21 @@ export class DragModule extends Module {
     let fixed = false
 
     if (dragDelta > 0 && vpStart < contentStart + buffer) {
-      // Drag вправо → viewport уходит влево → подставляем слайды перед первым
+      dragLog('checkContentCoverageAndFix PREV', {
+        dragDelta,
+        activeIndex: this.tvist.engine.index.get(),
+        realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined
+      })
       loopModule.fix({ direction: 'prev', activeSlideIndex: 0 })
       fixed = true
     } else if (dragDelta < 0 && vpEnd > contentEnd - buffer) {
-      
-      // Вычисляем activeSlideIndex из фактической позиции viewport.
-      // Используем слайд, ближайший к ЛЕВОМУ краю viewport — он виден пользователю
-      // и должен остаться в той же экранной позиции после loopFix.
-      // Если передать lastIdx, loopFix может переместить слишком много слайдов
-      // (например, 3 из 4), и коррекция позиции создаст пустоту на другом краю.
       const coverageActiveIdx = this.findSlideNearViewportEdge(vpStart, slides)
-
-      // Drag влево → viewport уходит вправо → подставляем слайды после последнего
+      dragLog('checkContentCoverageAndFix NEXT', {
+        dragDelta,
+        coverageActiveIdx,
+        activeIndex: this.tvist.engine.index.get(),
+        realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined
+      })
       loopModule.fix({ direction: 'next', activeSlideIndex: coverageActiveIdx })
       fixed = true
     }
@@ -909,15 +946,14 @@ export class DragModule extends Module {
       }
     }
     
-    if (this.options.debug) {
-      console.warn('[DragModule] snapToNearestSlide:', {
-        currentPosition,
-        nearestIndex,
-        minDistance
-      })
-    }
+    dragLog('snapToNearestSlide', {
+      currentPosition,
+      nearestIndex,
+      minDistance,
+      activeIndex: engine.index.get(),
+      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined
+    })
     
-    // Переходим к ближайшему слайду
     engine.scrollTo(nearestIndex)
   }
 
@@ -928,44 +964,42 @@ export class DragModule extends Module {
     const { engine } = this.tvist
     const startIndex = engine.activeIndex
     
-    // Размер слайда с gap
     const slideSize = engine.slideSizeValue
     const gap = this.options.gap ?? 0
     const slideWithGap = slideSize + gap
     
     if (slideWithGap === 0) {
+      dragLog('snapWithThreshold (no size)', { targetIndex: startIndex })
       engine.scrollTo(startIndex)
       return
     }
     
-    // Вычисляем ЧИСТОЕ расстояние drag (без модификаторов)
     const isHorizontal = this.options.direction !== 'vertical'
     const dragDistance = isHorizontal 
       ? this.currentX - this.startX 
       : this.currentY - this.startY
     
-    // Threshold = 20% от размера слайда (как в Embla)
-    // Или минимум 80px (как swipeThreshold в Glide)
     const threshold = Math.max(slideSize * 0.2, 80)
     
-    // Определяем целевой индекс
     let targetIndex: number
     
     if (Math.abs(dragDistance) < threshold) {
-      // Недостаточно сдвинули - возвращаемся к текущему
       targetIndex = startIndex
     } else {
-      // Достаточно сдвинули - переходим в направлении свайпа
       if (dragDistance > 0) {
-        // Свайп вправо = предыдущий слайд
         targetIndex = startIndex - 1
       } else {
-        // Свайп влево = следующий слайд
         targetIndex = startIndex + 1
       }
     }
 
-    // Snap через scrollTo
+    dragLog('snapWithThreshold', {
+      startIndex,
+      targetIndex,
+      dragDistance,
+      threshold,
+      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined
+    })
     engine.scrollTo(targetIndex)
   }
 
