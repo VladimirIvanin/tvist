@@ -274,9 +274,16 @@ export class DragModule extends Module {
       activeIndex: this.tvist.engine.index.get(),
       realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
       location: this.tvist.engine.location.get(),
+      startPosition: this.startPosition,
+      startIndex: this.startIndex,
       wasAnimating: this.wasAnimating,
       animationTarget: this.animationTarget,
-      loop: this.options.loop
+      loop: this.options.loop,
+      rewind: this.options.rewind,
+      autoplay: this.options.autoplay,
+      slidesCount: this.tvist.slides.length,
+      slideSize: this.tvist.engine.slideSizeValue,
+      expectedLocationForIndex3: this.tvist.engine.getScrollPositionForIndex(3)
     })
 
     // Останавливаем активную анимацию если была
@@ -496,8 +503,15 @@ export class DragModule extends Module {
         activeIndex: this.tvist.engine.index.get(),
         realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
         location: this.tvist.engine.location.get(),
+        startPosition: this.startPosition,
+        startIndex: this.startIndex,
+        currentX: this.currentX,
+        startX: this.startX,
+        dragDistance: this.currentX - this.startX,
         willSnap: !(this.options.marquee !== false && this.options.marquee !== undefined),
-        dragMode: this.options.drag
+        dragMode: this.options.drag,
+        loop: this.options.loop,
+        rewind: this.options.rewind
       })
       this.emit('dragEnd', e)
 
@@ -995,11 +1009,18 @@ export class DragModule extends Module {
 
     dragLog('snapWithThreshold', {
       startIndex,
+      startIndexFromEngine: this.startIndex,
       targetIndex,
       dragDistance,
+      currentLocation: engine.location.get(),
+      startPosition: this.startPosition,
       threshold,
-      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined
+      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
+      loop: this.options.loop,
+      rewind: this.options.rewind
     })
+    
+    dragLog('>>> CALLING engine.scrollTo', targetIndex)
     engine.scrollTo(targetIndex)
   }
 

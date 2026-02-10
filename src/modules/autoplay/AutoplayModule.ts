@@ -24,6 +24,11 @@ export class AutoplayModule extends Module {
   private mouseEnterHandler?: () => void
   private mouseLeaveHandler?: () => void
 
+  // Флаг для отслеживания состояния drag
+  private isDragging = false
+  // Таймаут для fallback resume после drag (если transitionEnd не сработает)
+  private dragEndTimeout: number | null = null
+
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
 
@@ -41,6 +46,7 @@ export class AutoplayModule extends Module {
 
   override destroy(): void {
     this.stop()
+    this.clearDragEndTimeout()
     this.detachHoverEvents()
   }
 
@@ -96,6 +102,31 @@ export class AutoplayModule extends Module {
   }
 
   /**
+   * Очистка таймаута fallback resume
+   */
+  private clearDragEndTimeout(): void {
+    if (this.dragEndTimeout !== null) {
+      window.clearTimeout(this.dragEndTimeout)
+      this.dragEndTimeout = null
+    }
+  }
+
+  /**
+   * Возобновление autoplay после drag
+   * Вызывается из transitionEnd или fallback timeout
+   */
+  private resumeAfterDrag(): void {
+    if (!this.isDragging) return
+    
+    this.isDragging = false
+    this.clearDragEndTimeout()
+    
+    if (!this.options.disableOnInteraction && !this.stopped && this.paused) {
+      this.resume()
+    }
+  }
+
+  /**
    * Настройка событий
    */
   private setupEvents(): void {
@@ -107,6 +138,9 @@ export class AutoplayModule extends Module {
     // иначе таймер может вызвать next() во время/сразу после драга (rewind к 0)
     // и перебить snap к нужному слайду — пагинация тогда расходится с кадром
     this.on('dragStart', () => {
+      this.isDragging = true
+      this.clearDragEndTimeout()
+      
       if (this.options.disableOnInteraction) {
         this.stop()
         this.stopped = true
@@ -115,12 +149,31 @@ export class AutoplayModule extends Module {
       }
     })
     
+    // dragEnd: запускаем fallback таймаут на случай если transitionEnd не сработает
+    // (например, если snap вернул на тот же слайд и indexChanged === false)
+    this.on('dragEnd', () => {
+      if (!this.isDragging) return
+      
+      const speed = this.options.speed ?? 300
+      // Fallback: resume через speed + буфер, если transitionEnd не сработает
+      this.dragEndTimeout = window.setTimeout(() => {
+        this.resumeAfterDrag()
+      }, speed + 100)
+    })
+    
     // ВАЖНО: resume() вызываем НЕ на dragEnd, а на transitionEnd.
     // Причина: dragEnd срабатывает ДО завершения snap-анимации.
     // Если вызвать resume() сразу, setInterval начнёт отсчёт,
     // и next() может сработать во время или сразу после snap,
     // что приводит к багу с пагинацией (activeBullet != activeIndex).
     this.on('transitionEnd', () => {
+      // Если был drag — resume через resumeAfterDrag
+      if (this.isDragging) {
+        this.resumeAfterDrag()
+        return
+      }
+      
+      // Для обычной навигации (не drag) — resume если на паузе
       if (!this.options.disableOnInteraction && !this.stopped && this.paused) {
         this.resume()
       }

@@ -488,27 +488,58 @@ export class Engine {
         this.tvist.emit('slideChange', normalizedIndex)
       }
 
-      this.animator.animate(
-        this.location.get(),
+      // Проверяем, нужна ли анимация для корректировки позиции
+      const currentLocation = this.location.get()
+      const positionDiff = Math.abs(currentLocation - targetPosition)
+      const needsAnimation = positionDiff > 0.5 // tolerance 0.5px
+      
+      engineLog('Position correction check', {
+        currentLocation,
         targetPosition,
-        speed,
-        (value) => {
-          this.location.set(value)
-          this.applyTransform()
-          this.emitProgress()
-          this.tvist.emit('scroll')
-        },
-        () => {
-          // transitionEnd эмитим ВСЕГДА по завершении анимации,
-          // чтобы модули (AutoplayModule и др.) могли корректно реагировать
-          this.tvist.emit('transitionEnd', normalizedIndex)
+        positionDiff,
+        needsAnimation,
+        indexChanged
+      })
+      
+      if (needsAnimation) {
+        // Запускаем анимацию для корректировки позиции
+        this.animator.animate(
+          currentLocation,
+          targetPosition,
+          speed,
+          (value) => {
+            this.location.set(value)
+            this.applyTransform()
+            this.emitProgress()
+            this.tvist.emit('scroll')
+          },
+          () => {
+            engineLog('Position correction completed', {
+              finalLocation: this.location.get(),
+              targetPosition,
+              normalizedIndex
+            })
+            
+            // transitionEnd эмитим ВСЕГДА по завершении анимации,
+            // чтобы модули (AutoplayModule и др.) могли корректно реагировать
+            this.tvist.emit('transitionEnd', normalizedIndex)
 
-          if (indexChanged) {
-            this.tvist.emit('slideChanged', normalizedIndex)
-            this.emitReachEdge(normalizedIndex, endIndex)
+            if (indexChanged) {
+              this.tvist.emit('slideChanged', normalizedIndex)
+              this.emitReachEdge(normalizedIndex, endIndex)
+            }
           }
+        )
+      } else {
+        // Позиция уже корректна, но эмитим transitionEnd для модулей
+        // (например, AutoplayModule ждет это событие для resume)
+        if (!indexChanged) {
+          // Используем microtask чтобы событие было асинхронным как после анимации
+          Promise.resolve().then(() => {
+            this.tvist.emit('transitionEnd', normalizedIndex)
+          })
         }
-      )
+      }
     }
   }
 
