@@ -33,6 +33,10 @@ export class DragModule extends Module {
   private startIndex = 0 // Индекс слайда при начале драга (для center mode)
   private currentX = 0 // Текущая позиция курсора
   private currentY = 0
+  
+  // Для восстановления анимации при коротком клике
+  private wasAnimating = false
+  private animationTarget: number | null = null
 
   // RAF для momentum
   private animationId: number | null = null
@@ -153,13 +157,14 @@ export class DragModule extends Module {
   private attachEvents(): void {
     const { root } = this.tvist
 
-    // Passive для touchstart (не блокируем скролл)
-    root.addEventListener('touchstart', this.onPointerDown, { passive: true })
-    root.addEventListener('mousedown', this.onPointerDown)
-
-    // PointerEvents для универсальности (если поддерживается)
+    // Используем Pointer Events если поддерживаются (они покрывают mouse и touch)
+    // Иначе используем отдельные обработчики для mouse и touch
     if ('PointerEvent' in window) {
       root.addEventListener('pointerdown', this.onPointerDown)
+    } else {
+      // Fallback для старых браузеров
+      root.addEventListener('touchstart', this.onPointerDown, { passive: true })
+      root.addEventListener('mousedown', this.onPointerDown)
     }
   }
 
@@ -169,11 +174,11 @@ export class DragModule extends Module {
   private detachEvents(): void {
     const { root } = this.tvist
 
-    root.removeEventListener('touchstart', this.onPointerDown)
-    root.removeEventListener('mousedown', this.onPointerDown)
-
     if ('PointerEvent' in window) {
       root.removeEventListener('pointerdown', this.onPointerDown)
+    } else {
+      root.removeEventListener('touchstart', this.onPointerDown)
+      root.removeEventListener('mousedown', this.onPointerDown)
     }
 
     this.removeDocumentEvents()
@@ -218,6 +223,13 @@ export class DragModule extends Module {
     this.isFirstMove = true
     this.lastDirection = null
 
+    // Запоминаем состояние анимации для возможного восстановления
+    this.wasAnimating = this.tvist.engine.animator.isAnimating()
+    if (this.wasAnimating) {
+      // Сохраняем целевой индекс анимации (activeIndex уже обновлен)
+      this.animationTarget = this.tvist.engine.activeIndex
+    }
+
     // Останавливаем активную анимацию если была
     this.stopMomentum()
     this.tvist.engine.animator.stop()
@@ -251,6 +263,10 @@ export class DragModule extends Module {
     if (!this.isDragging) {
       if (absDelta > this.MIN_DRAG_DISTANCE) {
         this.isDragging = true
+        
+        // Останавливаем активную анимацию только когда начинается реальный драг
+        this.stopMomentum()
+        this.tvist.engine.animator.stop()
         
         // КРИТИЧНО: вызываем loopFix ДО первого применения transform
         if (this.options.loop && this.isFirstMove && !this.loopFixed) {
@@ -399,6 +415,7 @@ export class DragModule extends Module {
   private onPointerUp = (e: TouchEvent | MouseEvent | PointerEvent): void => {
     if (!this.isPotentialDrag && !this.isDragging) return
 
+    const wasDragging = this.isDragging
     this.isPotentialDrag = false
 
     // Если был драг
@@ -438,7 +455,15 @@ export class DragModule extends Module {
       } else {
         this.snapToNearest(velocity)
       }
+    } else if (!wasDragging && this.wasAnimating && this.animationTarget !== null) {
+      // Если не было драга, но была анимация - возобновляем её
+      // Используем scrollTo без immediate чтобы продолжить анимацию
+      this.tvist.scrollTo(this.animationTarget, false)
     }
+    
+    // Сбрасываем флаги
+    this.wasAnimating = false
+    this.animationTarget = null
     
     // Удаляем listeners в любом случае
     this.removeDocumentEvents()

@@ -24,13 +24,30 @@ export interface TouchEventConfig {
 }
 
 /**
- * Создаёт MouseEvent с заданными координатами
+ * Создаёт MouseEvent или PointerEvent с заданными координатами
+ * Если PointerEvent поддерживается, создаёт PointerEvent (для совместимости с DragModule)
  */
 export function createMouseEvent(
   type: 'mousedown' | 'mousemove' | 'mouseup' | 'click',
   config: MouseEventConfig
-): MouseEvent {
+): MouseEvent | PointerEvent {
   const { clientX, clientY, button = 0, bubbles = true, cancelable = true } = config
+
+  // Если PointerEvent поддерживается, используем его
+  // (DragModule подписывается на pointerdown если PointerEvent доступен)
+  if ('PointerEvent' in window && type !== 'click') {
+    const pointerType = type.replace('mouse', 'pointer') as 'pointerdown' | 'pointermove' | 'pointerup'
+    return new PointerEvent(pointerType, {
+      clientX,
+      clientY,
+      button,
+      bubbles,
+      cancelable,
+      view: window,
+      pointerType: 'mouse',
+      isPrimary: true,
+    })
+  }
 
   return new MouseEvent(type, {
     clientX,
@@ -85,7 +102,7 @@ export interface DragSequenceConfig {
   deltaX: number
   deltaY?: number
   steps?: number
-  type?: 'mouse' | 'touch'
+  type?: 'mouse' | 'touch' | 'pointer'
 }
 
 /**
@@ -112,15 +129,25 @@ export async function simulateDrag(config: DragSequenceConfig): Promise<void> {
     type = 'mouse',
   } = config
 
-  const startEventType = type === 'mouse' ? 'mousedown' : 'touchstart'
-  const moveEventType = type === 'mouse' ? 'mousemove' : 'touchmove'
-  const endEventType = type === 'mouse' ? 'mouseup' : 'touchend'
-
   // Start
-  const startEvent =
-    type === 'mouse'
-      ? createMouseEvent('mousedown', { clientX: startX, clientY: startY })
-      : createTouchEvent('touchstart', { clientX: startX, clientY: startY })
+  let startEvent: Event
+  if (type === 'touch') {
+    // Для touch используем PointerEvent с pointerType: 'touch' если поддерживается
+    if ('PointerEvent' in window) {
+      startEvent = new PointerEvent('pointerdown', {
+        clientX: startX,
+        clientY: startY,
+        bubbles: true,
+        cancelable: true,
+        pointerType: 'touch',
+        isPrimary: true,
+      })
+    } else {
+      startEvent = createTouchEvent('touchstart', { clientX: startX, clientY: startY })
+    }
+  } else {
+    startEvent = createMouseEvent('mousedown', { clientX: startX, clientY: startY })
+  }
 
   element.dispatchEvent(startEvent)
 
@@ -134,10 +161,23 @@ export async function simulateDrag(config: DragSequenceConfig): Promise<void> {
     const currentX = startX + stepX * i
     const currentY = startY + stepY * i
 
-    const moveEvent =
-      type === 'mouse'
-        ? createMouseEvent('mousemove', { clientX: currentX, clientY: currentY })
-        : createTouchEvent('touchmove', { clientX: currentX, clientY: currentY })
+    let moveEvent: Event
+    if (type === 'touch') {
+      if ('PointerEvent' in window) {
+        moveEvent = new PointerEvent('pointermove', {
+          clientX: currentX,
+          clientY: currentY,
+          bubbles: true,
+          cancelable: true,
+          pointerType: 'touch',
+          isPrimary: true,
+        })
+      } else {
+        moveEvent = createTouchEvent('touchmove', { clientX: currentX, clientY: currentY })
+      }
+    } else {
+      moveEvent = createMouseEvent('mousemove', { clientX: currentX, clientY: currentY })
+    }
 
     document.dispatchEvent(moveEvent)
   }
@@ -146,10 +186,23 @@ export async function simulateDrag(config: DragSequenceConfig): Promise<void> {
   const endX = startX + deltaX
   const endY = startY + deltaY
 
-  const endEvent =
-    type === 'mouse'
-      ? createMouseEvent('mouseup', { clientX: endX, clientY: endY })
-      : createTouchEvent('touchend', { clientX: endX, clientY: endY })
+  let endEvent: Event
+  if (type === 'touch') {
+    if ('PointerEvent' in window) {
+      endEvent = new PointerEvent('pointerup', {
+        clientX: endX,
+        clientY: endY,
+        bubbles: true,
+        cancelable: true,
+        pointerType: 'touch',
+        isPrimary: true,
+      })
+    } else {
+      endEvent = createTouchEvent('touchend', { clientX: endX, clientY: endY })
+    }
+  } else {
+    endEvent = createMouseEvent('mouseup', { clientX: endX, clientY: endY })
+  }
 
   document.dispatchEvent(endEvent)
 }
@@ -165,6 +218,41 @@ export function simulateClick(element: HTMLElement, config?: Partial<MouseEventC
   })
 
   element.dispatchEvent(clickEvent)
+}
+
+/**
+ * Создает правильное событие для drag (PointerEvent если поддерживается, иначе MouseEvent)
+ * Используйте эту функцию вместо прямого создания MouseEvent в тестах
+ */
+export function createPointerOrMouseEvent(
+  type: 'down' | 'move' | 'up',
+  config: MouseEventConfig
+): Event {
+  const { clientX, clientY, button = 0, bubbles = true, cancelable = true } = config
+
+  if ('PointerEvent' in window) {
+    const eventType = `pointer${type}` as 'pointerdown' | 'pointermove' | 'pointerup'
+    return new PointerEvent(eventType, {
+      clientX,
+      clientY,
+      button,
+      bubbles,
+      cancelable,
+      view: window,
+      pointerType: 'mouse',
+      isPrimary: true,
+    })
+  }
+
+  const eventType = `mouse${type}` as 'mousedown' | 'mousemove' | 'mouseup'
+  return new MouseEvent(eventType, {
+    clientX,
+    clientY,
+    button,
+    bubbles,
+    cancelable,
+    view: window,
+  })
 }
 
 /**
