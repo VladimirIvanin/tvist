@@ -82,6 +82,7 @@ onUnmounted(() => {
   font-size: 48px;
   font-weight: bold;
   color: white;
+  user-select: none;
 }
 
 .tvist-v0__slide[data-tvist-slide-index="0"] { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
