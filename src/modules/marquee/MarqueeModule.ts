@@ -63,6 +63,9 @@ export class MarqueeModule extends Module {
       this.tvist.updateOptions({ loop: true })
     }
 
+    // Исправляем gap у последнего слайда
+    this.fixLastSlideGap()
+
     // Вычисляем общий размер
     this.calculateTotalSize()
 
@@ -136,6 +139,48 @@ export class MarqueeModule extends Module {
       if (this.shouldBeActive()) {
         this.detachHoverEvents()
         this.setupEvents()
+      }
+    }
+  }
+
+  /**
+   * Обработка обновления (вызывается из Engine)
+   */
+  override onUpdate(): void {
+    if (this.shouldBeActive()) {
+      this.fixLastSlideGap()
+      this.calculateTotalSize()
+    }
+  }
+
+  /**
+   * Исправляет отсутствующий gap у последнего слайда
+   * В режиме Marquee нам нужен gap после КАЖДОГО слайда для бесшовного цикла
+   */
+  private fixLastSlideGap(): void {
+    const gap = this.options.gap ?? 0
+    if (gap <= 0) return
+
+    const slides = this.tvist.slides
+    if (slides.length === 0) return
+
+    const isHorizontal = this.options.direction !== 'vertical'
+    
+    // Engine убирает margin у последнего слайда.
+    // Нам нужно, чтобы у ВСЕХ слайдов был margin, так как они зациклены.
+    // Мы просто находим последний слайд и принудительно ставим ему margin.
+    const lastSlide = slides[slides.length - 1]
+    if (!lastSlide) return
+
+    if (isHorizontal) {
+      // Проверяем стиль и добавляем, если нет
+      // Engine ставит margin: '' для последнего слайда
+      if (!lastSlide.style.marginRight) {
+        lastSlide.style.marginRight = `${gap}px`
+      }
+    } else {
+      if (!lastSlide.style.marginBottom) {
+        lastSlide.style.marginBottom = `${gap}px`
       }
     }
   }
