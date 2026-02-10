@@ -87,6 +87,20 @@ export class DragModule extends Module {
   private onLoopFix = (): void => {
     // После loopFix обновляем стартовую позицию, если идёт драг
     if (this.isDragging) {
+      const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
+      
+      if (isMarqueeActive) {
+        // В режиме marquee нужно обновить и startMarqueePosition
+        const marqueeModule = this.tvist.getModule('marquee') as {
+          getCurrentPosition?: () => number
+        }
+        if (marqueeModule?.getCurrentPosition) {
+          // Обновляем startMarqueePosition на текущую позицию marquee
+          // это компенсирует перестановку слайдов
+          this.startMarqueePosition = marqueeModule.getCurrentPosition()
+        }
+      }
+      
       this.startPosition = this.tvist.engine.location.get()
     }
   }
@@ -301,8 +315,44 @@ export class DragModule extends Module {
             loopModule.fix({ direction })
             this.isFirstMove = false
             this.loopFixed = true // Предотвращаем повторный вызов для этого направления
-            // КРИТИЧНО: обновляем startPosition и startIndex после loopFix
-            this.startPosition = this.tvist.engine.location.get()
+            
+            // КРИТИЧНО: после loopFix нужно полностью пересчитать стартовые координаты
+            // Новая логика: делаем текущую позицию новой стартовой точкой
+            // чтобы следующее движение начиналось с корректной базы
+            const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
+            
+            if (isMarqueeActive) {
+              // Для marquee: синхронизируем marquee position с engine location
+              const marqueeModule = this.tvist.getModule('marquee') as {
+                getCurrentPosition?: () => number
+                setCurrentPosition?: (position: number) => void
+              }
+              
+              // КРИТИЧНО: после loopFix нужно синхронизировать marquee.currentPosition
+              // с новым engine.location чтобы transform был корректным
+              const newLocation = this.tvist.engine.location.get()
+              if (marqueeModule?.setCurrentPosition) {
+                // marquee использует положительное значение currentPosition
+                // engine.location - это transform offset (отрицательный)
+                marqueeModule.setCurrentPosition(-newLocation)
+              }
+              
+              // Обновляем startMarqueePosition на новое значение
+              if (marqueeModule?.getCurrentPosition) {
+                this.startMarqueePosition = marqueeModule.getCurrentPosition()
+              }
+              
+              // Текущая позиция курсора становится новой стартовой точкой
+              this.startX = point.x
+              this.startY = point.y
+            } else {
+              // Для обычного режима: обновляем startPosition
+              this.startPosition = this.tvist.engine.location.get()
+              // Текущая позиция курсора становится новой стартовой точкой
+              this.startX = point.x
+              this.startY = point.y
+            }
+            
             this.startIndex = this.tvist.engine.index.get()
           }
         }
@@ -331,8 +381,36 @@ export class DragModule extends Module {
       }
       if (loopModule?.fix) {
         loopModule.fix({ direction: currentDirection })
-        // КРИТИЧНО: обновляем startPosition и startIndex после loopFix
-        this.startPosition = this.tvist.engine.location.get()
+        
+        // КРИТИЧНО: после loopFix делаем текущую позицию новой стартовой точкой
+        const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
+        
+        if (isMarqueeActive) {
+          // Для marquee: синхронизируем marquee position с engine location
+          const marqueeModule = this.tvist.getModule('marquee') as {
+            getCurrentPosition?: () => number
+            setCurrentPosition?: (position: number) => void
+          }
+          
+          const newLocation = this.tvist.engine.location.get()
+          if (marqueeModule?.setCurrentPosition) {
+            marqueeModule.setCurrentPosition(-newLocation)
+          }
+          
+          if (marqueeModule?.getCurrentPosition) {
+            this.startMarqueePosition = marqueeModule.getCurrentPosition()
+          }
+          
+          // Текущая позиция курсора - новая стартовая точка
+          this.startX = point.x
+          this.startY = point.y
+        } else {
+          // Для обычного режима
+          this.startPosition = this.tvist.engine.location.get()
+          this.startX = point.x
+          this.startY = point.y
+        }
+        
         this.startIndex = this.tvist.engine.index.get()
       }
     }
@@ -349,11 +427,16 @@ export class DragModule extends Module {
     const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
     
     if (isMarqueeActive) {
-      // При marquee: учитываем начальную позицию marquee аналогично center mode
-      // marquee применяет transform как translate3d(-currentPosition, 0, 0)
-      // поэтому для корректного расчета используем отрицательное значение
-      const marqueeOffset = -this.startMarqueePosition
-      newPosition = marqueeOffset + distance
+      // При marquee с loop: используем обычную логику startPosition + distance
+      // startPosition уже корректируется в onLoopFix после перестановки слайдов
+      if (this.options.loop) {
+        newPosition = this.startPosition + distance
+      } else {
+        // При marquee без loop: учитываем начальную позицию marquee
+        // marquee применяет transform как translate3d(-currentPosition, 0, 0)
+        const marqueeOffset = -this.startMarqueePosition
+        newPosition = marqueeOffset + distance
+      }
       
       // В marquee с loop режимом не применяем rubberband
       if (this.options.rubberband !== false && !this.options.loop) {
@@ -384,8 +467,9 @@ export class DragModule extends Module {
     // Применяем transform напрямую (без пересчёта размеров)
     this.tvist.engine.applyTransformPublic()
 
-    // Проверяем достижение границ для loopFix
-    if (this.options.loop && !this.loopFixed) {
+    // Проверяем достижение границ для loopFix (только для обычного режима, не marquee)
+    // В marquee режиме логика loop интегрирована в сам MarqueeModule
+    if (this.options.loop && !isMarqueeActive && !this.loopFixed) {
       const loopModule = this.tvist.getModule('loop') as { 
         fix?: (params: { direction?: 'next' | 'prev'; setTranslate?: boolean; activeSlideIndex?: number }) => void 
       }
@@ -490,12 +574,24 @@ export class DragModule extends Module {
       
       if (isMarqueeActive) {
         // Для marquee режима не применяем snap, просто возобновляем marquee
-        // Обновляем позицию marquee на основе финальной позиции engine
-        // Используем отрицательное значение location так как marquee применяет -currentPosition
-        const finalPosition = this.tvist.engine.location.get()
-        if (marqueeModule?.setCurrentPosition) {
-          marqueeModule.setCurrentPosition(-finalPosition)
+        if (this.options.loop) {
+          // При loop: синхронизируем позицию marquee с engine.location
+          // engine.location уже корректный после loopFix
+          const finalPosition = this.tvist.engine.location.get()
+          if (marqueeModule?.setCurrentPosition) {
+            // Marquee использует положительное значение currentPosition
+            // а engine.location - это transform offset (может быть отрицательным)
+            // Поэтому используем отрицательное значение
+            marqueeModule.setCurrentPosition(-finalPosition)
+          }
+        } else {
+          // При отсутствии loop: обновляем позицию marquee на основе финальной позиции engine
+          const finalPosition = this.tvist.engine.location.get()
+          if (marqueeModule?.setCurrentPosition) {
+            marqueeModule.setCurrentPosition(-finalPosition)
+          }
         }
+        
         if (marqueeModule?.resume) {
           marqueeModule.resume()
         }
