@@ -652,7 +652,18 @@ export class DragModule extends Module {
     // После каждого loopFix startX сбрасывается к point.x, и на следующем кадре
     // dragDelta ≈ 0.4px с произвольным знаком, что вызывает ложные срабатывания.
     const MIN_COVERAGE_DRAG_DELTA = 10
-    if (Math.abs(dragDelta) < MIN_COVERAGE_DRAG_DELTA) return
+    if (Math.abs(dragDelta) < MIN_COVERAGE_DRAG_DELTA) {
+      // === DEBUG: пропуск из-за малого dragDelta ===
+      const needsFix = (dragDelta > 0 && vpStart < contentStart - 5) || (dragDelta < 0 && vpEnd > contentEnd + 5)
+      if (needsFix) {
+        console.log('%c[DRAG] coverageCheck SKIP (small delta)', 'color: orange', {
+          dragDelta: Math.round(dragDelta * 10) / 10,
+          vpStart: Math.round(vpStart), vpEnd: Math.round(vpEnd),
+          contentStart, contentEnd,
+        })
+      }
+      return
+    }
 
     // Frame-based cooldown: после любого loopFix (isFirstMove или coverageFix)
     // пропускаем N pointermove событий. При быстрых drag-ах в маленьких каруселях
@@ -661,6 +672,12 @@ export class DragModule extends Module {
     // даёт позиции стабилизироваться.
     if (this.coverageFixCooldown > 0) {
       this.coverageFixCooldown--
+      // === DEBUG: пропуск из-за cooldown ===
+      console.log('%c[DRAG] coverageCheck SKIP (cooldown)', 'color: orange', {
+        cooldown: this.coverageFixCooldown + 1,
+        vpStart: Math.round(vpStart), vpEnd: Math.round(vpEnd),
+        contentStart, contentEnd,
+      })
       return
     }
 
@@ -688,13 +705,20 @@ export class DragModule extends Module {
       // === DEBUG ===
       const _bef = { location: this.tvist.engine.location.get(), slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(',') }
       
+      // Вычисляем activeSlideIndex из фактической позиции viewport.
+      // Используем слайд, ближайший к ЛЕВОМУ краю viewport — он виден пользователю
+      // и должен остаться в той же экранной позиции после loopFix.
+      // Если передать lastIdx, loopFix может переместить слишком много слайдов
+      // (например, 3 из 4), и коррекция позиции создаст пустоту на другом краю.
+      const coverageActiveIdx = this.findSlideNearViewportEdge(vpStart, slides)
+
       // Drag влево → viewport уходит вправо → подставляем слайды после последнего
-      loopModule.fix({ direction: 'next', activeSlideIndex: lastIdx })
+      loopModule.fix({ direction: 'next', activeSlideIndex: coverageActiveIdx })
       fixed = true
 
       // === DEBUG ===
       console.log('%c[DRAG] coverageFix NEXT', 'color: purple; font-weight: bold', {
-        vpStart, vpEnd, contentStart, contentEnd, dragDelta,
+        vpStart, vpEnd, contentStart, contentEnd, dragDelta, coverageActiveIdx,
         before: _bef,
         after: { location: this.tvist.engine.location.get(), slidesOrder: this.tvist.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(','), realIndex: (this.tvist as any).realIndex },
       })
@@ -710,6 +734,36 @@ export class DragModule extends Module {
       // Cooldown: пропускаем следующие N pointermove для стабилизации
       this.coverageFixCooldown = 5
     }
+  }
+
+  /**
+   * Находит индекс слайда, ближайшего к левому краю viewport.
+   * Используется для определения корректного activeSlideIndex при coverageFix NEXT,
+   * чтобы loopFix переместил правильное количество слайдов и сделал верную коррекцию позиции.
+   * 
+   * Проблема: если передать lastIdx, loopFix перемещает слишком много слайдов 
+   * (например, 3 из 4) и коррекция создаёт пустоту на противоположном краю.
+   * Используя слайд у левого края viewport, мы перемещаем только слайды,
+   * которые уже за пределами видимости (слева от viewport).
+   */
+  private findSlideNearViewportEdge(
+    viewportLeft: number,
+    slides: HTMLElement[]
+  ): number {
+    // Находим последний слайд, чья позиция <= viewport left.
+    // Это слайд, видимый у левого края viewport.
+    let nearestIdx = 0
+    for (let i = 0; i < slides.length; i++) {
+      const pos = this.tvist.engine.getSlidePosition(i)
+      if (pos <= viewportLeft) {
+        nearestIdx = i
+      }
+    }
+
+    // Гарантируем минимум 1, чтобы порог append-проверки в loopFix
+    // (activeIdx + slidesPerView > slidesCount - loopedSlides) всегда срабатывал.
+    // При index=0 проверка может не пройти для маленьких каруселей.
+    return Math.max(nearestIdx, 1)
   }
 
   /**
