@@ -53,6 +53,19 @@
   transition: background 0.2s ease;
   cursor: grab;
   
+  // Увеличенная область захвата для мобильных устройств
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200%;
+    height: 200%;
+    min-width: 44px; // Минимальная область касания по WCAG
+    min-height: 44px;
+  }
+  
   &:hover {
     background: rgba(0, 0, 0, 0.6);
   }
