@@ -51,6 +51,7 @@ export class DragModule extends Module {
   // Флаги для loop
   private loopFixed = false // Флаг, что loopFix уже был вызван в этом жесте
   private isFirstMove = true // Флаг первого движения
+  private lastDirection: 'prev' | 'next' | null = null // Последнее направление движения
   
   // Для расчёта velocity
   private lastMoveTime = 0
@@ -207,6 +208,7 @@ export class DragModule extends Module {
     // Сбрасываем флаги для loop
     this.loopFixed = false
     this.isFirstMove = true
+    this.lastDirection = null
 
     // Останавливаем активную анимацию если была
     this.stopMomentum()
@@ -241,6 +243,28 @@ export class DragModule extends Module {
     if (!this.isDragging) {
       if (absDelta > this.MIN_DRAG_DISTANCE) {
         this.isDragging = true
+        
+        // КРИТИЧНО: вызываем loopFix ДО первого применения transform (как в Swiper)
+        if (this.options.loop && this.isFirstMove && !this.loopFixed) {
+          const loopModule = this.tvist.getModule('loop') as { 
+            fix?: (params: { direction?: 'next' | 'prev'; slideTo?: boolean; setTranslate?: boolean }) => void 
+          }
+          if (loopModule?.fix) {
+            // Определяем направление движения:
+            // Движение вправо (delta > 0) = движение к началу = 'prev'
+            // Движение влево (delta < 0) = движение к концу = 'next'
+            const delta = isHorizontal ? deltaX : deltaY
+            const direction = delta > 0 ? 'prev' : 'next'
+            
+            // Вызываем loopFix для подготовки слайдов
+            loopModule.fix({ direction })
+            this.isFirstMove = false
+            this.loopFixed = true // Предотвращаем повторный вызов для этого направления
+            // КРИТИЧНО: обновляем startPosition после loopFix
+            this.startPosition = this.tvist.engine.location.get()
+          }
+        }
+        
         // Инициализируем базовое событие
         this.baseEvent = { x: point.x, y: point.y, time: now }
         this.lastMoveTime = now
@@ -254,22 +278,22 @@ export class DragModule extends Module {
     }
 
     const delta = isHorizontal ? deltaX : deltaY
-
-    // Вызываем loopFix при первом движении (как в Swiper)
-    if (this.options.loop && this.isFirstMove && !this.loopFixed) {
-      const loopModule = this.tvist.getModule('loop') as { fix?: (params: { direction?: 'next' | 'prev' }) => void }
+    
+    // Определяем текущее направление движения
+    const currentDirection: 'prev' | 'next' = delta > 0 ? 'prev' : 'next'
+    
+    // Если направление изменилось, вызываем loopFix для нового направления
+    if (this.options.loop && this.lastDirection !== null && this.lastDirection !== currentDirection) {
+      const loopModule = this.tvist.getModule('loop') as { 
+        fix?: (params: { direction?: 'next' | 'prev' }) => void 
+      }
       if (loopModule?.fix) {
-        // ИСПРАВЛЕНО: движение вправо (delta > 0) = движение к началу = 'prev'
-        // движение влево (delta < 0) = движение к концу = 'next'
-        const direction = delta > 0 ? 'prev' : 'next'
-        loopModule.fix({ direction })
-        this.isFirstMove = false
-        this.loopFixed = true // Предотвращаем второй вызов loopFix в этом жесте
-        // КРИТИЧНО: обновляем startPosition сразу после loopFix
-        // т.к. loopFix изменил location для корректного отображения слайдов
+        loopModule.fix({ direction: currentDirection })
+        // КРИТИЧНО: обновляем startPosition после loopFix
         this.startPosition = this.tvist.engine.location.get()
       }
     }
+    this.lastDirection = currentDirection
 
     // Применяем dragSpeed
     const dragSpeed = this.options.dragSpeed ?? 1
