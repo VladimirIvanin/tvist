@@ -154,11 +154,8 @@ export class ScrollbarModule extends Module {
     this.on('scroll', this.handleScroll)
     this.on('slideChanged', this.handleSlideChanged)
 
-    // Автоскрытие
-    if (this.hide) {
-      this.tvist.root.addEventListener('mouseenter', this.showScrollbar)
-      this.tvist.root.addEventListener('mouseleave', this.startHideTimer)
-    }
+    // Автоскрытие (показать при наведении, скрыть по таймеру)
+    this.updateAutoHideListeners()
   }
 
   /**
@@ -461,6 +458,26 @@ export class ScrollbarModule extends Module {
   }
 
   /**
+   * Прикрепить/открепить обработчики автоскрытия в зависимости от this.hide
+   */
+  private updateAutoHideListeners(): void {
+    // Сначала всегда снимаем, чтобы не дублировать при повторном включении
+    this.tvist.root.removeEventListener('mouseenter', this.showScrollbar)
+    this.tvist.root.removeEventListener('mouseleave', this.startHideTimer)
+    if (this.hideTimer) {
+      window.clearTimeout(this.hideTimer)
+      this.hideTimer = undefined
+    }
+
+    if (this.hide) {
+      this.tvist.root.addEventListener('mouseenter', this.showScrollbar)
+      this.tvist.root.addEventListener('mouseleave', this.startHideTimer)
+    } else {
+      this.scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarHidden)
+    }
+  }
+
+  /**
    * Хук обновления опций
    */
   override onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
@@ -473,11 +490,12 @@ export class ScrollbarModule extends Module {
       this.hideDelay = scrollbarOptions.hideDelay ?? 1000
       this.draggable = scrollbarOptions.draggable ?? true
 
-      // Применяем класс hide
+      // Обновляем слушатели автоскрытия (добавить при hide: true, убрать при hide: false)
+      this.updateAutoHideListeners()
+
+      // Если автоскрытие включено — скроллбар изначально скрыт
       if (this.hide) {
         this.scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarHidden)
-      } else {
-        this.scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarHidden)
       }
 
       this.updateScrollbar()
@@ -505,10 +523,8 @@ export class ScrollbarModule extends Module {
     document.removeEventListener('touchmove', this.handleThumbTouchMove)
     document.removeEventListener('touchend', this.handleThumbTouchEnd)
 
-    if (this.hide) {
-      this.tvist.root.removeEventListener('mouseenter', this.showScrollbar)
-      this.tvist.root.removeEventListener('mouseleave', this.startHideTimer)
-    }
+    this.tvist.root.removeEventListener('mouseenter', this.showScrollbar)
+    this.tvist.root.removeEventListener('mouseleave', this.startHideTimer)
 
     // Удаляем DOM элементы (если не кастомный контейнер)
     if (!this.isCustomContainer && this.scrollbarEl) {
