@@ -381,6 +381,8 @@ export class MarqueeModule extends Module {
    * Пауза marquee
    */
   pause(): void {
+    if (!this.shouldBeActive()) return
+
     if (!this.paused) {
       this.paused = true
       // Синхронизируем engine.location с визуальной позицией marquee.
@@ -397,6 +399,8 @@ export class MarqueeModule extends Module {
    * Возобновление marquee
    */
   resume(): void {
+    if (!this.shouldBeActive()) return
+
     if (this.paused && !this.stopped) {
       // Синхронизируем currentPosition с engine.location
       // (после drag/snap engine.location мог измениться)
