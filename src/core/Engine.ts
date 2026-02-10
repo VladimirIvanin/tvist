@@ -535,7 +535,7 @@ export class Engine {
         // (например, AutoplayModule ждет это событие для resume)
         if (!indexChanged) {
           // Используем microtask чтобы событие было асинхронным как после анимации
-          Promise.resolve().then(() => {
+          void Promise.resolve().then(() => {
             this.tvist.emit('transitionEnd', normalizedIndex)
           })
         }
