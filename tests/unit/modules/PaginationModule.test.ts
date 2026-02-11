@@ -255,6 +255,459 @@ describe('PaginationModule', () => {
     })
   })
 
+  describe('Bullets limit', () => {
+    describe('Even strategy', () => {
+      it('should create limited bullets with even distribution (10 slides, limit 5)', () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 5,
+            strategy: 'even'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(5)
+        
+        // Каждая точка должна представлять 2 слайда (10/5=2)
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('1')
+        expect(bullets[4].getAttribute('data-group-start')).toBe('8')
+        expect(bullets[4].getAttribute('data-group-end')).toBe('9')
+      })
+
+      it('should handle remainder with center strategy (7 slides, limit 2)', () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 2,
+            strategy: 'even',
+            remainderStrategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(2)
+        
+        // 7/2=3 с остатком 1, центр получает остаток: [4, 3]
+        // При 2 точках центр - это первая точка (startOffset = floor((2-1)/2) = 0)
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('3')
+        expect(bullets[1].getAttribute('data-group-start')).toBe('4')
+        expect(bullets[1].getAttribute('data-group-end')).toBe('6')
+      })
+
+      it('should handle remainder with left strategy (7 slides, limit 2)', () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 2,
+            strategy: 'even',
+            remainderStrategy: 'left'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(2)
+        
+        // 7/2=3 с остатком 1, левая получает остаток: [4, 3]
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('3')
+        expect(bullets[1].getAttribute('data-group-start')).toBe('4')
+        expect(bullets[1].getAttribute('data-group-end')).toBe('6')
+      })
+
+      it('should handle remainder with center strategy (10 slides, limit 3)', () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 3,
+            strategy: 'even',
+            remainderStrategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(3)
+        
+        // 10/3=3 с остатком 1, центр получает остаток: [3, 4, 3]
+        // startOffset = floor((3-1)/2) = 1, центральная точка (индекс 1) получает остаток
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('2')
+        expect(bullets[1].getAttribute('data-group-start')).toBe('3')
+        expect(bullets[1].getAttribute('data-group-end')).toBe('6')
+        expect(bullets[2].getAttribute('data-group-start')).toBe('7')
+        expect(bullets[2].getAttribute('data-group-end')).toBe('9')
+      })
+
+      it('should handle remainder with right strategy (7 slides, limit 2)', () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 2,
+            strategy: 'even',
+            remainderStrategy: 'right'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(2)
+        
+        // 7/2=3 с остатком 1, правая получает остаток: [3, 4]
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('2')
+        expect(bullets[1].getAttribute('data-group-start')).toBe('3')
+        expect(bullets[1].getAttribute('data-group-end')).toBe('6')
+      })
+
+      it('should activate correct bullet based on slide index', async () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          speed: 0,
+          pagination: {
+            type: 'bullets',
+            limit: 5,
+            strategy: 'even'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        
+        // Изначально активна первая точка (slides 0-1)
+        expect(bullets[0].classList.contains('active')).toBe(true)
+        
+        // Переходим к слайду 2 - должна активироваться вторая точка (slides 2-3)
+        await new Promise<void>(resolve => {
+          slider.on('slideChange', () => resolve())
+          slider.scrollTo(2)
+        })
+        expect(bullets[0].classList.contains('active')).toBe(false)
+        expect(bullets[1].classList.contains('active')).toBe(true)
+
+        // Переходим к слайду 3 - все еще вторая точка
+        await new Promise<void>(resolve => {
+          slider.on('slideChange', () => resolve())
+          slider.scrollTo(3)
+        })
+        expect(bullets[1].classList.contains('active')).toBe(true)
+
+        // Переходим к слайду 4 - третья точка (slides 4-5)
+        await new Promise<void>(resolve => {
+          slider.on('slideChange', () => resolve())
+          slider.scrollTo(4)
+        })
+        expect(bullets[1].classList.contains('active')).toBe(false)
+        expect(bullets[2].classList.contains('active')).toBe(true)
+      })
+
+      it('should work with perPage > 1', () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 12 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 2,
+          pagination: {
+            type: 'bullets',
+            limit: 5,
+            strategy: 'even'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        // 12 слайдов, perPage=2 → 11 позиций (12-2+1=11)
+        // limit=5 → 5 точек
+        expect(bullets.length).toBe(5)
+      })
+    })
+
+    describe('Center strategy', () => {
+      it('should create limited bullets with center distribution (10 slides, limit 5)', () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 5,
+            strategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(5)
+        
+        // Первая точка - первый слайд
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('0')
+        
+        // Последняя точка - последний слайд
+        expect(bullets[4].getAttribute('data-group-start')).toBe('9')
+        expect(bullets[4].getAttribute('data-group-end')).toBe('9')
+      })
+
+      it('should handle center distribution (7 slides, limit 3)', () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 3,
+            strategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(3)
+        
+        // Первая точка - слайд 0
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('0')
+        
+        // Центральная точка - слайды 1-5 (5 слайдов)
+        expect(bullets[1].getAttribute('data-group-start')).toBe('1')
+        expect(bullets[1].getAttribute('data-group-end')).toBe('5')
+        
+        // Последняя точка - слайд 6
+        expect(bullets[2].getAttribute('data-group-start')).toBe('6')
+        expect(bullets[2].getAttribute('data-group-end')).toBe('6')
+      })
+
+      it('should activate correct bullet in center strategy', async () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          speed: 0,
+          pagination: {
+            type: 'bullets',
+            limit: 5,
+            strategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        
+        // Слайд 0 - первая точка
+        expect(bullets[0].classList.contains('active')).toBe(true)
+        
+        // Переходим к слайду 1 - должна активироваться вторая точка (центральная группа)
+        await new Promise<void>(resolve => {
+          slider.on('slideChange', () => resolve())
+          slider.scrollTo(1)
+        })
+        expect(bullets[0].classList.contains('active')).toBe(false)
+        expect(bullets[1].classList.contains('active')).toBe(true)
+
+        // Переходим к слайду 9 (последний) - последняя точка
+        await new Promise<void>(resolve => {
+          slider.on('slideChange', () => resolve())
+          slider.scrollTo(9)
+        })
+        expect(bullets[1].classList.contains('active')).toBe(false)
+        expect(bullets[4].classList.contains('active')).toBe(true)
+      })
+
+      it('should handle limit=2 with center strategy', () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 2,
+            strategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(2)
+        
+        // Первая точка - слайды 0-4
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('4')
+        
+        // Вторая точка - слайды 5-9
+        expect(bullets[1].getAttribute('data-group-start')).toBe('5')
+        expect(bullets[1].getAttribute('data-group-end')).toBe('9')
+      })
+
+      it('should handle limit=1 with center strategy', () => {
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 1,
+            strategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(1)
+        
+        // Одна точка - все слайды
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('9')
+      })
+    })
+
+    it('should not use limit when limit >= total slides', () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            ${Array.from({ length: 5 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+          </div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
+        </div>
+      `
+
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+        perPage: 1,
+        pagination: {
+          type: 'bullets',
+          limit: 10 // больше чем слайдов
+        }
+      })
+
+      const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+      // Должно быть 5 точек, не используя limit
+      expect(bullets.length).toBe(5)
+    })
+
+    it('should click bullet and navigate to group start', () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+          </div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
+        </div>
+      `
+
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+        perPage: 1,
+        speed: 0,
+        pagination: {
+          type: 'bullets',
+          limit: 5,
+          strategy: 'even'
+        }
+      })
+
+      const bullets = container.querySelectorAll<HTMLElement>(`.${TVIST_CLASSES.bullet}`)
+      
+      // Клик по третьей точке (slides 4-5) должен перейти к слайду 4
+      bullets[2].click()
+      expect(slider.activeIndex).toBe(4)
+
+      // Клик по последней точке (slides 8-9) должен перейти к слайду 8
+      bullets[4].click()
+      expect(slider.activeIndex).toBe(8)
+    })
+  })
+
   describe('EndIndex logic', () => {
     it('should not allow scrolling beyond endIndex when perPage > 1', async () => {
       container.innerHTML = `

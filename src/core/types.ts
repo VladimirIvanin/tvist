@@ -221,6 +221,29 @@ export interface TvistOptions {
     renderFraction?: (current: number, total: number) => string
     /** Функция рендеринга кастомной пагинации */
     renderCustom?: (current: number, total: number) => string
+    
+    // Лимит точек
+    /** 
+     * Максимальное количество видимых точек (только для type: 'bullets')
+     * Если не указано - показываются все точки
+     * @default undefined
+     */
+    limit?: number
+    /** 
+     * Стратегия распределения слайдов по точкам при использовании limit
+     * - 'even': равномерное распределение - каждая точка представляет равное количество слайдов
+     * - 'center': центральное распределение - крайние точки по 1 слайду, остальные группируются в центре
+     * @default 'even'
+     */
+    strategy?: 'even' | 'center'
+    /**
+     * Стратегия распределения остатка при равномерном делении (только для strategy: 'even')
+     * - 'left': остаток добавляется к левым точкам
+     * - 'center': остаток добавляется к центральным точкам
+     * - 'right': остаток добавляется к правым точкам
+     * @default 'center'
+     */
+    remainderStrategy?: 'left' | 'center' | 'right'
   }
   
   // Autoplay
