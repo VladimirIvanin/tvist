@@ -213,7 +213,6 @@ pagination: {
   margin: 0 auto 1.5rem;
   position: relative;
 }
-.nav-demo-slider .tvist-v1__container { overflow: hidden; }
 .nav-demo-slider .tvist-v1__slide {
   height: 120px;
   display: flex;
