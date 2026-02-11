@@ -488,7 +488,15 @@ export class AutoplayModule extends Module {
 
     this.stop() // Очищаем предыдущий таймер
     this.paused = false
-    this.run() // Запускаем рекурсивный цикл
+
+    // Если включен режим ожидания видео, проверяем текущий слайд сразу при старте
+    if (this.config?.waitForVideo) {
+      // Используем realIndex для loop режима, иначе activeIndex
+      const currentIndex = this.tvist.realIndex ?? this.tvist.activeIndex
+      this.handleSlideChangedForVideo(currentIndex)
+    } else {
+      this.run() // Запускаем рекурсивный цикл
+    }
 
     this.emit('autoplayStart')
   }
