@@ -8,33 +8,32 @@
 </head>
 <body>
   <div class="sandbox-container">
-    <h1>Tvist Sandbox - Grid Lock Test</h1>
+    <h1>Tvist Sandbox - Autoplay Test</h1>
     
-    <h2>Test 1: Grid 2x2 with 8 slides (должен скроллиться)</h2>
+    <div class="test-instructions">
+      <h3>Тест исправления бага с накоплением переключений</h3>
+      <p><strong>Как тестировать:</strong></p>
+      <ol>
+        <li>Запустите автоплей (он запускается автоматически с задержкой 2 сек)</li>
+        <li>Минимизируйте окно браузера на 10-15 секунд</li>
+        <li>Верните окно обратно</li>
+        <li><strong>Ожидаемое поведение:</strong> Слайдер должен плавно продолжить автоплей БЕЗ множественных быстрых переключений</li>
+        <li><strong>Старое поведение (баг):</strong> Происходила куча переключений за всё время отсутствия</li>
+      </ol>
+      <p>Счётчик переключений показывает сколько раз переключился слайд.</p>
+    </div>
+
     <div id="slider1" class="tvist-v1">
       <div class="tvist-v1__container">
-        <div class="tvist-v1__slide">1</div>
-        <div class="tvist-v1__slide">2</div>
-        <div class="tvist-v1__slide">3</div>
-        <div class="tvist-v1__slide">4</div>
-        <div class="tvist-v1__slide">5</div>
-        <div class="tvist-v1__slide">6</div>
-        <div class="tvist-v1__slide">7</div>
-        <div class="tvist-v1__slide">8</div>
+        <div class="tvist-v1__slide" style="background: #ff6b6b;">Слайд 1</div>
+        <div class="tvist-v1__slide" style="background: #4ecdc4;">Слайд 2</div>
+        <div class="tvist-v1__slide" style="background: #45b7d1;">Слайд 3</div>
+        <div class="tvist-v1__slide" style="background: #96ceb4;">Слайд 4</div>
+        <div class="tvist-v1__slide" style="background: #ffeaa7;">Слайд 5</div>
       </div>
     </div>
+    
     <div id="info1" class="info"></div>
-
-    <h2>Test 2: Grid 2x2 with 4 slides (должен быть locked)</h2>
-    <div id="slider2" class="tvist-v1">
-      <div class="tvist-v1__container">
-        <div class="tvist-v1__slide">1</div>
-        <div class="tvist-v1__slide">2</div>
-        <div class="tvist-v1__slide">3</div>
-        <div class="tvist-v1__slide">4</div>
-      </div>
-    </div>
-    <div id="info2" class="info"></div>
   </div>
 
   <script type="module" src="./script.ts"></script>

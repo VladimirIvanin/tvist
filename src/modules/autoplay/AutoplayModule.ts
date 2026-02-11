@@ -8,6 +8,11 @@
  * - Пауза при потере видимости вкладки (visibilitychange)
  * - Полная остановка при взаимодействии (опционально)
  * - Публичное API: start, stop, pause, resume
+ * 
+ * Использует рекурсивный setTimeout вместо setInterval:
+ * - setTimeout вызывается ПОСЛЕ завершения переключения слайда
+ * - Предотвращает накопление событий когда браузер неактивен
+ * - Более надежная работа с паузами и возобновлением
  */
 
 import { Module } from '../Module'
@@ -242,19 +247,29 @@ export class AutoplayModule extends Module {
   }
 
   /**
+   * Рекурсивная функция для автоплея
+   * Вызывается через setTimeout после каждого переключения
+   */
+  private run(): void {
+    if (this.paused || this.stopped) return
+
+    this.timer = window.setTimeout(() => {
+      if (!this.paused && !this.stopped) {
+        this.tvist.next()
+        this.run() // Рекурсивный вызов после переключения
+      }
+    }, this.delay)
+  }
+
+  /**
    * Старт autoplay
    */
   start(): void {
     if (this.stopped) return
 
-    this.stop() // Очищаем предыдущий timer
+    this.stop() // Очищаем предыдущий таймер
     this.paused = false
-
-    this.timer = window.setInterval(() => {
-      if (!this.paused && !this.stopped) {
-        this.tvist.next()
-      }
-    }, this.delay)
+    this.run() // Запускаем рекурсивный цикл
 
     this.emit('autoplayStart')
   }
@@ -264,7 +279,7 @@ export class AutoplayModule extends Module {
    */
   stop(): void {
     if (this.timer !== null) {
-      window.clearInterval(this.timer)
+      window.clearTimeout(this.timer)
       this.timer = null
     }
     this.emit('autoplayStop')
@@ -278,9 +293,8 @@ export class AutoplayModule extends Module {
     if (!this.paused) {
       this.paused = true
       // Очищаем таймер — иначе callback может сработать между pause() и resume()
-      // и вызвать next() сразу после resume() (баг с пагинацией после драга)
       if (this.timer !== null) {
-        window.clearInterval(this.timer)
+        window.clearTimeout(this.timer)
         this.timer = null
       }
       this.emit('autoplayPause')
@@ -289,7 +303,7 @@ export class AutoplayModule extends Module {
 
   /**
    * Возобновление autoplay
-   * Перезапускает таймер, чтобы избежать немедленного автоперелистывания
+   * Перезапускает таймер с полной задержкой
    */
   resume(): void {
     // Не возобновляем, если вкладка скрыта
@@ -299,9 +313,9 @@ export class AutoplayModule extends Module {
     
     if (this.paused && !this.stopped) {
       this.paused = false
-      // Перезапускаем таймер, чтобы отсчёт начался заново
-      // Это предотвращает ситуацию, когда после драга сразу срабатывает автоплей
-      this.start()
+      // Перезапускаем с полной задержкой
+      // Это предотвращает немедленное переключение после паузы
+      this.run()
       this.emit('autoplayResume')
     }
   }

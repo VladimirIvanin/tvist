@@ -1,57 +1,90 @@
 import Tvist from '../src/index'
 
-function updateInfo(slider: Tvist, infoId: string) {
-  const info = document.getElementById(infoId)
+let switchCounter = 0
+let startTime = Date.now()
+
+function updateInfo(slider: Tvist) {
+  const info = document.getElementById('info1')
   if (!info) return
   
-  const isLocked = slider.engine.isLocked
+  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
+  const autoplay = slider.autoplay
+  
   info.innerHTML = `
-    <strong>Status:</strong> ${isLocked ? '🔒 LOCKED (drag disabled)' : '🔓 UNLOCKED (drag enabled)'}<br>
-    <strong>Can scroll:</strong> prev=${slider.engine.canScrollPrev()}, next=${slider.engine.canScrollNext()}<br>
-    <strong>Slides:</strong> ${slider.engine.slideCount}<br>
-    <strong>Current index:</strong> ${slider.engine.activeIndex}
+    <strong>Текущий слайд:</strong> ${slider.activeIndex + 1} из ${slider.engine.slideCount}<br>
+    <strong>Счётчик переключений:</strong> ${switchCounter}<br>
+    <strong>Время работы:</strong> ${elapsed}с<br>
+    <strong>Autoplay:</strong> ${autoplay.isRunning() ? '▶️ Running' : autoplay.isPaused() ? '⏸️ Paused' : '⏹️ Stopped'}<br>
+    <strong>Видимость страницы:</strong> ${document.visibilityState === 'visible' ? '👁️ Visible' : '🙈 Hidden'}
   `
   info.style.cssText = `
-    padding: 10px;
-    margin: 10px 0 20px;
-    background: ${isLocked ? '#ffebee' : '#e8f5e9'};
-    border: 2px solid ${isLocked ? '#c62828' : '#2e7d32'};
-    border-radius: 4px;
-    font-size: 14px;
+    padding: 15px;
+    margin: 20px 0;
+    background: #e3f2fd;
+    border: 2px solid #1976d2;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: monospace;
   `
 }
 
-// Test 1: Grid 2x2 with 8 slides
+// Autoplay test slider
 const slider1 = new Tvist('#slider1', {
-  grid: {
-    rows: 2,
-    cols: 2,
-    gap: 10
+  autoplay: 2000, // 2 секунды
+  pauseOnHover: true,
+  loop: true,
+  arrows: true,
+  pagination: {
+    enabled: true,
+    clickable: true
   }
 })
 
-// Test 2: Grid 2x2 with 4 slides
-const slider2 = new Tvist('#slider2', {
-  grid: {
-    rows: 2,
-    cols: 2,
-    gap: 10
-  }
+// Обновляем информацию при каждом переключении
+slider1.on('slideChanged', () => {
+  switchCounter++
+  updateInfo(slider1)
+  console.log(`Slide changed to ${slider1.activeIndex}, counter: ${switchCounter}`)
 })
 
-// Update info after init
+// Обновляем при событиях autoplay
+slider1.on('autoplayStart', () => {
+  console.log('Autoplay started')
+  updateInfo(slider1)
+})
+
+slider1.on('autoplayPause', () => {
+  console.log('Autoplay paused')
+  updateInfo(slider1)
+})
+
+slider1.on('autoplayResume', () => {
+  console.log('Autoplay resumed')
+  updateInfo(slider1)
+})
+
+// Отслеживаем видимость страницы
+document.addEventListener('visibilitychange', () => {
+  console.log('Visibility changed:', document.visibilityState)
+  updateInfo(slider1)
+})
+
+// Initial update
 setTimeout(() => {
-  updateInfo(slider1, 'info1')
-  updateInfo(slider2, 'info2')
+  updateInfo(slider1)
 }, 100)
 
-// Update on events
-slider1.on('lock', () => updateInfo(slider1, 'info1'))
-slider1.on('unlock', () => updateInfo(slider1, 'info1'))
-slider1.on('slideChanged', () => updateInfo(slider1, 'info1'))
+// Update every second to show elapsed time
+setInterval(() => {
+  updateInfo(slider1)
+}, 1000)
 
-slider2.on('lock', () => updateInfo(slider2, 'info2'))
-slider2.on('unlock', () => updateInfo(slider2, 'info2'))
-slider2.on('slideChanged', () => updateInfo(slider2, 'info2'))
+console.log('Autoplay test initialized!', { slider1 })
 
-console.log('Sandbox initialized!', { slider1, slider2 })
+// Expose for debugging
+;(window as any).slider = slider1
+;(window as any).resetCounter = () => {
+  switchCounter = 0
+  startTime = Date.now()
+  updateInfo(slider1)
+}
