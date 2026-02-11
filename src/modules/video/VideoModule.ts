@@ -35,8 +35,6 @@ interface VideoEntry {
   video: HTMLVideoElement
   /** Подключённые обработчики для очистки */
   handlers: Map<string, EventListener>
-  /** Отладочные обработчики (номера событий для iOS) — очищаются в cleanup */
-  debugHandlers?: Array<{ event: string; handler: EventListener }>
 }
 
 /** Запись об iframe на слайде */
@@ -415,35 +413,6 @@ export class VideoModule extends Module {
         this.emit('videoProgress', payload)
       }
     })
-
-    // Отладка на iOS: какое событие сработало (номер в консоль)
-    // 1=loadstart, 2=progress, 3=loadedmetadata, 4=loadeddata, 5=canplay, 6=canplaythrough,
-    // 7=playing, 8=waiting, 9=seeking, 10=seeked, 11=ended, 12=error, 13=stalled, 14=suspend, 15=abort, 16=emptied, 17=durationchange
-    const debugEvents: [string, number][] = [
-      ['loadstart', 1],
-      ['progress', 2],
-      ['loadedmetadata', 3],
-      ['loadeddata', 4],
-      ['canplay', 5],
-      ['canplaythrough', 6],
-      ['playing', 7],
-      ['waiting', 8],
-      ['seeking', 9],
-      ['seeked', 10],
-      ['ended', 11],
-      ['error', 12],
-      ['stalled', 13],
-      ['suspend', 14],
-      ['abort', 15],
-      ['emptied', 16],
-      ['durationchange', 17],
-    ]
-    entry.debugHandlers = []
-    debugEvents.forEach(([ev, num]) => {
-      const handler: EventListener = () => console.log(`[Tvist video] ${num} ${ev}`)
-      video.addEventListener(ev, handler)
-      entry.debugHandlers!.push({ event: ev, handler })
-    })
   }
 
   /**
@@ -455,10 +424,6 @@ export class VideoModule extends Module {
         entry.video.removeEventListener(event, handler)
       })
       entry.handlers.clear()
-      entry.debugHandlers?.forEach(({ event, handler }) => {
-        entry.video.removeEventListener(event, handler)
-      })
-      entry.debugHandlers = undefined
     })
   }
 
@@ -533,53 +498,38 @@ export class VideoModule extends Module {
    * - Race condition (отмена предыдущего play)
    */
   private safePlay(video: HTMLVideoElement): void {
-    // Применяем mute состояние
     video.muted = this.muted
-    console.log(1)
 
     const doPlay = () => {
       const playPromise = video.play()
       this.activePlayPromise = playPromise
-      console.log(2)
 
       playPromise
         .then(() => {
-          console.log(3)
           if (this.activePlayPromise === playPromise) {
             this.activePlayPromise = null
           }
         })
         .catch((error: DOMException) => {
-          console.log(4)
           if (this.activePlayPromise === playPromise) {
             this.activePlayPromise = null
           }
-          // AbortError — нормальная ситуация при быстром pause() после play()
           if (error.name !== 'AbortError') {
             console.warn('Tvist VideoModule: playback failed:', error.message)
           }
         })
     }
 
-    // Проверяем readyState
     if (video.readyState >= 2) {
-      // HAVE_CURRENT_DATA — можно играть сразу
-      console.log(5)
       doPlay()
     } else {
-      // Видео на других слайдах могло не начать загрузку — принудительно запускаем load(), иначе события не придут.
-      console.log(6)
       video.load()
-      const onReady = (e: Event) => {
-        console.log(7, e.type)
+      const onReady = () => {
         video.removeEventListener('canplay', onReady)
         video.removeEventListener('canplaythrough', onReady)
         video.removeEventListener('loadeddata', onReady)
         video.removeEventListener('loadedmetadata', onReady)
-        requestAnimationFrame(() => {
-          console.log(8)
-          doPlay()
-        })
+        requestAnimationFrame(doPlay)
       }
       video.addEventListener('canplay', onReady)
       video.addEventListener('canplaythrough', onReady)
