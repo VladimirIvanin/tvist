@@ -301,7 +301,7 @@ pagination: {
 .pagination-demo-slider :deep(.tvist-v1__bullet::after) {
   display: none !important;
 }
-.pagination-demo-slider :deep(.tvist-v1__bullet.active) {
+.pagination-demo-slider :deep(.tvist-v1__bullet--active) {
   background: #fff;
   width: 24px;
   border-radius: 4px;
@@ -433,7 +433,7 @@ pagination: {
 | `type` | `'bullets' \| 'fraction' \| 'progress' \| 'custom'` | Тип пагинации |
 | `clickable` | `boolean` | Клики по буллетам переключают слайд (по умолчанию `true` для bullets) |
 | `bulletClass` | `string` | CSS-класс буллета |
-| `bulletActiveClass` | `string` | CSS-класс активного буллета (по умолчанию `'active'`) |
+| `bulletActiveClass` | `string` | CSS-класс активного буллета (по умолчанию `'tvist-v1__bullet--active'`, BEM) |
 | `container` | `string \| HTMLElement` | Селектор или элемент-контейнер для пагинации |
 | `renderBullet` | `(index, className) => string` | Кастомный HTML буллета |
 | `renderFraction` | `(current, total) => string` | Кастомный HTML для fraction |

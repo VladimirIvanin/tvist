@@ -45,6 +45,7 @@ export const TVIST_CLASSES = {
 
   pagination: `${P}__pagination`,
   bullet: `${P}__bullet`,
+  bulletActive: `${P}__bullet--active`,
   paginationCurrent: `${P}__pagination-current`,
   paginationSeparator: `${P}__pagination-separator`,
   paginationTotal: `${P}__pagination-total`,

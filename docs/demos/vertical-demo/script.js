@@ -18,7 +18,7 @@ const thumbsVertical = new Tvist('#thumbs-vertical', {
   direction: 'vertical',
   slideMinSize: 90, // Автоматический расчет perPage на основе высоты
   gap: 10,
-  isNavigation: true, // Включает кликабельность и active классы
+  isNavigation: true, // Включает кликабельность и класс --nav-active на активной миниатюре
 })
 
 const mainHorizontal = new Tvist('#main-horizontal', {

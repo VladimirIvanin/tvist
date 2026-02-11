@@ -103,7 +103,7 @@ mainSlider.sync(thumbSlider);
   cursor: pointer;
 }
 
-.thumb-slider .tvist-v1__slide.is-active {
+.thumb-slider .tvist-v1__slide--nav-active {
   opacity: 1;
   border: 3px solid #333;
 }
@@ -202,7 +202,7 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.thumb-slider :deep(.tvist-v1__slide.is-active) {
+.thumb-slider :deep(.tvist-v1__slide--nav-active) {
   opacity: 1;
   border: 3px solid #333;
 }

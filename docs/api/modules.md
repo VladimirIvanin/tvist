@@ -161,7 +161,7 @@ const slider = new Tvist('.slider', {
     type: 'bullets',
     clickable: true,
     bulletClass: 'my-bullet',
-    bulletActiveClass: 'active'
+    bulletActiveClass: 'tvist-v1__bullet--active'  // по умолчанию BEM-модификатор
   }
 })
 ```

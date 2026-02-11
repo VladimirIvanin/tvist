@@ -115,8 +115,7 @@ h2 {
   border: 3px solid transparent;
 }
 
-/* Активный класс (добавляется ThumbsModule или вручную) */
-.tvist-thumbs .tvist-v1__slide.is-active,
+/* Активный класс (добавляется ThumbsModule: BEM-модификатор --nav-active) */
 .tvist-thumbs .tvist-v1__slide--nav-active {
   opacity: 1;
   border-color: #333;

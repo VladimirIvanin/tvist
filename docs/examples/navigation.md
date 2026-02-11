@@ -172,7 +172,7 @@ arrows: {
 | `type` | `'bullets' \| 'fraction' \| 'progress' \| 'custom'` | Тип: точки, дробь, прогресс-бар, кастомный HTML. | `type: 'fraction'` |
 | `clickable` | `boolean` | Клик по буллету переключает слайд. | `clickable: true` |
 | `bulletClass` | `string` | Класс буллета. | `bulletClass: 'dot'` |
-| `bulletActiveClass` | `string` | Класс активного буллета. | `bulletActiveClass: 'current'` |
+| `bulletActiveClass` | `string` | Класс активного буллета (по умолчанию BEM `tvist-v1__bullet--active`). | `bulletActiveClass: 'current'` |
 | `renderBullet` | `(index, className) => string` | Кастомный HTML буллета. | см. [Pagination](./pagination.md) |
 | `renderFraction` | `(current, total) => string` | Кастомный HTML для типа `fraction`. | см. [Pagination](./pagination.md) |
 | `renderCustom` | `(current, total) => string` | Кастомный HTML для типа `custom`. | см. [Pagination](./pagination.md) |
@@ -264,7 +264,7 @@ pagination: {
   cursor: pointer;
   padding: 0;
 }
-.nav-demo-slider :deep(.tvist-v1__bullet.active) { background: #333; }
+.nav-demo-slider :deep(.tvist-v1__bullet--active) { background: #333; }
 
 .slider-controls.nav-outside-controls {
   display: flex;

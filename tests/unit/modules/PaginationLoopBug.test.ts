@@ -46,7 +46,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
     const log: Array<{ step: string; activeIndex: number; realIndex: number; activeBullet: number }> = []
 
     const recordState = (step: string) => {
-      const activeBulletIndex = Array.from(bullets).findIndex(b => b.classList.contains('active'))
+      const activeBulletIndex = Array.from(bullets).findIndex(b => b.classList.contains(TVIST_CLASSES.bulletActive))
       log.push({
         step,
         activeIndex: slider.activeIndex,
@@ -58,39 +58,39 @@ describe('PaginationModule - Loop Bug Investigation', () => {
 
     recordState('Initial')
     expect(slider.realIndex).toBe(0)
-    expect(bullets[0].classList.contains('active')).toBe(true)
+    expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
     // Первый цикл
     slider.scrollTo(1, true)
     recordState('First cycle: 0->1')
     expect(slider.realIndex).toBe(1)
-    expect(bullets[1].classList.contains('active')).toBe(true)
+    expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
     slider.scrollTo(2, true)
     recordState('First cycle: 1->2')
     expect(slider.realIndex).toBe(2)
-    expect(bullets[2].classList.contains('active')).toBe(true)
+    expect(bullets[2].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
     slider.scrollTo(0, true)
     recordState('First cycle: 2->0 (loop)')
     expect(slider.realIndex).toBe(0)
-    expect(bullets[0].classList.contains('active')).toBe(true)
+    expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
     // Второй цикл
     slider.scrollTo(1, true)
     recordState('Second cycle: 0->1')
     expect(slider.realIndex).toBe(1)
-    expect(bullets[1].classList.contains('active')).toBe(true)
+    expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
     slider.scrollTo(2, true)
     recordState('Second cycle: 1->2')
     expect(slider.realIndex).toBe(2)
-    expect(bullets[2].classList.contains('active')).toBe(true)
+    expect(bullets[2].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
     slider.scrollTo(0, true)
     recordState('Second cycle: 2->0 (loop)')
     expect(slider.realIndex).toBe(0)
-    expect(bullets[0].classList.contains('active')).toBe(true)
+    expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
     // Выводим полный лог
     console.table(log)
@@ -186,7 +186,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
 
     console.log('Before drag: activeIndex=', slider.activeIndex, 'realIndex=', slider.realIndex)
     expect(slider.realIndex).toBe(1)
-    expect(bullets[1].classList.contains('active')).toBe(true)
+    expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
     // Начинаем драг
     slider.emit('dragStart')
@@ -195,9 +195,9 @@ describe('PaginationModule - Loop Bug Investigation', () => {
     slider.emit('slideChangeStart', 2)
     
     // Проверяем что пагинация НЕ обновилась
-    console.log('During drag after slideChangeStart: activeBullet=', Array.from(bullets).findIndex(b => b.classList.contains('active')))
-    expect(bullets[1].classList.contains('active')).toBe(true)
-    expect(bullets[2].classList.contains('active')).toBe(false)
+    console.log('During drag after slideChangeStart: activeBullet=', Array.from(bullets).findIndex(b => b.classList.contains(TVIST_CLASSES.bulletActive)))
+    expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
+    expect(bullets[2].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
 
     // Заканчиваем драг
     slider.emit('dragEnd')
@@ -207,7 +207,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
 
     console.log('After drag: activeIndex=', slider.activeIndex, 'realIndex=', slider.realIndex)
     expect(slider.realIndex).toBe(1)
-    expect(bullets[1].classList.contains('active')).toBe(true)
+    expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
   })
 
   it('should check getCurrentSlideIndex during drag on second cycle', async () => {

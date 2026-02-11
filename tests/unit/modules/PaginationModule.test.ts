@@ -134,8 +134,8 @@ describe('PaginationModule', () => {
       const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       
       // Изначально активна первая точка (index 0)
-      expect(bullets[0].classList.contains('active')).toBe(true)
-      expect(bullets[1].classList.contains('active')).toBe(false)
+      expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
 
       // Переходим к слайду 1 (вторая позиция). Ждём slideChangeStart (эмитится сразу при scrollTo)
       await new Promise<void>(resolve => {
@@ -143,8 +143,8 @@ describe('PaginationModule', () => {
         slider.scrollTo(1)
       })
       
-      expect(bullets[0].classList.contains('active')).toBe(false)
-      expect(bullets[1].classList.contains('active')).toBe(true)
+      expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
     })
 
     it('should navigate to correct slide when clicking bullet', () => {
@@ -433,30 +433,30 @@ describe('PaginationModule', () => {
         const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
         
         // Изначально активна первая точка (slides 0-1)
-        expect(bullets[0].classList.contains('active')).toBe(true)
+        expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
         
         // Переходим к слайду 2 - должна активироваться вторая точка (slides 2-3)
         await new Promise<void>(resolve => {
           slider.on('slideChangeStart', () => resolve())
           slider.scrollTo(2)
         })
-        expect(bullets[0].classList.contains('active')).toBe(false)
-        expect(bullets[1].classList.contains('active')).toBe(true)
+        expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
+        expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
         // Переходим к слайду 3 - все еще вторая точка
         await new Promise<void>(resolve => {
           slider.on('slideChangeStart', () => resolve())
           slider.scrollTo(3)
         })
-        expect(bullets[1].classList.contains('active')).toBe(true)
+        expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
         // Переходим к слайду 4 - третья точка (slides 4-5)
         await new Promise<void>(resolve => {
           slider.on('slideChangeStart', () => resolve())
           slider.scrollTo(4)
         })
-        expect(bullets[1].classList.contains('active')).toBe(false)
-        expect(bullets[2].classList.contains('active')).toBe(true)
+        expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
+        expect(bullets[2].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
       })
 
       it('should work with perPage > 1', () => {
@@ -575,23 +575,23 @@ describe('PaginationModule', () => {
         const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
         
         // Слайд 0 - первая точка
-        expect(bullets[0].classList.contains('active')).toBe(true)
+        expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
         
         // Переходим к слайду 1 - должна активироваться вторая точка (центральная группа)
         await new Promise<void>(resolve => {
           slider.on('slideChangeStart', () => resolve())
           slider.scrollTo(1)
         })
-        expect(bullets[0].classList.contains('active')).toBe(false)
-        expect(bullets[1].classList.contains('active')).toBe(true)
+        expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
+        expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
         // Переходим к слайду 9 (последний) - последняя точка
         await new Promise<void>(resolve => {
           slider.on('slideChangeStart', () => resolve())
           slider.scrollTo(9)
         })
-        expect(bullets[1].classList.contains('active')).toBe(false)
-        expect(bullets[4].classList.contains('active')).toBe(true)
+        expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
+        expect(bullets[4].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
       })
 
       it('should handle limit=2 with center strategy', () => {
@@ -735,14 +735,14 @@ describe('PaginationModule', () => {
       const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       
       // Изначально активна первая точка
-      expect(bullets[0].classList.contains('active')).toBe(true)
-      expect(bullets[1].classList.contains('active')).toBe(false)
+      expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
 
       // Отслеживаем изменения активной точки
       const activeBulletChanges: number[] = []
       const observer = new MutationObserver(() => {
         bullets.forEach((bullet, index) => {
-          if (bullet.classList.contains('active')) {
+          if (bullet.classList.contains(TVIST_CLASSES.bulletActive)) {
             activeBulletChanges.push(index)
           }
         })
@@ -762,8 +762,8 @@ describe('PaginationModule', () => {
       slider.emit('slideChangeStart', 1)
       
       // Проверяем что активная точка НЕ изменилась (isDragging = true)
-      expect(bullets[0].classList.contains('active')).toBe(true)
-      expect(bullets[1].classList.contains('active')).toBe(false)
+      expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
       
       // Эмулируем окончание драга
       slider.emit('dragEnd')
@@ -772,8 +772,8 @@ describe('PaginationModule', () => {
       slider.emit('slideChangeEnd', 0)
       
       // Теперь должна обновиться активная точка
-      expect(bullets[0].classList.contains('active')).toBe(true)
-      expect(bullets[1].classList.contains('active')).toBe(false)
+      expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
 
       observer.disconnect()
     })
@@ -804,7 +804,7 @@ describe('PaginationModule', () => {
       const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       
       // Изначально активна первая точка
-      expect(bullets[0].classList.contains('active')).toBe(true)
+      expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
       // Эмулируем полный драг
       slider.emit('dragStart')
@@ -812,16 +812,16 @@ describe('PaginationModule', () => {
       
       // slideChangeStart во время драга - не должен обновить пагинацию
       slider.emit('slideChangeStart', 1)
-      expect(bullets[0].classList.contains('active')).toBe(true)
-      expect(bullets[1].classList.contains('active')).toBe(false)
+      expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
       
       slider.emit('dragEnd')
       
       // Нужно реально переключить слайд, а не просто эмитить событие
       slider.scrollTo(1, true)
       
-      expect(bullets[0].classList.contains('active')).toBe(false)
-      expect(bullets[1].classList.contains('active')).toBe(true)
+      expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
     })
 
     it('should work correctly with autoplay + loop + drag', async () => {
@@ -851,11 +851,11 @@ describe('PaginationModule', () => {
       const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       
       // Изначально активна первая точка
-      expect(bullets[0].classList.contains('active')).toBe(true)
+      expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
       // Autoplay переключает слайд (без драга)
       slider.scrollTo(1, true)
-      expect(bullets[1].classList.contains('active')).toBe(true)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
       // Теперь эмулируем драг во время autoplay
       slider.emit('dragStart')
@@ -863,14 +863,14 @@ describe('PaginationModule', () => {
       // slideChangeStart во время драга
       slider.emit('slideChangeStart', 2)
       // Не должно обновиться
-      expect(bullets[1].classList.contains('active')).toBe(true)
-      expect(bullets[2].classList.contains('active')).toBe(false)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
+      expect(bullets[2].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
       
       slider.emit('dragEnd')
       
       // Реальное переключение после драга
       slider.scrollTo(2, true)
-      expect(bullets[2].classList.contains('active')).toBe(true)
+      expect(bullets[2].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
     })
 
     it('should handle pagination correctly on second loop cycle with drag', async () => {
@@ -898,23 +898,23 @@ describe('PaginationModule', () => {
       const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       
       // Проходим полный первый цикл (0 -> 1 -> 2 -> 0)
-      expect(bullets[0].classList.contains('active')).toBe(true)
+      expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
       
       // 0 -> 1
       slider.scrollTo(1, true)
-      expect(bullets[1].classList.contains('active')).toBe(true)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
       
       // 1 -> 2
       slider.scrollTo(2, true)
-      expect(bullets[2].classList.contains('active')).toBe(true)
+      expect(bullets[2].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
       
       // 2 -> 0 (переход через границу loop - начало второго цикла)
       slider.scrollTo(0, true)
-      expect(bullets[0].classList.contains('active')).toBe(true)
+      expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
       
       // Второй цикл: 0 -> 1
       slider.scrollTo(1, true)
-      expect(bullets[1].classList.contains('active')).toBe(true)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
       
       // Теперь эмулируем драг на втором цикле
       slider.emit('dragStart')
@@ -922,8 +922,8 @@ describe('PaginationModule', () => {
       // Начинаем тянуть к слайду 2
       slider.emit('slideChangeStart', 2)
       // Во время драга пагинация не должна обновиться
-      expect(bullets[1].classList.contains('active')).toBe(true)
-      expect(bullets[2].classList.contains('active')).toBe(false)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
+      expect(bullets[2].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
       
       // Отпускаем, но не доводим до конца (snap вернет обратно)
       slider.emit('dragEnd')
@@ -932,8 +932,8 @@ describe('PaginationModule', () => {
       slider.scrollTo(1, true)
       
       // Должна остаться активной вторая точка
-      expect(bullets[1].classList.contains('active')).toBe(true)
-      expect(bullets[2].classList.contains('active')).toBe(false)
+      expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
+      expect(bullets[2].classList.contains(TVIST_CLASSES.bulletActive)).toBe(false)
     })
 
     it('should not flicker pagination during drag on second loop cycle with autoplay', async () => {
@@ -966,7 +966,7 @@ describe('PaginationModule', () => {
       const recordState = () => {
         bulletStateChanges.push({
           time: Date.now(),
-          states: Array.from(bullets).map(b => b.classList.contains('active'))
+          states: Array.from(bullets).map(b => b.classList.contains(TVIST_CLASSES.bulletActive))
         })
       }
       

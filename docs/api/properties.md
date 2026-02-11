@@ -326,14 +326,12 @@ updateProgress()
 ### Применение классов к активному слайду
 
 ```javascript
+// SlideStatesModule уже проставляет .tvist-v1__slide--active.
+// Если нужно своё поведение:
+const activeClass = 'tvist-v1__slide--active'
 slider.on('slideChangeStart', (index) => {
-  // Убрать класс у всех слайдов
-  slider.slides.forEach(slide => {
-    slide.classList.remove('is-active')
-  })
-  
-  // Добавить класс активному слайду
-  slider.slides[index]?.classList.add('is-active')
+  slider.slides.forEach(slide => slide.classList.remove(activeClass))
+  slider.slides[index]?.classList.add(activeClass)
 })
 ```
 

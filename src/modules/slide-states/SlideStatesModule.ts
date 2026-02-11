@@ -1,6 +1,6 @@
 /**
  * SlideStatesModule - управление классами состояний слайдов
- * Применяет классы active, prev, next, visible к слайдам
+ * Применяет BEM-модификаторы: --active, --prev, --next, --visible (tvist-v1__slide--*)
  */
 
 import { Module } from '../Module'

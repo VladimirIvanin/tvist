@@ -613,8 +613,8 @@ export class PaginationModule extends Module {
   private updateBulletsActive(): void {
     const pagination = this.options.pagination
     const activeClass = typeof pagination === 'object' && pagination !== null
-      ? pagination.bulletActiveClass ?? 'active'
-      : 'active'
+      ? pagination.bulletActiveClass ?? TVIST_CLASSES.bulletActive
+      : TVIST_CLASSES.bulletActive
 
     // Текущая страница соответствует индексу (в loop режиме используем realIndex)
     const currentSlideIndex = this.getCurrentSlideIndex()

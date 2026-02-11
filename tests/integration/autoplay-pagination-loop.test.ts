@@ -44,7 +44,7 @@ describe('Autoplay + Pagination + Loop integration', () => {
   function getActiveBulletIndex(container: HTMLElement): number {
     const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
     for (let i = 0; i < bullets.length; i++) {
-      if (bullets[i].classList.contains('active')) {
+      if (bullets[i].classList.contains(TVIST_CLASSES.bulletActive)) {
         return i
       }
     }
@@ -425,7 +425,7 @@ describe('Autoplay + Pagination + Drag (no loop, rewind)', () => {
   function getActiveBulletIndex(cont: HTMLElement): number {
     const bullets = cont.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
     for (let i = 0; i < bullets.length; i++) {
-      if (bullets[i].classList.contains('active')) return i
+      if (bullets[i].classList.contains(TVIST_CLASSES.bulletActive)) return i
     }
     return -1
   }

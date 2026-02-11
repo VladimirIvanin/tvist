@@ -107,7 +107,6 @@ mainHorizontal.sync(thumbsVertical);
   font-weight: bold;
 }
 
-.tvist-thumbs .tvist-v1__slide.is-active,
 .tvist-thumbs .tvist-v1__slide--nav-active {
   opacity: 1;
   border-color: #333;
@@ -217,7 +216,6 @@ onUnmounted(() => {
   font-weight: bold;
 }
 
-.tvist-thumbs :deep(.tvist-v1__slide.is-active),
 .tvist-thumbs :deep(.tvist-v1__slide--nav-active) {
   opacity: 1;
   border-color: #333;

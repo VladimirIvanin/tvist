@@ -327,7 +327,7 @@ export interface TvistOptions {
     clickable?: boolean
     /** CSS класс для буллета */
     bulletClass?: string
-    /** CSS класс для активного буллета */
+    /** CSS класс для активного буллета (по умолчанию BEM: tvist-v1__bullet--active) */
     bulletActiveClass?: string
     /** Функция рендеринга буллета */
     renderBullet?: (index: number, className: string) => string

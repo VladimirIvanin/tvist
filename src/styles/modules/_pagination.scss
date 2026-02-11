@@ -30,7 +30,7 @@
       transform: scale(1.2);
     }
 
-    &.active {
+    &--active {
       background: var(--#{$tvist-block}-bullet-active-color, #000);
       width: var(--#{$tvist-block}-bullet-active-width, 20px);
       border-radius: var(--#{$tvist-block}-bullet-active-radius, 4px);

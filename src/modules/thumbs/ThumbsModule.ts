@@ -3,7 +3,7 @@
  * Реализует функционал навигации через миниатюры
  * 
  * Опции:
- * - navigationMode: boolean - если true, делает слайды кликабельными и добавляет active класс
+ * - navigationMode: boolean - если true, делает слайды кликабельными и добавляет класс --nav-active
  */
 
 import { Module } from '../Module'
@@ -28,7 +28,6 @@ export class ThumbsModule extends Module {
     const slides = this.tvist.slides
     const listeners: (() => void)[] = []
     const activeClass = TVIST_CLASSES.slideNavActive
-    const legacyActiveClass = 'is-active'
 
     // 1. Обработка кликов
     slides.forEach((slide, index) => {
@@ -55,10 +54,8 @@ export class ThumbsModule extends Module {
       slides.forEach((slide, i) => {
         if (i === index) {
           slide.classList.add(activeClass)
-          slide.classList.add(legacyActiveClass)
         } else {
           slide.classList.remove(activeClass)
-          slide.classList.remove(legacyActiveClass)
         }
       })
     }
