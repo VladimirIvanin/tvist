@@ -115,7 +115,11 @@ import AutoWidthExample from './.vitepress/theme/examples/AutoWidthExample.vue'
 
 <ScrollbarExample detailsLink="./examples/scrollbar" />
 
-## 22. Auto Width / Auto Height
+## 22. Навигация (стрелки и пагинация)
+
+Опции `arrows` и `pagination`, в том числе **навигация за пределами root** — кнопки и пагинация в шапке, футере или сбоку от слайдера. См. [Навигация](./examples/navigation).
+
+## 23. Auto Width / Auto Height
 
 <AutoWidthExample detailsLink="./examples/auto-width" />
 

@@ -79,6 +79,7 @@ export default defineConfig({
           { text: 'Scroll Control', link: '/examples/scroll-control' },
           { text: 'Scrollbar', link: '/examples/scrollbar' },
           { text: 'Lock', link: '/examples/lock' },
+          { text: 'Навигация', link: '/examples/navigation' },
           { text: 'Pagination', link: '/examples/pagination' },
           { text: 'LazyLoad', link: '/examples/lazyload' },
           { text: 'Modules', link: '/examples/modules' },

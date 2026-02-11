@@ -127,6 +127,15 @@ const slider = new Tvist('.slider', {
 })
 ```
 
+**Стрелки за пределами root:** селекторы `prev` и `next` ищутся через `document.querySelector`, поэтому кнопки могут находиться в любом месте страницы (шапка, футер, боковая панель):
+
+```javascript
+// HTML: <button id="slider-prev">←</button> ... <div id="slider-root">...</div> ... <button id="slider-next">→</button>
+const slider = new Tvist('#slider-root', {
+  arrows: { prev: '#slider-prev', next: '#slider-next' }
+})
+```
+
 #### PaginationModule
 
 ```javascript
@@ -154,6 +163,15 @@ const slider = new Tvist('.slider', {
     bulletClass: 'my-bullet',
     bulletActiveClass: 'active'
   }
+})
+```
+
+**Пагинация за пределами root:** опция `container` принимает селектор или элемент; поиск через `document.querySelector`, поэтому контейнер может быть вне корня слайдера:
+
+```javascript
+// HTML: <div id="pagination"></div> ... <div id="slider-root">...</div>
+const slider = new Tvist('#slider-root', {
+  pagination: { container: '#pagination', type: 'fraction', clickable: true }
 })
 ```
 
