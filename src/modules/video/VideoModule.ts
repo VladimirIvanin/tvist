@@ -540,17 +540,17 @@ export class VideoModule extends Module {
     const doPlay = () => {
       const playPromise = video.play()
       this.activePlayPromise = playPromise
-      console.log(2);
+      console.log(2)
 
       playPromise
         .then(() => {
-          console.log(3);
+          console.log(3)
           if (this.activePlayPromise === playPromise) {
             this.activePlayPromise = null
           }
         })
         .catch((error: DOMException) => {
-          console.log(4);
+          console.log(4)
           if (this.activePlayPromise === playPromise) {
             this.activePlayPromise = null
           }
@@ -562,22 +562,24 @@ export class VideoModule extends Module {
     }
 
     // Проверяем readyState
-    if (video.readyState >= 2) { // HAVE_CURRENT_DATA
-      console.log(5);
+    if (video.readyState >= 2) {
+      // HAVE_CURRENT_DATA — можно играть сразу
+      console.log(5)
       doPlay()
     } else {
-      console.log(6);
-      // Ждём canplay
-      const onCanPlay = () => {
-        console.log(7);
-        // According to snippet, wait for RAF before playing
+      // На iOS canplay часто не срабатывает, срабатывает canplaythrough — подписываемся на оба
+      console.log(6)
+      const onReady = (e: Event) => {
+        console.log(7, e.type)
+        video.removeEventListener('canplay', onReady)
+        video.removeEventListener('canplaythrough', onReady)
         requestAnimationFrame(() => {
-          console.log(8);
+          console.log(8)
           doPlay()
         })
-        video.removeEventListener('canplay', onCanPlay)
       }
-      video.addEventListener('canplay', onCanPlay)
+      video.addEventListener('canplay', onReady)
+      video.addEventListener('canplaythrough', onReady)
     }
   }
 
