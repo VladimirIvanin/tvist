@@ -445,7 +445,7 @@ export class PaginationModule extends Module {
     const pageCount = slideCount === 0 ? 0 : endIndex + 1
 
     // Проверяем, используется ли лимит
-    const limit = typeof pagination === 'object' && pagination !== null && pagination.limit
+    const limit = typeof pagination === 'object' && pagination?.limit
       ? Math.min(pagination.limit, pageCount)
       : undefined
 

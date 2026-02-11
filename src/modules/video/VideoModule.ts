@@ -232,8 +232,8 @@ export class VideoModule extends Module {
       this.config = normalizeVideoOptions(newOptions.video)
       const isNowActive = this.config !== null
 
-      if (!wasActive && isNowActive) {
-        this.muted = this.config!.muted
+      if (!wasActive && isNowActive && this.config) {
+        this.muted = this.config.muted
         this.scanSlides()
         this.setupVisibilityHandlers()
         this.activateSlideByRealIndex(this.tvist.realIndex ?? this.tvist.activeIndex)
@@ -272,7 +272,7 @@ export class VideoModule extends Module {
       // iframe (YouTube/Vimeo)
       const iframe = slide.querySelector('iframe')
       if (iframe) {
-        const src = iframe.getAttribute('src') || iframe.getAttribute('data-src') || ''
+        const src = iframe.getAttribute('src') ?? iframe.getAttribute('data-src') ?? ''
         if (isVideoIframe(src)) {
           this.registerIframe(registrationIndex, slide, iframe, src)
         }
@@ -320,7 +320,7 @@ export class VideoModule extends Module {
    */
   private registerIframe(index: number, slide: HTMLElement, iframe: HTMLIFrameElement, src: string): void {
     // Добавляем allow="autoplay" для корректной работы
-    const currentAllow = iframe.getAttribute('allow') || ''
+    const currentAllow = iframe.getAttribute('allow') ?? ''
     if (!currentAllow.includes('autoplay')) {
       iframe.setAttribute('allow', currentAllow ? `${currentAllow}; autoplay` : 'autoplay')
     }
@@ -343,11 +343,11 @@ export class VideoModule extends Module {
     this.videos.forEach(entry => {
       const { video } = entry
       video.muted = this.muted
-      if (this.config!.playsinline) {
+      if (this.config?.playsinline) {
         video.setAttribute('playsinline', '')
         video.playsInline = true
       }
-      if (this.config!.loop) {
+      if (this.config?.loop) {
         video.loop = true
       } else {
         video.loop = false
@@ -683,7 +683,7 @@ export class VideoModule extends Module {
 
     const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
     const entry = this.videos.get(realIndex)
-    if (entry && entry.video.paused) {
+    if (entry?.video.paused) {
       this.safePlay(entry.video)
     }
   }

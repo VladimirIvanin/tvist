@@ -84,13 +84,13 @@ export class AutoplayModule extends Module {
 
   // Для корректного возобновления после паузы
   private timeLeft: number | null = null
-  private currentDuration: number = 0
-  private currentChunkDuration: number = 0
+  private currentDuration = 0
+  private currentChunkDuration = 0
 
   // Для autoplayProgress
   private progressRAF: number | null = null
   private progressStartTime: number | null = null
-  private progressStartOffset: number = 0
+  private progressStartOffset = 0
 
   // Для waitForVideo — слушаем videoEnded
   private waitingForVideo = false
@@ -395,7 +395,7 @@ export class AutoplayModule extends Module {
 
     // Если timeLeft есть, значит мы возобновляем после паузы
     // Иначе начинаем новый цикл (полная задержка)
-    let delay = this.timeLeft ?? this.config.delay
+    const delay = this.timeLeft ?? this.config.delay
     
     // Если это новый цикл, сбрасываем параметры
     if (this.timeLeft === null) {
