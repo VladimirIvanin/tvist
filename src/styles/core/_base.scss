@@ -78,6 +78,13 @@
     }
   }
 
+  // Заблокированный слайдер — не показываем grab (листать некуда)
+  &--locked.#{$tvist-block}--draggable {
+    .#{$tvist-block}__container {
+      cursor: default;
+    }
+  }
+
   // Вертикальный + draggable: разрешаем горизонтальный скролл
   &--vertical#{&}--draggable {
     .#{$tvist-block}__container {

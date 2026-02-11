@@ -257,77 +257,65 @@ describe('Lock functionality', () => {
     expect(slider.engine.isLocked).toBe(false)
   })
 
-  it('should not lock loop slider IF content exceeds container', () => {
+  it('should not lock loop slider when content exceeds (slideCount > perPage)', () => {
+    // 5 слайдов, perPage 2 — контент не помещается, листать есть куда → не блокируем
     fixture = createSliderFixture({
       slidesCount: 5,
       width: 1000
     })
 
-    // 5 slides, width 1000.
-    // perPage 5 -> slideSize 200. Total 1000. With loop контент не расширяется.
-    // Loop не создаёт клонов — размер контента как без loop. Lock не применяется к loop.
-    const slider1 = new Tvist(fixture.root, {
-      perPage: 5,
-      loop: true,
-      gap: 0
-    })
-
-    // Debug output
-    // console.log('Content Size:', (slider1.engine as any).getContentSize())
-    // console.log('Container Size:', (slider1.engine as any).containerSize)
-    
-    expect(slider1.engine.isLocked).toBe(false)
-    
-    slider1.destroy()
-
-    // perPage 2 -> slideSize 500. Total 2500. 2500 > 1000 -> Not Locked.
-    const slider2 = new Tvist(fixture.root, {
+    const slider = new Tvist(fixture.root, {
       perPage: 2,
       loop: true,
       gap: 0
     })
-    
-    expect(slider2.engine.isLocked).toBe(false)
-    slider2.destroy()
+
+    expect(slider.engine.isLocked).toBe(false)
   })
 
-  it('should never lock when loop is enabled, regardless of content size', () => {
-    // Test 1: loop with 4 slides, container 1336px, slideSize 314px
+  it('should lock when loop is true but slides count <= perPage (e.g. perPage 2, 1 slide)', () => {
+    // perPage 2, loop true, 1 слайд — листать некуда, должен сработать lock
     fixture = createSliderFixture({
-      slidesCount: 4,
-      width: 1336
+      slidesCount: 1,
+      width: 1000
     })
 
-    const slider1 = new Tvist(fixture.root, {
+    const onLock = vi.fn()
+    const onUnlock = vi.fn()
+
+    const slider = new Tvist(fixture.root, {
+      perPage: 2,
       loop: true,
-      gap: 20,
-      slideMinSize: 314
+      gap: 0,
+      on: {
+        lock: onLock,
+        unlock: onUnlock
+      }
     })
 
-    expect(slider1.engine.isLocked).toBe(false)
-    expect(slider1.canScrollNext).toBe(true)
-    expect(slider1.canScrollPrev).toBe(true)
-    
-    slider1.destroy()
+    expect(slider.engine.isLocked).toBe(true)
+    expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(true)
+    expect(onLock).toHaveBeenCalled()
+    expect(slider.canScrollNext).toBe(false)
+    expect(slider.canScrollPrev).toBe(false)
+  })
 
-    // Test 2: loop with few slides that would fit without loop
+  it('should lock when loop is enabled but slideCount <= perPage (nothing to scroll)', () => {
+    // loop + все слайды помещаются (slideCount <= perPage) → lock
     fixture = createSliderFixture({
       slidesCount: 3,
       width: 1000
     })
 
-    const slider2 = new Tvist(fixture.root, {
+    const slider = new Tvist(fixture.root, {
       loop: true,
       perPage: 3,
       gap: 0
     })
 
-    // Even though 3 slides fit exactly in container, loop should prevent lock
-    expect(slider2.engine.isLocked).toBe(false)
-    expect(slider2.canScrollNext).toBe(true)
-    expect(slider2.canScrollPrev).toBe(true)
-    
-    slider2.destroy()
+    expect(slider.engine.isLocked).toBe(true)
+    expect(slider.canScrollNext).toBe(false)
+    expect(slider.canScrollPrev).toBe(false)
   })
 
   it('should lock when slides fit without scrollability (no loop)', () => {
