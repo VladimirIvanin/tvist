@@ -147,7 +147,7 @@ updateOptions(newOptions: Partial<TvistOptions>): this
 - `direction` - направление прокрутки
 - `center` - центрирование активного слайда
 - `drag`, `dragSpeed`, `rubberband` - настройки drag
-- `autoplay`, `pauseOnHover`, `pauseOnInteraction` - настройки автопрокрутки
+- `autoplay` - настройки автопрокрутки (число, `true`/`false` или объект с `delay`, `pauseOnHover`, `pauseOnInteraction`, `disableOnInteraction`, `waitForVideo`)
 - `on` - обработчики событий (заменяют предыдущие)
 - и другие опции модулей
 

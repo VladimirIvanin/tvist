@@ -25,8 +25,7 @@ const config2 = {
   perPage: 1,
   gap: 0,
   drag: false,
-  autoplay: 3000,
-  pauseOnHover: true,
+  autoplay: { delay: 3000, pauseOnHover: true },
   pagination: {
     type: 'bullets',
     clickable: true

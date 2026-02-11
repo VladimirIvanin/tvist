@@ -28,10 +28,11 @@ import './modules/scroll-control'
 import './modules/scrollbar'
 import './modules/marquee'
 import './modules/lazyload'
+import './modules/video'
 
 
 // Types
-export type { TvistOptions } from './core/types'
+export type { TvistOptions, AutoplayOptions, VideoOptions, VideoEvent, VideoProgressEvent } from './core/types'
 export type { Module, ModuleConstructor } from './modules/Module'
 
 // Utils (опционально для расширенного использования)

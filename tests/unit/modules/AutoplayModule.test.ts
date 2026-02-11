@@ -122,8 +122,7 @@ describe('AutoplayModule', () => {
       `
 
       const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
-        autoplay: 1000,
-        pauseOnHover: true
+        autoplay: { delay: 1000, pauseOnHover: true }
       })
 
       expect(slider.activeIndex).toBe(0)
@@ -157,8 +156,7 @@ describe('AutoplayModule', () => {
       `
 
       const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
-        autoplay: 1000,
-        pauseOnHover: false
+        autoplay: { delay: 1000, pauseOnHover: false }
       })
 
       expect(slider.activeIndex).toBe(0)
@@ -187,8 +185,7 @@ describe('AutoplayModule', () => {
       `
 
       const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
-        autoplay: 1000,
-        pauseOnInteraction: true,
+        autoplay: { delay: 1000, pauseOnInteraction: true },
         drag: true
       })
 
@@ -225,8 +222,7 @@ describe('AutoplayModule', () => {
       `
 
       const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
-        autoplay: 1000,
-        pauseOnInteraction: true,
+        autoplay: { delay: 1000, pauseOnInteraction: true },
         drag: true
       })
 
@@ -272,9 +268,7 @@ describe('AutoplayModule', () => {
       `
 
       const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
-        autoplay: 1000,
-        pauseOnInteraction: true,
-        disableOnInteraction: true,
+        autoplay: { delay: 1000, pauseOnInteraction: true, disableOnInteraction: true },
         drag: true
       })
 
@@ -588,8 +582,7 @@ describe('AutoplayModule', () => {
       const resumeSpy = vi.fn()
 
       const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
-        autoplay: 1000,
-        pauseOnHover: true,
+        autoplay: { delay: 1000, pauseOnHover: true },
         on: {
           autoplayStart: startSpy,
           autoplayStop: stopSpy,

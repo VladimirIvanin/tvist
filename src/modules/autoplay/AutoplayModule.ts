@@ -7,17 +7,59 @@
  * - Пауза при взаимодействии (drag, click)
  * - Пауза при потере видимости вкладки (visibilitychange)
  * - Полная остановка при взаимодействии (опционально)
+ * - Ожидание окончания видео вместо таймера (waitForVideo)
+ * - Прогресс автопрокрутки (autoplayProgress)
  * - Публичное API: start, stop, pause, resume
  * 
  * Использует рекурсивный setTimeout вместо setInterval:
  * - setTimeout вызывается ПОСЛЕ завершения переключения слайда
  * - Предотвращает накопление событий когда браузер неактивен
  * - Более надежная работа с паузами и возобновлением
+ * 
+ * Опция autoplay принимает:
+ * - false / undefined — выключен
+ * - true — включен с delay: 3000
+ * - number — включен с указанной задержкой
+ * - AutoplayOptions — полный контроль
  */
 
 import { Module } from '../Module'
 import type { Tvist } from '../../core/Tvist'
-import type { TvistOptions } from '../../core/types'
+import type { TvistOptions, AutoplayOptions } from '../../core/types'
+
+/** Дефолтные значения для AutoplayOptions */
+const AUTOPLAY_DEFAULTS: Required<AutoplayOptions> = {
+  delay: 3000,
+  pauseOnHover: true,
+  pauseOnInteraction: true,
+  disableOnInteraction: false,
+  waitForVideo: false,
+}
+
+/**
+ * Нормализация autoplay опций в объект AutoplayOptions.
+ * Возвращает null если autoplay выключен.
+ */
+function normalizeAutoplay(raw: TvistOptions['autoplay']): Required<AutoplayOptions> | null {
+  if (raw === false || raw === undefined) return null
+
+  if (raw === true) {
+    return { ...AUTOPLAY_DEFAULTS }
+  }
+
+  if (typeof raw === 'number') {
+    return { ...AUTOPLAY_DEFAULTS, delay: raw }
+  }
+
+  // Object form
+  return {
+    delay: raw.delay ?? AUTOPLAY_DEFAULTS.delay,
+    pauseOnHover: raw.pauseOnHover ?? AUTOPLAY_DEFAULTS.pauseOnHover,
+    pauseOnInteraction: raw.pauseOnInteraction ?? AUTOPLAY_DEFAULTS.pauseOnInteraction,
+    disableOnInteraction: raw.disableOnInteraction ?? AUTOPLAY_DEFAULTS.disableOnInteraction,
+    waitForVideo: raw.waitForVideo ?? AUTOPLAY_DEFAULTS.waitForVideo,
+  }
+}
 
 export class AutoplayModule extends Module {
   readonly name = 'autoplay'
@@ -25,7 +67,9 @@ export class AutoplayModule extends Module {
   private timer: number | null = null
   private paused = false
   private stopped = false
-  private delay: number
+  
+  /** Нормализованные опции autoplay */
+  private config: Required<AutoplayOptions> | null = null
 
   private mouseEnterHandler?: () => void
   private mouseLeaveHandler?: () => void
@@ -38,12 +82,24 @@ export class AutoplayModule extends Module {
   // Флаг для отслеживания паузы из-за потери видимости вкладки
   private pausedByVisibility = false
 
+  // Для корректного возобновления после паузы
+  private timeLeft: number | null = null
+  private currentDuration: number = 0
+  private currentChunkDuration: number = 0
+
+  // Для autoplayProgress
+  private progressRAF: number | null = null
+  private progressStartTime: number | null = null
+  private progressStartOffset: number = 0
+
+  // Для waitForVideo — слушаем videoEnded
+  private waitingForVideo = false
+  private videoEndedWhilePaused = false  // видео закончилось пока autoplay на паузе (hover)
+  private videoEndedHandler?: () => void
+
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
-
-    // Определяем delay
-    const autoplay = this.options.autoplay
-    this.delay = typeof autoplay === 'number' ? autoplay : 3000
+    this.config = normalizeAutoplay(this.options.autoplay)
   }
 
   override init(): void {
@@ -57,12 +113,14 @@ export class AutoplayModule extends Module {
   override destroy(): void {
     this.stop()
     this.clearDragEndTimeout()
+    this.stopProgressTracking()
     this.detachHoverEvents()
     this.detachVisibilityEvents()
+    this.detachVideoEndedListener()
   }
 
   protected override shouldBeActive(): boolean {
-    return this.options.autoplay !== false && this.options.autoplay !== undefined
+    return this.config !== null
   }
 
   /**
@@ -71,18 +129,12 @@ export class AutoplayModule extends Module {
   override onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
     // Если autoplay изменился
     if (newOptions.autoplay !== undefined) {
-      // Определяем, был ли autoplay активен ДО обновления
-      // К этому моменту this.options уже содержит новые значения,
-      // но мы можем определить старое состояние по наличию таймера
-      const wasActive = this.timer !== null
+      const wasActive = this.config !== null && this.timer !== null
       
-      // Обновляем delay
-      const autoplay = newOptions.autoplay
-      if (typeof autoplay === 'number') {
-        this.delay = autoplay
-      }
+      // Перенормализуем
+      this.config = normalizeAutoplay(newOptions.autoplay)
 
-      const isNowActive = newOptions.autoplay !== false && newOptions.autoplay !== undefined
+      const isNowActive = this.config !== null
 
       // Если autoplay был выключен, а теперь включен
       if (!wasActive && isNowActive) {
@@ -96,20 +148,17 @@ export class AutoplayModule extends Module {
         this.stop()
         this.detachHoverEvents()
         this.detachVisibilityEvents()
+        this.detachVideoEndedListener()
         this.stopped = true
       }
-      // Если autoplay был включен и остается включен (но изменилась задержка)
-      else if (wasActive && isNowActive) {
-        this.start() // Перезапускаем с новой задержкой
-      }
-    }
-
-    // Если изменились pauseOnHover или pauseOnInteraction
-    if (newOptions.pauseOnHover !== undefined || newOptions.pauseOnInteraction !== undefined) {
-      // Переинициализируем события
-      if (this.shouldBeActive()) {
+      // Если autoplay был включен и остается включен (но изменились настройки)
+      else if (wasActive && isNowActive && this.config) {
+        // Переинициализируем hover events при изменении pauseOnHover
         this.detachHoverEvents()
-        this.setupEvents()
+        if (this.config.pauseOnHover) {
+          this.attachHoverEvents()
+        }
+        this.start() // Перезапускаем с новой задержкой
       }
     }
   }
@@ -134,7 +183,7 @@ export class AutoplayModule extends Module {
     this.isDragging = false
     this.clearDragEndTimeout()
     
-    if (!this.options.disableOnInteraction && !this.stopped && this.paused) {
+    if (!this.config?.disableOnInteraction && !this.stopped && this.paused) {
       this.resume()
     }
   }
@@ -143,7 +192,9 @@ export class AutoplayModule extends Module {
    * Настройка событий
    */
   private setupEvents(): void {
-    if (this.options.pauseOnHover) {
+    if (!this.config) return
+
+    if (this.config.pauseOnHover) {
       this.attachHoverEvents()
     }
 
@@ -154,7 +205,7 @@ export class AutoplayModule extends Module {
       this.isDragging = true
       this.clearDragEndTimeout()
       
-      if (this.options.disableOnInteraction) {
+      if (this.config?.disableOnInteraction) {
         this.stop()
         this.stopped = true
       } else {
@@ -187,18 +238,102 @@ export class AutoplayModule extends Module {
       }
       
       // Для обычной навигации (не drag) — resume если на паузе
-      if (!this.options.disableOnInteraction && !this.stopped && this.paused) {
+      if (!this.config?.disableOnInteraction && !this.stopped && this.paused) {
         this.resume()
       }
     })
+
+    // При смене слайда — определяем, нужно ли ждать видео
+    this.on('slideChanged', (index: number) => {
+      if (!this.config?.waitForVideo) return
+      this.handleSlideChangedForVideo(index)
+    })
+  }
+
+  /**
+   * Обработка смены слайда для режима waitForVideo.
+   * index из slideChanged — это normalizedIndex (= realIndex), НЕ DOM-позиция.
+   * В loop-режиме DOM-позиция может отличаться, поэтому ищем слайд по data-tvist-slide-index.
+   */
+  private handleSlideChangedForVideo(index: number): void {
+    // Снимаем предыдущий videoEnded listener
+    this.detachVideoEndedListener()
+    this.waitingForVideo = false
+    this.videoEndedWhilePaused = false
+
+    // index = realIndex. Ищем слайд по data-tvist-slide-index (loop) или по DOM-позиции (обычный)
+    const slide = this.findSlideByRealIndex(index)
+
+    if (!slide) return
+
+    const video = slide.querySelector('video')
+    if (!video) {
+      // Нет видео — запускаем таймер (он мог быть отменён предыдущим waitingForVideo)
+      this.run()
+      return
+    }
+
+    // Есть видео — останавливаем таймер, ждём videoEnded
+    this.waitingForVideo = true
+    this.cancelTimer()
+    this.stopProgressTracking()
+
+    this.videoEndedHandler = () => {
+      if (this.stopped || !this.waitingForVideo) {
+        return
+      }
+      if (this.paused) {
+        // Видео закончилось пока autoplay на паузе (hover).
+        // Запоминаем — при resume() обработаем.
+        this.videoEndedWhilePaused = true
+        return
+      }
+      this.waitingForVideo = false
+      this.tvist.next()
+    }
+
+    this.on('videoEnded', this.videoEndedHandler)
+  }
+
+  /**
+   * Найти DOM-элемент слайда по realIndex (data-tvist-slide-index).
+   * В loop-режиме DOM-позиция может не совпадать с realIndex.
+   */
+  private findSlideByRealIndex(realIndex: number): HTMLElement | undefined {
+    const slides = this.tvist.slides
+    
+    // Сначала пробуем по data-tvist-slide-index (loop mode)
+    for (const slide of slides) {
+      const dataAttr = slide.getAttribute('data-tvist-slide-index')
+      if (dataAttr !== null && parseInt(dataAttr, 10) === realIndex) {
+        return slide
+      }
+    }
+    
+    // Fallback: по DOM-позиции (обычный режим, без loop)
+    return slides[realIndex]
+  }
+
+  /**
+   * Снять слушатель videoEnded
+   */
+  private detachVideoEndedListener(): void {
+    if (this.videoEndedHandler) {
+      this.off('videoEnded', this.videoEndedHandler)
+      this.videoEndedHandler = undefined
+    }
   }
 
   /**
    * Подключение hover событий
    */
   private attachHoverEvents(): void {
-    this.mouseEnterHandler = () => this.pause()
-    this.mouseLeaveHandler = () => this.resume()
+    this.mouseEnterHandler = () => {
+      this.pause()
+    }
+    this.mouseLeaveHandler = () => {
+      this.resume()
+    }
 
     this.tvist.root.addEventListener('mouseenter', this.mouseEnterHandler)
     this.tvist.root.addEventListener('mouseleave', this.mouseLeaveHandler)
@@ -210,9 +345,11 @@ export class AutoplayModule extends Module {
   private detachHoverEvents(): void {
     if (this.mouseEnterHandler) {
       this.tvist.root.removeEventListener('mouseenter', this.mouseEnterHandler)
+      this.mouseEnterHandler = undefined
     }
     if (this.mouseLeaveHandler) {
       this.tvist.root.removeEventListener('mouseleave', this.mouseLeaveHandler)
+      this.mouseLeaveHandler = undefined
     }
   }
 
@@ -251,14 +388,92 @@ export class AutoplayModule extends Module {
    * Вызывается через setTimeout после каждого переключения
    */
   private run(): void {
-    if (this.paused || this.stopped) return
+    if (this.paused || this.stopped || !this.config) return
+
+    // Если ждём видео — не запускаем таймер
+    if (this.waitingForVideo) return
+
+    // Если timeLeft есть, значит мы возобновляем после паузы
+    // Иначе начинаем новый цикл (полная задержка)
+    let delay = this.timeLeft ?? this.config.delay
+    
+    // Если это новый цикл, сбрасываем параметры
+    if (this.timeLeft === null) {
+      this.currentDuration = this.config.delay
+      this.progressStartOffset = 0
+    }
+    
+    // Запоминаем длительность текущего отрезка для расчёта паузы
+    this.currentChunkDuration = delay
+
+    // Запуск отслеживания прогресса
+    this.startProgressTracking(delay, this.currentDuration, this.progressStartOffset)
 
     this.timer = window.setTimeout(() => {
       if (!this.paused && !this.stopped) {
+        this.timeLeft = null // Сбрасываем timeLeft для следующего шага
+        this.progressStartOffset = 0
+        this.stopProgressTracking()
         this.tvist.next()
         this.run() // Рекурсивный вызов после переключения
       }
-    }, this.delay)
+    }, delay)
+  }
+
+  private startProgressTracking(timeLeft: number, totalDuration: number, startOffset: number): void {
+    this.stopProgressTracking()
+
+    if (timeLeft <= 0) {
+      this.emit('autoplayProgress', { progress: 1, index: this.tvist.activeIndex })
+      return
+    }
+
+    this.progressStartTime = performance.now()
+
+    const tick = () => {
+      if (this.paused || this.stopped || this.progressStartTime === null) return
+
+      const elapsed = performance.now() - this.progressStartTime
+      // Прогресс текущего отрезка (от 0 до 1)
+      const chunkProgress = Math.min(elapsed / timeLeft, 1)
+      
+      // Общий прогресс = смещение + (часть отрезка * доля отрезка в общем времени)
+      // Доля отрезка = timeLeft / totalDuration
+      let progress = startOffset + (chunkProgress * (timeLeft / totalDuration))
+      progress = Math.min(progress, 1)
+
+      this.emit('autoplayProgress', {
+        progress,
+        index: this.tvist.activeIndex,
+      })
+
+      if (progress < 1 && !this.paused && !this.stopped) {
+        this.progressRAF = requestAnimationFrame(tick)
+      }
+    }
+
+    this.progressRAF = requestAnimationFrame(tick)
+  }
+
+  /**
+   * Остановка отслеживания прогресса
+   */
+  private stopProgressTracking(): void {
+    if (this.progressRAF !== null) {
+      cancelAnimationFrame(this.progressRAF)
+      this.progressRAF = null
+    }
+    this.progressStartTime = null
+  }
+
+  /**
+   * Очистить только таймер (без остановки всего autoplay)
+   */
+  private cancelTimer(): void {
+    if (this.timer !== null) {
+      window.clearTimeout(this.timer)
+      this.timer = null
+    }
   }
 
   /**
@@ -278,10 +493,8 @@ export class AutoplayModule extends Module {
    * Остановка autoplay
    */
   stop(): void {
-    if (this.timer !== null) {
-      window.clearTimeout(this.timer)
-      this.timer = null
-    }
+    this.cancelTimer()
+    this.stopProgressTracking()
     this.emit('autoplayStop')
   }
 
@@ -292,11 +505,22 @@ export class AutoplayModule extends Module {
   pause(): void {
     if (!this.paused) {
       this.paused = true
-      // Очищаем таймер — иначе callback может сработать между pause() и resume()
-      if (this.timer !== null) {
-        window.clearTimeout(this.timer)
-        this.timer = null
+      
+      // Вычисляем оставшееся время и текущий прогресс
+      if (this.timer !== null && this.progressStartTime !== null && !this.waitingForVideo) {
+        const elapsed = performance.now() - this.progressStartTime
+        
+        // Сколько осталось от ТЕКУЩЕГО отрезка
+        this.timeLeft = Math.max(0, this.currentChunkDuration - elapsed)
+        
+        // Накопленный прогресс = стартовый + пройденный за этот отрезок
+        const chunkElapsedRatio = elapsed / this.currentDuration
+        this.progressStartOffset = Math.min(1, this.progressStartOffset + chunkElapsedRatio)
       }
+
+      // Очищаем таймер — иначе callback может сработать между pause() и resume()
+      this.cancelTimer()
+      this.stopProgressTracking()
       this.emit('autoplayPause')
     }
   }
@@ -313,6 +537,17 @@ export class AutoplayModule extends Module {
     
     if (this.paused && !this.stopped) {
       this.paused = false
+      
+      // Если видео закончилось пока мы были на паузе — обрабатываем сейчас
+      if (this.videoEndedWhilePaused && this.waitingForVideo) {
+        this.videoEndedWhilePaused = false
+        this.waitingForVideo = false
+        this.tvist.next()
+        this.emit('autoplayResume')
+        return
+      }
+      this.videoEndedWhilePaused = false
+      
       // Перезапускаем с полной задержкой
       // Это предотвращает немедленное переключение после паузы
       this.run()
@@ -338,4 +573,3 @@ export class AutoplayModule extends Module {
     }
   }
 }
-

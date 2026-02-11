@@ -34,6 +34,120 @@ export interface AutoplayModuleAPI {
   }
 }
 
+/** API модуля video для публичного геттера */
+export interface VideoModuleAPI {
+  getVideo(): {
+    play(index?: number): void
+    pause(index?: number): void
+    mute(): void
+    unmute(): void
+    isMuted(): boolean
+  } | undefined
+}
+
+/**
+ * Опции автопрокрутки (объект)
+ */
+export interface AutoplayOptions {
+  /**
+   * Задержка между переходами в миллисекундах
+   * @default 3000
+   */
+  delay?: number
+
+  /**
+   * Ставить автопрокрутку на паузу при наведении курсора
+   * @default true
+   */
+  pauseOnHover?: boolean
+
+  /**
+   * Ставить автопрокрутку на паузу при любом взаимодействии (drag, click)
+   * @default true
+   */
+  pauseOnInteraction?: boolean
+
+  /**
+   * Отключить автопрокрутку после первого взаимодействия пользователя
+   * @default false
+   */
+  disableOnInteraction?: boolean
+
+  /**
+   * Для видео-слайдов: ждать окончания видео вместо таймера.
+   * Для слайдов без видео используется обычный delay.
+   * @default false
+   */
+  waitForVideo?: boolean
+}
+
+/**
+ * Опции видео модуля
+ */
+export interface VideoOptions {
+  /**
+   * Воспроизводить видео при активации слайда
+   * @default true
+   */
+  autoplay?: boolean
+
+  /**
+   * Начинать видео с выключенным звуком (обязательно для autoplay в браузерах)
+   * @default true
+   */
+  muted?: boolean
+
+  /**
+   * Зациклить воспроизведение видео
+   * @default false
+   */
+  loop?: boolean
+
+  /**
+   * Добавить атрибут playsinline для iOS (без этого видео открывается на весь экран)
+   * @default true
+   */
+  playsinline?: boolean
+
+  /**
+   * Ставить видео на паузу при уходе со слайда
+   * @default true
+   */
+  pauseOnLeave?: boolean
+
+  /**
+   * Сбрасывать видео на начало при уходе со слайда
+   * @default false
+   */
+  resetOnLeave?: boolean
+}
+
+/** Payload события videoProgress */
+export interface VideoProgressEvent {
+  /** DOM-элемент слайда */
+  slide: HTMLElement
+  /** DOM-элемент видео */
+  video: HTMLVideoElement
+  /** Индекс слайда */
+  index: number
+  /** Прогресс воспроизведения (0..1) */
+  progress: number
+  /** Текущее время воспроизведения в секундах */
+  currentTime: number
+  /** Полная длительность видео в секундах */
+  duration: number
+}
+
+/** Payload событий video (play, pause, ended, ready) */
+export interface VideoEvent {
+  /** DOM-элемент слайда */
+  slide: HTMLElement
+  /** DOM-элемент видео */
+  video: HTMLVideoElement
+  /** Индекс слайда */
+  index: number
+}
+
 /**
  * Основные опции слайдера
  */
@@ -249,28 +363,25 @@ export interface TvistOptions {
   // Autoplay
   
   /**
-   * Автопрокрутка. Число - задержка в миллисекундах между переходами, true - использовать дефолтную задержку 3000мс
+   * Автопрокрутка слайдов.
+   * - `false` — выключена (по умолчанию)
+   * - `true` — включена с задержкой 3000мс и дефолтными настройками
+   * - `number` — включена с указанной задержкой в миллисекундах
+   * - `AutoplayOptions` — полный контроль: delay, pauseOnHover, pauseOnInteraction, disableOnInteraction, waitForVideo
    * @default false
    */
-  autoplay?: number | boolean
+  autoplay?: boolean | number | AutoplayOptions
+  
+  // Video
   
   /**
-   * Ставить автопрокрутку на паузу при наведении курсора
-   * @default true
-   */
-  pauseOnHover?: boolean
-  
-  /**
-   * Ставить автопрокрутку на паузу при любом взаимодействии (drag, click)
-   * @default true
-   */
-  pauseOnInteraction?: boolean
-  
-  /**
-   * Отключить автопрокрутку после первого взаимодействия пользователя
+   * Управление видео внутри слайдов (HTML `<video>` и iframe YouTube/Vimeo).
+   * - `false` — выключено (по умолчанию)
+   * - `true` — включено с дефолтными настройками
+   * - `VideoOptions` — полный контроль
    * @default false
    */
-  disableOnInteraction?: boolean
+  video?: boolean | VideoOptions
   
   // Loop
   
@@ -534,6 +645,18 @@ export interface TvistOptions {
     unlock?: () => void
     /** Обновлены опции через updateOptions() */
     optionsUpdated?: (tvist: Tvist, newOptions: Partial<TvistOptions>) => void
+    /** Видео загрузило метаданные и готово к воспроизведению */
+    videoReady?: (data: VideoEvent) => void
+    /** Видео начало воспроизведение */
+    videoPlay?: (data: VideoEvent) => void
+    /** Видео поставлено на паузу */
+    videoPause?: (data: VideoEvent) => void
+    /** Видео завершило воспроизведение */
+    videoEnded?: (data: VideoEvent) => void
+    /** Прогресс воспроизведения видео (0..1) */
+    videoProgress?: (data: VideoProgressEvent) => void
+    /** Прогресс автопрокрутки (0..1), работает и для таймера, и для видео */
+    autoplayProgress?: (data: { progress: number; index: number }) => void
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
     [key: string]: ((...args: any[]) => void) | undefined
   }

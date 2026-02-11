@@ -13,9 +13,7 @@ import AutoplayRewindExample from '../.vitepress/theme/examples/AutoplayRewindEx
 
 ```js
 const slider = new Tvist('.tvist-v1', {
-  autoplay: 3000, // задержка в миллисекундах
-  pauseOnHover: true, // пауза при наведении
-  pauseOnInteraction: true, // пауза при взаимодействии
+  autoplay: { delay: 3000, pauseOnHover: true, pauseOnInteraction: true },
   pagination: {
     type: 'bullets',
     clickable: true
@@ -31,10 +29,9 @@ const slider = new Tvist('.tvist-v1', {
 
 ```js
 const slider = new Tvist('.tvist-v1', {
-  autoplay: 2000,
+  autoplay: { delay: 2000, pauseOnHover: true },
   rewind: true, // автоматический возврат к началу
   loop: false, // rewind работает без loop
-  pauseOnHover: true
 })
 ```
 
@@ -63,29 +60,23 @@ autoplay.isStopped() // остановлен ли
 ## Опции
 
 ### `autoplay`
-- **Тип:** `number | boolean`
+- **Тип:** `number | boolean | object`
 - **По умолчанию:** `false`
-- **Описание:** Включает автопрокрутку. Число - задержка в миллисекундах, `true` - дефолтная задержка 3000мс
+- **Описание:** Включает автопрокрутку. Поддерживает сокращённую запись и объект настроек:
+  - `autoplay: true` — дефолтная задержка 3000мс, все настройки по умолчанию
+  - `autoplay: 5000` — число задаёт задержку в мс, остальное по умолчанию
+  - `autoplay: { delay: 3000, pauseOnHover: true, pauseOnInteraction: true }` — полный контроль
+- **Свойства объекта:**
+  - `delay` — задержка между переходами (мс)
+  - `pauseOnHover` — пауза при наведении курсора (по умолчанию `true`)
+  - `pauseOnInteraction` — пауза при любом взаимодействии: drag, click (по умолчанию `true`)
+  - `disableOnInteraction` — полностью отключить после первого взаимодействия (по умолчанию `false`)
+  - `waitForVideo` — для видео-слайдов: ждать окончания видео вместо таймера (по умолчанию `false`)
 
 ### `rewind`
 - **Тип:** `boolean`
 - **По умолчанию:** `false`
 - **Описание:** Автоматически возвращаться к первому слайду после достижения последнего (работает без `loop`)
-
-### `pauseOnHover`
-- **Тип:** `boolean`
-- **По умолчанию:** `true`
-- **Описание:** Ставить автопрокрутку на паузу при наведении курсора
-
-### `pauseOnInteraction`
-- **Тип:** `boolean`
-- **По умолчанию:** `true`
-- **Описание:** Ставить автопрокрутку на паузу при любом взаимодействии (drag, click)
-
-### `disableOnInteraction`
-- **Тип:** `boolean`
-- **По умолчанию:** `false`
-- **Описание:** Полностью отключить автопрокрутку после первого взаимодействия пользователя
 
 ## События
 
@@ -124,8 +115,7 @@ slider.updateOptions({ autoplay: 1000 })
 
 ```js
 const slider = new Tvist('.tvist-v1', {
-  autoplay: 3000,
-  disableOnInteraction: true // остановится после первого drag/click
+  autoplay: { delay: 3000, disableOnInteraction: true } // остановится после первого drag/click
 })
 ```
 
