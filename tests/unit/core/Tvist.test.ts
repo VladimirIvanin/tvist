@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { Tvist } from '@core/Tvist'
+import pkg from '../../../package.json' with { type: 'json' }
 import { createSliderFixture, createInvalidSliderFixture, createEmptySliderFixture } from '../../fixtures'
 import type { SliderFixture } from '../../fixtures'
 
@@ -70,7 +71,7 @@ describe('Tvist', () => {
     })
 
     it('should have version', () => {
-      expect(Tvist.VERSION).toBe('1.0.0')
+      expect(Tvist.VERSION).toBe(pkg.version)
     })
   })
 
