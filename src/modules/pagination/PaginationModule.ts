@@ -45,9 +45,6 @@ export class PaginationModule extends Module {
   // Группы слайдов для каждой точки (используется при limit)
   private bulletGroups: BulletGroup[] = []
   
-  // Флаг для отслеживания состояния драга
-  private isDragging = false
-
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
   }
@@ -78,11 +75,11 @@ export class PaginationModule extends Module {
     // Обновляем при изменении слайда СИНХРОННО (slideChangeStart эмитится ДО анимации),
     // чтобы к моменту slideChangeEnd (после анимации) bullet'ы были уже актуальны.
     // Также слушаем slideChangeEnd для instant-переходов (scrollTo с instant=true).
-    this.on('slideChangeStart', (index: number) => {
+    this.on('slideChangeStart', (_index: number) => {
       this.updateActive()
     })
     
-    this.on('slideChangeEnd', (index: number) => {
+    this.on('slideChangeEnd', (_index: number) => {
       this.updateActive()
       if (this.options.loop) this.scheduleUpdateActive()
     })
