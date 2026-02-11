@@ -88,6 +88,7 @@ export class AutoplayModule extends Module {
 
   // Для waitForVideo — слушаем videoEnded
   private waitingForVideo = false
+  private videoEndedWhilePaused = false  // видео закончилось пока autoplay на паузе (hover)
   private videoEndedHandler?: () => void
 
   constructor(tvist: Tvist, options: TvistOptions) {
@@ -244,18 +245,27 @@ export class AutoplayModule extends Module {
   }
 
   /**
-   * Обработка смены слайда для режима waitForVideo
+   * Обработка смены слайда для режима waitForVideo.
+   * index из slideChanged — это normalizedIndex (= realIndex), НЕ DOM-позиция.
+   * В loop-режиме DOM-позиция может отличаться, поэтому ищем слайд по data-tvist-slide-index.
    */
   private handleSlideChangedForVideo(index: number): void {
     // Снимаем предыдущий videoEnded listener
     this.detachVideoEndedListener()
     this.waitingForVideo = false
+    this.videoEndedWhilePaused = false
 
-    const slide = this.tvist.slides[index]
+    // index = realIndex. Ищем слайд по data-tvist-slide-index (loop) или по DOM-позиции (обычный)
+    const slide = this.findSlideByRealIndex(index)
+
     if (!slide) return
 
     const video = slide.querySelector('video')
-    if (!video) return // нет видео — используем обычный delay (таймер уже запущен)
+    if (!video) {
+      // Нет видео — запускаем таймер (он мог быть отменён предыдущим waitingForVideo)
+      this.run()
+      return
+    }
 
     // Есть видео — останавливаем таймер, ждём videoEnded
     this.waitingForVideo = true
@@ -263,14 +273,39 @@ export class AutoplayModule extends Module {
     this.stopProgressTracking()
 
     this.videoEndedHandler = () => {
-      if (!this.paused && !this.stopped && this.waitingForVideo) {
-        this.waitingForVideo = false
-        this.tvist.next()
-        // После next() transitionEnd перезапустит цикл
+      if (this.stopped || !this.waitingForVideo) {
+        return
       }
+      if (this.paused) {
+        // Видео закончилось пока autoplay на паузе (hover).
+        // Запоминаем — при resume() обработаем.
+        this.videoEndedWhilePaused = true
+        return
+      }
+      this.waitingForVideo = false
+      this.tvist.next()
     }
 
     this.on('videoEnded', this.videoEndedHandler)
+  }
+
+  /**
+   * Найти DOM-элемент слайда по realIndex (data-tvist-slide-index).
+   * В loop-режиме DOM-позиция может не совпадать с realIndex.
+   */
+  private findSlideByRealIndex(realIndex: number): HTMLElement | undefined {
+    const slides = this.tvist.slides
+    
+    // Сначала пробуем по data-tvist-slide-index (loop mode)
+    for (const slide of slides) {
+      const dataAttr = slide.getAttribute('data-tvist-slide-index')
+      if (dataAttr !== null && parseInt(dataAttr, 10) === realIndex) {
+        return slide
+      }
+    }
+    
+    // Fallback: по DOM-позиции (обычный режим, без loop)
+    return slides[realIndex]
   }
 
   /**
@@ -287,8 +322,12 @@ export class AutoplayModule extends Module {
    * Подключение hover событий
    */
   private attachHoverEvents(): void {
-    this.mouseEnterHandler = () => this.pause()
-    this.mouseLeaveHandler = () => this.resume()
+    this.mouseEnterHandler = () => {
+      this.pause()
+    }
+    this.mouseLeaveHandler = () => {
+      this.resume()
+    }
 
     this.tvist.root.addEventListener('mouseenter', this.mouseEnterHandler)
     this.tvist.root.addEventListener('mouseleave', this.mouseLeaveHandler)
@@ -457,6 +496,17 @@ export class AutoplayModule extends Module {
     
     if (this.paused && !this.stopped) {
       this.paused = false
+      
+      // Если видео закончилось пока мы были на паузе — обрабатываем сейчас
+      if (this.videoEndedWhilePaused && this.waitingForVideo) {
+        this.videoEndedWhilePaused = false
+        this.waitingForVideo = false
+        this.tvist.next()
+        this.emit('autoplayResume')
+        return
+      }
+      this.videoEndedWhilePaused = false
+      
       // Перезапускаем с полной задержкой
       // Это предотвращает немедленное переключение после паузы
       this.run()

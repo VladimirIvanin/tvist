@@ -115,6 +115,35 @@ export class Engine {
   }
 
   /**
+   * Получить realIndex (из data-tvist-slide-index) для слайда на указанной DOM-позиции.
+   * Если атрибут отсутствует, возвращает domIndex как есть.
+   */
+  private getEventIndex(domIndex: number): number {
+    const slide = this.tvist.slides[domIndex]
+    if (!slide) return domIndex
+    const dataAttr = slide.getAttribute('data-tvist-slide-index')
+    if (dataAttr !== null) {
+      return parseInt(dataAttr, 10)
+    }
+    return domIndex
+  }
+
+  /**
+   * Найти DOM-позицию слайда по его realIndex (data-tvist-slide-index).
+   * Возвращает -1, если слайд не найден.
+   */
+  private findDomIndexByRealIndex(realIndex: number): number {
+    const slides = this.tvist.slides
+    for (let i = 0; i < slides.length; i++) {
+      const dataAttr = slides[i]?.getAttribute('data-tvist-slide-index')
+      if (dataAttr !== null && parseInt(dataAttr, 10) === realIndex) {
+        return i
+      }
+    }
+    return -1
+  }
+
+  /**
    * Позиция скролла для индекса. При loop peekTrim не применяется.
    */
   public getScrollPositionForIndex(index: number): number {
@@ -424,11 +453,56 @@ export class Engine {
     // Сохраняем текущий индекс ДО изменения
     const previousIndex = this.index.get()
     
-    // Нормализуем индекс через Counter
-    const normalizedIndex = this.index.set(clampedIndex) ?? 0
+    // Вычисляем нормализованный индекс БЕЗ изменения Counter (для beforeTransitionStart)
+    let normalizedIndex = this.index.loop
+      ? (clampedIndex < 0 ? clampedIndex + this.index.max : clampedIndex % this.index.max)
+      : Math.max(0, Math.min(clampedIndex, this.index.endIndex))
     
     // Проверяем, действительно ли индекс изменился
-    const indexChanged = normalizedIndex !== previousIndex
+    let indexChanged = normalizedIndex !== previousIndex
+    
+    // eventIndex — realIndex для событий (slideChange, slideChanged и пр.)
+    // В loop-режиме normalizedIndex = DOM-позиция, eventIndex = realIndex из data-tvist-slide-index.
+    // В обычном режиме они совпадают.
+    const eventIndex = this.getEventIndex(normalizedIndex)
+
+    // Событие ПЕРЕД началом анимации и ДО изменения Counter (для loopFix)
+    if (indexChanged && !instant) {
+      const savedDirection = this.tvist._scrollDirection
+      const direction = savedDirection ?? (normalizedIndex > previousIndex ? 'next' : 'prev')
+      this.tvist._scrollDirection = undefined
+      
+      const counterBeforeEmit = this.index.get()
+      
+      this.tvist.emit('beforeTransitionStart', { index: eventIndex, direction })
+      
+      const counterAfterEmit = this.index.get()
+      
+      // LoopModule переставил слайды и обновил Counter на DOM-позицию текущего слайда.
+      // После перестановки DOM-позиция целевого слайда могла измениться.
+      // Находим DOM-позицию целевого слайда по его eventIndex (= realIndex).
+      if (counterBeforeEmit !== counterAfterEmit && this.options.loop) {
+        // Ищем DOM-позицию слайда с data-tvist-slide-index === eventIndex
+        const targetDomIndex = this.findDomIndexByRealIndex(eventIndex)
+        
+        if (targetDomIndex !== -1) {
+          clampedIndex = targetDomIndex
+          normalizedIndex = targetDomIndex
+        } else {
+          // Fallback: delta подход
+          const delta = clampedIndex - counterBeforeEmit
+          clampedIndex = counterAfterEmit + delta
+          normalizedIndex = ((clampedIndex % this.index.max) + this.index.max) % this.index.max
+        }
+        // indexChanged определяем по eventIndex (realIndex), а не по DOM-позиции.
+        // LoopModule мог переместить целевой слайд на ту же DOM-позицию, что и counterAfterEmit,
+        // но realIndex всё равно изменился — нужно эмитить события.
+        indexChanged = true
+      }
+    }
+    
+    // Обновляем Counter
+    this.index.set(clampedIndex)
 
     engineLog('scrollTo', {
       inputIndex: index,
@@ -454,7 +528,7 @@ export class Engine {
 
     // События генерируем только если индекс действительно изменился
     if (indexChanged) {
-      this.tvist.emit('beforeSlideChange', normalizedIndex)
+      this.tvist.emit('beforeSlideChange', eventIndex)
     }
 
     if (instant) {
@@ -464,28 +538,17 @@ export class Engine {
       this.emitProgress()
       
       if (indexChanged) {
-        this.tvist.emit('slideChanged', normalizedIndex)
-        this.emitReachEdge(normalizedIndex, endIndex)
+        this.tvist.emit('slideChanged', eventIndex)
+        this.emitReachEdge(eventIndex, endIndex)
       }
     } else {
-      // Событие ПЕРЕД началом анимации (для loopFix)
-      if (indexChanged) {
-        // Используем сохраненное направление из scrollBy, если есть
-        const savedDirection = this.tvist._scrollDirection
-        const direction = savedDirection ?? (normalizedIndex > previousIndex ? 'next' : 'prev')
-        
-        // Очищаем сохраненное направление
-        this.tvist._scrollDirection = undefined
-        
-        this.tvist.emit('beforeTransitionStart', { index: normalizedIndex, direction })
-      }
 
       this.target.set(targetPosition)
       const speed = this.options.speed ?? 300
 
       if (indexChanged) {
-        this.tvist.emit('transitionStart', normalizedIndex)
-        this.tvist.emit('slideChange', normalizedIndex)
+        this.tvist.emit('transitionStart', eventIndex)
+        this.tvist.emit('slideChange', eventIndex)
       }
 
       // Проверяем, нужна ли анимация для корректировки позиции
@@ -522,11 +585,11 @@ export class Engine {
             
             // transitionEnd эмитим ВСЕГДА по завершении анимации,
             // чтобы модули (AutoplayModule и др.) могли корректно реагировать
-            this.tvist.emit('transitionEnd', normalizedIndex)
+            this.tvist.emit('transitionEnd', eventIndex)
 
             if (indexChanged) {
-              this.tvist.emit('slideChanged', normalizedIndex)
-              this.emitReachEdge(normalizedIndex, endIndex)
+              this.tvist.emit('slideChanged', eventIndex)
+              this.emitReachEdge(eventIndex, endIndex)
             }
           }
         )
@@ -536,7 +599,7 @@ export class Engine {
         if (!indexChanged) {
           // Используем microtask чтобы событие было асинхронным как после анимации
           void Promise.resolve().then(() => {
-            this.tvist.emit('transitionEnd', normalizedIndex)
+            this.tvist.emit('transitionEnd', eventIndex)
           })
         }
       }
@@ -570,9 +633,8 @@ export class Engine {
    * @param delta - смещение в слайдах
    */
   scrollBy(delta: number): void {
-    const currentIndex = this.index.get()
-    const targetIndex = currentIndex + delta
-    
+    const targetIndex = this.index.get() + delta
+
     // Определяем направление для loop
     // Важно: в loop режиме направление определяется по знаку delta, а не по сравнению индексов
     const direction = delta > 0 ? 'next' : delta < 0 ? 'prev' : undefined

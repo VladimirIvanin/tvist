@@ -13,7 +13,7 @@
           <div class="tvist-v1__slide">
             <div class="slide-content">
               <div class="slide-number">2</div>
-              <div class="slide-text">Фото-слайд (5 сек)</div>
+              <div class="slide-text">Фото-слайд (2 сек)</div>
             </div>
           </div>
           <div class="tvist-v1__slide">
@@ -78,6 +78,7 @@ onMounted(() => {
     slider.value = new Tvist(sliderEl.value, {
       perPage: 1,
       gap: 0,
+      loop: true,
       video: {
         autoplay: true,
         muted: true,
@@ -86,7 +87,7 @@ onMounted(() => {
         resetOnLeave: true,
       },
       autoplay: {
-        delay: 5000,
+        delay: 2000,
         pauseOnHover: true,
         waitForVideo: true,
       },
@@ -107,7 +108,8 @@ onMounted(() => {
     })
 
     // Сброс при смене слайда
-    slider.value.on('slideChange', () => {
+    slider.value.on('slideChange', (index) => {
+      console.log('🎬 Example: slideChange event received, index =', index)
       progress.value = 0
     })
   }
@@ -164,9 +166,7 @@ onUnmounted(() => {
   opacity: 0.9;
 }
 
-.tvist-v1__slide:nth-child(1) { background: #000; }
-.tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v1__slide:nth-child(3) { background: #000; }
+.tvist-v1__slide { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
 
 .progress-bar {
   width: 100%;

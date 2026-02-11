@@ -176,10 +176,15 @@ export class VideoModule extends Module {
     this.scanSlides()
     this.setupVisibilityHandlers()
 
-    // Запускаем видео на начальном слайде
-    const startIndex = this.tvist.activeIndex
-    this.previousIndex = startIndex
-    this.activateSlide(startIndex)
+    // Подписываемся на событие смены слайда
+    this.on('slideChange', (index: number) => {
+      this.onSlideChange(index)
+    })
+
+    // Запускаем видео на начальном слайде (используем realIndex)
+    const startRealIndex = this.tvist.realIndex ?? this.tvist.activeIndex
+    this.previousIndex = startRealIndex
+    this.activateSlideByRealIndex(startRealIndex)
   }
 
   override destroy(): void {
@@ -196,21 +201,26 @@ export class VideoModule extends Module {
   }
 
   /**
-   * Хук смены слайда — ядро модуля
+   * Хук смены слайда — ядро модуля.
+   * ВАЖНО: index из slideChange — это normalizedIndex (= realIndex, оригинальный 0..N-1),
+   * а НЕ DOM-позиция. В loop-режиме DOM-позиция может отличаться после перестановки слайдов.
+   * Видео ищем напрямую по realIndex (ключ в this.videos Map).
    */
   override onSlideChange(index: number): void {
     if (!this.config) return
     
+    // index = realIndex (оригинальный индекс слайда)
+    const realIndex = index
     const prev = this.previousIndex
-    this.previousIndex = index
+    this.previousIndex = realIndex
 
     // Деактивируем предыдущий слайд
-    if (prev !== -1 && prev !== index) {
-      this.deactivateSlide(prev)
+    if (prev !== -1 && prev !== realIndex) {
+      this.deactivateSlideByRealIndex(prev)
     }
 
     // Активируем новый слайд
-    this.activateSlide(index)
+    this.activateSlideByRealIndex(realIndex)
   }
 
   /**
@@ -226,7 +236,7 @@ export class VideoModule extends Module {
         this.muted = this.config!.muted
         this.scanSlides()
         this.setupVisibilityHandlers()
-        this.activateSlide(this.tvist.activeIndex)
+        this.activateSlideByRealIndex(this.tvist.realIndex ?? this.tvist.activeIndex)
       } else if (wasActive && !isNowActive) {
         this.destroy()
       } else if (wasActive && isNowActive) {
@@ -239,17 +249,24 @@ export class VideoModule extends Module {
   // ==================== Сканирование ====================
 
   /**
-   * Сканировать слайды и найти все видео/iframe
+   * Сканировать слайды и найти все видео/iframe.
+   * Регистрирует по data-tvist-slide-index (оригинальный индекс) если доступен,
+   * иначе по позиции в DOM. Это обеспечивает корректную работу с LoopModule,
+   * который может переставлять слайды в DOM.
    */
   private scanSlides(): void {
     this.videos.clear()
     this.iframes.clear()
 
-    this.tvist.slides.forEach((slide, index) => {
+    this.tvist.slides.forEach((slide, domIndex) => {
+      // Используем оригинальный индекс (data-tvist-slide-index) если есть (loop mode)
+      const dataIndex = slide.getAttribute('data-tvist-slide-index')
+      const registrationIndex = dataIndex !== null ? parseInt(dataIndex, 10) : domIndex
+
       // HTML <video>
       const video = slide.querySelector('video')
       if (video) {
-        this.registerVideo(index, slide, video)
+        this.registerVideo(registrationIndex, slide, video)
       }
 
       // iframe (YouTube/Vimeo)
@@ -257,7 +274,7 @@ export class VideoModule extends Module {
       if (iframe) {
         const src = iframe.getAttribute('src') || iframe.getAttribute('data-src') || ''
         if (isVideoIframe(src)) {
-          this.registerIframe(index, slide, iframe, src)
+          this.registerIframe(registrationIndex, slide, iframe, src)
         }
       }
     })
@@ -406,32 +423,33 @@ export class VideoModule extends Module {
   // ==================== Активация/деактивация слайдов ====================
 
   /**
-   * Активировать видео на слайде
+   * Активировать видео по realIndex (оригинальный индекс слайда).
+   * Видео зарегистрированы в Map по realIndex (data-tvist-slide-index).
    */
-  private activateSlide(index: number): void {
+  private activateSlideByRealIndex(realIndex: number): void {
     if (!this.config) return
 
     // HTML video
-    const videoEntry = this.videos.get(index)
+    const videoEntry = this.videos.get(realIndex)
     if (videoEntry && this.config.autoplay) {
       this.safePlay(videoEntry.video)
     }
 
     // iframe
-    const iframeEntry = this.iframes.get(index)
+    const iframeEntry = this.iframes.get(realIndex)
     if (iframeEntry && this.config.autoplay) {
       this.activateIframe(iframeEntry)
     }
   }
 
   /**
-   * Деактивировать видео на слайде
+   * Деактивировать видео по realIndex (оригинальный индекс слайда).
    */
-  private deactivateSlide(index: number): void {
+  private deactivateSlideByRealIndex(realIndex: number): void {
     if (!this.config) return
 
     // HTML video
-    const videoEntry = this.videos.get(index)
+    const videoEntry = this.videos.get(realIndex)
     if (videoEntry) {
       if (this.config.pauseOnLeave) {
         videoEntry.video.pause()
@@ -442,7 +460,7 @@ export class VideoModule extends Module {
     }
 
     // iframe
-    const iframeEntry = this.iframes.get(index)
+    const iframeEntry = this.iframes.get(realIndex)
     if (iframeEntry) {
       this.deactivateIframe(iframeEntry)
     }
@@ -609,7 +627,8 @@ export class VideoModule extends Module {
     if (this.pausedByVisibility) return
     this.pausedByVisibility = true
 
-    const entry = this.videos.get(this.tvist.activeIndex)
+    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
+    const entry = this.videos.get(realIndex)
     if (entry && !entry.video.paused) {
       entry.video.pause()
     }
@@ -624,7 +643,8 @@ export class VideoModule extends Module {
 
     if (!this.config?.autoplay) return
 
-    const entry = this.videos.get(this.tvist.activeIndex)
+    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
+    const entry = this.videos.get(realIndex)
     if (entry && entry.video.paused) {
       this.safePlay(entry.video)
     }

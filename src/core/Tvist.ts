@@ -8,7 +8,7 @@ import { Engine } from './Engine'
 import { EventEmitter } from './EventEmitter'
 import { getElement, children } from '../utils/dom'
 import { TVIST_CLASSES } from './constants'
-import type { TvistOptions, LoopModuleAPI, AutoplayModuleAPI, VideoModuleAPI } from './types'
+import type { TvistOptions, AutoplayModuleAPI, VideoModuleAPI } from './types'
 import type { Module, ModuleConstructor } from '../modules/Module'
 import { throttle } from './Animator'
 
@@ -205,32 +205,7 @@ export class Tvist {
       // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
       const step = this.options.slidesPerGroup ?? 1
       
-      // В loop режиме вызываем loopFix ДО перехода
-      if (this.options.loop) {
-        const loopModule = this.modules.get('loop') as LoopModuleAPI | undefined
-        if (loopModule && typeof loopModule.fix === 'function') {
-          // КРИТИЧНО: останавливаем анимацию перед loopFix
-          this.engine.animator.stop()
-          
-          // Запоминаем текущую позицию во время анимации
-          const currentLocation = this.engine.location.get()
-          
-          // Синхронизируем target с location (останавливаем анимацию)
-          this.engine.target.set(currentLocation)
-          this.engine.location.set(currentLocation)
-          
-          // loopFix возвращает скорректированный ТЕКУЩИЙ индекс после перестановки
-          const currentCorrectedIndex = loopModule.fix({
-            direction: 'next'
-          })
-          
-          // Переходим относительно скорректированного индекса
-          this.engine.scrollTo(currentCorrectedIndex + step)
-          
-          return this
-        }
-      }
-      
+      // Просто вызываем scrollBy - LoopModule сам обработает через beforeTransitionStart
       this.engine.scrollBy(step)
     }
     return this
@@ -245,31 +220,7 @@ export class Tvist {
       // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
       const step = this.options.slidesPerGroup ?? 1
       
-      // В loop режиме вызываем loopFix ДО перехода
-      if (this.options.loop) {
-        const loopModule = this.modules.get('loop') as LoopModuleAPI | undefined
-        if (loopModule && typeof loopModule.fix === 'function') {
-          // КРИТИЧНО: останавливаем анимацию перед loopFix
-          this.engine.animator.stop()
-          
-          // Запоминаем текущую позицию во время анимации
-          const currentLocation = this.engine.location.get()
-          
-          // Синхронизируем target с location (останавливаем анимацию)
-          this.engine.target.set(currentLocation)
-          this.engine.location.set(currentLocation)
-          
-          // loopFix возвращает скорректированный ТЕКУЩИЙ индекс после перестановки
-          const currentCorrectedIndex = loopModule.fix({
-            direction: 'prev'
-          })
-          
-          // Переходим относительно скорректированного индекса
-          this.engine.scrollTo(currentCorrectedIndex - step)
-          return this
-        }
-      }
-      
+      // Просто вызываем scrollBy - LoopModule сам обработает через beforeTransitionStart
       this.engine.scrollBy(-step)
     }
     return this

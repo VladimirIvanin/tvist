@@ -69,7 +69,13 @@ export class LoopModule extends Module {
       activeIndex: this.tvist.engine.index.get()
     })
 
-    // Больше не слушаем beforeTransitionStart, т.к. loopFix вызывается в next()/prev()
+    // Подписываемся на beforeTransitionStart для автоматического loopFix
+    this.on('beforeTransitionStart', (data: { index: number; direction: 'next' | 'prev' }) => {
+      log('beforeTransitionStart received', data)
+      this.loopFix({
+        direction: data.direction,
+      })
+    })
     
     // Патчим геттер realIndex
     Object.defineProperty(this.tvist, 'realIndex', {
