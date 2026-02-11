@@ -8,6 +8,7 @@
               src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
               muted
               playsinline
+              height="300"
             ></video>
           </div>
           <div class="tvist-v1__slide">
@@ -21,6 +22,7 @@
               src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
               muted
               playsinline
+              height="300"
             ></video>
           </div>
         </div>

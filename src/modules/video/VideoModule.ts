@@ -567,12 +567,14 @@ export class VideoModule extends Module {
       console.log(5)
       doPlay()
     } else {
-      // На iOS canplay часто не срабатывает, срабатывает canplaythrough — подписываемся на оба
+      // На iOS canplay/canplaythrough могут не сработать — срабатывают loadedmetadata, loadeddata. Ждём любой из событий готовности.
       console.log(6)
       const onReady = (e: Event) => {
         console.log(7, e.type)
         video.removeEventListener('canplay', onReady)
         video.removeEventListener('canplaythrough', onReady)
+        video.removeEventListener('loadeddata', onReady)
+        video.removeEventListener('loadedmetadata', onReady)
         requestAnimationFrame(() => {
           console.log(8)
           doPlay()
@@ -580,6 +582,8 @@ export class VideoModule extends Module {
       }
       video.addEventListener('canplay', onReady)
       video.addEventListener('canplaythrough', onReady)
+      video.addEventListener('loadeddata', onReady)
+      video.addEventListener('loadedmetadata', onReady)
     }
   }
 
