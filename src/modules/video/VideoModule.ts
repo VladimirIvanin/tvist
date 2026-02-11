@@ -298,7 +298,7 @@ export class VideoModule extends Module {
     if (this.config.loop) {
       video.loop = true
     }
-    // Убираем нативный autoplay — управляем сами
+    // Убираем нативный autoplay — автоплеем мы управялем сами, по переключению слайдов
     video.removeAttribute('autoplay')
     video.autoplay = false
 
@@ -528,8 +528,11 @@ export class VideoModule extends Module {
     } else {
       // Ждём canplay
       const onCanPlay = () => {
+        // According to snippet, wait for RAF before playing
+        requestAnimationFrame(() => {
+          doPlay()
+        })
         video.removeEventListener('canplay', onCanPlay)
-        requestAnimationFrame(doPlay)
       }
       video.addEventListener('canplay', onCanPlay)
     }
