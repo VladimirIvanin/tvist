@@ -175,14 +175,18 @@ export class AutoplayModule extends Module {
 
   /**
    * Возобновление autoplay после drag
-   * Вызывается из transitionEnd или fallback timeout
+   * Вызывается из transitionEnd или fallback timeout.
+   * Сбрасываем timeLeft, чтобы следующий цикл шёл с полной задержкой (delay),
+   * а не с остатком до переключения — иначе слайдер перелистнётся сразу после отпускания.
    */
   private resumeAfterDrag(): void {
     if (!this.isDragging) return
     
     this.isDragging = false
     this.clearDragEndTimeout()
-    
+    this.timeLeft = null
+    this.progressStartOffset = 0
+
     if (!this.config?.disableOnInteraction && !this.stopped && this.paused) {
       this.resume()
     }
