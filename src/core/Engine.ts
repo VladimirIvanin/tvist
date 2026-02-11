@@ -136,7 +136,7 @@ export class Engine {
     const slides = this.tvist.slides
     for (let i = 0; i < slides.length; i++) {
       const dataAttr = slides[i]?.getAttribute('data-tvist-slide-index')
-      if (dataAttr !== null && parseInt(dataAttr, 10) === realIndex) {
+      if (dataAttr != null && parseInt(dataAttr, 10) === realIndex) {
         return i
       }
     }
