@@ -78,6 +78,7 @@ export default defineConfig({
           { text: 'Drag Free Mode', link: '/examples/drag-free' },
           { text: 'Scroll Control', link: '/examples/scroll-control' },
           { text: 'Scrollbar', link: '/examples/scrollbar' },
+          { text: 'Lock', link: '/examples/lock' },
           { text: 'Pagination', link: '/examples/pagination' },
           { text: 'LazyLoad', link: '/examples/lazyload' },
           { text: 'Modules', link: '/examples/modules' },

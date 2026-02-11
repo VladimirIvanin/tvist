@@ -66,6 +66,21 @@
           <button @click="slider4?.next()" :disabled="!slider4?.canScrollNext">Next →</button>
         </div>
       </div>
+
+      <!-- perPage: 2, loop: true, 1 слайд -->
+      <div class="demo-section">
+        <h3>perPage: 2, loop: true, 1 слайд</h3>
+        <div ref="slider5El" class="tvist-v1">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide"><span>1</span></div>
+          </div>
+        </div>
+        <div class="controls">
+          <button @click="slider5?.prev()">← Prev</button>
+          <span class="slide-info">activeIndex: {{ state5.activeIndex }} / realIndex: {{ state5.realIndex }}</span>
+          <button @click="slider5?.next()">Next →</button>
+        </div>
+      </div>
     </div>
   </ExampleCard>
 </template>
@@ -79,15 +94,18 @@ const slider1El = ref(null)
 const slider2El = ref(null)
 const slider3El = ref(null)
 const slider4El = ref(null)
+const slider5El = ref(null)
 
 const slider1 = ref(null)
 const slider2 = ref(null)
 const slider3 = ref(null)
 const slider4 = ref(null)
+const slider5 = ref(null)
 
 const state2 = reactive({ current: 1, total: 8 })
 const state3 = reactive({ current: 1, total: 8 })
 const state4 = reactive({ current: 1, total: 12 })
+const state5 = reactive({ activeIndex: 0, realIndex: 0 })
 
 const updateState = (slider, state, total) => {
   if (slider) {
@@ -148,6 +166,29 @@ onMounted(() => {
       }
     })
   }
+
+  // Slider 5: perPage = 2, loop = true, 1 слайд
+  if (slider5El.value) {
+    slider5.value = new Tvist(slider5El.value, {
+      perPage: 2,
+      loop: true,
+      gap: 16,
+      speed: 300,
+      drag: true,
+      on: {
+        slideChanged: () => {
+          if (slider5.value) {
+            state5.activeIndex = slider5.value.activeIndex
+            state5.realIndex = slider5.value.realIndex ?? 0
+          }
+        },
+        created: (instance) => {
+          state5.activeIndex = instance.activeIndex
+          state5.realIndex = instance.realIndex ?? 0
+        }
+      }
+    })
+  }
 })
 
 onUnmounted(() => {
@@ -155,6 +196,7 @@ onUnmounted(() => {
   slider2.value?.destroy()
   slider3.value?.destroy()
   slider4.value?.destroy()
+  slider5.value?.destroy()
 })
 </script>
 
