@@ -378,7 +378,7 @@ pagination: {
 - `'center'` (по умолчанию) — остаток добавляется к центральным точкам
 - `'right'` — остаток добавляется к правым точкам
 
-Пример: 7 слайдов, лимит 2, стратегия центр → [4, 3] слайда на точку.
+Пример: 7 слайдов, лимит 2, стратегия центр → [3, 4] слайда на точку.
 
 <div ref="evenCenterRef" class="tvist-v1 pagination-demo-slider">
   <div class="tvist-v1__container">
@@ -394,7 +394,7 @@ pagination: {
   type: 'bullets',
   limit: 2,
   strategy: 'even',
-  remainderStrategy: 'center' // левая точка получает остаток
+  remainderStrategy: 'center' // остаток распределяется в центре (правая точка)
 }
 ```
 

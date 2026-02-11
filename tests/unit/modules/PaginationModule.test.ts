@@ -309,11 +309,11 @@ describe('PaginationModule', () => {
         const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
         expect(bullets.length).toBe(2)
         
-        // 7/2=3 с остатком 1, центр получает остаток: [4, 3]
-        // При 2 точках центр - это первая точка (startOffset = floor((2-1)/2) = 0)
+        // 7/2=3 с остатком 1, центр получает остаток: [3, 4]
+        // При 2 точках с ceil остаток идет во вторую точку (startOffset = ceil((2-1)/2) = 1)
         expect(bullets[0].getAttribute('data-group-start')).toBe('0')
-        expect(bullets[0].getAttribute('data-group-end')).toBe('3')
-        expect(bullets[1].getAttribute('data-group-start')).toBe('4')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('2')
+        expect(bullets[1].getAttribute('data-group-start')).toBe('3')
         expect(bullets[1].getAttribute('data-group-end')).toBe('6')
       })
 

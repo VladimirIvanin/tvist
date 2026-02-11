@@ -209,7 +209,7 @@ export class PaginationModule extends Module {
           }
         } else if (remainderStrategy === 'center') {
           // Добавляем к центральным точкам
-          const startOffset = Math.floor((limit - remainder) / 2)
+          const startOffset = Math.ceil((limit - remainder) / 2)
           if (i >= startOffset && i < startOffset + remainder) {
             groupSize++
           }
@@ -292,7 +292,7 @@ export class PaginationModule extends Module {
       let groupSize = baseCenterSize
       
       // Распределяем остаток равномерно (в центре)
-      const startOffset = Math.floor((centerPoints - centerRemainder) / 2)
+      const startOffset = Math.ceil((centerPoints - centerRemainder) / 2)
       if (i >= startOffset && i < startOffset + centerRemainder) {
         groupSize++
       }
