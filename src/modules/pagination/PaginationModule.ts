@@ -20,6 +20,18 @@ const log = (..._args: unknown[]) => {
   }
 }
 
+/**
+ * Структура группы слайдов для точки пагинации
+ */
+interface BulletGroup {
+  /** Индекс начального слайда группы */
+  startIndex: number
+  /** Индекс конечного слайда группы (включительно) */
+  endIndex: number
+  /** Количество слайдов в группе */
+  count: number
+}
+
 export class PaginationModule extends Module {
   readonly name = 'pagination'
 
@@ -29,6 +41,9 @@ export class PaginationModule extends Module {
   
   // Счётчик обновлений для отладки
   private updateCounter = 0
+  
+  // Группы слайдов для каждой точки (используется при limit)
+  private bulletGroups: BulletGroup[] = []
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
@@ -147,6 +162,183 @@ export class PaginationModule extends Module {
   }
 
   /**
+   * Вычисление групп слайдов при использовании limit
+   * @param totalSlides - общее количество слайдов
+   * @param limit - максимальное количество точек
+   * @returns массив групп слайдов для каждой точки
+   */
+  private calculateBulletGroups(totalSlides: number, limit: number): BulletGroup[] {
+    const pagination = this.options.pagination
+    const strategy = typeof pagination === 'object' && pagination !== null
+      ? pagination.strategy ?? 'even'
+      : 'even'
+
+    if (strategy === 'even') {
+      return this.calculateEvenGroups(totalSlides, limit)
+    } else {
+      return this.calculateCenterGroups(totalSlides, limit)
+    }
+  }
+
+  /**
+   * Равномерное распределение слайдов по точкам
+   * @param totalSlides - общее количество слайдов
+   * @param limit - количество точек
+   */
+  private calculateEvenGroups(totalSlides: number, limit: number): BulletGroup[] {
+    const pagination = this.options.pagination
+    const remainderStrategy = typeof pagination === 'object' && pagination !== null
+      ? pagination.remainderStrategy ?? 'center'
+      : 'center'
+
+    const groups: BulletGroup[] = []
+    const baseSize = Math.floor(totalSlides / limit)
+    const remainder = totalSlides % limit
+
+    let currentIndex = 0
+
+    for (let i = 0; i < limit; i++) {
+      let groupSize = baseSize
+      
+      // Распределяем остаток
+      if (remainder > 0) {
+        if (remainderStrategy === 'left') {
+          // Добавляем к левым точкам
+          if (i < remainder) {
+            groupSize++
+          }
+        } else if (remainderStrategy === 'center') {
+          // Добавляем к центральным точкам
+          const startOffset = Math.ceil((limit - remainder) / 2)
+          if (i >= startOffset && i < startOffset + remainder) {
+            groupSize++
+          }
+        } else if (remainderStrategy === 'right') {
+          // Добавляем к правым точкам
+          if (i >= limit - remainder) {
+            groupSize++
+          }
+        }
+      }
+
+      groups.push({
+        startIndex: currentIndex,
+        endIndex: currentIndex + groupSize - 1,
+        count: groupSize
+      })
+
+      currentIndex += groupSize
+    }
+
+    return groups
+  }
+
+  /**
+   * Центральное распределение слайдов по точкам
+   * Крайние точки (первая и последняя) = 1 слайд
+   * Центральные точки = делим оставшиеся слайды
+   * @param totalSlides - общее количество слайдов
+   * @param limit - количество точек
+   */
+  private calculateCenterGroups(totalSlides: number, limit: number): BulletGroup[] {
+    const groups: BulletGroup[] = []
+
+    if (limit === 1) {
+      // Одна точка - все слайды
+      groups.push({
+        startIndex: 0,
+        endIndex: totalSlides - 1,
+        count: totalSlides
+      })
+      return groups
+    }
+
+    if (limit === 2) {
+      // Две точки - делим пополам
+      const half = Math.ceil(totalSlides / 2)
+      groups.push({
+        startIndex: 0,
+        endIndex: half - 1,
+        count: half
+      })
+      groups.push({
+        startIndex: half,
+        endIndex: totalSlides - 1,
+        count: totalSlides - half
+      })
+      return groups
+    }
+
+    // Для limit >= 3
+    // Первая точка - первый слайд
+    groups.push({
+      startIndex: 0,
+      endIndex: 0,
+      count: 1
+    })
+
+    // Последняя точка - последний слайд
+    const lastSlideIndex = totalSlides - 1
+    
+    // Центральные точки - делим оставшиеся слайды
+    const centerPoints = limit - 2
+    const centerSlidesCount = totalSlides - 2
+    const baseCenterSize = Math.floor(centerSlidesCount / centerPoints)
+    const centerRemainder = centerSlidesCount % centerPoints
+
+    let currentIndex = 1
+
+    for (let i = 0; i < centerPoints; i++) {
+      let groupSize = baseCenterSize
+      
+      // Распределяем остаток равномерно (в центре)
+      const startOffset = Math.ceil((centerPoints - centerRemainder) / 2)
+      if (i >= startOffset && i < startOffset + centerRemainder) {
+        groupSize++
+      }
+
+      groups.push({
+        startIndex: currentIndex,
+        endIndex: currentIndex + groupSize - 1,
+        count: groupSize
+      })
+
+      currentIndex += groupSize
+    }
+
+    // Последняя точка
+    groups.push({
+      startIndex: lastSlideIndex,
+      endIndex: lastSlideIndex,
+      count: 1
+    })
+
+    return groups
+  }
+
+  /**
+   * Определить индекс активной точки по текущему индексу слайда
+   * @param slideIndex - текущий индекс слайда
+   * @returns индекс активной точки
+   */
+  private getActiveBulletIndex(slideIndex: number): number {
+    if (this.bulletGroups.length === 0) {
+      return slideIndex
+    }
+
+    // Ищем группу, в которую попадает текущий слайд
+    for (let i = 0; i < this.bulletGroups.length; i++) {
+      const group = this.bulletGroups[i]
+      if (group && slideIndex >= group.startIndex && slideIndex <= group.endIndex) {
+        return i
+      }
+    }
+
+    // Fallback
+    return 0
+  }
+
+  /**
    * Получить текущий индекс слайда с учётом loop режима
    * В loop режиме используем realIndex, иначе activeIndex
    */
@@ -237,6 +429,7 @@ export class PaginationModule extends Module {
 
     this.container.innerHTML = ''
     this.bullets = []
+    this.bulletGroups = []
     this.detachClickHandlers()
 
     // Вычисляем количество страниц с учетом perPage
@@ -251,29 +444,68 @@ export class PaginationModule extends Module {
     // Если слайдов нет, то 0 страниц
     const pageCount = slideCount === 0 ? 0 : endIndex + 1
 
-    // Создаем точки для каждой возможной позиции
-    for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-      let bulletHTML: string
+    // Проверяем, используется ли лимит
+    const limit = typeof pagination === 'object' && pagination !== null && pagination.limit
+      ? Math.min(pagination.limit, pageCount)
+      : undefined
 
-      // Кастомный рендер
-      if (typeof pagination === 'object' && pagination?.renderBullet) {
-        bulletHTML = pagination.renderBullet(pageIndex, bulletClass)
-      } else {
-        bulletHTML = `<span class="${bulletClass}" data-index="${pageIndex}"></span>`
-      }
-
-      const bullet = this.createElementFromHTML(bulletHTML)
-      container.appendChild(bullet)
-      this.bullets.push(bullet)
-
-      // Clickable - переходим к соответствующему индексу
-      if (clickable) {
-        const slideIndex = pageIndex
+    // Если используется лимит, вычисляем группы слайдов
+    if (limit && limit < pageCount) {
+      this.bulletGroups = this.calculateBulletGroups(pageCount, limit)
+      
+      // Создаем ограниченное количество точек
+      for (let bulletIndex = 0; bulletIndex < limit; bulletIndex++) {
+        const group = this.bulletGroups[bulletIndex]
+        if (!group) continue
         
-        const handler = () => this.tvist.scrollTo(slideIndex)
-        this.clickHandlers.set(bullet, handler)
-        bullet.addEventListener('click', handler)
-        bullet.style.cursor = 'pointer'
+        let bulletHTML: string
+
+        // Кастомный рендер
+        if (typeof pagination === 'object' && pagination?.renderBullet) {
+          bulletHTML = pagination.renderBullet(bulletIndex, bulletClass)
+        } else {
+          bulletHTML = `<span class="${bulletClass}" data-index="${bulletIndex}" data-group-start="${group.startIndex}" data-group-end="${group.endIndex}"></span>`
+        }
+
+        const bullet = this.createElementFromHTML(bulletHTML)
+        container.appendChild(bullet)
+        this.bullets.push(bullet)
+
+        // Clickable - переходим к начальному индексу группы
+        if (clickable) {
+          const slideIndex = group.startIndex
+          
+          const handler = () => this.tvist.scrollTo(slideIndex)
+          this.clickHandlers.set(bullet, handler)
+          bullet.addEventListener('click', handler)
+          bullet.style.cursor = 'pointer'
+        }
+      }
+    } else {
+      // Обычный режим - создаем точки для каждой возможной позиции
+      for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+        let bulletHTML: string
+
+        // Кастомный рендер
+        if (typeof pagination === 'object' && pagination?.renderBullet) {
+          bulletHTML = pagination.renderBullet(pageIndex, bulletClass)
+        } else {
+          bulletHTML = `<span class="${bulletClass}" data-index="${pageIndex}"></span>`
+        }
+
+        const bullet = this.createElementFromHTML(bulletHTML)
+        container.appendChild(bullet)
+        this.bullets.push(bullet)
+
+        // Clickable - переходим к соответствующему индексу
+        if (clickable) {
+          const slideIndex = pageIndex
+          
+          const handler = () => this.tvist.scrollTo(slideIndex)
+          this.clickHandlers.set(bullet, handler)
+          bullet.addEventListener('click', handler)
+          bullet.style.cursor = 'pointer'
+        }
       }
     }
   }
@@ -392,17 +624,24 @@ export class PaginationModule extends Module {
       : 'active'
 
     // Текущая страница соответствует индексу (в loop режиме используем realIndex)
-    const currentPage = this.getCurrentSlideIndex()
+    const currentSlideIndex = this.getCurrentSlideIndex()
+
+    // Если используются группы, определяем активную точку через группы
+    const activeBulletIndex = this.bulletGroups.length > 0
+      ? this.getActiveBulletIndex(currentSlideIndex)
+      : currentSlideIndex
 
     log('updateBulletsActive', {
-      currentPage,
+      currentSlideIndex,
+      activeBulletIndex,
       bulletsCount: this.bullets.length,
+      hasGroups: this.bulletGroups.length > 0,
       activeIndex: this.tvist.activeIndex,
       realIndex: this.options.loop ? this.tvist.realIndex : undefined
     })
 
-    this.bullets.forEach((bullet, pageIndex) => {
-      if (pageIndex === currentPage) {
+    this.bullets.forEach((bullet, bulletIndex) => {
+      if (bulletIndex === activeBulletIndex) {
         bullet.classList.add(activeClass)
         bullet.setAttribute('aria-current', 'true')
       } else {

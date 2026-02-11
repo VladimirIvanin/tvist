@@ -10,10 +10,17 @@ const bulletsRef = ref(null)
 const fractionRef = ref(null)
 const progressRef = ref(null)
 const customRef = ref(null)
+const evenRef = ref(null)
+const evenCenterRef = ref(null)
+const centerRef = ref(null)
+
 let sliderBullets = null
 let sliderFraction = null
 let sliderProgress = null
 let sliderCustom = null
+let sliderEven = null
+let sliderEvenCenter = null
+let sliderCenter = null
 
 onMounted(() => {
   if (bulletsRef.value) {
@@ -52,6 +59,43 @@ onMounted(() => {
       }
     })
   }
+  if (evenRef.value) {
+    sliderEven = new Tvist(evenRef.value, {
+      perPage: 1,
+      speed: 300,
+      arrows: true,
+      pagination: {
+        type: 'bullets',
+        limit: 5,
+        strategy: 'even'
+      }
+    })
+  }
+  if (evenCenterRef.value) {
+    sliderEvenCenter = new Tvist(evenCenterRef.value, {
+      perPage: 1,
+      speed: 300,
+      arrows: true,
+      pagination: {
+        type: 'bullets',
+        limit: 2,
+        strategy: 'even',
+        remainderStrategy: 'center'
+      }
+    })
+  }
+  if (centerRef.value) {
+    sliderCenter = new Tvist(centerRef.value, {
+      perPage: 1,
+      speed: 300,
+      arrows: true,
+      pagination: {
+        type: 'bullets',
+        limit: 5,
+        strategy: 'center'
+      }
+    })
+  }
 })
 
 onUnmounted(() => {
@@ -59,6 +103,9 @@ onUnmounted(() => {
   sliderFraction?.destroy()
   sliderProgress?.destroy()
   sliderCustom?.destroy()
+  sliderEven?.destroy()
+  sliderEvenCenter?.destroy()
+  sliderCenter?.destroy()
 })
 </script>
 
@@ -194,6 +241,11 @@ pagination: {
 .pagination-demo-slider .tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
 .pagination-demo-slider .tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 .pagination-demo-slider .tvist-v1__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.pagination-demo-slider .tvist-v1__slide:nth-child(6) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+.pagination-demo-slider .tvist-v1__slide:nth-child(7) { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+.pagination-demo-slider .tvist-v1__slide:nth-child(8) { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+.pagination-demo-slider .tvist-v1__slide:nth-child(9) { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+.pagination-demo-slider .tvist-v1__slide:nth-child(10) { background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%); }
 
 /* Стрелки — позиция поверх слайда */
 .pagination-demo-slider :deep(.tvist-v1__arrow--prev),
@@ -291,6 +343,89 @@ pagination: {
 }
 </style>
 
+---
+
+## Лимит точек (Bullets Limit)
+
+Для слайдеров с большим количеством слайдов можно ограничить количество отображаемых точек и объединить слайды в группы. Поддерживаются две стратегии распределения:
+
+### Равномерное распределение (Even Strategy)
+
+Каждая точка представляет равное количество слайдов. Например, 10 слайдов с лимитом 5 точек: каждая точка = 2 слайда.
+
+<div ref="evenRef" class="tvist-v1 pagination-demo-slider">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide" v-for="i in 10" :key="i">{{i}}</div>
+  </div>
+  <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
+  <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
+  <div class="tvist-v1__pagination"></div>
+</div>
+
+```javascript
+pagination: {
+  type: 'bullets',
+  limit: 5,
+  strategy: 'even'
+}
+```
+
+#### Стратегия распределения остатка
+
+Когда слайды не делятся нацело на количество точек, остаток можно распределить по-разному:
+
+- `'left'` — остаток добавляется к левым точкам
+- `'center'` (по умолчанию) — остаток добавляется к центральным точкам
+- `'right'` — остаток добавляется к правым точкам
+
+Пример: 7 слайдов, лимит 2, стратегия центр → [3, 4] слайда на точку.
+
+<div ref="evenCenterRef" class="tvist-v1 pagination-demo-slider">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide" v-for="i in 7" :key="i">{{i}}</div>
+  </div>
+  <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
+  <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
+  <div class="tvist-v1__pagination"></div>
+</div>
+
+```javascript
+pagination: {
+  type: 'bullets',
+  limit: 2,
+  strategy: 'even',
+  remainderStrategy: 'center' // остаток распределяется в центре (правая точка)
+}
+```
+
+### Центральное распределение (Center Strategy)
+
+Крайние точки (первая и последняя) представляют по одному слайду, остальные слайды группируются в центральных точках.
+
+<div ref="centerRef" class="tvist-v1 pagination-demo-slider">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide" v-for="i in 10" :key="i">{{i}}</div>
+  </div>
+  <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
+  <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
+  <div class="tvist-v1__pagination"></div>
+</div>
+
+```javascript
+pagination: {
+  type: 'bullets',
+  limit: 5,
+  strategy: 'center'
+}
+```
+
+В этом примере (10 слайдов, 5 точек):
+- Точка 1: слайд 0
+- Точки 2-4: слайды 1-8 (центральная группа)
+- Точка 5: слайд 9
+
+---
+
 ## Опции пагинации
 
 | Опция | Тип | Описание |
@@ -303,5 +438,8 @@ pagination: {
 | `renderBullet` | `(index, className) => string` | Кастомный HTML буллета |
 | `renderFraction` | `(current, total) => string` | Кастомный HTML для fraction |
 | `renderCustom` | `(current, total) => string` | Кастомный HTML для типа `custom` |
+| `limit` | `number` | Максимальное количество видимых точек (только для `type: 'bullets'`) |
+| `strategy` | `'even' \| 'center'` | Стратегия распределения слайдов по точкам при использовании `limit` (по умолчанию `'even'`) |
+| `remainderStrategy` | `'left' \| 'center' \| 'right'` | Стратегия распределения остатка при равномерном делении (только для `strategy: 'even'`, по умолчанию `'center'`) |
 
 Контейнер по умолчанию — элемент с классом `.tvist-v1__pagination` внутри корня слайдера.
