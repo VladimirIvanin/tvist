@@ -378,22 +378,29 @@ export class VideoModule extends Module {
     addHandler('play', () => {
       const payload: VideoEvent = { slide, video, index: slideIndex }
       this.emit('videoPlay', payload)
+      // Запускаем плавное отслеживание прогресса
+      this.startProgressTracking(video, slide, slideIndex)
     })
 
     // pause
     addHandler('pause', () => {
       const payload: VideoEvent = { slide, video, index: slideIndex }
       this.emit('videoPause', payload)
+      this.stopProgressTracking()
     })
 
     // ended
     addHandler('ended', () => {
       const payload: VideoEvent = { slide, video, index: slideIndex }
       this.emit('videoEnded', payload)
+      this.stopProgressTracking()
     })
 
     // timeupdate — для прогресса
     addHandler('timeupdate', () => {
+      // Если видео воспроизводится, прогресс обновляется через RAF для плавности
+      if (!video.paused && !video.ended) return
+
       if (video.duration && isFinite(video.duration)) {
         const payload: VideoProgressEvent = {
           slide,
@@ -561,6 +568,37 @@ export class VideoModule extends Module {
   }
 
   // ==================== Прогресс ====================
+
+  /**
+   * Запуск плавного отслеживания прогресса через RAF
+   */
+  private startProgressTracking(video: HTMLVideoElement, slide: HTMLElement, index: number): void {
+    this.stopProgressTracking()
+
+    const tick = () => {
+      // Если видео на паузе или закончилось — останавливаем
+      if (video.paused || video.ended) {
+        this.stopProgressTracking()
+        return
+      }
+
+      if (video.duration && isFinite(video.duration)) {
+        const payload: VideoProgressEvent = {
+          slide,
+          video,
+          index,
+          progress: video.currentTime / video.duration,
+          currentTime: video.currentTime,
+          duration: video.duration,
+        }
+        this.emit('videoProgress', payload)
+      }
+
+      this.progressRAF = requestAnimationFrame(tick)
+    }
+
+    this.progressRAF = requestAnimationFrame(tick)
+  }
 
   /**
    * Остановить отслеживание прогресса через RAF

@@ -82,9 +82,15 @@ export class AutoplayModule extends Module {
   // Флаг для отслеживания паузы из-за потери видимости вкладки
   private pausedByVisibility = false
 
+  // Для корректного возобновления после паузы
+  private timeLeft: number | null = null
+  private currentDuration: number = 0
+  private currentChunkDuration: number = 0
+
   // Для autoplayProgress
   private progressRAF: number | null = null
   private progressStartTime: number | null = null
+  private progressStartOffset: number = 0
 
   // Для waitForVideo — слушаем videoEnded
   private waitingForVideo = false
@@ -387,13 +393,26 @@ export class AutoplayModule extends Module {
     // Если ждём видео — не запускаем таймер
     if (this.waitingForVideo) return
 
-    const delay = this.config.delay
+    // Если timeLeft есть, значит мы возобновляем после паузы
+    // Иначе начинаем новый цикл (полная задержка)
+    let delay = this.timeLeft ?? this.config.delay
+    
+    // Если это новый цикл, сбрасываем параметры
+    if (this.timeLeft === null) {
+      this.currentDuration = this.config.delay
+      this.progressStartOffset = 0
+    }
+    
+    // Запоминаем длительность текущего отрезка для расчёта паузы
+    this.currentChunkDuration = delay
 
     // Запуск отслеживания прогресса
-    this.startProgressTracking(delay)
+    this.startProgressTracking(delay, this.currentDuration, this.progressStartOffset)
 
     this.timer = window.setTimeout(() => {
       if (!this.paused && !this.stopped) {
+        this.timeLeft = null // Сбрасываем timeLeft для следующего шага
+        this.progressStartOffset = 0
         this.stopProgressTracking()
         this.tvist.next()
         this.run() // Рекурсивный вызов после переключения
@@ -401,25 +420,34 @@ export class AutoplayModule extends Module {
     }, delay)
   }
 
-  /**
-   * Запуск отслеживания прогресса autoplay таймера
-   */
-  private startProgressTracking(duration: number): void {
+  private startProgressTracking(timeLeft: number, totalDuration: number, startOffset: number): void {
     this.stopProgressTracking()
+
+    if (timeLeft <= 0) {
+      this.emit('autoplayProgress', { progress: 1, index: this.tvist.activeIndex })
+      return
+    }
+
     this.progressStartTime = performance.now()
 
     const tick = () => {
       if (this.paused || this.stopped || this.progressStartTime === null) return
 
       const elapsed = performance.now() - this.progressStartTime
-      const progress = Math.min(elapsed / duration, 1)
+      // Прогресс текущего отрезка (от 0 до 1)
+      const chunkProgress = Math.min(elapsed / timeLeft, 1)
+      
+      // Общий прогресс = смещение + (часть отрезка * доля отрезка в общем времени)
+      // Доля отрезка = timeLeft / totalDuration
+      let progress = startOffset + (chunkProgress * (timeLeft / totalDuration))
+      progress = Math.min(progress, 1)
 
       this.emit('autoplayProgress', {
         progress,
         index: this.tvist.activeIndex,
       })
 
-      if (progress < 1) {
+      if (progress < 1 && !this.paused && !this.stopped) {
         this.progressRAF = requestAnimationFrame(tick)
       }
     }
@@ -477,6 +505,19 @@ export class AutoplayModule extends Module {
   pause(): void {
     if (!this.paused) {
       this.paused = true
+      
+      // Вычисляем оставшееся время и текущий прогресс
+      if (this.timer !== null && this.progressStartTime !== null && !this.waitingForVideo) {
+        const elapsed = performance.now() - this.progressStartTime
+        
+        // Сколько осталось от ТЕКУЩЕГО отрезка
+        this.timeLeft = Math.max(0, this.currentChunkDuration - elapsed)
+        
+        // Накопленный прогресс = стартовый + пройденный за этот отрезок
+        const chunkElapsedRatio = elapsed / this.currentDuration
+        this.progressStartOffset = Math.min(1, this.progressStartOffset + chunkElapsedRatio)
+      }
+
       // Очищаем таймер — иначе callback может сработать между pause() и resume()
       this.cancelTimer()
       this.stopProgressTracking()
