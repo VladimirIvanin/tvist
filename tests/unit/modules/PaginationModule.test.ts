@@ -518,6 +518,11 @@ describe('PaginationModule', () => {
       })
 
       it('should handle center distribution (7 slides, limit 3)', () => {
+        // 7 слайдов, limit 3
+        // При limit = 3: первый, центр, последний
+        // Точка 0: слайд 0
+        // Точка 1: слайды 1-5 (центр)
+        // Точка 2: слайд 6
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
             <div class="${TVIST_CLASSES.container}">
@@ -650,6 +655,250 @@ describe('PaginationModule', () => {
         // Одна точка - все слайды
         expect(bullets[0].getAttribute('data-group-start')).toBe('0')
         expect(bullets[0].getAttribute('data-group-end')).toBe('9')
+      })
+
+      it('should distribute with symmetric edges (10 slides, limit 5)', () => {
+        // 10 слайдов, limit 5
+        // Симметричное распределение:
+        // Точка 0: слайд 0 (первый)
+        // Точка 1: слайд 1 (второй)
+        // Точка 2: слайды 2-7 (центр, все остальные)
+        // Точка 3: слайд 8 (предпоследний)
+        // Точка 4: слайд 9 (последний)
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 5,
+            strategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(5)
+        
+        // Точка 0: слайд 0
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('0')
+        
+        // Точка 1: слайд 1
+        expect(bullets[1].getAttribute('data-group-start')).toBe('1')
+        expect(bullets[1].getAttribute('data-group-end')).toBe('1')
+        
+        // Точка 2: слайды 2-7 (центр)
+        expect(bullets[2].getAttribute('data-group-start')).toBe('2')
+        expect(bullets[2].getAttribute('data-group-end')).toBe('7')
+        
+        // Точка 3: слайд 8
+        expect(bullets[3].getAttribute('data-group-start')).toBe('8')
+        expect(bullets[3].getAttribute('data-group-end')).toBe('8')
+        
+        // Точка 4: слайд 9
+        expect(bullets[4].getAttribute('data-group-start')).toBe('9')
+        expect(bullets[4].getAttribute('data-group-end')).toBe('9')
+      })
+
+      it('should distribute with symmetric edges (11 slides, limit 6)', () => {
+        // 11 слайдов, limit 6
+        // Симметричное распределение:
+        // Точка 0: слайд 0
+        // Точка 1: слайд 1
+        // Точка 2: слайд 2
+        // Точка 3: слайды 3-7 (центр)
+        // Точка 4: слайд 8
+        // Точка 5: слайд 9
+        // Точка 6: слайд 10
+        // Но у нас только 6 точек, поэтому:
+        // Точка 0: слайд 0
+        // Точка 1: слайд 1
+        // Точка 2: слайды 2-8 (центр)
+        // Точка 3: слайд 9
+        // Точка 4: слайд 10
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 11 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 5,
+            strategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(5)
+        
+        // Точка 0: слайд 0
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('0')
+        
+        // Точка 1: слайд 1
+        expect(bullets[1].getAttribute('data-group-start')).toBe('1')
+        expect(bullets[1].getAttribute('data-group-end')).toBe('1')
+        
+        // Точка 2: слайды 2-8 (центр)
+        expect(bullets[2].getAttribute('data-group-start')).toBe('2')
+        expect(bullets[2].getAttribute('data-group-end')).toBe('8')
+        
+        // Точка 3: слайд 9
+        expect(bullets[3].getAttribute('data-group-start')).toBe('9')
+        expect(bullets[3].getAttribute('data-group-end')).toBe('9')
+        
+        // Точка 4: слайд 10
+        expect(bullets[4].getAttribute('data-group-start')).toBe('10')
+        expect(bullets[4].getAttribute('data-group-end')).toBe('10')
+      })
+
+      it('should distribute with symmetric edges (9 slides, limit 4 - even)', () => {
+        // 9 слайдов, limit 4 (чётное)
+        // Симметричное распределение с 2 центральными точками:
+        // edgePointsPerSide = floor(4/2) - 1 = 1
+        // Точка 0: слайд 0 (край слева)
+        // Точка 1: слайды 1-4 (центр левый)
+        // Точка 2: слайды 5-7 (центр правый)
+        // Точка 3: слайд 8 (край справа)
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 9 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 4,
+            strategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(4)
+        
+        // Точка 0: слайд 0
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('0')
+        
+        // Точка 1: слайды 1-4 (центр левый)
+        expect(bullets[1].getAttribute('data-group-start')).toBe('1')
+        expect(bullets[1].getAttribute('data-group-end')).toBe('4')
+        
+        // Точка 2: слайды 5-7 (центр правый)
+        expect(bullets[2].getAttribute('data-group-start')).toBe('5')
+        expect(bullets[2].getAttribute('data-group-end')).toBe('7')
+        
+        // Точка 3: слайд 8
+        expect(bullets[3].getAttribute('data-group-start')).toBe('8')
+        expect(bullets[3].getAttribute('data-group-end')).toBe('8')
+      })
+
+      it('should distribute with symmetric edges (12 slides, limit 6 - even)', () => {
+        // 12 слайдов, limit 6 (чётное)
+        // edgePointsPerSide = floor(6/2) - 1 = 2
+        // Точка 0: слайд 0
+        // Точка 1: слайд 1
+        // Точка 2: слайды 2-5 (центр левый)
+        // Точка 3: слайды 6-9 (центр правый)
+        // Точка 4: слайд 10
+        // Точка 5: слайд 11
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 12 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 6,
+            strategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(6)
+        
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[0].getAttribute('data-group-end')).toBe('0')
+        
+        expect(bullets[1].getAttribute('data-group-start')).toBe('1')
+        expect(bullets[1].getAttribute('data-group-end')).toBe('1')
+        
+        expect(bullets[2].getAttribute('data-group-start')).toBe('2')
+        expect(bullets[2].getAttribute('data-group-end')).toBe('5')
+        
+        expect(bullets[3].getAttribute('data-group-start')).toBe('6')
+        expect(bullets[3].getAttribute('data-group-end')).toBe('9')
+        
+        expect(bullets[4].getAttribute('data-group-start')).toBe('10')
+        expect(bullets[4].getAttribute('data-group-end')).toBe('10')
+        
+        expect(bullets[5].getAttribute('data-group-start')).toBe('11')
+        expect(bullets[5].getAttribute('data-group-end')).toBe('11')
+      })
+
+      it('should distribute with symmetric edges (15 slides, limit 7 - odd)', () => {
+        // 15 слайдов, limit 7 (нечётное)
+        // edgePointsPerSide = floor((7-1)/2) = 3
+        // Точка 0: слайд 0
+        // Точка 1: слайд 1
+        // Точка 2: слайд 2
+        // Точка 3: слайды 3-11 (центр)
+        // Точка 4: слайд 12
+        // Точка 5: слайд 13
+        // Точка 6: слайд 14
+        container.innerHTML = `
+          <div class="${TVIST_CLASSES.block}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 15 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
+            <div class="${TVIST_CLASSES.pagination}"></div>
+          </div>
+        `
+
+        const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+          perPage: 1,
+          pagination: {
+            type: 'bullets',
+            limit: 7,
+            strategy: 'center'
+          }
+        })
+
+        const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+        expect(bullets.length).toBe(7)
+        
+        expect(bullets[0].getAttribute('data-group-start')).toBe('0')
+        expect(bullets[1].getAttribute('data-group-start')).toBe('1')
+        expect(bullets[2].getAttribute('data-group-start')).toBe('2')
+        expect(bullets[3].getAttribute('data-group-start')).toBe('3')
+        expect(bullets[3].getAttribute('data-group-end')).toBe('11')
+        expect(bullets[4].getAttribute('data-group-start')).toBe('12')
+        expect(bullets[5].getAttribute('data-group-start')).toBe('13')
+        expect(bullets[6].getAttribute('data-group-start')).toBe('14')
       })
     })
 

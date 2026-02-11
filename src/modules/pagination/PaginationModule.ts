@@ -226,9 +226,24 @@ export class PaginationModule extends Module {
   }
 
   /**
-   * Центральное распределение слайдов по точкам
-   * Крайние точки (первая и последняя) = 1 слайд
-   * Центральные точки = делим оставшиеся слайды
+   * Центральное распределение слайдов по точкам (симметричное)
+   * 
+   * Стратегия:
+   * - limit = 1: все слайды в одной точке
+   * - limit = 2: делим пополам
+   * - limit = 3: первый слайд, центр (все остальные), последний слайд
+   * - limit >= 4: симметричное распределение с краёв
+   *   - Первые (limit-1)/2 точек = по одному слайду с начала
+   *   - Центральная точка(и) = все остальные слайды
+   *   - Последние (limit-1)/2 точек = по одному слайду с конца
+   * 
+   * Пример (10 слайдов, limit 5):
+   * - Точка 0: слайд 0
+   * - Точка 1: слайд 1
+   * - Точка 2: слайды 2-7 (центр)
+   * - Точка 3: слайд 8
+   * - Точка 4: слайд 9
+   * 
    * @param totalSlides - общее количество слайдов
    * @param limit - количество точек
    */
@@ -261,49 +276,80 @@ export class PaginationModule extends Module {
       return groups
     }
 
-    // Для limit >= 3
-    // Первая точка - первый слайд
-    groups.push({
-      startIndex: 0,
-      endIndex: 0,
-      count: 1
-    })
-
-    // Последняя точка - последний слайд
-    const lastSlideIndex = totalSlides - 1
-    
-    // Центральные точки - делим оставшиеся слайды
-    const centerPoints = limit - 2
-    const centerSlidesCount = totalSlides - 2
-    const baseCenterSize = Math.floor(centerSlidesCount / centerPoints)
-    const centerRemainder = centerSlidesCount % centerPoints
-
-    let currentIndex = 1
-
-    for (let i = 0; i < centerPoints; i++) {
-      let groupSize = baseCenterSize
-      
-      // Распределяем остаток равномерно (в центре)
-      const startOffset = Math.ceil((centerPoints - centerRemainder) / 2)
-      if (i >= startOffset && i < startOffset + centerRemainder) {
-        groupSize++
-      }
-
+    if (limit === 3) {
+      // Три точки: первый, центр, последний
       groups.push({
-        startIndex: currentIndex,
-        endIndex: currentIndex + groupSize - 1,
-        count: groupSize
+        startIndex: 0,
+        endIndex: 0,
+        count: 1
       })
-
-      currentIndex += groupSize
+      groups.push({
+        startIndex: 1,
+        endIndex: totalSlides - 2,
+        count: totalSlides - 2
+      })
+      groups.push({
+        startIndex: totalSlides - 1,
+        endIndex: totalSlides - 1,
+        count: 1
+      })
+      return groups
     }
 
-    // Последняя точка
-    groups.push({
-      startIndex: lastSlideIndex,
-      endIndex: lastSlideIndex,
-      count: 1
-    })
+    // Для limit >= 4: симметричное распределение
+    // Количество точек с каждого края (по одному слайду)
+    // При нечётном limit: (limit-1)/2 точек с каждой стороны + 1 центральная
+    // При чётном limit: limit/2 - 1 точек с каждой стороны + 2 центральные (или делим центр)
+    const edgePointsPerSide = limit % 2 === 0 
+      ? Math.floor(limit / 2) - 1  // Чётное: 4->1, 6->2, 8->3
+      : Math.floor((limit - 1) / 2) // Нечётное: 5->2, 7->3, 9->4
+    
+    // Создаём точки с начала (по одному слайду)
+    for (let i = 0; i < edgePointsPerSide; i++) {
+      groups.push({
+        startIndex: i,
+        endIndex: i,
+        count: 1
+      })
+    }
+    
+    // Центральные точки - все остальные слайды
+    const centerStartIndex = edgePointsPerSide
+    const centerEndIndex = totalSlides - 1 - edgePointsPerSide
+    const centerSlidesCount = centerEndIndex - centerStartIndex + 1
+    
+    // При чётном limit создаём 2 центральные точки, при нечётном - 1
+    if (limit % 2 === 0) {
+      // Делим центральные слайды на 2 точки
+      const halfCenter = Math.ceil(centerSlidesCount / 2)
+      groups.push({
+        startIndex: centerStartIndex,
+        endIndex: centerStartIndex + halfCenter - 1,
+        count: halfCenter
+      })
+      groups.push({
+        startIndex: centerStartIndex + halfCenter,
+        endIndex: centerEndIndex,
+        count: centerSlidesCount - halfCenter
+      })
+    } else {
+      // Одна центральная точка
+      groups.push({
+        startIndex: centerStartIndex,
+        endIndex: centerEndIndex,
+        count: centerSlidesCount
+      })
+    }
+    
+    // Создаём точки с конца (по одному слайду)
+    for (let i = 0; i < edgePointsPerSide; i++) {
+      const slideIndex = totalSlides - edgePointsPerSide + i
+      groups.push({
+        startIndex: slideIndex,
+        endIndex: slideIndex,
+        count: 1
+      })
+    }
 
     return groups
   }
