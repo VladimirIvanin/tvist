@@ -327,7 +327,6 @@ describe('VideoModule + LoopModule + AutoplayModule Integration', () => {
 
       slider.destroy()
     })
-
   })
 
   describe('Hover during video playback (waitForVideo)', () => {
