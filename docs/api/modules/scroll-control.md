@@ -147,8 +147,7 @@ const slider = new Tvist('.tvist', {
 ```javascript
 const slider = new Tvist('.tvist', {
   wheel: true,
-  autoplay: 3000,
-  pauseOnInteraction: true
+  autoplay: { delay: 3000, pauseOnInteraction: true }
 })
 ```
 

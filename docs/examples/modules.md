@@ -32,8 +32,7 @@ const slider = new Tvist('.tvist', {
 const slider = new Tvist('.tvist', {
   perPage: 1,
   gap: 0,
-  autoplay: 3000,
-  pauseOnHover: true,
+  autoplay: { delay: 3000, pauseOnHover: true },
   pagination: {
     type: 'bullets',
     clickable: true

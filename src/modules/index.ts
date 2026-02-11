@@ -18,5 +18,6 @@ export { ScrollControlModule } from './scroll-control'
 export { ScrollbarModule } from './scrollbar'
 export { MarqueeModule } from './marquee'
 export { LazyLoadModule } from './lazyload'
+export { VideoModule } from './video'
 
 

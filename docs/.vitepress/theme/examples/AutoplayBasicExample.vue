@@ -72,9 +72,7 @@ onMounted(() => {
     slider.value = new Tvist(sliderEl.value, {
       perPage: 1,
       gap: 0,
-      autoplay: 3000,
-      pauseOnHover: true,
-      pauseOnInteraction: true,
+      autoplay: { delay: 3000, pauseOnHover: true, pauseOnInteraction: true },
       pagination: {
         type: 'bullets',
         clickable: true

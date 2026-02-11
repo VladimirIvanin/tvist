@@ -223,10 +223,12 @@ Tvist.registerModule('autoplay', AutoplayModule)
 Автоматическая прокрутка слайдов.
 
 **Опции:**
-- `autoplay` - задержка между переходами (мс) или `true` для дефолтной задержки
-- `pauseOnHover` - пауза при наведении курсора
-- `pauseOnInteraction` - пауза при взаимодействии
-- `disableOnInteraction` - отключение после взаимодействия
+- `autoplay` - задержка (число или `true`), либо объект с настройками:
+  - `delay` - задержка между переходами (мс)
+  - `pauseOnHover` - пауза при наведении курсора (по умолчанию `true`)
+  - `pauseOnInteraction` - пауза при взаимодействии (по умолчанию `true`)
+  - `disableOnInteraction` - отключить после взаимодействия (по умолчанию `false`)
+  - `waitForVideo` - ждать окончания видео вместо таймера (по умолчанию `false`)
 
 **Методы модуля:**
 - `start()` - запустить автопрокрутку
@@ -237,9 +239,7 @@ Tvist.registerModule('autoplay', AutoplayModule)
 
 ```javascript
 const slider = new Tvist('.slider', {
-  autoplay: 3000,
-  pauseOnHover: true,
-  pauseOnInteraction: true
+  autoplay: { delay: 3000, pauseOnHover: true, pauseOnInteraction: true }
 })
 
 // Управление через модуль

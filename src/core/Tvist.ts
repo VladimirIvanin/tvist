@@ -8,7 +8,7 @@ import { Engine } from './Engine'
 import { EventEmitter } from './EventEmitter'
 import { getElement, children } from '../utils/dom'
 import { TVIST_CLASSES } from './constants'
-import type { TvistOptions, LoopModuleAPI, AutoplayModuleAPI } from './types'
+import type { TvistOptions, LoopModuleAPI, AutoplayModuleAPI, VideoModuleAPI } from './types'
 import type { Module, ModuleConstructor } from '../modules/Module'
 import { throttle } from './Animator'
 
@@ -549,6 +549,17 @@ export class Tvist {
     const module = this.modules.get('autoplay') as AutoplayModuleAPI | undefined
     if (module && typeof module.getAutoplay === 'function') {
       return module.getAutoplay()
+    }
+    return undefined
+  }
+
+  /**
+   * Получить публичное API video модуля
+   */
+  get video() {
+    const module = this.modules.get('video') as VideoModuleAPI | undefined
+    if (module && typeof module.getVideo === 'function') {
+      return module.getVideo()
     }
     return undefined
   }

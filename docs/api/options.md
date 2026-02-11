@@ -46,10 +46,7 @@
 
 Автоматическое поведение слайдера:
 
-- `autoplay` - автоматическая прокрутка
-- `pauseOnHover` - пауза при наведении
-- `pauseOnInteraction` - пауза при взаимодействии
-- `disableOnInteraction` - отключение после взаимодействия
+- `autoplay` - автоматическая прокрутка (число, `true` или объект с `delay`, `pauseOnHover`, `pauseOnInteraction`, `disableOnInteraction`, `waitForVideo`)
 
 ### Режимы отображения
 
@@ -93,9 +90,8 @@ const slider = new Tvist('.slider', {
 ```javascript
 const slider = new Tvist('.slider', {
   perPage: 1,
-  autoplay: 3000,
-  loop: true,
-  pauseOnHover: true
+  autoplay: { delay: 3000, pauseOnHover: true },
+  loop: true
 })
 ```
 
@@ -194,8 +190,7 @@ const slider = new Tvist('.slider', {
   keyboard: true,
   
   // Автоматизация
-  autoplay: 5000,
-  pauseOnHover: true,
+  autoplay: { delay: 5000, pauseOnHover: true },
   loop: true,
   
   // Адаптивность
@@ -271,10 +266,7 @@ slider
 - `rubberband` - эффект резинки
 
 #### Autoplay
-- `autoplay` - автопрокрутка
-- `pauseOnHover` - пауза при наведении
-- `pauseOnInteraction` - пауза при взаимодействии
-- `disableOnInteraction` - отключение после взаимодействия
+- `autoplay` - автопрокрутка (число, `true`, `false` или объект с `delay`, `pauseOnHover`, `pauseOnInteraction`, `disableOnInteraction`, `waitForVideo`)
 
 #### События
 - `on` - обработчики событий (заменяют предыдущие)

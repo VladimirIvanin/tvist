@@ -191,8 +191,7 @@ window.addEventListener('resize', () => {
 
 ```javascript
 const slider = new Tvist('.slider', {
-  autoplay: 3000,
-  pauseOnHover: true
+  autoplay: { delay: 3000, pauseOnHover: true }
 })
 
 const autoplay = slider.getModule('autoplay')

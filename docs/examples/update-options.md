@@ -40,9 +40,7 @@ updateOptions(newOptions: Partial<TvistOptions>): this
 - `rubberband` - эффект резинки
 
 #### Автопрокрутка
-- `autoplay` - включение/настройка автопрокрутки
-- `pauseOnHover` - пауза при наведении
-- `pauseOnInteraction` - пауза при взаимодействии
+- `autoplay` - включение/настройка автопрокрутки (число, `true`, `false` или объект с `delay`, `pauseOnHover`, `pauseOnInteraction`, `disableOnInteraction`, `waitForVideo`)
 
 #### События
 - `on` - обработчики событий (заменяют предыдущие)
@@ -117,7 +115,7 @@ toggleBtn.addEventListener('click', () => {
 ```javascript
 // Включить автопрокрутку
 document.querySelector('.enable-autoplay').addEventListener('click', () => {
-  slider.updateOptions({ autoplay: 3000 })
+  slider.updateOptions({ autoplay: 3000 }) // или autoplay: { delay: 3000 }
 })
 
 // Отключить автопрокрутку
@@ -127,7 +125,7 @@ document.querySelector('.disable-autoplay').addEventListener('click', () => {
 
 // Изменить скорость
 document.querySelector('.speed-slider').addEventListener('input', (e) => {
-  slider.updateOptions({ autoplay: parseInt(e.target.value) })
+  slider.updateOptions({ autoplay: parseInt(e.target.value) }) // shorthand: число задаёт delay
 })
 ```
 

@@ -30,8 +30,7 @@ function updateInfo(slider: Tvist) {
 
 // Autoplay test slider
 const slider1 = new Tvist('#slider1', {
-  autoplay: 2000, // 2 секунды
-  pauseOnHover: true,
+  autoplay: { delay: 2000, pauseOnHover: true },
   loop: true,
   arrows: true,
   pagination: {
