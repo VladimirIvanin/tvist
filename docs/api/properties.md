@@ -211,7 +211,7 @@ function updateNavButtons() {
   nextBtn.disabled = !slider.canScrollNext
 }
 
-slider.on('slideChange', updateNavButtons)
+slider.on('slideChangeStart', updateNavButtons)
 ```
 
 ## Ядро
@@ -288,7 +288,7 @@ function updateCounter() {
   counter.textContent = `${slider.activeIndex + 1} / ${slider.slides.length}`
 }
 
-slider.on('slideChange', updateCounter)
+slider.on('slideChangeStart', updateCounter)
 updateCounter()
 ```
 
@@ -307,7 +307,7 @@ function updateButtons() {
   nextBtn.classList.toggle('disabled', !slider.canScrollNext)
 }
 
-slider.on('slideChange', updateButtons)
+slider.on('slideChangeStart', updateButtons)
 updateButtons()
 ```
 
@@ -319,14 +319,14 @@ function updateProgress() {
   document.querySelector('.progress-bar').style.width = `${progress}%`
 }
 
-slider.on('slideChange', updateProgress)
+slider.on('slideChangeStart', updateProgress)
 updateProgress()
 ```
 
 ### Применение классов к активному слайду
 
 ```javascript
-slider.on('slideChange', (index) => {
+slider.on('slideChangeStart', (index) => {
   // Убрать класс у всех слайдов
   slider.slides.forEach(slide => {
     slide.classList.remove('is-active')

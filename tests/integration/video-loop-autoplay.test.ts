@@ -170,7 +170,7 @@ describe('VideoModule + LoopModule + AutoplayModule Integration', () => {
           muted: true,
         },
         on: {
-          slideChange: slideChangeSpy,
+          slideChangeStart: slideChangeSpy,
         },
       })
 
@@ -194,7 +194,7 @@ describe('VideoModule + LoopModule + AutoplayModule Integration', () => {
         expect(slider.realIndex).toBe(0)
       })
 
-      // Проверяем что slideChange был вызван
+      // Проверяем что slideChangeStart был вызван
       expect(slideChangeSpy).toHaveBeenCalled()
 
       // Проверяем что видео на целевом слайде (realIndex=0) было воспроизведено
@@ -295,7 +295,7 @@ describe('VideoModule + LoopModule + AutoplayModule Integration', () => {
         },
         on: {
           videoEnded: videoEndedSpy,
-          slideChange: slideChangeSpy,
+          slideChangeStart: slideChangeSpy,
         },
       })
 
@@ -322,7 +322,7 @@ describe('VideoModule + LoopModule + AutoplayModule Integration', () => {
         expect(slider.realIndex).toBe(0)
       }, { timeout: 1000 })
 
-      // slideChange вызван (DOM-индекс может отличаться от realIndex)
+      // slideChangeStart вызван (DOM-индекс может отличаться от realIndex)
       expect(slideChangeSpy).toHaveBeenCalled()
 
       slider.destroy()
@@ -425,7 +425,7 @@ describe('VideoModule + LoopModule + AutoplayModule Integration', () => {
       mockVideos(root as HTMLElement) // обновляем spy после init
 
       const slideChangeLog: number[] = []
-      slider.on('slideChange', (idx: number) => slideChangeLog.push(idx))
+      slider.on('slideChangeStart', (idx: number) => slideChangeLog.push(idx))
 
       // === Итерация 1: 0 → 1 → 2 → (loop wrap) 0 ===
 
@@ -479,7 +479,7 @@ describe('VideoModule + LoopModule + AutoplayModule Integration', () => {
       }, { timeout: 500 })
 
       // Проверяем что за 3 итерации было 9 переходов (3 x [0→1, 1→2, 2→0])
-      console.log('slideChange log:', slideChangeLog)
+      console.log('slideChangeStart log:', slideChangeLog)
       expect(slideChangeLog).toEqual([1, 2, 0, 1, 2, 0, 1, 2, 0])
 
       slider.destroy()
@@ -525,7 +525,7 @@ describe('VideoModule + LoopModule + AutoplayModule Integration', () => {
       slider.scrollTo(2)
       expect(slider.realIndex).toBe(2)
 
-      // slideChanged эмитится мгновенно (speed: 0), handleSlideChangedForVideo
+      // slideChangeEnd эмитится мгновенно (speed: 0), handleSlideChangedForVideo
       // установил waitingForVideo=true и подписался на videoEnded.
       // Ждём чтобы всё обработалось
       await new Promise(r => setTimeout(r, 10))

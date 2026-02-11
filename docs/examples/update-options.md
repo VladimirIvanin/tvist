@@ -149,7 +149,7 @@ peekSlider.addEventListener('input', (e) => {
 // Изначальный обработчик
 const slider = new Tvist('.slider', {
   on: {
-    slideChange: (index) => {
+    slideChangeStart: (index) => {
       console.log('Слайд 1:', index)
     }
   }
@@ -158,7 +158,7 @@ const slider = new Tvist('.slider', {
 // Заменить обработчик
 slider.updateOptions({
   on: {
-    slideChange: (index) => {
+    slideChangeStart: (index) => {
       console.log('Слайд 2:', index)
       // Новая логика
       updateAnalytics(index)

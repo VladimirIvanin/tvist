@@ -461,7 +461,7 @@ export class Engine {
     // Проверяем, действительно ли индекс изменился
     let indexChanged = normalizedIndex !== previousIndex
     
-    // eventIndex — realIndex для событий (slideChange, slideChanged и пр.)
+    // eventIndex — realIndex для событий (slideChangeStart, slideChangeEnd и пр.)
     // В loop-режиме normalizedIndex = DOM-позиция, eventIndex = realIndex из data-tvist-slide-index.
     // В обычном режиме они совпадают.
     const eventIndex = this.getEventIndex(normalizedIndex)
@@ -538,7 +538,7 @@ export class Engine {
       this.emitProgress()
       
       if (indexChanged) {
-        this.tvist.emit('slideChanged', eventIndex)
+        this.tvist.emit('slideChangeEnd', eventIndex)
         this.emitReachEdge(eventIndex, endIndex)
       }
     } else {
@@ -548,7 +548,7 @@ export class Engine {
 
       if (indexChanged) {
         this.tvist.emit('transitionStart', eventIndex)
-        this.tvist.emit('slideChange', eventIndex)
+        this.tvist.emit('slideChangeStart', eventIndex)
       }
 
       // Проверяем, нужна ли анимация для корректировки позиции
@@ -588,7 +588,7 @@ export class Engine {
             this.tvist.emit('transitionEnd', eventIndex)
 
             if (indexChanged) {
-              this.tvist.emit('slideChanged', eventIndex)
+              this.tvist.emit('slideChangeEnd', eventIndex)
               this.emitReachEdge(eventIndex, endIndex)
             }
           }

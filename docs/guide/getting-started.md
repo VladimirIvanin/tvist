@@ -118,7 +118,7 @@ var slider = new TvistV1('.tvist-v1', {
 });
 
 // Смена слайда
-slider.on('slideChange', function () {
+slider.on('slideChangeStart', function () {
   console.log('Активный слайд:', slider.activeIndex);
 });
 
@@ -203,7 +203,7 @@ console.log(slider.slides.length); // Количество слайдов
       }
     });
 
-    slider.on('slideChange', function () {
+    slider.on('slideChangeStart', function () {
       console.log('Активный слайд:', slider.activeIndex);
     });
   </script>

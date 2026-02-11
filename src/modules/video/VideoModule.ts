@@ -177,7 +177,7 @@ export class VideoModule extends Module {
     this.setupVisibilityHandlers()
 
     // Подписываемся на событие смены слайда
-    this.on('slideChange', (index: number) => {
+    this.on('slideChangeStart', (index: number) => {
       this.onSlideChange(index)
     })
 
@@ -202,7 +202,7 @@ export class VideoModule extends Module {
 
   /**
    * Хук смены слайда — ядро модуля.
-   * ВАЖНО: index из slideChange — это normalizedIndex (= realIndex, оригинальный 0..N-1),
+   * ВАЖНО: index из slideChangeStart — это normalizedIndex (= realIndex, оригинальный 0..N-1),
    * а НЕ DOM-позиция. В loop-режиме DOM-позиция может отличаться после перестановки слайдов.
    * Видео ищем напрямую по realIndex (ключ в this.videos Map).
    */

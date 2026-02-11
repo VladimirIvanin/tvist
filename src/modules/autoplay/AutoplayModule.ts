@@ -248,7 +248,7 @@ export class AutoplayModule extends Module {
     })
 
     // При смене слайда — определяем, нужно ли ждать видео
-    this.on('slideChanged', (index: number) => {
+    this.on('slideChangeEnd', (index: number) => {
       if (!this.config?.waitForVideo) return
       this.handleSlideChangedForVideo(index)
     })
@@ -256,7 +256,7 @@ export class AutoplayModule extends Module {
 
   /**
    * Обработка смены слайда для режима waitForVideo.
-   * index из slideChanged — это normalizedIndex (= realIndex), НЕ DOM-позиция.
+   * index из slideChangeEnd — это normalizedIndex (= realIndex), НЕ DOM-позиция.
    * В loop-режиме DOM-позиция может отличаться, поэтому ищем слайд по data-tvist-slide-index.
    */
   private handleSlideChangedForVideo(index: number): void {

@@ -26,8 +26,8 @@ export class SlideStatesModule extends Module {
     this.updateClasses()
 
     // Слушаем события изменения слайдов
-    this.tvist.on('slideChange', () => this.updateClasses())
-    this.tvist.on('slideChanged', () => this.updateClasses())
+    this.tvist.on('slideChangeStart', () => this.updateClasses())
+    this.tvist.on('slideChangeEnd', () => this.updateClasses())
     this.tvist.on('scroll', () => this.updateVisibleClasses())
   }
 

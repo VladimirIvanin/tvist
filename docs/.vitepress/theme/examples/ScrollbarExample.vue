@@ -89,7 +89,7 @@ function initSlider() {
         clickable: true
       },
       on: {
-        slideChanged: () => {
+        slideChangeEnd: () => {
           state.current = slider.value.activeIndex + 1
         },
         created: (instance) => {

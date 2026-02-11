@@ -40,7 +40,7 @@ const slider1 = new Tvist('#slider1', {
 })
 
 // Обновляем информацию при каждом переключении
-slider1.on('slideChanged', () => {
+slider1.on('slideChangeEnd', () => {
   switchCounter++
   updateInfo(slider1)
   console.log(`Slide changed to ${slider1.activeIndex}, counter: ${switchCounter}`)

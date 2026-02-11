@@ -22,7 +22,7 @@ describe('Autoplay + Pagination + Loop integration', () => {
     container = document.createElement('div')
     document.body.appendChild(container)
     vi.useFakeTimers()
-    // Мокаем размеры, чтобы переходы и slideChanged срабатывали
+    // Мокаем размеры, чтобы переходы и slideChangeEnd срабатывали
     Object.defineProperties(HTMLElement.prototype, {
       clientWidth: { get: () => 800 },
       offsetWidth: { get: () => 800 }
@@ -213,7 +213,7 @@ describe('Autoplay + Pagination + Loop integration', () => {
     slider.destroy()
   })
 
-  it('should emit slideChanged event with correct index when looping', () => {
+  it('should emit slideChangeEnd event with correct index when looping', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
         <div class="${TVIST_CLASSES.container}">
@@ -235,7 +235,7 @@ describe('Autoplay + Pagination + Loop integration', () => {
         type: 'bullets'
       },
       on: {
-        slideChanged: slideChangedSpy
+        slideChangeEnd: slideChangedSpy
       }
     })
 
@@ -572,7 +572,7 @@ describe('Autoplay + Pagination + Drag (no loop, rewind)', () => {
   /**
    * Локализация бага: на слайде 0 при драге вправо с autoplay
    * после dragEnd вызывается resume(), и таймер autoplay сразу срабатывает,
-   * вызывая next() → scrollTo(1) → slideChanged(1).
+   * вызывая next() → scrollTo(1) → slideChangeEnd(1).
    * Ожидание: pause() должен очищать таймер, чтобы callback не сработал сразу после resume().
    */
   it('should stay on slide 0 after drag right when autoplay is enabled (pause must clear timer)', () => {
@@ -597,7 +597,7 @@ describe('Autoplay + Pagination + Drag (no loop, rewind)', () => {
     })
 
     const slideChangedLog: number[] = []
-    slider.on('slideChanged', (index: number) => {
+    slider.on('slideChangeEnd', (index: number) => {
       slideChangedLog.push(index)
     })
 
@@ -616,11 +616,11 @@ describe('Autoplay + Pagination + Drag (no loop, rewind)', () => {
     // Продвигаем время на 200ms — если таймер не был очищен, он бы сработал
     vi.advanceTimersByTime(200)
 
-    // Баг: без фикса приходит slideChanged(1) от autoplay
+    // Баг: без фикса приходит slideChangeEnd(1) от autoplay
     expect(slider.activeIndex).toBe(0)
     expect(getActiveBulletIndex(container)).toBe(0)
 
-    // Не должно быть slideChanged(1) сразу после драга
+    // Не должно быть slideChangeEnd(1) сразу после драга
     expect(slideChangedLog).not.toContain(1)
 
     slider.destroy()

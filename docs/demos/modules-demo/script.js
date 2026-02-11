@@ -113,7 +113,7 @@ displayConfig('config4', config4)
 // Логируем события (только для успешно созданных слайдеров)
 const sliders = [slider1, slider2, slider3, slider4].filter(Boolean)
 sliders.forEach((slider, i) => {
-  slider.on('slideChanged', (index) => {
+  slider.on('slideChangeEnd', (index) => {
     console.log(`Slider ${i + 1}: active slide = ${index}`)
   })
 })

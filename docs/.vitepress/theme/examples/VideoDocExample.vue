@@ -108,8 +108,8 @@ onMounted(() => {
     })
 
     // Сброс при смене слайда
-    slider.value.on('slideChange', (index) => {
-      console.log('🎬 Example: slideChange event received, index =', index)
+    slider.value.on('slideChangeStart', (index) => {
+      console.log('🎬 Example: slideChangeStart event received, index =', index)
       progress.value = 0
     })
   }

@@ -133,7 +133,7 @@ onMounted(() => {
       speed: 300,
       drag: true,
       on: {
-        slideChanged: () => updateState(slider2.value, state2, 8),
+        slideChangeEnd: () => updateState(slider2.value, state2, 8),
         created: (instance) => updateState(instance, state2, 8)
       }
     })
@@ -147,7 +147,7 @@ onMounted(() => {
       speed: 300,
       drag: true,
       on: {
-        slideChanged: () => updateState(slider3.value, state3, 8),
+        slideChangeEnd: () => updateState(slider3.value, state3, 8),
         created: (instance) => updateState(instance, state3, 8)
       }
     })
@@ -161,7 +161,7 @@ onMounted(() => {
       speed: 300,
       drag: true,
       on: {
-        slideChanged: () => updateState(slider4.value, state4, 12),
+        slideChangeEnd: () => updateState(slider4.value, state4, 12),
         created: (instance) => updateState(instance, state4, 12)
       }
     })
@@ -176,7 +176,7 @@ onMounted(() => {
       speed: 300,
       drag: true,
       on: {
-        slideChanged: () => {
+        slideChangeEnd: () => {
           if (slider5.value) {
             state5.activeIndex = slider5.value.activeIndex
             state5.realIndex = slider5.value.realIndex ?? 0

@@ -571,14 +571,14 @@ export class Tvist {
    */
   sync(target: Tvist): this {
     // 1. Когда скроллится этот слайдер -> скроллим целевой
-    this.on('slideChange', (index: number) => {
+    this.on('slideChangeStart', (index: number) => {
       if (target.activeIndex !== index) {
         target.scrollTo(index)
       }
     })
 
     // 2. Когда скроллится целевой -> скроллим этот
-    target.on('slideChange', (index: number) => {
+    target.on('slideChangeStart', (index: number) => {
       if (this.activeIndex !== index) {
         this.scrollTo(index)
       }

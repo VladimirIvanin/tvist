@@ -152,7 +152,7 @@ export class ScrollbarModule extends Module {
 
     // События слайдера
     this.on('scroll', this.handleScroll)
-    this.on('slideChanged', this.handleSlideChanged)
+    this.on('slideChangeEnd', this.handleSlideChanged)
 
     // Автоскрытие (показать при наведении, скрыть по таймеру)
     this.updateAutoHideListeners()

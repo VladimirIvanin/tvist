@@ -131,7 +131,7 @@ onMounted(() => {
         preloadPrevNext: state.preloadPrevNext
       },
       on: {
-        slideChanged: () => {
+        slideChangeEnd: () => {
           state.current = slider.value.activeIndex + 1
         },
         created: (instance) => {

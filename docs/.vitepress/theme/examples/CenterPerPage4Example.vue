@@ -83,8 +83,8 @@ onMounted(() => {
 
   updateState()
 
-  tvist.on('slideChange', updateState)
-  tvist.on('slideChanged', updateState)
+  tvist.on('slideChangeStart', updateState)
+  tvist.on('slideChangeEnd', updateState)
 })
 
 onBeforeUnmount(() => {

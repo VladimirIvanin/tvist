@@ -113,7 +113,7 @@ describe('Tvist.updateOptions()', () => {
 
     const slider = new Tvist(fixture.root, {
       on: {
-        slideChange: () => {
+        slideChangeStart: () => {
           handler1Called = true
         }
       }
@@ -126,7 +126,7 @@ describe('Tvist.updateOptions()', () => {
     // Обновляем обработчик
     slider.updateOptions({
       on: {
-        slideChange: () => {
+        slideChangeStart: () => {
           handler2Called = true
         }
       }

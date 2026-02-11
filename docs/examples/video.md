@@ -120,7 +120,7 @@ slider.on('autoplayProgress', ({ progress }) => {
 })
 
 // Сброс при смене слайда
-slider.on('slideChange', () => {
+slider.on('slideChangeStart', () => {
   progressBar.style.width = '0%'
 })
 ```

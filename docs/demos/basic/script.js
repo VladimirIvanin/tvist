@@ -7,7 +7,7 @@ const slider = new Tvist('#slider', {
   speed: 300,
   loop: false,
   on: {
-    slideChanged: (index) => {
+    slideChangeEnd: (index) => {
       updateInfo(index)
     }
   }

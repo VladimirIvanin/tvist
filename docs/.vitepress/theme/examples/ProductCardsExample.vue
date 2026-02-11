@@ -147,7 +147,7 @@ onMounted(() => {
       }
     },
     on: {
-      slideChanged: updateSlideInfo,
+      slideChangeEnd: updateSlideInfo,
       created: (instance) => {
         updateSlideInfo()
         isSliderMode.value = instance.isEnabled

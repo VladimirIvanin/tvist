@@ -178,8 +178,8 @@ export class LazyLoadModule extends Module {
   private setupEvents(): void {
     // Проверяем изображения при прокрутке, смене слайда
     this.on('scroll', () => this.check())
-    this.on('slideChange', () => this.check())
-    this.on('slideChanged', () => this.check())
+    this.on('slideChangeStart', () => this.check())
+    this.on('slideChangeEnd', () => this.check())
   }
 
   /**

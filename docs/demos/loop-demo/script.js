@@ -77,7 +77,7 @@ window.slider = new Tvist('#slider', {
       const realIndex = slider.realIndex
       log(`📍 beforeSlideChange: realIndex=${index}, current: activeIndex=${activeIndex}, realIndex=${realIndex}`, 'event')
     },
-    slideChanged: (index) => {
+    slideChangeEnd: (index) => {
       const activeIndex = slider.activeIndex
       const realIndex = slider.realIndex
       const position = slider.engine.location.get()
@@ -86,7 +86,7 @@ window.slider = new Tvist('#slider', {
       const isClone = currentSlide?.getAttribute('data-tvist-clone') === 'true'
       const slideIndex = currentSlide?.getAttribute('data-tvist-slide-index')
       
-      log(`✨ slideChanged: realIndex=${index}`, 'event')
+      log(`✨ slideChangeEnd: realIndex=${index}`, 'event')
       log(`   → activeIndex=${activeIndex}, position=${position.toFixed(0)}px`, 'dom')
       log(`   → current slide: [${activeIndex}] data-index=${slideIndex}, isClone=${isClone}`, 'dom')
       updateInfo()

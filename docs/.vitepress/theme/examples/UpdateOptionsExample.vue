@@ -249,7 +249,7 @@ onMounted(() => {
       drag: true,
       rewind: true,
       on: {
-        slideChange: (index: number) => {
+        slideChangeStart: (index: number) => {
           currentIndex.value = index
           updateNavigationState()
         }

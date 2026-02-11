@@ -64,8 +64,8 @@ export class ThumbsModule extends Module {
     }
 
     // Подписываемся на изменение слайда
-    this.on('slideChange', updateClasses)
-    this.on('slideChanged', updateClasses) // На всякий случай дублируем для надежности
+    this.on('slideChangeStart', updateClasses)
+    this.on('slideChangeEnd', updateClasses) // На всякий случай дублируем для надежности
     
     // Начальное состояние
     this.on('created', () => {

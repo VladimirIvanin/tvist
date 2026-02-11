@@ -41,7 +41,7 @@ const options: TvistOptions = {
   direction: 'horizontal',
   autoplay: 5000,
   on: {
-    slideChange: (index: number) => {
+    slideChangeStart: (index: number) => {
       console.log(`Активный слайд: ${index}`)
     },
     optionsUpdated: (tvist: Tvist, newOptions: Partial<TvistOptions>) => {
@@ -88,7 +88,7 @@ const ModuleClass: ModuleConstructor = AutoplayModule
 import type { Tvist, TvistOptions } from 'tvist'
 
 // Обработчики с типизированными параметрами
-slider.on('slideChange', (index: number) => {
+slider.on('slideChangeStart', (index: number) => {
   console.log(index)
 })
 
@@ -143,11 +143,11 @@ export class MyModule extends Module {
 
   init(): void {
     // Инициализация с полной типизацией
-    this.on('slideChange', this.handleSlideChange)
+    this.on('slideChangeStart', this.handleSlideChange)
   }
 
   destroy(): void {
-    this.off('slideChange', this.handleSlideChange)
+    this.off('slideChangeStart', this.handleSlideChange)
     
     if (this.intervalId) {
       clearInterval(this.intervalId)
@@ -303,8 +303,8 @@ const slider = SliderFactory.create({
 
 ```typescript
 type SliderEventMap = {
-  slideChange: [index: number]
-  slideChanged: [index: number]
+  slideChangeStart: [index: number]
+  slideChangeEnd: [index: number]
   beforeSlideChange: [index: number]
   created: [tvist: Tvist]
   destroyed: [tvist: Tvist]
@@ -329,7 +329,7 @@ function on<K extends keyof SliderEventMap>(
 }
 
 // Использование
-on(slider, 'slideChange', (index) => {
+on(slider, 'slideChangeStart', (index) => {
   console.log(index) // index автоматически типизирован как number
 })
 

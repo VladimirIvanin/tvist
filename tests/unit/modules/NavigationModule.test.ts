@@ -14,7 +14,7 @@ describe('NavigationModule', () => {
   beforeEach(() => {
     container = document.createElement('div')
     document.body.appendChild(container)
-    // Мокаем размеры, чтобы анимация (и slideChanged) срабатывали при speed: 0
+    // Мокаем размеры, чтобы анимация (и slideChangeEnd) срабатывали при speed: 0
     Object.defineProperties(HTMLElement.prototype, {
       clientWidth: { get: () => 800 },
       offsetWidth: { get: () => 800 }
@@ -251,7 +251,7 @@ describe('NavigationModule', () => {
         speed: 0
       })
 
-      // Переходим на последний слайд (instant, чтобы slideChanged гарантированно сработал)
+      // Переходим на последний слайд (instant, чтобы slideChangeEnd гарантированно сработал)
       slider.scrollTo(2, true)
       await Promise.resolve()
 

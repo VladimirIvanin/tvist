@@ -44,7 +44,7 @@ onMounted(() => {
       speed: 300,
       loop: false,
       on: {
-        slideChanged: () => {
+        slideChangeEnd: () => {
           state.current = slider.value.activeIndex + 1
         },
         created: (instance) => {

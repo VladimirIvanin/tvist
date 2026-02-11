@@ -201,7 +201,7 @@ const slider = new Tvist('.slider', {
   
   // События
   on: {
-    slideChange: (index) => {
+    slideChangeStart: (index) => {
       console.log('Активный слайд:', index)
     }
   }
@@ -336,7 +336,7 @@ slider.updateOptions({ peek: 0 })
 ```javascript
 slider.updateOptions({
   on: {
-    slideChange: (index) => {
+    slideChangeStart: (index) => {
       console.log('Новый обработчик:', index)
       // Новая логика
     }

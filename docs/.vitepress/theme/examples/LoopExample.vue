@@ -40,7 +40,7 @@ onMounted(() => {
       drag: true,
       speed: 300,
       on: {
-        slideChanged: () => {
+        slideChangeEnd: () => {
           state.activeIndex = slider.value.activeIndex
           state.realIndex = slider.value.realIndex ?? 0
         },

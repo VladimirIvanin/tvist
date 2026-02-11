@@ -46,7 +46,7 @@ describe('Loop basic: next() wrap', () => {
       speed: 0,
     })
 
-    slider.on('slideChange', (idx: number) => slideChanges.push(idx))
+    slider.on('slideChangeStart', (idx: number) => slideChanges.push(idx))
 
     expect(slider.realIndex).toBe(0)
 
@@ -63,7 +63,7 @@ describe('Loop basic: next() wrap', () => {
     // 2 → 0 (loop wrap)
     slider.next()
     console.log('After next() #3 (loop): activeIndex=', slider.activeIndex, 'realIndex=', slider.realIndex)
-    console.log('slideChange events received:', slideChanges)
+    console.log('slideChangeStart events received:', slideChanges)
     
     // Главная проверка
     expect(slider.realIndex).toBe(0)
@@ -71,7 +71,7 @@ describe('Loop basic: next() wrap', () => {
     slider.destroy()
   })
 
-  it('slideChange events fire with correct indices through full loop cycle', () => {
+  it('slideChangeStart events fire with correct indices through full loop cycle', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
         <div class="${TVIST_CLASSES.container}">
@@ -90,8 +90,8 @@ describe('Loop basic: next() wrap', () => {
       speed: 0,
     })
 
-    slider.on('slideChange', (idx: number) => slideChanges.push(idx))
-    slider.on('slideChanged', (idx: number) => slideChangedEvents.push(idx))
+    slider.on('slideChangeStart', (idx: number) => slideChanges.push(idx))
+    slider.on('slideChangeEnd', (idx: number) => slideChangedEvents.push(idx))
 
     // Полный цикл: 0→1→2→0→1→2
     for (let i = 0; i < 6; i++) {
@@ -100,8 +100,8 @@ describe('Loop basic: next() wrap', () => {
 
     const realIndices = [1, 2, 0, 1, 2, 0]
     
-    console.log('slideChange events:', slideChanges)
-    console.log('slideChanged events:', slideChangedEvents)
+    console.log('slideChangeStart events:', slideChanges)
+    console.log('slideChangeEnd events:', slideChangedEvents)
     console.log('Final realIndex:', slider.realIndex)
 
     expect(slider.realIndex).toBe(0)

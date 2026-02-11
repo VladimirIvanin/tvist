@@ -514,7 +514,7 @@ export class MyCustomModule extends Module {
   // Инициализация модуля
   init(): void {
     // Подписка на события
-    this.on('slideChange', this.handleSlideChange)
+    this.on('slideChangeStart', this.handleSlideChange)
     this.on('resize', this.handleResize)
     
     // Инициализация логики
@@ -524,7 +524,7 @@ export class MyCustomModule extends Module {
   // Очистка ресурсов
   destroy(): void {
     // Отписка от событий
-    this.off('slideChange', this.handleSlideChange)
+    this.off('slideChangeStart', this.handleSlideChange)
     this.off('resize', this.handleResize)
     
     // Очистка таймеров

@@ -610,9 +610,11 @@ export interface TvistOptions {
     /** Перед сменой слайда */
     beforeSlideChange?: (index: number) => void
     /** Начало смены слайда (старт анимации) */
-    slideChange?: (index: number) => void
-    /** Смена слайда завершена */
-    slideChanged?: (index: number) => void
+    slideChangeStart?: (index: number) => void
+    /** Смена слайда завершена (после анимации) */
+    slideChangeEnd?: (index: number) => void
+    /** @deprecated Используйте slideChangeEnd. Будет удалено в следующей мажорной версии */
+    slideChangeEnd?: (index: number) => void
     /** Перед началом анимации перехода (для loop fix) */
     beforeTransitionStart?: (data: { index: number; direction: 'next' | 'prev' }) => void
     /** Начало анимации перехода */

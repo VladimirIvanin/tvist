@@ -40,7 +40,7 @@ describe('ThumbsModule + DragModule Integration', () => {
     })
 
     // Синхронизация: thumbSlider управляет основным
-    thumbSlider.on('slideChanged', (index: number) => {
+    thumbSlider.on('slideChangeEnd', (index: number) => {
       mainSlider.scrollTo(index)
     })
   })
@@ -92,7 +92,7 @@ describe('ThumbsModule + DragModule Integration', () => {
     expect(thumbSlider.activeIndex).toBe(4)
     
     // Основной слайдер тоже должен остаться на слайде 4
-    // (раньше он ошибочно менялся из-за генерации slideChanged события)
+    // (раньше он ошибочно менялся из-за генерации slideChangeEnd события)
     expect(mainSlider.activeIndex).toBe(4)
   })
   
@@ -129,7 +129,7 @@ describe('ThumbsModule + DragModule Integration', () => {
     thumbSlider.scrollTo(4, true)
     
     const slideChangedSpy = vi.fn()
-    thumbSlider.on('slideChanged', slideChangedSpy)
+    thumbSlider.on('slideChangeEnd', slideChangedSpy)
     
     // Эмулируем короткий свайп влево (пытаемся пойти дальше последнего)
     const thumbRoot = thumbSlider.root
@@ -155,7 +155,7 @@ describe('ThumbsModule + DragModule Integration', () => {
     
     await waitForAnimation(400)
     
-    // slideChanged НЕ должен был вызваться (индекс не изменился)
+    // slideChangeEnd НЕ должен был вызваться (индекс не изменился)
     expect(slideChangedSpy).not.toHaveBeenCalled()
     
     // Оба слайдера остались на месте

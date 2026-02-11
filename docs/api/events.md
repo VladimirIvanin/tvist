@@ -15,8 +15,8 @@
 
 ### Смена слайда
 - [`beforeSlideChange`](#beforeslidechange) — перед сменой слайда
-- [`slideChange`](#slidechange) — начало смены (старт анимации)
-- [`slideChanged`](#slidechanged) — смена завершена
+- [`slideChangeStart`](#slideChangeStart) — начало смены (старт анимации)
+- [`slideChangeEnd`](#slideChangeEnd) — смена завершена
 - [`beforeTransitionStart`](#beforetransitionstart) — перед началом анимации перехода (для loop)
 - [`transitionStart`](#transitionstart) — начало анимации перехода
 - [`transitionEnd`](#transitionend) — конец анимации перехода
@@ -58,7 +58,7 @@
 ```javascript
 const slider = new Tvist('.slider', {
   on: {
-    slideChange: (index) => {
+    slideChangeStart: (index) => {
       console.log('Слайд изменился:', index)
     },
     resized: () => {
@@ -71,7 +71,7 @@ const slider = new Tvist('.slider', {
 ### Через метод `on()`
 
 ```javascript
-slider.on('slideChange', (index) => {
+slider.on('slideChangeStart', (index) => {
   console.log('Слайд изменился:', index)
 })
 
@@ -86,19 +86,19 @@ slider.on('resized', () => {
 const handler = (index) => console.log(index)
 
 // Подписка
-slider.on('slideChange', handler)
+slider.on('slideChangeStart', handler)
 
 // Отписка от конкретного обработчика
-slider.off('slideChange', handler)
+slider.off('slideChangeStart', handler)
 
 // Отписка от всех обработчиков события
-slider.off('slideChange')
+slider.off('slideChangeStart')
 ```
 
 ### Подписка на одно срабатывание
 
 ```javascript
-slider.once('slideChange', (index) => {
+slider.once('slideChangeStart', (index) => {
   console.log('Выполнится только один раз:', index)
 })
 ```
@@ -221,10 +221,10 @@ slider.on('beforeSlideChange', (index) => {
 })
 ```
 
-### slideChange
+### slideChangeStart
 
 ```typescript
-slideChange: (index: number) => void
+slideChangeStart: (index: number) => void
 ```
 
 Вызывается при начале смены слайда (начало анимации).
@@ -235,7 +235,7 @@ slideChange: (index: number) => void
 **Примеры:**
 
 ```javascript
-slider.on('slideChange', (index) => {
+slider.on('slideChangeStart', (index) => {
   console.log(`Переход к слайду ${index + 1}`)
   
   // Обновление UI
@@ -246,10 +246,10 @@ slider.on('slideChange', (index) => {
 })
 ```
 
-### slideChanged
+### slideChangeEnd
 
 ```typescript
-slideChanged: (index: number) => void
+slideChangeEnd: (index: number) => void
 ```
 
 Вызывается после завершения смены слайда (конец анимации).
@@ -260,7 +260,7 @@ slideChanged: (index: number) => void
 **Примеры:**
 
 ```javascript
-slider.on('slideChanged', (index) => {
+slider.on('slideChangeEnd', (index) => {
   console.log('Завершён переход к слайду:', index)
   
   // Ленивая загрузка для следующего слайда
@@ -434,7 +434,7 @@ reachBeginning: () => void
 reachEnd: () => void
 ```
 
-Вызываются при достижении первого или последнего слайда (после `slideChanged`).
+Вызываются при достижении первого или последнего слайда (после `slideChangeEnd`).
 
 ### breakpoint
 
@@ -792,7 +792,7 @@ lazyModule.loadSlide(5)
 ### Отслеживание просмотров в аналитике
 
 ```javascript
-slider.on('slideChanged', (index) => {
+slider.on('slideChangeEnd', (index) => {
   // Google Analytics
   gtag('event', 'slide_view', {
     slide_index: index,
@@ -813,7 +813,7 @@ slider.on('slideChanged', (index) => {
 ```javascript
 const thumbnails = document.querySelectorAll('.thumbnail')
 
-slider.on('slideChange', (index) => {
+slider.on('slideChangeStart', (index) => {
   // Обновить активную миниатюру
   thumbnails.forEach((thumb, i) => {
     thumb.classList.toggle('active', i === index)
@@ -828,7 +828,7 @@ slider.on('slideChange', (index) => {
 ### Управление видео
 
 ```javascript
-slider.on('slideChange', (index) => {
+slider.on('slideChangeStart', (index) => {
   // Остановить видео на предыдущих слайдах
   slider.slides.forEach((slide, i) => {
     if (i !== index) {
@@ -861,14 +861,14 @@ function updateProgress() {
     `${current + 1} / ${total}`
 }
 
-slider.on('slideChange', updateProgress)
+slider.on('slideChangeStart', updateProgress)
 slider.on('created', updateProgress)
 ```
 
 ### Кастомная анимация элементов
 
 ```javascript
-slider.on('slideChange', (index) => {
+slider.on('slideChangeStart', (index) => {
   const currentSlide = slider.slides[index]
   
   // Анимация заголовка

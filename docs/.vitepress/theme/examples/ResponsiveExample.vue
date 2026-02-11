@@ -215,7 +215,7 @@ function initSlider1(presetId) {
       drag: true,
       breakpoints: { ...preset.breakpoints },
       on: {
-        slideChanged: () => updateState(slider1.value, state1, 12),
+        slideChangeEnd: () => updateState(slider1.value, state1, 12),
         created: (instance) => updateState(instance, state1, 12),
         breakpoint: (bp) => {
           state1.breakpoint = bp
@@ -243,7 +243,7 @@ onMounted(() => {
       speed: 300,
       drag: true,
       on: {
-        slideChanged: () => updateState(slider2.value, state2, 12),
+        slideChangeEnd: () => updateState(slider2.value, state2, 12),
         created: (instance) => updateState(instance, state2, 12),
         resize: () => updateState(slider2.value, state2, 12)
       }
@@ -269,7 +269,7 @@ onMounted(() => {
         }
       },
       on: {
-        slideChanged: () => updateState(slider3.value, state3, 8),
+        slideChangeEnd: () => updateState(slider3.value, state3, 8),
         created: (instance) => updateState(instance, state3, 8),
         breakpoint: () => updateState(slider3.value, state3, 8),
         resize: () => updateState(slider3.value, state3, 8)

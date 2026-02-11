@@ -59,7 +59,7 @@ slider.updateOptions({ perPage: 4 })
 slider.destroy()
 
 // Работа с событиями
-slider.on('slideChange', (index) => {
+slider.on('slideChangeStart', (index) => {
   console.log('Активный слайд:', index)
 })
 
@@ -157,7 +157,7 @@ const slider = new Tvist('.slider', {
     created: (tvist) => {
       console.log('Слайдер создан')
     },
-    slideChange: (index) => {
+    slideChangeStart: (index) => {
       console.log('Переход к слайду:', index)
     },
     resize: () => {

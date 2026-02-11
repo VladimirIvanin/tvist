@@ -137,9 +137,9 @@ describe('PaginationModule', () => {
       expect(bullets[0].classList.contains('active')).toBe(true)
       expect(bullets[1].classList.contains('active')).toBe(false)
 
-      // Переходим к слайду 1 (вторая позиция). Ждём slideChange (эмитится сразу при scrollTo)
+      // Переходим к слайду 1 (вторая позиция). Ждём slideChangeStart (эмитится сразу при scrollTo)
       await new Promise<void>(resolve => {
-        slider.on('slideChange', () => resolve())
+        slider.on('slideChangeStart', () => resolve())
         slider.scrollTo(1)
       })
       
@@ -244,9 +244,9 @@ describe('PaginationModule', () => {
       // Первая позиция (1/4) = 25% (6-3+1=4 позиции: 0,1,2,3)
       expect(progressBar?.style.width).toBe('25%')
 
-      // Переходим к слайду 3 (последняя позиция, 4/4) = 100%. Ждём slideChange (эмитится сразу при scrollTo)
+      // Переходим к слайду 3 (последняя позиция, 4/4) = 100%. Ждём slideChangeStart (эмитится сразу при scrollTo)
       await new Promise<void>(resolve => {
-        slider.on('slideChange', () => resolve())
+        slider.on('slideChangeStart', () => resolve())
         slider.scrollTo(3)
       })
       
@@ -437,7 +437,7 @@ describe('PaginationModule', () => {
         
         // Переходим к слайду 2 - должна активироваться вторая точка (slides 2-3)
         await new Promise<void>(resolve => {
-          slider.on('slideChange', () => resolve())
+          slider.on('slideChangeStart', () => resolve())
           slider.scrollTo(2)
         })
         expect(bullets[0].classList.contains('active')).toBe(false)
@@ -445,14 +445,14 @@ describe('PaginationModule', () => {
 
         // Переходим к слайду 3 - все еще вторая точка
         await new Promise<void>(resolve => {
-          slider.on('slideChange', () => resolve())
+          slider.on('slideChangeStart', () => resolve())
           slider.scrollTo(3)
         })
         expect(bullets[1].classList.contains('active')).toBe(true)
 
         // Переходим к слайду 4 - третья точка (slides 4-5)
         await new Promise<void>(resolve => {
-          slider.on('slideChange', () => resolve())
+          slider.on('slideChangeStart', () => resolve())
           slider.scrollTo(4)
         })
         expect(bullets[1].classList.contains('active')).toBe(false)
@@ -579,7 +579,7 @@ describe('PaginationModule', () => {
         
         // Переходим к слайду 1 - должна активироваться вторая точка (центральная группа)
         await new Promise<void>(resolve => {
-          slider.on('slideChange', () => resolve())
+          slider.on('slideChangeStart', () => resolve())
           slider.scrollTo(1)
         })
         expect(bullets[0].classList.contains('active')).toBe(false)
@@ -587,7 +587,7 @@ describe('PaginationModule', () => {
 
         // Переходим к слайду 9 (последний) - последняя точка
         await new Promise<void>(resolve => {
-          slider.on('slideChange', () => resolve())
+          slider.on('slideChangeStart', () => resolve())
           slider.scrollTo(9)
         })
         expect(bullets[1].classList.contains('active')).toBe(false)
@@ -734,9 +734,9 @@ describe('PaginationModule', () => {
       })
 
       // endIndex должен быть 2 (6 - 4 = 2)
-      // Попытка перейти к индексу 5 должна ограничиться до 2. Ждём slideChange (эмитится сразу при scrollTo)
+      // Попытка перейти к индексу 5 должна ограничиться до 2. Ждём slideChangeStart (эмитится сразу при scrollTo)
       await new Promise<void>(resolve => {
-        slider.on('slideChange', () => resolve())
+        slider.on('slideChangeStart', () => resolve())
         slider.scrollTo(5)
       })
 

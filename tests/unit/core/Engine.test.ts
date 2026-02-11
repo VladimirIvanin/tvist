@@ -83,8 +83,8 @@ describe('Engine', () => {
       perPage: 1,
       on: {
         beforeSlideChange: beforeChange,
-        slideChange: change,
-        slideChanged: changed,
+        slideChangeStart: change,
+        slideChangeEnd: changed,
       },
     })
 

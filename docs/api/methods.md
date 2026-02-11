@@ -170,7 +170,7 @@ slider.updateOptions({ direction: 'vertical' })
 // Обновить обработчики событий
 slider.updateOptions({
   on: {
-    slideChange: (index) => {
+    slideChangeStart: (index) => {
       console.log('Новый обработчик:', index)
     }
   }
@@ -313,13 +313,13 @@ on(event: string, handler: Function): this
 **Примеры:**
 
 ```javascript
-slider.on('slideChange', (index) => {
+slider.on('slideChangeStart', (index) => {
   console.log('Активный слайд:', index)
 })
 
 // Множественные подписки
 slider
-  .on('slideChange', handler1)
+  .on('slideChangeStart', handler1)
   .on('resize', handler2)
   .on('dragEnd', handler3)
 ```
@@ -344,13 +344,13 @@ off(event: string, handler?: Function): this
 const handler = (index) => console.log(index)
 
 // Подписка
-slider.on('slideChange', handler)
+slider.on('slideChangeStart', handler)
 
 // Отписка от конкретного обработчика
-slider.off('slideChange', handler)
+slider.off('slideChangeStart', handler)
 
 // Отписка от всех обработчиков события
-slider.off('slideChange')
+slider.off('slideChangeStart')
 ```
 
 ### once()
@@ -370,7 +370,7 @@ once(event: string, handler: Function): this
 **Примеры:**
 
 ```javascript
-slider.once('slideChange', (index) => {
+slider.once('slideChangeStart', (index) => {
   console.log('Выполнится только один раз:', index)
 })
 
@@ -412,6 +412,6 @@ slider.emit('customEvent', { data: 'value' })
 slider
   .updateOptions({ perPage: 3 })
   .scrollTo(0)
-  .on('slideChange', handler)
+  .on('slideChangeStart', handler)
   .next()
 ```
