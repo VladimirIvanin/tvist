@@ -87,7 +87,7 @@ describe('SlideStatesModule', () => {
       })
 
       const slides = tvist.slides
-      expect(slides[4].classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`)).toBe(false)
+      expect(slides[0].classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`)).toBe(false)
     })
 
     it('не должен применять next класс к последнему слайду без loop', () => {
@@ -98,7 +98,7 @@ describe('SlideStatesModule', () => {
       })
 
       const slides = tvist.slides
-      expect(slides[0].classList.contains(`${TVIST_CSS_PREFIX}__slide--next`)).toBe(false)
+      expect(slides[4].classList.contains(`${TVIST_CSS_PREFIX}__slide--next`)).toBe(false)
     })
 
     it('должен применять prev/next циклически с loop', async () => {

@@ -85,7 +85,9 @@ h2 {
   /* Градиенты для первого демо */
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
-.tvist--h-500 .tvist-v1__slide:nth-child(even) {
+.tvist--h-500 .tvist-v1__slide[data-tvist-slide-index="1"],
+.tvist--h-500 .tvist-v1__slide[data-tvist-slide-index="3"],
+.tvist--h-500 .tvist-v1__slide[data-tvist-slide-index="5"] {
   background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
 }
 

@@ -50,9 +50,6 @@ export class LoopModule extends Module {
     this.isInitialized = true
     log('Init started', { slidesCount })
 
-    // 1. Проставляем data-tvist-slide-index всем слайдам
-    this.initSlides()
-
     // 2. Первый loopFix для начальной расстановки слайдов
     const initialRealIndex = this.options.start ?? 0
     const bothDirections = this.options.center ?? false
@@ -104,17 +101,6 @@ export class LoopModule extends Module {
     } else if (newOptions.loop === false) {
       this.destroy()
     }
-  }
-
-  /**
-   * Проставляет data-tvist-slide-index всем слайдам
-   */
-  private initSlides(): void {
-    const slides = this.tvist.slides
-    slides.forEach((el, index) => {
-      el.setAttribute('data-tvist-slide-index', String(index))
-    })
-    log('Slides indexed', { count: slides.length })
   }
 
   /**

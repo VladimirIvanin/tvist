@@ -236,16 +236,16 @@ pagination: {
   color: white;
 }
 
-.pagination-demo-slider .tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.pagination-demo-slider .tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.pagination-demo-slider .tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.pagination-demo-slider .tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-.pagination-demo-slider .tvist-v1__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
-.pagination-demo-slider .tvist-v1__slide:nth-child(6) { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
-.pagination-demo-slider .tvist-v1__slide:nth-child(7) { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
-.pagination-demo-slider .tvist-v1__slide:nth-child(8) { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
-.pagination-demo-slider .tvist-v1__slide:nth-child(9) { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
-.pagination-demo-slider .tvist-v1__slide:nth-child(10) { background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%); }
+.pagination-demo-slider .tvist-v1__slide[data-tvist-slide-index="0"] { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.pagination-demo-slider .tvist-v1__slide[data-tvist-slide-index="1"] { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.pagination-demo-slider .tvist-v1__slide[data-tvist-slide-index="2"] { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.pagination-demo-slider .tvist-v1__slide[data-tvist-slide-index="3"] { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.pagination-demo-slider .tvist-v1__slide[data-tvist-slide-index="4"] { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.pagination-demo-slider .tvist-v1__slide[data-tvist-slide-index="5"] { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+.pagination-demo-slider .tvist-v1__slide[data-tvist-slide-index="6"] { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+.pagination-demo-slider .tvist-v1__slide[data-tvist-slide-index="7"] { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); }
+.pagination-demo-slider .tvist-v1__slide[data-tvist-slide-index="8"] { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); }
+.pagination-demo-slider .tvist-v1__slide[data-tvist-slide-index="9"] { background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%); }
 
 /* Стрелки — позиция поверх слайда */
 .pagination-demo-slider :deep(.tvist-v1__arrow--prev),

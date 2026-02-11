@@ -97,6 +97,9 @@ export class Tvist {
       ...options,
     }
 
+    // Индексы слайдов для стилизации и идентификации (в т.ч. для loop)
+    this.updateSlideIndices()
+
     // Проверяем начальное состояние enabled
     this._isEnabled = this.options.enabled !== false
 
@@ -470,6 +473,15 @@ export class Tvist {
    */
   updateSlidesList(): void {
     this._slides = children(this.container, `.${TVIST_CLASSES.slide}`)
+  }
+
+  /**
+   * Проставляет data-tvist-slide-index слайдам по порядку в DOM.
+   */
+  private updateSlideIndices(): void {
+    this._slides.forEach((el, index) => {
+      el.setAttribute('data-tvist-slide-index', String(index))
+    })
   }
 
   /**

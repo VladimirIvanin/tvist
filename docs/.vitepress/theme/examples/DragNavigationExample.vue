@@ -58,11 +58,11 @@ const slider = new Tvist('.tvist', {
   color: white;
 }
 
-.tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-.tvist-v1__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.tvist-v1__slide[data-tvist-slide-index="0"] { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v1__slide[data-tvist-slide-index="1"] { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v1__slide[data-tvist-slide-index="2"] { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v1__slide[data-tvist-slide-index="3"] { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v1__slide[data-tvist-slide-index="4"] { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
 ```
       </details>
     </template>
@@ -121,9 +121,9 @@ onUnmounted(() => {
   color: white;
 }
 
-.tvist-v1__slide:nth-child(1) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v1__slide:nth-child(2) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v1__slide:nth-child(3) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v1__slide:nth-child(4) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-.tvist-v1__slide:nth-child(5) { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.tvist-v1__slide[data-tvist-slide-index="0"] { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.tvist-v1__slide[data-tvist-slide-index="1"] { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.tvist-v1__slide[data-tvist-slide-index="2"] { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.tvist-v1__slide[data-tvist-slide-index="3"] { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.tvist-v1__slide[data-tvist-slide-index="4"] { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
 </style>

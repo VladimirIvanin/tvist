@@ -47,6 +47,7 @@ npm run typecheck       # Проверка типов
 - SCSS с modern-compiler API
 - Переменные в `_variables.scss`
 - Базовые стили в `_base.scss`
+- **Слайды по индексу:** не использовать `:nth-child()` — при loop порядок в DOM меняется. Использовать селекторы по атрибуту: `.tvist-v1__slide[data-tvist-slide-index="0"]`, `[data-tvist-slide-index="1"]` и т.д. (индекс с 0).
 
 ### Код
 - ESLint + Prettier

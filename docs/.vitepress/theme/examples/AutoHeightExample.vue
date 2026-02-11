@@ -105,19 +105,29 @@ onBeforeUnmount(() => {
   width: 100%;
 }
 
-.tvist-v1__slide:nth-child(5n + 1) {
+.tvist-v1__slide[data-tvist-slide-index="0"],
+.tvist-v1__slide[data-tvist-slide-index="5"],
+.tvist-v1__slide[data-tvist-slide-index="10"] {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
-.tvist-v1__slide:nth-child(5n + 2) {
+.tvist-v1__slide[data-tvist-slide-index="1"],
+.tvist-v1__slide[data-tvist-slide-index="6"],
+.tvist-v1__slide[data-tvist-slide-index="11"] {
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
-.tvist-v1__slide:nth-child(5n + 3) {
+.tvist-v1__slide[data-tvist-slide-index="2"],
+.tvist-v1__slide[data-tvist-slide-index="7"],
+.tvist-v1__slide[data-tvist-slide-index="12"] {
   background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
-.tvist-v1__slide:nth-child(5n + 4) {
+.tvist-v1__slide[data-tvist-slide-index="3"],
+.tvist-v1__slide[data-tvist-slide-index="8"],
+.tvist-v1__slide[data-tvist-slide-index="13"] {
   background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
 }
-.tvist-v1__slide:nth-child(5n + 5) {
+.tvist-v1__slide[data-tvist-slide-index="4"],
+.tvist-v1__slide[data-tvist-slide-index="9"],
+.tvist-v1__slide[data-tvist-slide-index="14"] {
   background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
 }
 
