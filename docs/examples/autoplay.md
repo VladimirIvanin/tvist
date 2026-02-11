@@ -7,6 +7,7 @@
 <script setup>
 import AutoplayBasicExample from '../.vitepress/theme/examples/AutoplayBasicExample.vue'
 import AutoplayRewindExample from '../.vitepress/theme/examples/AutoplayRewindExample.vue'
+import AutoplayLoopExample from '../.vitepress/theme/examples/AutoplayLoopExample.vue'
 </script>
 
 <AutoplayBasicExample />
@@ -18,6 +19,21 @@ const slider = new Tvist('.tvist-v1', {
     type: 'bullets',
     clickable: true
   }
+})
+```
+
+## Autoplay с Loop
+
+Бесконечная прокрутка: при `loop: true` после последнего слайда плавно переходим к первому без «перемотки».
+
+<AutoplayLoopExample />
+
+```js
+const slider = new Tvist('.tvist-v1', {
+  autoplay: { delay: 2000, pauseOnHover: true },
+  loop: true, // бесконечный цикл
+  arrows: true,
+  pagination: { type: 'bullets', clickable: true }
 })
 ```
 
