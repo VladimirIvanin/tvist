@@ -186,9 +186,9 @@ export interface TvistOptions {
    * @default false
    */
   arrows?: boolean | {
-    /** Селектор или элемент для кнопки "назад" */
+    /** Селектор или элемент для кнопки "назад". Может быть вне root — поиск по document */
     prev?: string | HTMLElement
-    /** Селектор или элемент для кнопки "вперёд" */
+    /** Селектор или элемент для кнопки "вперёд". Может быть вне root */
     next?: string | HTMLElement
     /** CSS класс для неактивных стрелок */
     disabledClass?: string
@@ -205,7 +205,7 @@ export interface TvistOptions {
    * @default false
    */
   pagination?: boolean | {
-    /** Селектор или элемент контейнера для пагинации */
+    /** Селектор или элемент контейнера для пагинации. Может быть вне root */
     container?: string | HTMLElement
     /** Тип пагинации */
     type?: 'bullets' | 'fraction' | 'progress' | 'custom'
