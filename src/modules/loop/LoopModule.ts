@@ -314,6 +314,15 @@ export class LoopModule extends Module {
 
     // Обновляем список слайдов после перемещения
     this.tvist.updateSlidesList()
+
+    // ВАЖНО: Обновляем индекс ДО вызова update(), чтобы модули (Pagination) видели корректный realIndex
+    if (slideTo) {
+      if (prependSlidesIndexes.length > 0) {
+        this.tvist.engine.index.set(activeIndex + Math.ceil(slidesPrepended))
+      } else if (appendSlidesIndexes.length > 0) {
+        this.tvist.engine.index.set(activeIndex - slidesAppended)
+      }
+    }
     
     // Сохраняем текущий location перед update (чтобы не было скачка)
     const locationBeforeUpdate = this.tvist.engine.location.get()
@@ -335,6 +344,7 @@ export class LoopModule extends Module {
     if (prependSlidesIndexes.length > 0) {
       // Вычисляем разницу в позиции слайда (используем сохранённые позиции)
       const oldSlidePosition = oldSlidePositions[activeIndex] ?? 0
+      // Используем activeIndex + slidesPrepended, что совпадает с новым индексом, который мы только что установили
       const newSlidePosition = this.tvist.engine.getSlidePosition(activeIndex + Math.ceil(slidesPrepended))
       const diff = newSlidePosition - oldSlidePosition
 
@@ -349,11 +359,6 @@ export class LoopModule extends Module {
         slideTo
       })
 
-      if (slideTo) {
-        // Обновляем индекс напрямую (без анимации)
-        this.tvist.engine.index.set(activeIndex + Math.ceil(slidesPrepended))
-      }
-
       // Корректируем translate мгновенно
       const newTranslate = currentTranslate - diff
       this.tvist.engine.location.set(newTranslate)
@@ -365,6 +370,7 @@ export class LoopModule extends Module {
     } else if (appendSlidesIndexes.length > 0) {
       // Вычисляем разницу в позиции слайда (используем сохранённые позиции)
       const oldSlidePosition = oldSlidePositions[activeIndex] ?? 0
+      // Используем activeIndex - slidesAppended, что совпадает с новым индексом
       const newSlidePosition = this.tvist.engine.getSlidePosition(activeIndex - slidesAppended)
       const diff = newSlidePosition - oldSlidePosition
 
@@ -378,11 +384,6 @@ export class LoopModule extends Module {
         newTranslate: currentTranslate - diff,
         slideTo
       })
-
-      if (slideTo) {
-        // Обновляем индекс напрямую (без анимации)
-        this.tvist.engine.index.set(activeIndex - slidesAppended)
-      }
 
       // Корректируем translate мгновенно 
       const newTranslate = currentTranslate - diff
@@ -446,7 +447,11 @@ export class LoopModule extends Module {
 
     const realIndexAttr = activeSlide.getAttribute('data-tvist-slide-index')
     if (realIndexAttr) {
-      return parseInt(realIndexAttr, 10)
+      const parsed = parseInt(realIndexAttr, 10)
+      if (LOOP_DEBUG) {
+        console.log('[Loop] getRealIndex', { activeIndex, attr: realIndexAttr, parsed })
+      }
+      return parsed
     }
 
     return activeIndex

@@ -708,6 +708,311 @@ describe('PaginationModule', () => {
     })
   })
 
+  describe('Pagination with Drag', () => {
+    it('should not flicker active bullet during incomplete drag (with loop)', async () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+          </div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
+        </div>
+      `
+
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+        loop: true,
+        drag: true,
+        speed: 0,
+        pagination: {
+          clickable: true
+        }
+      })
+
+      const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+      
+      // Изначально активна первая точка
+      expect(bullets[0].classList.contains('active')).toBe(true)
+      expect(bullets[1].classList.contains('active')).toBe(false)
+
+      // Отслеживаем изменения активной точки
+      const activeBulletChanges: number[] = []
+      const observer = new MutationObserver(() => {
+        bullets.forEach((bullet, index) => {
+          if (bullet.classList.contains('active')) {
+            activeBulletChanges.push(index)
+          }
+        })
+      })
+
+      bullets.forEach(bullet => {
+        observer.observe(bullet, { attributes: true, attributeFilter: ['class'] })
+      })
+
+      // Эмулируем начало драга (dragStart)
+      slider.emit('dragStart')
+      
+      // Небольшая задержка
+      await new Promise(resolve => setTimeout(resolve, 10))
+      
+      // Эмулируем slideChangeStart (как будто начали тянуть к следующему слайду)
+      slider.emit('slideChangeStart', 1)
+      
+      // Проверяем что активная точка НЕ изменилась (isDragging = true)
+      expect(bullets[0].classList.contains('active')).toBe(true)
+      expect(bullets[1].classList.contains('active')).toBe(false)
+      
+      // Эмулируем окончание драга
+      slider.emit('dragEnd')
+      
+      // Эмулируем slideChangeEnd (snap вернул обратно к первому слайду)
+      slider.emit('slideChangeEnd', 0)
+      
+      // Теперь должна обновиться активная точка
+      expect(bullets[0].classList.contains('active')).toBe(true)
+      expect(bullets[1].classList.contains('active')).toBe(false)
+
+      observer.disconnect()
+    })
+
+    it('should update active bullet after successful drag (with loop)', async () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+          </div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
+        </div>
+      `
+
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+        loop: true,
+        drag: true,
+        speed: 0,
+        pagination: {
+          clickable: true
+        }
+      })
+
+      const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+      
+      // Изначально активна первая точка
+      expect(bullets[0].classList.contains('active')).toBe(true)
+
+      // Эмулируем полный драг
+      slider.emit('dragStart')
+      await new Promise(resolve => setTimeout(resolve, 10))
+      
+      // slideChangeStart во время драга - не должен обновить пагинацию
+      slider.emit('slideChangeStart', 1)
+      expect(bullets[0].classList.contains('active')).toBe(true)
+      expect(bullets[1].classList.contains('active')).toBe(false)
+      
+      slider.emit('dragEnd')
+      
+      // Нужно реально переключить слайд, а не просто эмитить событие
+      slider.scrollTo(1, true)
+      
+      expect(bullets[0].classList.contains('active')).toBe(false)
+      expect(bullets[1].classList.contains('active')).toBe(true)
+    })
+
+    it('should work correctly with autoplay + loop + drag', async () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+          </div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
+        </div>
+      `
+
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+        loop: true,
+        drag: true,
+        autoplay: { delay: 1000 },
+        speed: 0,
+        pagination: {
+          clickable: true
+        }
+      })
+
+      const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+      
+      // Изначально активна первая точка
+      expect(bullets[0].classList.contains('active')).toBe(true)
+
+      // Autoplay переключает слайд (без драга)
+      slider.scrollTo(1, true)
+      expect(bullets[1].classList.contains('active')).toBe(true)
+
+      // Теперь эмулируем драг во время autoplay
+      slider.emit('dragStart')
+      
+      // slideChangeStart во время драга
+      slider.emit('slideChangeStart', 2)
+      // Не должно обновиться
+      expect(bullets[1].classList.contains('active')).toBe(true)
+      expect(bullets[2].classList.contains('active')).toBe(false)
+      
+      slider.emit('dragEnd')
+      
+      // Реальное переключение после драга
+      slider.scrollTo(2, true)
+      expect(bullets[2].classList.contains('active')).toBe(true)
+    })
+
+    it('should handle pagination correctly on second loop cycle with drag', async () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+          </div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
+        </div>
+      `
+
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+        loop: true,
+        drag: true,
+        autoplay: { delay: 100 },
+        speed: 0,
+        pagination: {
+          clickable: true
+        }
+      })
+
+      const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+      
+      // Проходим полный первый цикл (0 -> 1 -> 2 -> 0)
+      expect(bullets[0].classList.contains('active')).toBe(true)
+      
+      // 0 -> 1
+      slider.scrollTo(1, true)
+      expect(bullets[1].classList.contains('active')).toBe(true)
+      
+      // 1 -> 2
+      slider.scrollTo(2, true)
+      expect(bullets[2].classList.contains('active')).toBe(true)
+      
+      // 2 -> 0 (переход через границу loop - начало второго цикла)
+      slider.scrollTo(0, true)
+      expect(bullets[0].classList.contains('active')).toBe(true)
+      
+      // Второй цикл: 0 -> 1
+      slider.scrollTo(1, true)
+      expect(bullets[1].classList.contains('active')).toBe(true)
+      
+      // Теперь эмулируем драг на втором цикле
+      slider.emit('dragStart')
+      
+      // Начинаем тянуть к слайду 2
+      slider.emit('slideChangeStart', 2)
+      // Во время драга пагинация не должна обновиться
+      expect(bullets[1].classList.contains('active')).toBe(true)
+      expect(bullets[2].classList.contains('active')).toBe(false)
+      
+      // Отпускаем, но не доводим до конца (snap вернет обратно)
+      slider.emit('dragEnd')
+      
+      // slideChangeEnd вернет к слайду 1
+      slider.scrollTo(1, true)
+      
+      // Должна остаться активной вторая точка
+      expect(bullets[1].classList.contains('active')).toBe(true)
+      expect(bullets[2].classList.contains('active')).toBe(false)
+    })
+
+    it('should not flicker pagination during drag on second loop cycle with autoplay', async () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+          </div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
+        </div>
+      `
+
+      const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+        loop: true,
+        drag: true,
+        autoplay: { delay: 100, pauseOnInteraction: true },
+        speed: 0,
+        pagination: {
+          clickable: true
+        }
+      })
+
+      const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+      
+      // Отслеживаем все изменения классов на bullets
+      const bulletStateChanges: Array<{ time: number; states: boolean[] }> = []
+      
+      const recordState = () => {
+        bulletStateChanges.push({
+          time: Date.now(),
+          states: Array.from(bullets).map(b => b.classList.contains('active'))
+        })
+      }
+      
+      recordState() // Начальное состояние: [true, false, false]
+      
+      // Проходим полный первый цикл
+      slider.scrollTo(1, true)
+      recordState() // [false, true, false]
+      
+      slider.scrollTo(2, true)
+      recordState() // [false, false, true]
+      
+      slider.scrollTo(0, true)
+      recordState() // [true, false, false] - вернулись к началу
+      
+      // Второй цикл - переходим к слайду 1
+      slider.scrollTo(1, true)
+      recordState() // [false, true, false]
+      
+      // Начинаем драг
+      slider.emit('dragStart')
+      recordState() // Должно остаться [false, true, false]
+      
+      // Эмулируем попытку перехода во время драга
+      slider.emit('slideChangeStart', 2)
+      recordState() // Должно остаться [false, true, false] - НЕ обновляться!
+      
+      // Отпускаем драг
+      slider.emit('dragEnd')
+      recordState() // Должно остаться [false, true, false]
+      
+      // Snap вернул обратно к слайду 1
+      slider.scrollTo(1, true)
+      recordState() // [false, true, false]
+      
+      // Проверяем что не было мерцания (активация слайда 2 и возврат к 1)
+      // Все записи после начала драга должны иметь bullets[1] = true
+      const statesAfterDragStart = bulletStateChanges.slice(5) // После "Начинаем драг"
+      
+      statesAfterDragStart.forEach((state, idx) => {
+        expect(state.states[1]).toBe(true) // bullets[1] всегда активен
+        expect(state.states[2]).toBe(false) // bullets[2] никогда не активируется
+      })
+    })
+  })
+
   describe('EndIndex logic', () => {
     it('should not allow scrolling beyond endIndex when perPage > 1', async () => {
       container.innerHTML = `

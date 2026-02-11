@@ -79,12 +79,10 @@ export class PaginationModule extends Module {
     // чтобы к моменту slideChangeEnd (после анимации) bullet'ы были уже актуальны.
     // Также слушаем slideChangeEnd для instant-переходов (scrollTo с instant=true).
     this.on('slideChangeStart', (index: number) => {
-      log('slideChangeStart event received', { index })
       this.updateActive()
     })
     
     this.on('slideChangeEnd', (index: number) => {
-      log('slideChangeEnd event received', { index })
       this.updateActive()
       if (this.options.loop) this.scheduleUpdateActive()
     })
@@ -92,17 +90,11 @@ export class PaginationModule extends Module {
     // Для loop режима нужны дополнительные события
     if (this.options.loop) {
       this.on('loopFix', () => {
-        log('loopFix event received', {
-          hasRealIndexGetter: 'realIndex' in this.tvist,
-          realIndex: this.tvist.realIndex,
-          activeIndex: this.tvist.activeIndex
-        })
         this.updateActive()
         this.scheduleUpdateActive()
       })
       
       this.on('transitionEnd', () => {
-        log('transitionEnd event received')
         this.updateActive()
         this.scheduleUpdateActive()
       })
@@ -598,6 +590,7 @@ export class PaginationModule extends Module {
       currentSlideIndex: this.getCurrentSlideIndex(),
       type: this.getType()
     })
+
 
     const type = this.getType()
 
