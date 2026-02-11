@@ -136,6 +136,99 @@ describe('SlideStatesModule', () => {
     })
   })
 
+  describe('Visible class', () => {
+    it('класс visible не проставляется в happy-dom (нулевые размеры)', async () => {
+      // В happy-dom getBoundingClientRect возвращает нули, поэтому
+      // canCheckVisibility = false и класс visible не проставляется
+      tvist = new Tvist(root, {
+        perPage: 1,
+        start: 0,
+      })
+
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const slides = tvist.slides
+      
+      // В happy-dom класс visible не проставляется из-за нулевых размеров
+      // Это ограничение тестового окружения, в реальном браузере будет работать
+      const hasVisible = slides.some(s => s.classList.contains(`${TVIST_CSS_PREFIX}__slide--visible`))
+      expect(hasVisible).toBe(false)
+    })
+  })
+
+  describe('PerPage = 1 mode', () => {
+    it('должен проставлять active/prev/next независимо от видимости в viewport', async () => {
+      tvist = new Tvist(root, {
+        perPage: 1,
+        start: 2,
+        loop: false,
+      })
+
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const slides = tvist.slides
+      
+      // Даже если prev/next слайды не видны в viewport (за пределами),
+      // классы состояний должны быть проставлены
+      expect(slides[1].classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`)).toBe(true)
+      expect(slides[2].classList.contains(`${TVIST_CSS_PREFIX}__slide--active`)).toBe(true)
+      expect(slides[3].classList.contains(`${TVIST_CSS_PREFIX}__slide--next`)).toBe(true)
+    })
+
+    it('должен проставлять prev/next при perPage=1 и loop=true', async () => {
+      tvist = new Tvist(root, {
+        perPage: 1,
+        start: 0,
+        loop: true,
+      })
+
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const slides = tvist.slides
+      
+      // В режиме loop первый слайд активен, последний - prev, второй - next
+      // Эти классы должны быть независимо от видимости
+      const activeSlides = slides.filter(s => s.classList.contains(`${TVIST_CSS_PREFIX}__slide--active`))
+      const prevSlides = slides.filter(s => s.classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`))
+      const nextSlides = slides.filter(s => s.classList.contains(`${TVIST_CSS_PREFIX}__slide--next`))
+      
+      expect(activeSlides.length).toBeGreaterThan(0)
+      expect(prevSlides.length).toBeGreaterThan(0)
+      expect(nextSlides.length).toBeGreaterThan(0)
+    })
+
+    it('должен обновлять prev/next при навигации с perPage=1', async () => {
+      tvist = new Tvist(root, {
+        perPage: 1,
+        start: 1,
+        speed: 0,
+        loop: false,
+      })
+
+      await new Promise(resolve => setTimeout(resolve, 10))
+
+      const slides = tvist.slides
+      
+      // Начальное состояние: slide 1 активен
+      expect(slides[0].classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`)).toBe(true)
+      expect(slides[1].classList.contains(`${TVIST_CSS_PREFIX}__slide--active`)).toBe(true)
+      expect(slides[2].classList.contains(`${TVIST_CSS_PREFIX}__slide--next`)).toBe(true)
+
+      // Переходим на следующий слайд
+      tvist.next()
+      await new Promise(resolve => setTimeout(resolve, 50))
+
+      // Новое состояние: slide 2 активен
+      expect(slides[1].classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`)).toBe(true)
+      expect(slides[2].classList.contains(`${TVIST_CSS_PREFIX}__slide--active`)).toBe(true)
+      expect(slides[3].classList.contains(`${TVIST_CSS_PREFIX}__slide--next`)).toBe(true)
+      
+      // Старые классы должны быть удалены
+      expect(slides[0].classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`)).toBe(false)
+      expect(slides[1].classList.contains(`${TVIST_CSS_PREFIX}__slide--active`)).toBe(false)
+    })
+  })
+
   describe('Cleanup', () => {
     it('должен удалять все классы при destroy', async () => {
       tvist = new Tvist(root, {

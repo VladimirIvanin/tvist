@@ -83,12 +83,6 @@ export class SlideStatesModule extends Module {
       nextTargetIndex = (activeLogicalIndex + 1) % originalCount
     }
 
-    const rootRect = this.tvist.root.getBoundingClientRect()
-    const isVertical = this.options.direction === 'vertical'
-    // При нулевых размерах root (например happy-dom) не фильтруем по видимости
-    const canCheckVisibility =
-      (isVertical ? rootRect.height : rootRect.width) > 0
-
     slides.forEach((slide, index) => {
       let currentLogicalIndex = index
 
@@ -115,18 +109,11 @@ export class SlideStatesModule extends Module {
         isNext = index === activeIndex + 1
       }
 
-      // Классы active/prev/next только у видимых слайдов
-      let isVisible = true
-      if (canCheckVisibility) {
-        const slideRect = slide.getBoundingClientRect()
-        isVisible = isVertical
-          ? this.isVerticallyVisible(slideRect, rootRect)
-          : this.isHorizontallyVisible(slideRect, rootRect)
-      }
-
-      this.toggleClass(slide, this.CLASS_ACTIVE, isActive && isVisible)
-      this.toggleClass(slide, this.CLASS_PREV, isPrev && isVisible)
-      this.toggleClass(slide, this.CLASS_NEXT, isNext && isVisible)
+      // Классы active/prev/next проставляются независимо от видимости
+      // (даже если слайд находится вне viewport)
+      this.toggleClass(slide, this.CLASS_ACTIVE, isActive)
+      this.toggleClass(slide, this.CLASS_PREV, isPrev)
+      this.toggleClass(slide, this.CLASS_NEXT, isNext)
     })
   }
 
@@ -163,11 +150,12 @@ export class SlideStatesModule extends Module {
     slideRect: DOMRect,
     rootRect: DOMRect
   ): boolean {
-    // Слайд видим, если его левый край <= правого края root
-    // И правый край >= левого края root
+    // Слайд видим, если он имеет значительное пересечение с viewport
+    // Используем порог 1px чтобы избежать ложных срабатываний при касании краев
+    const THRESHOLD = 1
     return (
-      Math.floor(slideRect.left) < Math.ceil(rootRect.right) &&
-      Math.ceil(slideRect.right) > Math.floor(rootRect.left)
+      slideRect.left < rootRect.right - THRESHOLD &&
+      slideRect.right > rootRect.left + THRESHOLD
     )
   }
 
@@ -178,11 +166,12 @@ export class SlideStatesModule extends Module {
     slideRect: DOMRect,
     rootRect: DOMRect
   ): boolean {
-    // Слайд видим, если его верхний край <= нижнего края root
-    // И нижний край >= верхнего края root
+    // Слайд видим, если он имеет значительное пересечение с viewport
+    // Используем порог 1px чтобы избежать ложных срабатываний при касании краев
+    const THRESHOLD = 1
     return (
-      Math.floor(slideRect.top) < Math.ceil(rootRect.bottom) &&
-      Math.ceil(slideRect.bottom) > Math.floor(rootRect.top)
+      slideRect.top < rootRect.bottom - THRESHOLD &&
+      slideRect.bottom > rootRect.top + THRESHOLD
     )
   }
 
