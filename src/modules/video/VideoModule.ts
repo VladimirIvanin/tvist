@@ -567,8 +567,9 @@ export class VideoModule extends Module {
       console.log(5)
       doPlay()
     } else {
-      // На iOS canplay/canplaythrough могут не сработать — срабатывают loadedmetadata, loadeddata. Ждём любой из событий готовности.
+      // Видео на других слайдах могло не начать загрузку — принудительно запускаем load(), иначе события не придут.
       console.log(6)
+      video.load()
       const onReady = (e: Event) => {
         console.log(7, e.type)
         video.removeEventListener('canplay', onReady)
