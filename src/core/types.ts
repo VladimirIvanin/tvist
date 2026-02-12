@@ -34,6 +34,19 @@ export interface AutoplayModuleAPI {
   }
 }
 
+/** API модуля marquee для публичного геттера */
+export interface MarqueeModuleAPI {
+  getMarquee(): {
+    start(): void
+    stop(): void
+    pause(): void
+    resume(): void
+    isRunning(): boolean
+    isPaused(): boolean
+    isStopped(): boolean
+  }
+}
+
 /** API модуля video для публичного геттера */
 export interface VideoModuleAPI {
   getVideo(): {

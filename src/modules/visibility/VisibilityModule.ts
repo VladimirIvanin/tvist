@@ -16,7 +16,12 @@
 
 import { Module } from '../Module'
 import type { Tvist } from '../../core/Tvist'
-import type { TvistOptions, VisibilityOptions } from '../../core/types'
+import type {
+  TvistOptions,
+  VisibilityOptions,
+  AutoplayModuleAPI,
+  MarqueeModuleAPI
+} from '../../core/types'
 
 /** Дефолтные значения для VisibilityOptions */
 const VISIBILITY_DEFAULTS: Required<VisibilityOptions> = {
@@ -143,8 +148,7 @@ export class VisibilityModule extends Module {
           this.resumeModules()
         }
         // Удаляем модуль из списка активных модулей
-        // Используем приватный доступ через (this.tvist as any)
-        ;(this.tvist as any).modules.delete(this.name)
+        this.tvist.removeModule(this.name)
       }
     }
   }
@@ -241,25 +245,21 @@ export class VisibilityModule extends Module {
 
     // Приостанавливаем autoplay
     if (this.config.pauseAutoplay) {
-      const autoplayModule = this.tvist.getModule('autoplay')
-      if (autoplayModule) {
-        const autoplay = (autoplayModule as any).getAutoplay?.()
-        if (autoplay && autoplay.isRunning()) {
-          this.autoplayWasRunning = true
-          autoplay.pause()
-        }
+      const autoplayModule = this.tvist.getModule('autoplay') as AutoplayModuleAPI | undefined
+      const autoplay = autoplayModule?.getAutoplay()
+      if (autoplay?.isRunning()) {
+        this.autoplayWasRunning = true
+        autoplay.pause()
       }
     }
 
     // Приостанавливаем marquee
     if (this.config.pauseMarquee) {
-      const marqueeModule = this.tvist.getModule('marquee')
-      if (marqueeModule) {
-        const marquee = (marqueeModule as any).getMarquee?.()
-        if (marquee && marquee.isRunning()) {
-          this.marqueeWasRunning = true
-          marquee.pause()
-        }
+      const marqueeModule = this.tvist.getModule('marquee') as MarqueeModuleAPI | undefined
+      const marquee = marqueeModule?.getMarquee()
+      if (marquee?.isRunning()) {
+        this.marqueeWasRunning = true
+        marquee.pause()
       }
     }
   }
@@ -272,24 +272,20 @@ export class VisibilityModule extends Module {
 
     // Возобновляем autoplay если он был запущен
     if (this.config.pauseAutoplay && this.autoplayWasRunning) {
-      const autoplayModule = this.tvist.getModule('autoplay')
-      if (autoplayModule) {
-        const autoplay = (autoplayModule as any).getAutoplay?.()
-        if (autoplay) {
-          autoplay.resume()
-        }
+      const autoplayModule = this.tvist.getModule('autoplay') as AutoplayModuleAPI | undefined
+      const autoplay = autoplayModule?.getAutoplay()
+      if (autoplay) {
+        autoplay.resume()
       }
       this.autoplayWasRunning = false
     }
 
     // Возобновляем marquee если он был запущен
     if (this.config.pauseMarquee && this.marqueeWasRunning) {
-      const marqueeModule = this.tvist.getModule('marquee')
-      if (marqueeModule) {
-        const marquee = (marqueeModule as any).getMarquee?.()
-        if (marquee) {
-          marquee.resume()
-        }
+      const marqueeModule = this.tvist.getModule('marquee') as MarqueeModuleAPI | undefined
+      const marquee = marqueeModule?.getMarquee()
+      if (marquee) {
+        marquee.resume()
       }
       this.marqueeWasRunning = false
     }

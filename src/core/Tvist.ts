@@ -592,6 +592,14 @@ export class Tvist {
   }
 
   /**
+   * Удалить модуль из реестра (для модулей, которые отключаются через updateOptions).
+   * @internal
+   */
+  removeModule(name: string): void {
+    this.modules.delete(name)
+  }
+
+  /**
    * Получить список слайдов
    */
   get slides(): HTMLElement[] {
