@@ -24,7 +24,7 @@
           type="range"
           v-model.number="dragSpeed"
           min="0.5"
-          max="5"
+          max="3"
           step="0.1"
           @input="updateSettings"
         />
