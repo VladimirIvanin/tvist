@@ -1,89 +1,139 @@
 import Tvist from '../src/index'
 
-let switchCounter = 0
-let startTime = Date.now()
-
-function updateInfo(slider: Tvist) {
-  const info = document.getElementById('info1')
-  if (!info) return
-  
-  const elapsed = ((Date.now() - startTime) / 1000).toFixed(1)
-  const autoplay = slider.autoplay
-  
-  info.innerHTML = `
-    <strong>Текущий слайд:</strong> ${slider.activeIndex + 1} из ${slider.engine.slideCount}<br>
-    <strong>Счётчик переключений:</strong> ${switchCounter}<br>
-    <strong>Время работы:</strong> ${elapsed}с<br>
-    <strong>Autoplay:</strong> ${autoplay.isRunning() ? '▶️ Running' : autoplay.isPaused() ? '⏸️ Paused' : '⏹️ Stopped'}<br>
-    <strong>Видимость страницы:</strong> ${document.visibilityState === 'visible' ? '👁️ Visible' : '🙈 Hidden'}
-  `
-  info.style.cssText = `
-    padding: 15px;
-    margin: 20px 0;
-    background: #e3f2fd;
-    border: 2px solid #1976d2;
-    border-radius: 8px;
-    font-size: 16px;
-    font-family: monospace;
-  `
+// Обновление ширины окна
+function updateWindowWidth() {
+  const el = document.getElementById('windowWidth')
+  if (el) {
+    el.textContent = window.innerWidth.toString()
+  }
 }
 
-// Autoplay test slider
+updateWindowWidth()
+window.addEventListener('resize', updateWindowWidth)
+
+// Слайдер 1: Window-based breakpoints
 const slider1 = new Tvist('#slider1', {
-  autoplay: { delay: 2000, pauseOnHover: true },
-  loop: true,
+  perPage: 4,
+  gap: 20,
   arrows: true,
-  pagination: {
-    enabled: true,
-    clickable: true
+  pagination: true,
+  breakpoints: {
+    1200: {
+      perPage: 3,
+      gap: 16
+    },
+    768: {
+      perPage: 1,
+      gap: 0
+    }
+  },
+  on: {
+    created: (instance) => {
+      updateSlider1Info(instance)
+    },
+    breakpoint: (bp) => {
+      console.log('Slider 1 breakpoint:', bp)
+      updateSlider1Info(slider1)
+    },
+    slideChangeEnd: () => {
+      updateSlider1Info(slider1)
+    }
   }
 })
 
-// Обновляем информацию при каждом переключении
-slider1.on('slideChangeEnd', () => {
-  switchCounter++
-  updateInfo(slider1)
-  console.log(`Slide changed to ${slider1.activeIndex}, counter: ${switchCounter}`)
+function updateSlider1Info(slider: typeof slider1) {
+  const perPageEl = document.getElementById('slider1-perPage')
+  const bpEl = document.getElementById('slider1-bp')
+  if (perPageEl) perPageEl.textContent = slider.options.perPage?.toString() ?? '-'
+  if (bpEl) {
+    const breakpointsModule = (slider as any).modules?.get('breakpoints')
+    const currentBp = breakpointsModule?.getCurrentBreakpoint()
+    bpEl.textContent = currentBp !== null ? currentBp.toString() : 'none'
+  }
+}
+
+// Слайдер 2: Container-based
+const slider2 = new Tvist('#slider2', {
+  perPage: 3,
+  gap: 12,
+  arrows: true,
+  breakpointsBase: 'container',
+  breakpoints: {
+    500: {
+      perPage: 2,
+      gap: 8
+    },
+    400: {
+      perPage: 1,
+      gap: 0
+    }
+  },
+  on: {
+    created: (instance) => {
+      updateSlider2Info(instance)
+    },
+    breakpoint: (bp) => {
+      console.log('Slider 2 breakpoint:', bp)
+      updateSlider2Info(slider2)
+    },
+    slideChangeEnd: () => {
+      updateSlider2Info(slider2)
+    }
+  }
 })
 
-// Обновляем при событиях autoplay
-slider1.on('autoplayStart', () => {
-  console.log('Autoplay started')
-  updateInfo(slider1)
+function updateSlider2Info(slider: typeof slider2) {
+  const perPageEl = document.getElementById('slider2-perPage')
+  const bpEl = document.getElementById('slider2-bp')
+  if (perPageEl) perPageEl.textContent = slider.options.perPage?.toString() ?? '-'
+  if (bpEl) {
+    const breakpointsModule = (slider as any).modules?.get('breakpoints')
+    const currentBp = breakpointsModule?.getCurrentBreakpoint()
+    bpEl.textContent = currentBp !== null ? currentBp.toString() : 'none'
+  }
+}
+
+// Слайдер 3: Lock/Unlock
+const slider3 = new Tvist('#slider3', {
+  perPage: 2,
+  gap: 16,
+  arrows: true,
+  pagination: true,
+  breakpoints: {
+    768: {
+      perPage: 1
+    }
+  },
+  on: {
+    created: (instance) => {
+      updateSlider3Info(instance)
+    },
+    breakpoint: (bp) => {
+      console.log('Slider 3 breakpoint:', bp)
+      updateSlider3Info(slider3)
+    },
+    lock: () => {
+      console.log('Slider 3 locked')
+      updateSlider3Info(slider3)
+    },
+    unlock: () => {
+      console.log('Slider 3 unlocked')
+      updateSlider3Info(slider3)
+    },
+    slideChangeEnd: () => {
+      updateSlider3Info(slider3)
+    }
+  }
 })
 
-slider1.on('autoplayPause', () => {
-  console.log('Autoplay paused')
-  updateInfo(slider1)
-})
+function updateSlider3Info(slider: typeof slider3) {
+  const perPageEl = document.getElementById('slider3-perPage')
+  const lockedEl = document.getElementById('slider3-locked')
+  if (perPageEl) perPageEl.textContent = slider.options.perPage?.toString() ?? '-'
+  if (lockedEl) lockedEl.textContent = slider.engine.isLocked ? 'YES' : 'NO'
+}
 
-slider1.on('autoplayResume', () => {
-  console.log('Autoplay resumed')
-  updateInfo(slider1)
-})
-
-// Отслеживаем видимость страницы
-document.addEventListener('visibilitychange', () => {
-  console.log('Visibility changed:', document.visibilityState)
-  updateInfo(slider1)
-})
-
-// Initial update
-setTimeout(() => {
-  updateInfo(slider1)
-}, 100)
-
-// Update every second to show elapsed time
-setInterval(() => {
-  updateInfo(slider1)
-}, 1000)
-
-console.log('Autoplay test initialized!', { slider1 })
+console.log('Breakpoints test initialized!', { slider1, slider2, slider3 })
 
 // Expose for debugging
-;(window as any).slider = slider1
-;(window as any).resetCounter = () => {
-  switchCounter = 0
-  startTime = Date.now()
-  updateInfo(slider1)
-}
+;(window as any).sliders = { slider1, slider2, slider3 }

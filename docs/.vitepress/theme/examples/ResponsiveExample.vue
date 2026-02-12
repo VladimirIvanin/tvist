@@ -85,6 +85,74 @@
         </div>
       </div>
 
+      <!-- Pagination limit по breakpoints -->
+      <div class="demo-section">
+        <h3>Pagination limit по разрешениям</h3>
+        <p class="description">
+          На разных разрешениях меняется <strong>limit</strong> у пагинации: десктоп — 7 точек, планшет (≤992) — 5, мобила (≤768) — 3.
+          Количество слайдов одно и то же; меняется только сколько точек показывается.
+        </p>
+        <div ref="sliderLimitEl" class="tvist-v1">
+          <div class="tvist-v1__container">
+            <div v-for="i in 12" :key="i" class="tvist-v1__slide">
+              <div class="slide-content">
+                <span class="slide-number">{{ i }}</span>
+                <span class="slide-label">Slide {{ i }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="tvist-v1__pagination"></div>
+        </div>
+        <div class="controls">
+          <button @click="sliderLimit?.prev()" :disabled="!sliderLimit?.canScrollPrev">← Prev</button>
+          <span class="slide-info">
+            {{ stateLimit.current }} / {{ stateLimit.total }}
+            <span class="breakpoint-info">(limit: {{ stateLimit.paginationLimit }})</span>
+          </span>
+          <button @click="sliderLimit?.next()" :disabled="!sliderLimit?.canScrollNext">Next →</button>
+        </div>
+        <div class="current-breakpoint">
+          Текущий limit пагинации: <strong>{{ stateLimit.paginationLimit ?? '—' }}</strong>
+        </div>
+      </div>
+
+      <!-- Lock на десктопе, листание на мобиле -->
+      <div class="demo-section">
+        <h3>Lock на десктопе, листание на мобиле</h3>
+        <p class="description">
+          Десктоп: <strong>perPage 2</strong>, 2 слайда — одна страница, стрелки и пагинация скрыты (lock).
+          Мобила (≤768): <strong>perPage 1</strong>, 2 слайда — две страницы, появляются стрелки и пагинация.
+        </p>
+        <div ref="sliderLockEl" class="tvist-v1">
+          <div class="tvist-v1__container">
+            <div v-for="i in 2" :key="i" class="tvist-v1__slide">
+              <div class="slide-content">
+                <span class="slide-number">{{ i }}</span>
+                <span class="slide-label">Slide {{ i }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="tvist-v1__arrows">
+            <button type="button" class="tvist-v1__arrow tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
+            <button type="button" class="tvist-v1__arrow tvist-v1__arrow--next" aria-label="Следующий"></button>
+          </div>
+          <div class="tvist-v1__pagination"></div>
+        </div>
+        <div class="controls">
+          <button @click="sliderLock?.prev()" :disabled="!sliderLock?.canScrollPrev">← Prev</button>
+          <span class="slide-info">
+            {{ stateLock.current }} / {{ stateLock.total }}
+            <span class="breakpoint-info">(perPage: {{ stateLock.perPage }})</span>
+          </span>
+          <button @click="sliderLock?.next()" :disabled="!sliderLock?.canScrollNext">Next →</button>
+        </div>
+        <div class="current-breakpoint">
+          perPage: <strong>{{ stateLock.perPage }}</strong>
+          · Страниц: <strong>{{ stateLock.total }}</strong>
+          · Стрелки и пагинация скрыты при одной странице (hideWhenSinglePage).
+        </div>
+      </div>
+
       <!-- Container-based breakpoints -->
       <div class="demo-section">
         <h3>Container-based breakpoints</h3>
@@ -127,14 +195,20 @@ import ExampleCard from '../ExampleCard.vue'
 const slider1El = ref(null)
 const slider2El = ref(null)
 const slider3El = ref(null)
+const sliderLimitEl = ref(null)
+const sliderLockEl = ref(null)
 
 const slider1 = ref(null)
 const slider2 = ref(null)
 const slider3 = ref(null)
+const sliderLimit = ref(null)
+const sliderLock = ref(null)
 
 const state1 = reactive({ current: 1, total: 12, breakpoint: null, perPage: 4 })
 const state2 = reactive({ current: 1, total: 12, perPage: 1 })
 const state3 = reactive({ current: 1, total: 8, perPage: 1 })
+const stateLimit = reactive({ current: 1, total: 12, paginationLimit: 7 })
+const stateLock = reactive({ current: 1, total: 2, perPage: 2 })
 
 const activePresetId = ref('default')
 
@@ -185,6 +259,23 @@ const updateState = (slider, state, total) => {
   if (slider) {
     state.current = slider.activeIndex + 1
     state.total = total
+    state.perPage = slider.options.perPage || 1
+  }
+}
+
+const updateStateLimit = (slider, state) => {
+  if (slider) {
+    state.current = slider.activeIndex + 1
+    state.total = 12
+    const p = slider.options.pagination
+    state.paginationLimit = typeof p === 'object' && p !== null && p.limit != null ? p.limit : undefined
+  }
+}
+
+const updateStateLock = (slider, state) => {
+  if (slider) {
+    state.current = slider.activeIndex + 1
+    state.total = slider.options.perPage === 1 ? 2 : 1
     state.perPage = slider.options.perPage || 1
   }
 }
@@ -253,14 +344,14 @@ onMounted(() => {
   // Slider 3: Container-based breakpoints
   if (slider3El.value) {
     slider3.value = new Tvist(slider3El.value, {
-      perPage: 2,
+      perPage: 3,
       gap: 12,
       speed: 300,
       drag: true,
       breakpointsBase: 'container',
       breakpoints: {
-        600: {
-          perPage: 1,
+        500: {
+          perPage: 2,
           gap: 0
         },
         400: {
@@ -276,12 +367,69 @@ onMounted(() => {
       }
     })
   }
+
+  // Slider: Pagination limit по breakpoints
+  if (sliderLimitEl.value) {
+    sliderLimit.value = new Tvist(sliderLimitEl.value, {
+      perPage: 3,
+      gap: 16,
+      speed: 300,
+      drag: true,
+      pagination: {
+        limit: 7,
+        clickable: true
+      },
+      breakpoints: {
+        992: {
+          pagination: {
+            limit: 5,
+            clickable: true
+          }
+        },
+        768: {
+          pagination: {
+            limit: 3,
+            clickable: true
+          }
+        }
+      },
+      on: {
+        slideChangeEnd: () => updateStateLimit(sliderLimit.value, stateLimit),
+        created: (instance) => updateStateLimit(instance, stateLimit),
+        breakpoint: () => updateStateLimit(sliderLimit.value, stateLimit)
+      }
+    })
+  }
+
+  // Slider: Lock на десктопе (perPage 2, 2 слайда), листание на мобиле
+  if (sliderLockEl.value) {
+    sliderLock.value = new Tvist(sliderLockEl.value, {
+      perPage: 2,
+      gap: 16,
+      speed: 300,
+      drag: true,
+      arrows: true,
+      pagination: true,
+      breakpoints: {
+        768: {
+          perPage: 1
+        }
+      },
+      on: {
+        slideChangeEnd: () => updateStateLock(sliderLock.value, stateLock),
+        created: (instance) => updateStateLock(instance, stateLock),
+        breakpoint: () => updateStateLock(sliderLock.value, stateLock)
+      }
+    })
+  }
 })
 
 onUnmounted(() => {
   slider1.value?.destroy()
   slider2.value?.destroy()
   slider3.value?.destroy()
+  sliderLimit.value?.destroy()
+  sliderLock.value?.destroy()
 })
 </script>
 

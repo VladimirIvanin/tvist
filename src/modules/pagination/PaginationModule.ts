@@ -68,11 +68,7 @@ export class PaginationModule extends Module {
       hasRealIndexGetter: 'realIndex' in this.tvist
     })
 
-    this.render()
-    this.updateActive()
-    this.updateVisibility()
-    this.emit('pagination:mounted')
-
+    // Подписываемся на события ДО первого render/updateVisibility
     // Обновляем при изменении слайда СИНХРОННО (slideChangeStart эмитится ДО анимации),
     // чтобы к моменту slideChangeEnd (после анимации) bullet'ы были уже актуальны.
     // Также слушаем slideChangeEnd для instant-переходов (scrollTo с instant=true).
@@ -84,6 +80,15 @@ export class PaginationModule extends Module {
       this.updateActive()
       if (this.options.loop) this.scheduleUpdateActive()
     })
+    
+    // Обновляем видимость при lock/unlock (для breakpoints)
+    this.on('lock', () => this.updateVisibility())
+    this.on('unlock', () => this.updateVisibility())
+
+    this.render()
+    this.updateActive()
+    this.updateVisibility()
+    this.emit('pagination:mounted')
     
     // Для loop режима нужны дополнительные события
     if (this.options.loop) {
@@ -791,6 +796,8 @@ export class PaginationModule extends Module {
       this.render()
       this.updateActive()
     }
+    // Обновляем видимость (для breakpoints и lock/unlock)
+    this.updateVisibility()
   }
 }
 

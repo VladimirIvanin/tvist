@@ -46,6 +46,10 @@ export class NavigationModule extends Module {
 
     // Обновляем состояние при изменении слайда
     this.on('slideChangeEnd', () => this.updateArrowsState())
+    
+    // Обновляем состояние при lock/unlock (для breakpoints)
+    this.on('lock', () => this.updateArrowsState())
+    this.on('unlock', () => this.updateArrowsState())
   }
 
   override destroy(): void {
@@ -252,17 +256,19 @@ export class NavigationModule extends Module {
       return
     }
 
-    // Без loop и rewind проверяем границы
+    // Показываем обе стрелки (они не single-page и не locked)
+    this.showArrow(this.prevButton, hiddenClass)
+    this.showArrow(this.nextButton, hiddenClass)
+
+    // Без loop и rewind проверяем границы для disabled состояния
     if (canScrollPrev) {
       this.enableArrow(this.prevButton, disabledClass)
-      this.showArrow(this.prevButton, hiddenClass)
     } else {
       this.disableArrow(this.prevButton, disabledClass)
     }
 
     if (canScrollNext) {
       this.enableArrow(this.nextButton, disabledClass)
-      this.showArrow(this.nextButton, hiddenClass)
     } else {
       this.disableArrow(this.nextButton, disabledClass)
     }

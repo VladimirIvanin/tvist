@@ -763,6 +763,13 @@ export class Engine {
       this.tvist.root.classList.toggle(TVIST_CLASSES.locked, isLocked)
       
       if (isLocked) {
+        // При блокировке сбрасываем позицию на начало (индекс 0)
+        this.index.set(0)
+        const initialPos = this.getScrollPositionForIndex(0)
+        this.location.set(initialPos)
+        this.target.set(initialPos)
+        this.applyTransform()
+        
         this.tvist.emit('lock')
       } else {
         this.tvist.emit('unlock')

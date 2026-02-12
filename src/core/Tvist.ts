@@ -11,6 +11,7 @@ import { TVIST_CLASSES } from './constants'
 import type { TvistOptions, AutoplayModuleAPI, VideoModuleAPI } from './types'
 import type { Module, ModuleConstructor } from '../modules/Module'
 import { throttle } from './Animator'
+import { applyInitialBreakpoint } from '../utils/breakpoints'
 
 export class Tvist {
   static readonly VERSION = pkg.version ?? '0.0.0'
@@ -30,6 +31,9 @@ export class Tvist {
 
   // Опции
   readonly options: TvistOptions
+  
+  // Оригинальные опции (до применения breakpoints) - для BreakpointsModule
+  readonly _originalOptions?: TvistOptions
 
   // Ядро
   readonly engine: Engine
@@ -101,6 +105,21 @@ export class Tvist {
       preventClicksPropagation: true,
       ...options,
     }
+
+    // Сохраняем оригинальные опции ДО применения breakpoints
+    // Это нужно для BreakpointsModule чтобы восстанавливать базовые опции
+    if (this.options.breakpoints && Object.keys(this.options.breakpoints).length > 0) {
+      // Deep clone оригинальных опций
+      const cloned = JSON.parse(JSON.stringify(this.options))
+      // Убеждаемся что breakpointsBase сохранен
+      if (this.options.breakpointsBase) {
+        cloned.breakpointsBase = this.options.breakpointsBase
+      }
+      ;(this as { _originalOptions?: TvistOptions })._originalOptions = cloned
+    }
+
+    // Применяем breakpoints ДО создания Engine (если есть)
+    applyInitialBreakpoint(this.root, this.options)
 
     // Индексы слайдов для стилизации и идентификации (в т.ч. для loop)
     this.updateSlideIndices()
@@ -264,6 +283,11 @@ export class Tvist {
   update(): this {
     // Не обновляем, если слайдер отключен
     if (!this._isEnabled) return this
+
+    // Вызываем onResize на модулях ДО engine.update (для breakpoints)
+    this.modules.forEach((module) => {
+      module.onResize?.()
+    })
 
     // Обновляем класс направления
     if (this.options.direction === 'vertical') {
