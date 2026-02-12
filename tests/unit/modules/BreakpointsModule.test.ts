@@ -1,6 +1,6 @@
 /**
  * Тесты для BreakpointsModule
- * 
+ *
  * Проверяем:
  * - Desktop-first подход (max-width)
  * - Window-based vs Container-based
@@ -11,46 +11,26 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { Tvist } from '../../../src/core/Tvist'
-import { JSDOM } from 'jsdom'
+import { createSliderFixture, resizeSlider } from '../../fixtures'
 import '../../../src/modules/breakpoints' // Регистрируем модуль
 
 describe('BreakpointsModule', () => {
-  let dom: JSDOM
-  let container: HTMLElement
+  let fixture: ReturnType<typeof createSliderFixture>
+  let root: HTMLElement
 
   beforeEach(() => {
-    dom = new JSDOM(`
-      <!DOCTYPE html>
-      <html>
-        <body>
-          <div id="slider" style="width: 1200px;">
-            <div class="tvist-v1__container">
-              <div class="tvist-v1__slide">1</div>
-              <div class="tvist-v1__slide">2</div>
-              <div class="tvist-v1__slide">3</div>
-              <div class="tvist-v1__slide">4</div>
-              <div class="tvist-v1__slide">5</div>
-              <div class="tvist-v1__slide">6</div>
-            </div>
-          </div>
-        </body>
-      </html>
-    `)
-    global.document = dom.window.document as unknown as Document
-    global.window = dom.window as unknown as Window & typeof globalThis
-    global.HTMLElement = dom.window.HTMLElement as unknown as typeof HTMLElement
-    global.Element = dom.window.Element as unknown as typeof Element
-    
-    container = document.getElementById('slider') as HTMLElement
+    fixture = createSliderFixture({ slidesCount: 6, width: 1200 })
+    root = fixture.root
   })
 
   afterEach(() => {
+    fixture.cleanup()
     vi.restoreAllMocks()
   })
 
   describe('Desktop-first (max-width) логика', () => {
     it('должен понимать что breakpoint 768 означает "при ширине ≤768px"', () => {
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 4,
         gap: 20,
         breakpoints: {
@@ -69,13 +49,9 @@ describe('BreakpointsModule', () => {
     })
 
     it('должен применять breakpoint когда ширина меньше или равна значению', () => {
-      // Имитируем мобильную ширину
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        value: 768
-      })
+      resizeSlider(root, 768)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 4,
         gap: 20,
         breakpointsBase: 'container',
@@ -95,12 +71,9 @@ describe('BreakpointsModule', () => {
     })
 
     it('должен выбирать ближайший подходящий breakpoint (smallest matching)', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        value: 800
-      })
+      resizeSlider(root, 800)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 4,
         gap: 20,
         breakpointsBase: 'container',
@@ -128,12 +101,9 @@ describe('BreakpointsModule', () => {
     })
 
     it('должен применять самый маленький breakpoint если ширина меньше всех', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        value: 400
-      })
+      resizeSlider(root, 400)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 4,
         gap: 20,
         breakpointsBase: 'container',
@@ -161,12 +131,9 @@ describe('BreakpointsModule', () => {
     })
 
     it('не должен применять breakpoint если ширина больше всех значений', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        value: 1400
-      })
+      resizeSlider(root, 1400)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 4,
         gap: 20,
         breakpointsBase: 'container',
@@ -192,12 +159,9 @@ describe('BreakpointsModule', () => {
 
   describe('Container-based breakpoints', () => {
     it('должен использовать ширину контейнера вместо окна', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        value: 500
-      })
+      resizeSlider(root, 500)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 3,
         gap: 12,
         breakpointsBase: 'container',
@@ -221,12 +185,9 @@ describe('BreakpointsModule', () => {
     })
 
     it('должен обновляться при изменении размера контейнера', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => 600
-      })
+      resizeSlider(root, 600)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 3,
         gap: 12,
         breakpointsBase: 'container',
@@ -245,12 +206,9 @@ describe('BreakpointsModule', () => {
       // Изначально perPage: 3 (ширина 600px)
       expect(slider.options.perPage).toBe(3)
 
-      // Меняем ширину контейнера - переопределяем descriptor
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => 450
-      })
-      
+      // Меняем ширину контейнера
+      resizeSlider(root, 450)
+
       // Вызываем onResize на модуле напрямую (т.к. ResizeObserver не работает в тестах)
       const breakpointsModule = (slider as any).modules.get('breakpoints')
       if (breakpointsModule) {
@@ -267,12 +225,9 @@ describe('BreakpointsModule', () => {
 
   describe('Pagination limit при breakpoints', () => {
     it('должен обновлять pagination.limit при смене breakpoint', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        value: 1200
-      })
+      resizeSlider(root, 1200)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 3,
         gap: 16,
         pagination: {
@@ -303,12 +258,9 @@ describe('BreakpointsModule', () => {
     })
 
     it('должен применять вложенные опции pagination из breakpoint', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        value: 700
-      })
+      resizeSlider(root, 700)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 3,
         gap: 16,
         pagination: {
@@ -341,29 +293,11 @@ describe('BreakpointsModule', () => {
 
   describe('Lock/unlock при смене perPage', () => {
     it('должен разблокировать слайдер когда perPage уменьшается', () => {
-      // 2 слайда, perPage: 2 -> заблокирован
-      dom = new JSDOM(`
-        <!DOCTYPE html>
-        <html>
-          <body>
-            <div id="slider" style="width: 1200px;">
-              <div class="tvist-v1__container">
-                <div class="tvist-v1__slide">1</div>
-                <div class="tvist-v1__slide">2</div>
-              </div>
-            </div>
-          </body>
-        </html>
-      `)
-      global.document = dom.window.document as unknown as Document
-      container = document.getElementById('slider') as HTMLElement
+      fixture.cleanup()
+      fixture = createSliderFixture({ slidesCount: 2, width: 1200 })
+      root = fixture.root
 
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        value: 1200
-      })
-
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 2,
         gap: 16,
         breakpointsBase: 'container',
@@ -381,28 +315,11 @@ describe('BreakpointsModule', () => {
     })
 
     it('должен разблокировать при переходе на мобильный breakpoint', () => {
-      dom = new JSDOM(`
-        <!DOCTYPE html>
-        <html>
-          <body>
-            <div id="slider" style="width: 1200px;">
-              <div class="tvist-v1__container">
-                <div class="tvist-v1__slide">1</div>
-                <div class="tvist-v1__slide">2</div>
-              </div>
-            </div>
-          </body>
-        </html>
-      `)
-      global.document = dom.window.document as unknown as Document
-      container = document.getElementById('slider') as HTMLElement
+      fixture.cleanup()
+      fixture = createSliderFixture({ slidesCount: 2, width: 1200 })
+      root = fixture.root
 
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => 1200
-      })
-
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 2,
         gap: 16,
         breakpointsBase: 'container',
@@ -417,11 +334,8 @@ describe('BreakpointsModule', () => {
       expect(slider.engine.isLocked).toBe(true)
 
       // Меняем ширину на мобильную
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => 600
-      })
-      
+      resizeSlider(root, 600)
+
       // Вызываем update() который вызовет onResize на модулях и engine.update()
       slider.update()
 
@@ -435,14 +349,11 @@ describe('BreakpointsModule', () => {
 
   describe('Реальное изменение размера', () => {
     it('должен вызывать onResize при update()', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => 600
-      })
+      resizeSlider(root, 600)
 
       const onResizeSpy = vi.fn()
-      
-      const slider = new Tvist(container, {
+
+      const slider = new Tvist(root, {
         perPage: 3,
         gap: 12,
         breakpointsBase: 'container',
@@ -474,13 +385,9 @@ describe('BreakpointsModule', () => {
     })
 
     it('должен читать новую ширину контейнера при checkBreakpoints', () => {
-      let currentWidth = 600
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => currentWidth
-      })
+      resizeSlider(root, 600)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 3,
         gap: 12,
         breakpointsBase: 'container',
@@ -498,20 +405,17 @@ describe('BreakpointsModule', () => {
 
       // Изначально perPage: 3
       expect(slider.options.perPage).toBe(3)
-      expect(container.clientWidth).toBe(600)
+      expect(root.clientWidth).toBe(600)
 
       // Меняем ширину
-      currentWidth = 450
-
-      // Проверяем что getter работает
-      expect(container.clientWidth).toBe(450)
+      resizeSlider(root, 450)
 
       // Вызываем onResize напрямую
       const breakpointsModule = (slider as any).modules.get('breakpoints')
       if (breakpointsModule) {
         const checkBreakpointsSpy = vi.spyOn(breakpointsModule as any, 'checkBreakpoints')
         breakpointsModule.onResize()
-        
+
         // checkBreakpoints должен быть вызван
         expect(checkBreakpointsSpy).toHaveBeenCalled()
       }
@@ -524,13 +428,9 @@ describe('BreakpointsModule', () => {
     })
 
     it('должен применять breakpoint при реальном resize через update()', () => {
-      let currentWidth = 600
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => currentWidth
-      })
+      resizeSlider(root, 600)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 3,
         gap: 12,
         breakpointsBase: 'container',
@@ -550,7 +450,7 @@ describe('BreakpointsModule', () => {
       expect(slider.options.perPage).toBe(3)
 
       // Меняем ширину контейнера
-      currentWidth = 450
+      resizeSlider(root, 450)
 
       // Вызываем update как это делает ResizeObserver
       slider.update()
@@ -563,29 +463,11 @@ describe('BreakpointsModule', () => {
     })
 
     it('должен разблокировать слайдер при уменьшении perPage через breakpoint', () => {
-      dom = new JSDOM(`
-        <!DOCTYPE html>
-        <html>
-          <body>
-            <div id="slider" style="width: 1200px;">
-              <div class="tvist-v1__container">
-                <div class="tvist-v1__slide">1</div>
-                <div class="tvist-v1__slide">2</div>
-              </div>
-            </div>
-          </body>
-        </html>
-      `)
-      global.document = dom.window.document as unknown as Document
-      container = document.getElementById('slider') as HTMLElement
+      fixture.cleanup()
+      fixture = createSliderFixture({ slidesCount: 2, width: 1200 })
+      root = fixture.root
 
-      let currentWidth = 1200
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => currentWidth
-      })
-
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 2,
         gap: 16,
         arrows: true,
@@ -602,7 +484,7 @@ describe('BreakpointsModule', () => {
       expect(slider.engine.isLocked).toBe(true)
 
       // Имитируем сужение окна
-      currentWidth = 600
+      resizeSlider(root, 600)
 
       // Вызываем update
       slider.update()
@@ -617,14 +499,11 @@ describe('BreakpointsModule', () => {
 
   describe('События breakpoint', () => {
     it('должен эмитить событие breakpoint при смене', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => 1200
-      })
+      resizeSlider(root, 1200)
 
       const breakpointCallback = vi.fn()
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 4,
         gap: 20,
         breakpointsBase: 'container',
@@ -643,11 +522,8 @@ describe('BreakpointsModule', () => {
       expect(breakpointCallback).not.toHaveBeenCalled()
 
       // Меняем ширину
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => 600
-      })
-      
+      resizeSlider(root, 600)
+
       // Вызываем onResize на модуле напрямую
       const breakpointsModule = (slider as any).modules.get('breakpoints')
       if (breakpointsModule) {
@@ -661,14 +537,11 @@ describe('BreakpointsModule', () => {
     })
 
     it('не должен эмитить событие если breakpoint не изменился', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        value: 600
-      })
+      resizeSlider(root, 600)
 
       const breakpointCallback = vi.fn()
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 4,
         gap: 20,
         breakpointsBase: 'container',
@@ -698,12 +571,9 @@ describe('BreakpointsModule', () => {
 
   describe('Мёрдж опций', () => {
     it('должен мёрджить опции из breakpoint с базовыми', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        value: 600
-      })
+      resizeSlider(root, 600)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 4,
         gap: 20,
         speed: 500,
@@ -730,12 +600,9 @@ describe('BreakpointsModule', () => {
     })
 
     it('должен переопределять базовые опции если они указаны в breakpoint', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        value: 600
-      })
+      resizeSlider(root, 600)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 4,
         gap: 20,
         speed: 500,
@@ -763,12 +630,9 @@ describe('BreakpointsModule', () => {
 
   describe('Восстановление базовых опций', () => {
     it('должен восстанавливать базовые опции при выходе из breakpoint', () => {
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => 600
-      })
+      resizeSlider(root, 600)
 
-      const slider = new Tvist(container, {
+      const slider = new Tvist(root, {
         perPage: 4,
         gap: 20,
         speed: 500,
@@ -788,11 +652,8 @@ describe('BreakpointsModule', () => {
       expect(slider.options.speed).toBe(300)
 
       // Выходим из breakpoint
-      Object.defineProperty(container, 'clientWidth', {
-        configurable: true,
-        get: () => 1200
-      })
-      
+      resizeSlider(root, 1200)
+
       // Вызываем onResize на модуле напрямую
       const breakpointsModule = (slider as any).modules.get('breakpoints')
       if (breakpointsModule) {

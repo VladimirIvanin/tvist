@@ -3,52 +3,51 @@
  * Проверяем что hideWhenSinglePage работает при смене breakpoint
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { Tvist } from '../../../src/core/Tvist'
-import { JSDOM } from 'jsdom'
+import { TVIST_CLASSES } from '../../../src/core/constants'
+import { createSliderFixture, resizeSlider } from '../../fixtures'
 import '../../../src/modules/breakpoints'
 import '../../../src/modules/navigation'
 import '../../../src/modules/pagination'
 
-describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
-  let dom: JSDOM
-  let container: HTMLElement
+function createSliderWithNavigation(slidesCount: number, width: number) {
+  const fixture = createSliderFixture({ slidesCount, width })
+  const root = fixture.root
 
-  beforeEach(() => {
-    dom = new JSDOM(`
-      <!DOCTYPE html>
-      <html>
-        <body>
-          <div id="slider" style="width: 1200px;">
-            <div class="tvist-v1__container">
-              <div class="tvist-v1__slide">1</div>
-              <div class="tvist-v1__slide">2</div>
-            </div>
-            <div class="tvist-v1__arrows">
-              <button type="button" class="tvist-v1__arrow tvist-v1__arrow--prev"></button>
-              <button type="button" class="tvist-v1__arrow tvist-v1__arrow--next"></button>
-            </div>
-            <div class="tvist-v1__pagination"></div>
-          </div>
-        </body>
-      </html>
-    `)
-    global.document = dom.window.document as unknown as Document
-    global.window = dom.window as unknown as Window & typeof globalThis
-    global.HTMLElement = dom.window.HTMLElement as unknown as typeof HTMLElement
-    global.Element = dom.window.Element as unknown as typeof Element
-    
-    container = document.getElementById('slider') as HTMLElement
+  const arrowsWrap = document.createElement('div')
+  arrowsWrap.className = 'tvist-v1__arrows'
+  const prevBtn = document.createElement('button')
+  prevBtn.type = 'button'
+  prevBtn.className = `${TVIST_CLASSES.arrowPrev}`
+  const nextBtn = document.createElement('button')
+  nextBtn.type = 'button'
+  nextBtn.className = `${TVIST_CLASSES.arrowNext}`
+  arrowsWrap.appendChild(prevBtn)
+  arrowsWrap.appendChild(nextBtn)
+  root.appendChild(arrowsWrap)
+
+  const paginationEl = document.createElement('div')
+  paginationEl.className = TVIST_CLASSES.pagination
+  root.appendChild(paginationEl)
+
+  return { fixture, root }
+}
+
+describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
+  let fixture: ReturnType<typeof createSliderFixture>
+  let root: HTMLElement
+
+  afterEach(() => {
+    fixture?.cleanup()
   })
 
   it('должен показывать стрелки при разблокировке через breakpoint', () => {
-    let currentWidth = 1200
-    Object.defineProperty(container, 'clientWidth', {
-      configurable: true,
-      get: () => currentWidth
-    })
+    const created = createSliderWithNavigation(2, 1200)
+    fixture = created.fixture
+    root = created.root
 
-    const slider = new Tvist(container, {
+    const slider = new Tvist(root, {
       perPage: 2,
       gap: 16,
       arrows: true,
@@ -61,38 +60,34 @@ describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
       }
     })
 
-    // Получаем стрелки
-    const prevArrow = container.querySelector('.tvist-v1__arrow--prev') as HTMLElement
-    const nextArrow = container.querySelector('.tvist-v1__arrow--next') as HTMLElement
+    const prevArrow = root.querySelector(`.${TVIST_CLASSES.arrowPrev}`) as HTMLElement
+    const nextArrow = root.querySelector(`.${TVIST_CLASSES.arrowNext}`) as HTMLElement
 
     // На десктопе (perPage: 2, 2 слайда) -> locked -> стрелки скрыты
     expect(slider.engine.isLocked).toBe(true)
-    expect(prevArrow?.classList.contains('tvist-v1__arrow--hidden')).toBe(true)
-    expect(nextArrow?.classList.contains('tvist-v1__arrow--hidden')).toBe(true)
+    expect(prevArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(true)
+    expect(nextArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(true)
 
     // Сужаем экран
-    currentWidth = 600
+    resizeSlider(root, 600)
     slider.update()
 
     // На мобиле (perPage: 1, 2 слайда) -> unlocked -> стрелки видны
     expect(slider.engine.isLocked).toBe(false)
     expect(slider.options.perPage).toBe(1)
-    
-    // ВАЖНО: стрелки должны стать видимыми
-    expect(prevArrow?.classList.contains('tvist-v1__arrow--hidden')).toBe(false)
-    expect(nextArrow?.classList.contains('tvist-v1__arrow--hidden')).toBe(false)
+    expect(prevArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(false)
+    expect(nextArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(false)
 
     slider.destroy()
   })
 
   it('должен скрывать стрелки при блокировке через breakpoint', () => {
-    let currentWidth = 600
-    Object.defineProperty(container, 'clientWidth', {
-      configurable: true,
-      get: () => currentWidth
-    })
+    const created = createSliderWithNavigation(2, 600)
+    fixture = created.fixture
+    root = created.root
+    resizeSlider(root, 600)
 
-    const slider = new Tvist(container, {
+    const slider = new Tvist(root, {
       perPage: 2,
       gap: 16,
       arrows: true,
@@ -105,35 +100,32 @@ describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
       }
     })
 
-    // Получаем стрелки
-    const prevArrow = container.querySelector('.tvist-v1__arrow--prev') as HTMLElement
-    const nextArrow = container.querySelector('.tvist-v1__arrow--next') as HTMLElement
+    const prevArrow = root.querySelector(`.${TVIST_CLASSES.arrowPrev}`) as HTMLElement
+    const nextArrow = root.querySelector(`.${TVIST_CLASSES.arrowNext}`) as HTMLElement
 
     // На мобиле (perPage: 1, 2 слайда) -> unlocked -> стрелки видны
     expect(slider.engine.isLocked).toBe(false)
-    expect(prevArrow?.classList.contains('tvist-v1__arrow--hidden')).toBe(false)
+    expect(prevArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(false)
 
     // Расширяем экран
-    currentWidth = 1200
+    resizeSlider(root, 1200)
     slider.update()
 
     // На десктопе (perPage: 2, 2 слайда) -> locked -> стрелки скрыты
     expect(slider.engine.isLocked).toBe(true)
     expect(slider.options.perPage).toBe(2)
-    expect(prevArrow?.classList.contains('tvist-v1__arrow--hidden')).toBe(true)
-    expect(nextArrow?.classList.contains('tvist-v1__arrow--hidden')).toBe(true)
+    expect(prevArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(true)
+    expect(nextArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(true)
 
     slider.destroy()
   })
 
   it('должен обновлять пагинацию при смене breakpoint', () => {
-    let currentWidth = 1200
-    Object.defineProperty(container, 'clientWidth', {
-      configurable: true,
-      get: () => currentWidth
-    })
+    const created = createSliderWithNavigation(2, 1200)
+    fixture = created.fixture
+    root = created.root
 
-    const slider = new Tvist(container, {
+    const slider = new Tvist(root, {
       perPage: 2,
       gap: 16,
       arrows: true,
@@ -146,36 +138,33 @@ describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
       }
     })
 
-    // Получаем пагинацию
-    const pagination = container.querySelector('.tvist-v1__pagination') as HTMLElement
+    const pagination = root.querySelector(`.${TVIST_CLASSES.pagination}`) as HTMLElement
 
     // На десктопе (perPage: 2, 2 слайда) -> 1 страница -> пагинация скрыта
     expect(slider.engine.isLocked).toBe(true)
-    expect(pagination?.classList.contains('tvist-v1__pagination--hidden')).toBe(true)
+    expect(pagination?.classList.contains(TVIST_CLASSES.paginationHidden)).toBe(true)
 
     // Сужаем экран
-    currentWidth = 600
+    resizeSlider(root, 600)
     slider.update()
 
     // На мобиле (perPage: 1, 2 слайда) -> 2 страницы -> пагинация видна
     expect(slider.engine.isLocked).toBe(false)
-    expect(pagination?.classList.contains('tvist-v1__pagination--hidden')).toBe(false)
-    
-    // Должно быть 2 буллета
-    const bullets = pagination?.querySelectorAll('.tvist-v1__bullet')
+    expect(pagination?.classList.contains(TVIST_CLASSES.paginationHidden)).toBe(false)
+
+    const bullets = pagination?.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
     expect(bullets?.length).toBe(2)
 
     slider.destroy()
   })
 
   it('должен сбрасывать позицию при блокировке через breakpoint', () => {
-    let currentWidth = 600
-    Object.defineProperty(container, 'clientWidth', {
-      configurable: true,
-      get: () => currentWidth
-    })
+    const created = createSliderWithNavigation(2, 600)
+    fixture = created.fixture
+    root = created.root
+    resizeSlider(root, 600)
 
-    const slider = new Tvist(container, {
+    const slider = new Tvist(root, {
       perPage: 2,
       gap: 16,
       arrows: true,
@@ -188,31 +177,24 @@ describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
       }
     })
 
-    // На мобиле (perPage: 1, 2 слайда) -> unlocked
     expect(slider.engine.isLocked).toBe(false)
     expect(slider.options.perPage).toBe(1)
 
-    // Переходим на второй слайд (instant чтобы не ждать анимацию)
     slider.scrollTo(1, { instant: true })
     expect(slider.engine.index.get()).toBe(1)
-    
-    // Позиция должна быть отрицательной (прокручено вправо)
+
     const mobilePosition = slider.engine.location.get()
     expect(mobilePosition).toBeLessThan(0)
 
     // Расширяем экран
-    currentWidth = 1200
+    resizeSlider(root, 1200)
     slider.update()
 
-    // На десктопе (perPage: 2, 2 слайда) -> locked
     expect(slider.engine.isLocked).toBe(true)
     expect(slider.options.perPage).toBe(2)
-    
-    // Позиция должна быть сброшена на 0 (начало)
+
     const desktopPosition = slider.engine.location.get()
     expect(desktopPosition).toBeCloseTo(0, 5)
-    
-    // Индекс должен быть сброшен на 0
     expect(slider.engine.index.get()).toBe(0)
 
     slider.destroy()
