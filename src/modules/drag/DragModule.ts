@@ -246,6 +246,9 @@ export class DragModule extends Module {
     this.currentY = point.y
     this.startIndex = this.tvist.engine.index.get()
     
+    // Разрешаем клики (пока не начался реальный драг)
+    this.tvist.allowClick = true
+    
     // Приостанавливаем marquee если активен.
     // MarqueeModule.pause() сам синхронизирует engine.location с визуальной позицией.
     const marqueeModule = this.tvist.getModule('marquee') as { pause?: () => void }
@@ -319,6 +322,9 @@ export class DragModule extends Module {
     if (!this.isDragging) {
       if (absDelta > this.MIN_DRAG_DISTANCE) {
         this.isDragging = true
+        
+        // Запрещаем клики при начале реального драга
+        this.tvist.allowClick = false
         
         // Останавливаем активную анимацию только когда начинается реальный драг
         this.stopMomentum()
@@ -478,6 +484,12 @@ export class DragModule extends Module {
 
       // Восстанавливаем transition (удаляем класс)
       this.tvist.root.classList.remove(TVIST_CLASSES.dragging)
+      
+      // Восстанавливаем возможность кликов после завершения текущего event loop
+      // Это предотвращает срабатывание клика сразу после окончания драга
+      setTimeout(() => {
+        this.tvist.allowClick = true
+      }, 0)
 
       // Проверяем и ограничиваем позицию после drag (rubberband мог вывести за границы)
       if (!this.options.loop) {

@@ -293,6 +293,18 @@ export interface TvistOptions {
    */
   focusableElements?: string
   
+  /**
+   * Предотвращать клики по слайдам во время перетаскивания
+   * @default true
+   */
+  preventClicks?: boolean
+  
+  /**
+   * Предотвращать распространение событий клика во время анимации
+   * @default true
+   */
+  preventClicksPropagation?: boolean
+  
   // Navigation
   
   /**

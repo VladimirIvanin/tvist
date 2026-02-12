@@ -50,6 +50,9 @@ export class Tvist {
   // Состояние включения/выключения слайдера
   private _isEnabled = true
 
+  // Флаг для контроля кликов (устанавливается в false при драге)
+  public allowClick = true
+
   /**
    * Создать экземпляр Tvist
    * @param target - селектор или HTMLElement
@@ -94,6 +97,8 @@ export class Tvist {
       start: 0,
       loop: false,
       enabled: true,
+      preventClicks: true,
+      preventClicksPropagation: true,
       ...options,
     }
 
@@ -151,6 +156,18 @@ export class Tvist {
   }
 
   private slideClickHandler = (e: MouseEvent): void => {
+    // Проверяем флаг allowClick (устанавливается в false при драге)
+    if (!this.allowClick) {
+      if (this.options.preventClicks) {
+        e.preventDefault()
+      }
+      if (this.options.preventClicksPropagation && this.engine.animator.isAnimating()) {
+        e.stopPropagation()
+        e.stopImmediatePropagation()
+      }
+      return
+    }
+
     const slide = (e.target as HTMLElement).closest(
       `.${TVIST_CLASSES.slide}`
     )
