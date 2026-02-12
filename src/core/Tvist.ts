@@ -61,6 +61,9 @@ export class Tvist {
   // Флаг для предотвращения применения брейкпоинтов во время enable/disable
   private _isTogglingEnabled = false
 
+  // Флаг видимости слайдера (управляется VisibilityModule)
+  public _isVisible = true
+
   // Флаг для контроля кликов (устанавливается в false при драге)
   public allowClick = true
 
@@ -248,7 +251,7 @@ export class Tvist {
    * Следующий слайд (или страница при perPage > 1)
    */
   next(): this {
-    if (!this._isEnabled) return this
+    if (!this._isEnabled || !this._isVisible) return this
     
     if (this.engine.canScrollNext()) {
       // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
@@ -264,7 +267,7 @@ export class Tvist {
    * Предыдущий слайд (или страница при perPage > 1)
    */
   prev(): this {
-    if (!this._isEnabled) return this
+    if (!this._isEnabled || !this._isVisible) return this
     if (this.engine.canScrollPrev()) {
       // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
       const step = this.options.slidesPerGroup ?? 1
@@ -281,7 +284,7 @@ export class Tvist {
    * @param instant - мгновенный переход без анимации
    */
   scrollTo(index: number, instant = false): this {
-    if (!this._isEnabled) return this
+    if (!this._isEnabled || !this._isVisible) return this
     const targetIndex = this.indexResolver ? this.indexResolver(index) : index
     this.engine.scrollTo(targetIndex, instant)
     return this

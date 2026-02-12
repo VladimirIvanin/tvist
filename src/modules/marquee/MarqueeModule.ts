@@ -366,7 +366,8 @@ export class MarqueeModule extends Module {
   }
 
   /**
-   * Остановка marquee
+   * Остановка marquee (отменяет RAF, но не меняет флаг stopped)
+   * Для полной остановки с установкой флага используйте публичное API: getMarquee().stop()
    */
   stop(): void {
     if (this.rafId !== null) {
@@ -443,7 +444,10 @@ export class MarqueeModule extends Module {
         this.stopped = false
         this.start()
       },
-      stop: () => this.stop(),
+      stop: () => {
+        this.stop()
+        this.stopped = true
+      },
       pause: () => this.pause(),
       resume: () => this.resume(),
       isRunning: () => this.rafId !== null && !this.paused,

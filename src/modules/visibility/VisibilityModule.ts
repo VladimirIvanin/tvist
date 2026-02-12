@@ -101,6 +101,9 @@ export class VisibilityModule extends Module {
   /** Интервал для проверки CSS видимости (fallback для display:none) */
   private cssCheckInterval: number | null = null
 
+  /** MutationObserver для отслеживания изменений style атрибута */
+  private mutationObserver: MutationObserver | null = null
+
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
     this.config = normalizeVisibility(this.options.visibility)
@@ -110,12 +113,16 @@ export class VisibilityModule extends Module {
     if (!this.shouldBeActive()) return
 
     this.setupObserver()
+    this.setupMutationObserver()
     this.startCSSCheck()
   }
 
   override destroy(): void {
     this.stopObserver()
+    this.stopMutationObserver()
     this.stopCSSCheck()
+    // Восстанавливаем видимость при уничтожении модуля
+    this.tvist._isVisible = true
   }
 
   public override shouldBeActive(): boolean {
@@ -137,12 +144,16 @@ export class VisibilityModule extends Module {
       // Если visibility был выключен, а теперь включен
       if (!wasActive && isNowActive) {
         this.setupObserver()
+        this.setupMutationObserver()
         this.startCSSCheck()
       }
       // Если visibility был включен, а теперь выключен
       else if (wasActive && !isNowActive) {
         this.stopObserver()
+        this.stopMutationObserver()
         this.stopCSSCheck()
+        // Восстанавливаем видимость
+        this.tvist._isVisible = true
         // Возобновляем модули если они были приостановлены
         if (!this.isVisible) {
           this.resumeModules()
@@ -196,21 +207,58 @@ export class VisibilityModule extends Module {
   }
 
   /**
+   * Настройка MutationObserver для отслеживания изменений style
+   */
+  private setupMutationObserver(): void {
+    this.mutationObserver = new MutationObserver(() => {
+      this.checkVisibility()
+    })
+
+    // Отслеживаем изменения атрибута style у root элемента и его родителей
+    let element: HTMLElement | null = this.tvist.root
+    while (element && element !== document.body) {
+      this.mutationObserver.observe(element, {
+        attributes: true,
+        attributeFilter: ['style', 'class'],
+      })
+      element = element.parentElement
+    }
+  }
+
+  /**
+   * Остановка MutationObserver
+   */
+  private stopMutationObserver(): void {
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect()
+      this.mutationObserver = null
+    }
+  }
+
+  /**
+   * Проверка видимости (вынесено в отдельный метод)
+   */
+  private checkVisibility(): void {
+    const isCSSVisible = isElementVisibleCSS(this.tvist.root)
+    
+    // Если CSS видимость изменилась
+    if (isCSSVisible !== this.isVisible) {
+      this.isVisible = isCSSVisible
+      this.handleVisibilityChange(isCSSVisible)
+    }
+  }
+
+  /**
    * Запуск периодической проверки CSS видимости
    * IntersectionObserver не реагирует на display:none, поэтому нужен fallback
+   * MutationObserver может пропустить изменения через JS, поэтому оставляем интервал
    */
   private startCSSCheck(): void {
     this.stopCSSCheck()
 
-    // Проверяем каждые 500ms
+    // Проверяем каждые 500ms (fallback если MutationObserver пропустил)
     this.cssCheckInterval = window.setInterval(() => {
-      const isCSSVisible = isElementVisibleCSS(this.tvist.root)
-      
-      // Если CSS видимость изменилась
-      if (isCSSVisible !== this.isVisible) {
-        this.isVisible = isCSSVisible
-        this.handleVisibilityChange(isCSSVisible)
-      }
+      this.checkVisibility()
     }, 500)
   }
 
@@ -229,9 +277,13 @@ export class VisibilityModule extends Module {
    */
   private handleVisibilityChange(isVisible: boolean): void {
     if (isVisible) {
+      // Разрешаем переключение слайдов
+      this.tvist._isVisible = true
       this.emit('sliderVisible')
       this.resumeModules()
     } else {
+      // Блокируем переключение слайдов
+      this.tvist._isVisible = false
       this.emit('sliderHidden')
       this.pauseModules()
     }
@@ -253,13 +305,13 @@ export class VisibilityModule extends Module {
       }
     }
 
-    // Приостанавливаем marquee
+    // Останавливаем marquee (stop вместо pause для полной остановки RAF)
     if (this.config.pauseMarquee) {
       const marqueeModule = this.tvist.getModule('marquee') as MarqueeModuleAPI | undefined
       const marquee = marqueeModule?.getMarquee()
       if (marquee?.isRunning()) {
         this.marqueeWasRunning = true
-        marquee.pause()
+        marquee.stop()
       }
     }
   }
@@ -280,12 +332,12 @@ export class VisibilityModule extends Module {
       this.autoplayWasRunning = false
     }
 
-    // Возобновляем marquee если он был запущен
+    // Запускаем marquee заново если он был запущен
     if (this.config.pauseMarquee && this.marqueeWasRunning) {
       const marqueeModule = this.tvist.getModule('marquee') as MarqueeModuleAPI | undefined
       const marquee = marqueeModule?.getMarquee()
       if (marquee) {
-        marquee.resume()
+        marquee.start()
       }
       this.marqueeWasRunning = false
     }
