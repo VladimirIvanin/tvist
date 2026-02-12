@@ -63,7 +63,7 @@ export abstract class Module {
    * Проверка, должен ли модуль быть активен
    * Используется для условной активации модулей
    */
-  protected shouldBeActive(): boolean {
+  public shouldBeActive(): boolean {
     return true
   }
 

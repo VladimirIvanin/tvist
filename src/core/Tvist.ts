@@ -210,8 +210,11 @@ export class Tvist {
     Tvist.MODULES.forEach((ModuleClass, name) => {
       try {
         const module = new ModuleClass(this, this.options)
-        this.modules.set(name, module)
-        module.init()
+        // Проверяем, должен ли модуль быть активным
+        if (module.shouldBeActive?.() !== false) {
+          this.modules.set(name, module)
+          module.init()
+        }
       } catch (error) {
         console.error(`Tvist: Failed to initialize module "${name}":`, error)
       }
@@ -411,6 +414,24 @@ export class Tvist {
     // Уведомляем модули об изменении опций
     this.modules.forEach((module) => {
       module.onOptionsUpdate?.(newOptions)
+    })
+
+    // Переинициализируем модули, которые были выключены, а теперь включены
+    // Это нужно для модулей типа autoplay, marquee, visibility и т.д.
+    Tvist.MODULES.forEach((ModuleClass, name) => {
+      // Пропускаем модули, которые уже есть
+      if (this.modules.has(name)) return
+      
+      try {
+        const module = new ModuleClass(this, this.options)
+        // Проверяем, должен ли модуль быть активным
+        if (module.shouldBeActive?.() !== false) {
+          this.modules.set(name, module)
+          module.init()
+        }
+      } catch (error) {
+        console.error(`Tvist: Failed to initialize module "${name}":`, error)
+      }
     })
 
     // Событие обновления опций

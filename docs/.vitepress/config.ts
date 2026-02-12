@@ -73,6 +73,7 @@ export default defineConfig({
           { text: 'Marquee', link: '/examples/marquee' },
           { text: 'Autoplay', link: '/examples/autoplay' },
           { text: 'Video', link: '/examples/video' },
+          { text: 'Visibility', link: '/examples/visibility' },
           { text: 'Fade Effect', link: '/examples/effect-fade' },
           { text: 'Cube Effect', link: '/examples/effect-cube' },
           { text: 'Vertical', link: '/examples/vertical' },

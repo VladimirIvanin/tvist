@@ -54,7 +54,7 @@ export class GridModule extends Module {
     }
   }
 
-  protected override shouldBeActive(): boolean {
+  public override shouldBeActive(): boolean {
     const { grid } = this.options
     // Активен если есть grid опции и заданы rows/cols или dimensions
     return !!grid && (!!grid.rows || !!grid.cols || (!!grid.dimensions && grid.dimensions.length > 0))

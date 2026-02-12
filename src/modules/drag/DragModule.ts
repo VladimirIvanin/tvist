@@ -124,7 +124,7 @@ export class DragModule extends Module {
     }
   }
 
-  protected override shouldBeActive(): boolean {
+  public override shouldBeActive(): boolean {
     return this.options.drag !== false
   }
 

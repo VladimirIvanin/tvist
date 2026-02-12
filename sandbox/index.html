@@ -8,68 +8,60 @@
 </head>
 <body>
   <div class="sandbox-container">
-    <h1>Tvist Sandbox - Breakpoints Test</h1>
+    <h1>Tvist Sandbox - Visibility Test</h1>
     
     <div class="test-instructions">
-      <h3>Тест breakpoints (desktop-first, max-width)</h3>
+      <h3>Тест модуля Visibility</h3>
       <p><strong>Тестируемая функциональность:</strong></p>
       <ul>
-        <li>Breakpoints применяются при инициализации</li>
-        <li>Breakpoints обновляются при resize</li>
-        <li>Container-based breakpoints работают</li>
-        <li>Lock/unlock при смене perPage</li>
-        <li>События breakpoint эмитятся</li>
+        <li>Autoplay приостанавливается при скрытии слайдера</li>
+        <li>Marquee приостанавливается при скрытии слайдера</li>
+        <li>Модули возобновляются при появлении слайдера</li>
+        <li>События sliderHidden/sliderVisible эмитятся</li>
       </ul>
-      <p><strong>Текущая ширина окна:</strong> <span id="windowWidth"></span>px</p>
+      <p><strong>Откройте консоль для просмотра событий</strong></p>
     </div>
 
-    <h2>Слайдер 1: Window-based breakpoints</h2>
-    <p>Desktop (>1200): 4 слайда | Tablet (≤1200): 3 слайда | Mobile (≤768): 1 слайд</p>
-    <div id="slider1" class="tvist-v1">
-      <div class="tvist-v1__container">
-        <div class="tvist-v1__slide" style="background: #ff6b6b;">1</div>
-        <div class="tvist-v1__slide" style="background: #4ecdc4;">2</div>
-        <div class="tvist-v1__slide" style="background: #45b7d1;">3</div>
-        <div class="tvist-v1__slide" style="background: #f7b731;">4</div>
-        <div class="tvist-v1__slide" style="background: #5f27cd;">5</div>
-        <div class="tvist-v1__slide" style="background: #00d2d3;">6</div>
-      </div>
-      <button class="tvist-v1__arrow--prev"></button>
-      <button class="tvist-v1__arrow--next"></button>
-      <div class="tvist-v1__pagination"></div>
+    <div style="margin-bottom: 20px;">
+      <button id="toggleSlider1" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+        Скрыть/Показать Слайдер 1 (Autoplay)
+      </button>
     </div>
-    <p>perPage: <strong id="slider1-perPage">-</strong> | Breakpoint: <strong id="slider1-bp">-</strong></p>
 
-    <h2>Слайдер 2: Container-based (узкий контейнер 500px)</h2>
-    <p>Breakpoints: >500: 3 слайда | ≤500: 2 слайда | ≤400: 1 слайд</p>
-    <div style="max-width: 500px; border: 2px solid #ccc; padding: 10px;">
-      <div id="slider2" class="tvist-v1">
+    <div id="slider1Container">
+      <h2>Слайдер 1: Autoplay + Visibility</h2>
+      <p>Autoplay с задержкой 2 секунды. При скрытии приостанавливается.</p>
+      <div id="slider1" class="tvist-v1">
         <div class="tvist-v1__container">
           <div class="tvist-v1__slide" style="background: #ff6b6b;">1</div>
           <div class="tvist-v1__slide" style="background: #4ecdc4;">2</div>
           <div class="tvist-v1__slide" style="background: #45b7d1;">3</div>
           <div class="tvist-v1__slide" style="background: #f7b731;">4</div>
           <div class="tvist-v1__slide" style="background: #5f27cd;">5</div>
-          <div class="tvist-v1__slide" style="background: #00d2d3;">6</div>
         </div>
-        <button class="tvist-v1__arrow--prev"></button>
-        <button class="tvist-v1__arrow--next"></button>
       </div>
     </div>
-    <p>perPage: <strong id="slider2-perPage">-</strong> | Breakpoint: <strong id="slider2-bp">-</strong></p>
 
-    <h2>Слайдер 3: Lock/Unlock (2 слайда)</h2>
-    <p>Desktop (perPage: 2) → locked | Mobile (≤768, perPage: 1) → unlocked</p>
-    <div id="slider3" class="tvist-v1">
-      <div class="tvist-v1__container">
-        <div class="tvist-v1__slide" style="background: #ff6b6b;">1</div>
-        <div class="tvist-v1__slide" style="background: #4ecdc4;">2</div>
-      </div>
-      <button class="tvist-v1__arrow--prev"></button>
-      <button class="tvist-v1__arrow--next"></button>
-      <div class="tvist-v1__pagination"></div>
+    <div style="margin: 40px 0 20px;">
+      <button id="toggleSlider2" style="padding: 10px 20px; font-size: 16px; cursor: pointer;">
+        Скрыть/Показать Слайдер 2 (Marquee)
+      </button>
     </div>
-    <p>perPage: <strong id="slider3-perPage">-</strong> | Locked: <strong id="slider3-locked">-</strong></p>
+
+    <div id="slider2Container">
+      <h2>Слайдер 2: Marquee + Visibility</h2>
+      <p>Бегущая строка. При скрытии приостанавливается.</p>
+      <div id="slider2" class="tvist-v1">
+        <div class="tvist-v1__container">
+          <div class="tvist-v1__slide" style="background: #f093fb;">A</div>
+          <div class="tvist-v1__slide" style="background: #f5576c;">B</div>
+          <div class="tvist-v1__slide" style="background: #4facfe;">C</div>
+          <div class="tvist-v1__slide" style="background: #00f2fe;">D</div>
+          <div class="tvist-v1__slide" style="background: #43e97b;">E</div>
+          <div class="tvist-v1__slide" style="background: #38f9d7;">F</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="./script.ts"></script>

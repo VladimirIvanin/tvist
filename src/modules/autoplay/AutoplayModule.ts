@@ -119,7 +119,7 @@ export class AutoplayModule extends Module {
     this.detachVideoEndedListener()
   }
 
-  protected override shouldBeActive(): boolean {
+  public override shouldBeActive(): boolean {
     return this.config !== null
   }
 

@@ -65,7 +65,7 @@ export class BreakpointsModule extends Module {
     this.mediaQueries.clear()
   }
 
-  protected override shouldBeActive(): boolean {
+  public override shouldBeActive(): boolean {
     return !!(this.options.breakpoints && Object.keys(this.options.breakpoints).length > 0)
   }
 

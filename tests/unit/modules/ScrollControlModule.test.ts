@@ -187,7 +187,8 @@ describe('ScrollControlModule', () => {
       })
 
       const module = slider.getModule<ScrollControlModule>('scroll-control')
-      expect(module).toBeDefined()
+      // Модуль не должен создаваться если wheel=false
+      expect(module).toBeUndefined()
       
       // Проверяем что обработчики не установлены через попытку вызвать wheel
       const wheelEvent = new WheelEvent('wheel', {
@@ -225,8 +226,8 @@ describe('ScrollControlModule', () => {
 
       const module = slider.getModule<ScrollControlModule>('scroll-control')
       
-      // Модуль зарегистрирован, но не активен
-      expect(module).toBeDefined()
+      // Модуль не должен создаваться если wheel не указан
+      expect(module).toBeUndefined()
     })
   })
 

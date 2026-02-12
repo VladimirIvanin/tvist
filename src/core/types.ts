@@ -122,6 +122,31 @@ export interface VideoOptions {
   resetOnLeave?: boolean
 }
 
+/**
+ * Опции модуля отслеживания видимости
+ */
+export interface VisibilityOptions {
+  /**
+   * Приостанавливать autoplay когда слайдер скрыт
+   * @default true
+   */
+  pauseAutoplay?: boolean
+
+  /**
+   * Приостанавливать marquee когда слайдер скрыт
+   * @default true
+   */
+  pauseMarquee?: boolean
+
+  /**
+   * Порог видимости для IntersectionObserver (0..1)
+   * 0 = считается видимым если хоть что-то видно
+   * 1 = считается видимым только если виден полностью
+   * @default 0
+   */
+  threshold?: number
+}
+
 /** Payload события videoProgress */
 export interface VideoProgressEvent {
   /** DOM-элемент слайда */
@@ -399,6 +424,17 @@ export interface TvistOptions {
    */
   video?: boolean | VideoOptions
   
+  // Visibility
+  
+  /**
+   * Отслеживание видимости слайдера для приостановки autoplay/marquee.
+   * - `false` — выключено (по умолчанию)
+   * - `true` — включено с дефолтными настройками
+   * - `VisibilityOptions` — полный контроль
+   * @default false
+   */
+  visibility?: boolean | VisibilityOptions
+  
   // Loop
   
   /**
@@ -673,6 +709,10 @@ export interface TvistOptions {
     videoProgress?: (data: VideoProgressEvent) => void
     /** Прогресс автопрокрутки (0..1), работает и для таймера, и для видео */
     autoplayProgress?: (data: { progress: number; index: number }) => void
+    /** Слайдер стал видимым */
+    sliderVisible?: () => void
+    /** Слайдер скрыт */
+    sliderHidden?: () => void
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
     [key: string]: ((...args: any[]) => void) | undefined
   }

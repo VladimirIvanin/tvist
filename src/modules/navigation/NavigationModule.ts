@@ -58,7 +58,7 @@ export class NavigationModule extends Module {
     this.nextButton = null
   }
 
-  protected override shouldBeActive(): boolean {
+  public override shouldBeActive(): boolean {
     const { arrows } = this.options
     return !!arrows
   }

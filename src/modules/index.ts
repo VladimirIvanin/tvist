@@ -19,5 +19,6 @@ export { ScrollbarModule } from './scrollbar'
 export { MarqueeModule } from './marquee'
 export { LazyLoadModule } from './lazyload'
 export { VideoModule } from './video'
+export { VisibilityModule } from './visibility'
 
 

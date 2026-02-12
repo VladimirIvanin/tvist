@@ -125,7 +125,7 @@ export class PaginationModule extends Module {
     this.bullets = []
   }
 
-  protected override shouldBeActive(): boolean {
+  public override shouldBeActive(): boolean {
     const { pagination } = this.options
     return !!pagination
   }

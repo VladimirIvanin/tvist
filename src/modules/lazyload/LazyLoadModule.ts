@@ -82,7 +82,7 @@ export class LazyLoadModule extends Module {
     this.removeSpinners()
   }
 
-  protected override shouldBeActive(): boolean {
+  public override shouldBeActive(): boolean {
     // Модуль активен только если lazy явно включен (true или объект с настройками)
     return this.options.lazy !== false && this.options.lazy !== undefined && this.options.lazy !== null
   }

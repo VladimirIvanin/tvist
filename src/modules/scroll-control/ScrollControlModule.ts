@@ -48,7 +48,7 @@ export class ScrollControlModule extends Module {
   /**
    * Проверить, должен ли модуль быть активен
    */
-  protected override shouldBeActive(): boolean {
+  public override shouldBeActive(): boolean {
     return this.options.wheel !== false && this.options.wheel !== undefined
   }
 

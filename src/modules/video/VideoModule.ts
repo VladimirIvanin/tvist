@@ -196,7 +196,7 @@ export class VideoModule extends Module {
     this.iframes.clear()
   }
 
-  protected override shouldBeActive(): boolean {
+  public override shouldBeActive(): boolean {
     return this.config !== null
   }
 

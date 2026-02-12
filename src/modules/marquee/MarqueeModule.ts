@@ -90,7 +90,7 @@ export class MarqueeModule extends Module {
     this.off('dragEnd')
   }
 
-  protected override shouldBeActive(): boolean {
+  public override shouldBeActive(): boolean {
     return this.options.marquee !== false && this.options.marquee !== undefined
   }
 

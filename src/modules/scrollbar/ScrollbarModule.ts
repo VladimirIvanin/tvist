@@ -71,7 +71,7 @@ export class ScrollbarModule extends Module {
   /**
    * Проверить, должен ли модуль быть активен
    */
-  protected override shouldBeActive(): boolean {
+  public override shouldBeActive(): boolean {
     return this.options.scrollbar !== false && this.options.scrollbar !== undefined
   }
 

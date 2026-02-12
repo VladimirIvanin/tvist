@@ -1,139 +1,74 @@
 import Tvist from '../src/index'
 
-// Обновление ширины окна
-function updateWindowWidth() {
-  const el = document.getElementById('windowWidth')
-  if (el) {
-    el.textContent = window.innerWidth.toString()
-  }
-}
-
-updateWindowWidth()
-window.addEventListener('resize', updateWindowWidth)
-
-// Слайдер 1: Window-based breakpoints
+// Слайдер 1: Autoplay + Visibility
 const slider1 = new Tvist('#slider1', {
-  perPage: 4,
+  perPage: 1,
   gap: 20,
-  arrows: true,
-  pagination: true,
-  breakpoints: {
-    1200: {
-      perPage: 3,
-      gap: 16
-    },
-    768: {
-      perPage: 1,
-      gap: 0
-    }
+  autoplay: {
+    delay: 2000,
   },
+  visibility: true,
   on: {
-    created: (instance) => {
-      updateSlider1Info(instance)
+    sliderHidden: () => {
+      console.log('🙈 Слайдер 1 скрыт - autoplay приостановлен')
     },
-    breakpoint: (bp) => {
-      console.log('Slider 1 breakpoint:', bp)
-      updateSlider1Info(slider1)
+    sliderVisible: () => {
+      console.log('👁️ Слайдер 1 виден - autoplay возобновлен')
     },
-    slideChangeEnd: () => {
-      updateSlider1Info(slider1)
+    slideChangeEnd: (index) => {
+      console.log('Слайдер 1: переход на слайд', index)
     }
   }
 })
 
-function updateSlider1Info(slider: typeof slider1) {
-  const perPageEl = document.getElementById('slider1-perPage')
-  const bpEl = document.getElementById('slider1-bp')
-  if (perPageEl) perPageEl.textContent = slider.options.perPage?.toString() ?? '-'
-  if (bpEl) {
-    const breakpointsModule = (slider as any).modules?.get('breakpoints')
-    const currentBp = breakpointsModule?.getCurrentBreakpoint()
-    bpEl.textContent = currentBp !== null ? currentBp.toString() : 'none'
-  }
+// Кнопка переключения видимости слайдера 1
+const toggleSlider1Btn = document.getElementById('toggleSlider1')
+const slider1Container = document.getElementById('slider1Container')
+
+if (toggleSlider1Btn && slider1Container) {
+  toggleSlider1Btn.addEventListener('click', () => {
+    if (slider1Container.style.display === 'none') {
+      slider1Container.style.display = 'block'
+    } else {
+      slider1Container.style.display = 'none'
+    }
+  })
 }
 
-// Слайдер 2: Container-based
+// Слайдер 2: Marquee + Visibility
 const slider2 = new Tvist('#slider2', {
   perPage: 3,
-  gap: 12,
-  arrows: true,
-  breakpointsBase: 'container',
-  breakpoints: {
-    500: {
-      perPage: 2,
-      gap: 8
-    },
-    400: {
-      perPage: 1,
-      gap: 0
-    }
+  gap: 20,
+  marquee: {
+    speed: 50,
+    direction: 'left',
   },
+  visibility: true,
   on: {
-    created: (instance) => {
-      updateSlider2Info(instance)
+    sliderHidden: () => {
+      console.log('🙈 Слайдер 2 скрыт - marquee приостановлен')
     },
-    breakpoint: (bp) => {
-      console.log('Slider 2 breakpoint:', bp)
-      updateSlider2Info(slider2)
-    },
-    slideChangeEnd: () => {
-      updateSlider2Info(slider2)
+    sliderVisible: () => {
+      console.log('👁️ Слайдер 2 виден - marquee возобновлен')
     }
   }
 })
 
-function updateSlider2Info(slider: typeof slider2) {
-  const perPageEl = document.getElementById('slider2-perPage')
-  const bpEl = document.getElementById('slider2-bp')
-  if (perPageEl) perPageEl.textContent = slider.options.perPage?.toString() ?? '-'
-  if (bpEl) {
-    const breakpointsModule = (slider as any).modules?.get('breakpoints')
-    const currentBp = breakpointsModule?.getCurrentBreakpoint()
-    bpEl.textContent = currentBp !== null ? currentBp.toString() : 'none'
-  }
+// Кнопка переключения видимости слайдера 2
+const toggleSlider2Btn = document.getElementById('toggleSlider2')
+const slider2Container = document.getElementById('slider2Container')
+
+if (toggleSlider2Btn && slider2Container) {
+  toggleSlider2Btn.addEventListener('click', () => {
+    if (slider2Container.style.display === 'none') {
+      slider2Container.style.display = 'block'
+    } else {
+      slider2Container.style.display = 'none'
+    }
+  })
 }
 
-// Слайдер 3: Lock/Unlock
-const slider3 = new Tvist('#slider3', {
-  perPage: 2,
-  gap: 16,
-  arrows: true,
-  pagination: true,
-  breakpoints: {
-    768: {
-      perPage: 1
-    }
-  },
-  on: {
-    created: (instance) => {
-      updateSlider3Info(instance)
-    },
-    breakpoint: (bp) => {
-      console.log('Slider 3 breakpoint:', bp)
-      updateSlider3Info(slider3)
-    },
-    lock: () => {
-      console.log('Slider 3 locked')
-      updateSlider3Info(slider3)
-    },
-    unlock: () => {
-      console.log('Slider 3 unlocked')
-      updateSlider3Info(slider3)
-    },
-    slideChangeEnd: () => {
-      updateSlider3Info(slider3)
-    }
-  }
-})
-
-function updateSlider3Info(slider: typeof slider3) {
-  const perPageEl = document.getElementById('slider3-perPage')
-  const lockedEl = document.getElementById('slider3-locked')
-  if (perPageEl) perPageEl.textContent = slider.options.perPage?.toString() ?? '-'
-  if (lockedEl) lockedEl.textContent = slider.engine.isLocked ? 'YES' : 'NO'
-}
-
-console.log('Breakpoints test initialized!', { slider1, slider2, slider3 })
+console.log('Visibility test initialized!', { slider1, slider2 })
 
 // Expose for debugging
-;(window as any).sliders = { slider1, slider2, slider3 }
+;(window as any).sliders = { slider1, slider2 }
