@@ -55,6 +55,12 @@ export class Tvist {
   // Состояние включения/выключения слайдера
   private _isEnabled = true
 
+  // Флаг для отслеживания ручного изменения enabled (для breakpoints)
+  private _manualEnabledChange = false
+
+  // Флаг для предотвращения применения брейкпоинтов во время enable/disable
+  private _isTogglingEnabled = false
+
   // Флаг для контроля кликов (устанавливается в false при драге)
   public allowClick = true
 
@@ -437,6 +443,8 @@ export class Tvist {
     if (!this._isEnabled) return this
 
     this._isEnabled = false
+    this._manualEnabledChange = true // Отмечаем ручное изменение
+    this._isTogglingEnabled = true // Предотвращаем применение брейкпоинтов
     this.root.classList.add(TVIST_CLASSES.disabled)
 
     // Очищаем стили
@@ -458,6 +466,7 @@ export class Tvist {
       }
     })
 
+    this._isTogglingEnabled = false // Разрешаем применение брейкпоинтов
     this.emit('disabled', this)
     return this
   }
@@ -469,6 +478,8 @@ export class Tvist {
     if (this._isEnabled) return this
 
     this._isEnabled = true
+    this._manualEnabledChange = true // Отмечаем ручное изменение
+    this._isTogglingEnabled = true // Предотвращаем применение брейкпоинтов
     this.root.classList.remove(TVIST_CLASSES.disabled)
 
     // Переинициализируем модули (кроме breakpoints - он уже работает)
@@ -488,6 +499,7 @@ export class Tvist {
     // Пересчитываем размеры и позиции
     this.update()
 
+    this._isTogglingEnabled = false // Разрешаем применение брейкпоинтов
     this.emit('enabled', this)
     return this
   }
@@ -497,6 +509,24 @@ export class Tvist {
    */
   get isEnabled(): boolean {
     return this._isEnabled
+  }
+
+  /**
+   * Проверить и сбросить флаг ручного изменения enabled
+   * Используется в BreakpointsModule для принудительного применения брейкпоинта
+   */
+  checkAndResetManualEnabledChange(): boolean {
+    const hasChanged = this._manualEnabledChange
+    this._manualEnabledChange = false
+    return hasChanged
+  }
+
+  /**
+   * Проверить, происходит ли сейчас переключение enabled
+   * Используется в BreakpointsModule для предотвращения применения брейкпоинтов
+   */
+  get isTogglingEnabled(): boolean {
+    return this._isTogglingEnabled
   }
 
   /**

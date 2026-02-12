@@ -100,17 +100,27 @@ export class BreakpointsModule extends Module {
 
   /**
    * Обработчик изменения media query.
-   * Вызывает полный цикл update() слайдера, чтобы после смены breakpoint
-   * Engine пересчитал размеры и позиции.
+   * Проверяет breakpoints и при необходимости вызывает update().
    */
   private handleMediaChange = (): void => {
-    this.tvist.update()
+    // Проверяем breakpoints напрямую (не через update, т.к. слайдер может быть отключён)
+    this.checkBreakpoints()
+    
+    // Если слайдер включён, вызываем update для пересчёта размеров
+    if (this.tvist.isEnabled) {
+      this.tvist.update()
+    }
   }
 
   /**
    * Проверка текущего breakpoint
    */
   private checkBreakpoints(): void {
+    // Не применяем брейкпоинты во время enable/disable
+    if (this.tvist.isTogglingEnabled) {
+      return
+    }
+
     const originalOptions = this.getOriginalOptions()
     
     // Создаем временный объект опций с breakpointsBase для findMatchingBreakpoint
@@ -121,18 +131,27 @@ export class BreakpointsModule extends Module {
 
     const newBreakpoint = findMatchingBreakpoint(this.tvist.root, optionsForCheck)
 
-    // Применяем только если breakpoint изменился
-    if (newBreakpoint !== this.currentBreakpoint) {
+    // Проверяем, был ли вручную изменён enabled
+    const manualEnabledChange = this.tvist.checkAndResetManualEnabledChange()
+
+    // Запоминаем старый breakpoint для события
+    const oldBreakpoint = this.currentBreakpoint
+    const breakpointChanged = newBreakpoint !== oldBreakpoint
+
+    // Применяем если breakpoint изменился ИЛИ был ручной вызов enable/disable
+    if (breakpointChanged || manualEnabledChange) {
       this.currentBreakpoint = newBreakpoint
       
       this.applyBreakpoint(newBreakpoint)
       
-      // Эмитим событие
-      this.emit('breakpoint', newBreakpoint)
+      // Эмитим событие только если breakpoint реально изменился
+      if (breakpointChanged) {
+        this.emit('breakpoint', newBreakpoint)
 
-      // Вызываем callback из опций
-      if (originalOptions.on?.breakpoint) {
-        originalOptions.on.breakpoint(newBreakpoint)
+        // Вызываем callback из опций
+        if (originalOptions.on?.breakpoint) {
+          originalOptions.on.breakpoint(newBreakpoint)
+        }
       }
     }
   }

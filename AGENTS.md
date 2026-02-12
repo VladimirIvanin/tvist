@@ -44,37 +44,43 @@ npm run typecheck       # Проверка типов
 
 #### Тестирование window-based брейкпоинтов
 
-**ВАЖНО:** В Vitest + happy-dom `window.matchMedia` замокан и возвращает `undefined`, что ломает window-based брейкпоинты.
+Window-based брейкпоинты (по умолчанию) работают в тестах благодаря кастомному моку `window.matchMedia` в `tests/setup.ts`.
 
-**Решение:** Всегда используй `breakpointsBase: 'container'` в тестах:
+**Как это работает:**
 
 ```typescript
-// ❌ НЕ работает в тестах (window.matchMedia замокан)
+// В tests/setup.ts настроен динамический мок matchMedia
+// который реагирует на изменения window.innerWidth
+
+// В тестах просто изменяй window.innerWidth:
+window.innerWidth = 800  // Автоматически триггерит matchMedia события
+
 const slider = new Tvist(root, {
+  breakpoints: {
+    999: { enabled: true, perPage: 1 }
+  }
+  // breakpointsBase по умолчанию 'window' - работает!
+})
+
+// Слайдер автоматически отреагирует на изменение ширины
+```
+
+**Альтернатива:** Container-based брейкпоинты:
+
+```typescript
+const slider = new Tvist(root, {
+  breakpointsBase: 'container',
   breakpoints: {
     767: { perPage: 1 }
   }
-  // breakpointsBase по умолчанию 'window'
 })
 
-// ✅ Работает в тестах
-const slider = new Tvist(root, {
-  breakpointsBase: 'container', // Явно указываем container
-  breakpoints: {
-    767: { perPage: 1 }
-  }
-})
-
-// Изменяем размер контейнера в тестах
+// Изменяем размер контейнера
 resizeSlider(root, 600) // из fixtures
 slider['modules'].get('breakpoints')?.['checkBreakpoints']()
 ```
 
-**Почему:** 
-- `window.matchMedia` в Vitest замокан и возвращает `undefined`
-- Попытка вызвать `addEventListener` на `undefined` приводит к ошибке
-- `breakpointsBase: 'container'` использует `root.clientWidth` вместо `window.innerWidth` и не зависит от `matchMedia`
-- В реальном браузере window-based брейкпоинты работают корректно
+**Важно:** Мок `matchMedia` в `tests/setup.ts` поддерживает только `max-width` queries. Если нужны другие типы queries, обнови мок.
 
 ### Стили
 - BEM нотация: `.tvist-v1__element--modifier`

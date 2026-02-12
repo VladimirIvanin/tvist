@@ -32,32 +32,89 @@ beforeAll(() => {
   } as any
 
   // Мокируем matchMedia (для Breakpoints модуля)
+  // Создаём динамический мок, который реагирует на изменения window.innerWidth
+  const mediaQueryListeners = new Map<string, Set<(event: any) => void>>()
+  
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: vi.fn().mockImplementation((query: string) => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  })
-
-  // Устанавливаем дефолтные размеры окна
-  Object.defineProperty(window, 'innerWidth', {
-    writable: true,
     configurable: true,
-    value: 1024,
+    value: (query: string) => {
+      // Парсим max-width из query
+      const maxWidthMatch = query.match(/max-width:\s*(\d+)px/)
+      const maxWidth = maxWidthMatch ? parseInt(maxWidthMatch[1], 10) : Infinity
+      
+      // Проверяем текущую ширину
+      const matches = window.innerWidth <= maxWidth
+      
+      const listeners = mediaQueryListeners.get(query) || new Set()
+      mediaQueryListeners.set(query, listeners)
+      
+      const mql = {
+        matches,
+        media: query,
+        onchange: null,
+        addListener: (callback: (event: any) => void) => {
+          listeners.add(callback)
+        },
+        removeListener: (callback: (event: any) => void) => {
+          listeners.delete(callback)
+        },
+        addEventListener: (event: string, callback: (event: any) => void) => {
+          if (event === 'change') {
+            listeners.add(callback)
+          }
+        },
+        removeEventListener: (event: string, callback: (event: any) => void) => {
+          if (event === 'change') {
+            listeners.delete(callback)
+          }
+        },
+        dispatchEvent: () => true,
+      }
+      
+      return mql as MediaQueryList
+    },
+  })
+  
+  // Хелпер для триггера matchMedia событий при изменении innerWidth
+  const originalInnerWidthDescriptor = Object.getOwnPropertyDescriptor(window, 'innerWidth')
+  Object.defineProperty(window, 'innerWidth', {
+    get() {
+      return originalInnerWidthDescriptor?.value ?? 1024
+    },
+    set(value: number) {
+      const oldValue = originalInnerWidthDescriptor?.value ?? 1024
+      if (originalInnerWidthDescriptor) {
+        originalInnerWidthDescriptor.value = value
+      }
+      
+      // Триггерим все matchMedia listeners
+      if (oldValue !== value) {
+        mediaQueryListeners.forEach((listeners, query) => {
+          const maxWidthMatch = query.match(/max-width:\s*(\d+)px/)
+          const maxWidth = maxWidthMatch ? parseInt(maxWidthMatch[1], 10) : Infinity
+          const newMatches = value <= maxWidth
+          const oldMatches = oldValue <= maxWidth
+          
+          if (newMatches !== oldMatches) {
+            listeners.forEach(callback => {
+              callback({ matches: newMatches, media: query })
+            })
+          }
+        })
+      }
+    },
+    configurable: true,
   })
 
+  // Устанавливаем дефолтный размер высоты окна
   Object.defineProperty(window, 'innerHeight', {
     writable: true,
     configurable: true,
     value: 768,
   })
+  
+  // innerWidth уже определён выше в matchMedia моке с начальным значением 1024
 
   // Мокируем getComputedStyle для возврата базовых стилей
   const originalGetComputedStyle = window.getComputedStyle
