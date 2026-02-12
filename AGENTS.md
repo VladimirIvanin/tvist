@@ -43,17 +43,38 @@ npm run typecheck       # Проверка типов
 - Используем Vitest + happy-dom
 
 #### Тестирование window-based брейкпоинтов
-При тестировании функционала, который зависит от `window.innerWidth` (например, breakpoints с `breakpointsBase: 'window'`), используй `window.happyDOM.setViewport()`:
+
+**ВАЖНО:** В Vitest + happy-dom `window.matchMedia` замокан и возвращает `undefined`, что ломает window-based брейкпоинты.
+
+**Решение:** Всегда используй `breakpointsBase: 'container'` в тестах:
 
 ```typescript
-// Изменение viewport в тестах
-window.happyDOM.setViewport({ width: 800, height: 600 })
+// ❌ НЕ работает в тестах (window.matchMedia замокан)
+const slider = new Tvist(root, {
+  breakpoints: {
+    767: { perPage: 1 }
+  }
+  // breakpointsBase по умолчанию 'window'
+})
 
-// Это изменит window.innerWidth и window.innerHeight
-// И триггернет resize события и matchMedia
+// ✅ Работает в тестах
+const slider = new Tvist(root, {
+  breakpointsBase: 'container', // Явно указываем container
+  breakpoints: {
+    767: { perPage: 1 }
+  }
+})
+
+// Изменяем размер контейнера в тестах
+resizeSlider(root, 600) // из fixtures
+slider['modules'].get('breakpoints')?.['checkBreakpoints']()
 ```
 
-**Важно:** Простое изменение `window.innerWidth` через `Object.defineProperty` НЕ триггерит события resize и не обновляет matchMedia. Всегда используй `setViewport()`.
+**Почему:** 
+- `window.matchMedia` в Vitest замокан и возвращает `undefined`
+- Попытка вызвать `addEventListener` на `undefined` приводит к ошибке
+- `breakpointsBase: 'container'` использует `root.clientWidth` вместо `window.innerWidth` и не зависит от `matchMedia`
+- В реальном браузере window-based брейкпоинты работают корректно
 
 ### Стили
 - BEM нотация: `.tvist-v1__element--modifier`
