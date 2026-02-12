@@ -30,13 +30,15 @@ export function findMatchingBreakpoint(root: HTMLElement, options: TvistOptions)
     .map(Number)
     .sort((a, b) => a - b) // ascending для правильной логики max-width
 
+  let result = null
   for (const bp of breakpoints) {
     if (currentWidth <= bp) {
-      return bp
+      result = bp
+      break
     }
   }
 
-  return null
+  return result
 }
 
 /**

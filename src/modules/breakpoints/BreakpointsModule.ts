@@ -99,10 +99,12 @@ export class BreakpointsModule extends Module {
   }
 
   /**
-   * Обработчик изменения media query
+   * Обработчик изменения media query.
+   * Вызывает полный цикл update() слайдера, чтобы после смены breakpoint
+   * Engine пересчитал размеры и позиции.
    */
   private handleMediaChange = (): void => {
-    this.checkBreakpoints()
+    this.tvist.update()
   }
 
   /**
@@ -116,7 +118,7 @@ export class BreakpointsModule extends Module {
       ...originalOptions,
       breakpointsBase: originalOptions.breakpointsBase
     }
-    
+
     const newBreakpoint = findMatchingBreakpoint(this.tvist.root, optionsForCheck)
 
     // Применяем только если breakpoint изменился
@@ -163,13 +165,13 @@ export class BreakpointsModule extends Module {
     this.tvist.options.breakpoints = breakpoints
 
     // Включаем или отключаем слайдер в зависимости от enabled
+    // ВАЖНО: enable/disable вызывают update(), что может привести к повторному onResize
+    // Но это не проблема, т.к. currentBreakpoint уже обновлён и повторного apply не будет
     if (shouldBeEnabled && !this.tvist.isEnabled) {
       this.tvist.enable()
     } else if (!shouldBeEnabled && this.tvist.isEnabled) {
       this.tvist.disable()
     }
-    // НЕ вызываем update() здесь - он уже вызван в Tvist.update()
-    // Опции применены, engine.update() и модули обновятся автоматически
   }
 
   /**
