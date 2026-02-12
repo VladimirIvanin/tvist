@@ -35,6 +35,780 @@
       "type": "number",
       "default": "0",
       "description": "Расстояние между слайдами в пикселях"
+    },
+    {
+      "name": "peek",
+      "type": "number | string",
+      "default": "undefined",
+      "description": "Peek — отступы, показывающие часть соседних слайдов (чтобы было видно, что есть ещё слайды). Для горизонтального слайдера: left/right, для вертикального: top/bottom. peek: 10 peek: '1rem' peek: { left: 10, right: 20 } peek: { top: 10, bottom: 20 }",
+      "nested": [
+        {
+          "name": "peek",
+          "type": "number | string | {",
+          "description": ""
+        },
+        {
+          "name": "left",
+          "type": "number | string",
+          "description": ""
+        },
+        {
+          "name": "right",
+          "type": "number | string",
+          "description": ""
+        },
+        {
+          "name": "top",
+          "type": "number | string",
+          "description": ""
+        },
+        {
+          "name": "bottom",
+          "type": "number | string",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "peekTrim",
+      "type": "boolean",
+      "default": "true",
+      "description": "Peek trim: при true (по умолчанию) концовка прижимается к краю — последний слайд без дыры справа/снизу. При включённом loop не применяется."
+    },
+    {
+      "name": "speed",
+      "type": "number",
+      "default": "300",
+      "description": "Скорость анимации перехода в миллисекундах"
+    },
+    {
+      "name": "direction",
+      "type": "'horizontal' | 'vertical'",
+      "default": "'horizontal'",
+      "description": "Направление прокрутки слайдера"
+    },
+    {
+      "name": "center",
+      "type": "boolean",
+      "default": "false",
+      "description": "Центрирование активного слайда. При true активный слайд будет находиться по центру контейнера."
+    },
+    {
+      "name": "debug",
+      "type": "boolean",
+      "default": "false",
+      "description": "Режим отладки: вывод предупреждений в консоль (arrows not found, container not found и т.д.)"
+    },
+    {
+      "name": "start",
+      "type": "number",
+      "default": "0",
+      "description": "Индекс начального слайда"
+    },
+    {
+      "name": "drag",
+      "type": "boolean | 'free'",
+      "default": "true",
+      "description": "Включить перетаскивание слайдов. 'free' - свободная прокрутка без привязки к слайдам"
+    },
+    {
+      "name": "dragSpeed",
+      "type": "number",
+      "default": "1",
+      "description": "Множитель скорости перетаскивания"
+    },
+    {
+      "name": "rubberband",
+      "type": "boolean",
+      "default": "true",
+      "description": "Эффект \"резинки\" при перетаскивании за границы"
+    },
+    {
+      "name": "freeSnap",
+      "type": "boolean",
+      "default": "false",
+      "description": "Привязка к слайдам в free режиме. Если true, после momentum scroll будет snap к ближайшему слайду"
+    },
+    {
+      "name": "flickPower",
+      "type": "number",
+      "default": "600",
+      "description": "Сила инерции (flick power). Множитель для скорости при расчёте дистанции momentum scroll"
+    },
+    {
+      "name": "flickMaxPages",
+      "type": "number",
+      "default": "1",
+      "description": "Максимальное количество страниц для flick в обычном режиме"
+    },
+    {
+      "name": "focusableElements",
+      "type": "string",
+      "default": "'button, a, input, select, textarea'",
+      "description": "CSS селектор для элементов, которые должны сохранять фокус при перетаскивании"
+    },
+    {
+      "name": "preventClicks",
+      "type": "boolean",
+      "default": "true",
+      "description": "Предотвращать клики по слайдам во время перетаскивания"
+    },
+    {
+      "name": "preventClicksPropagation",
+      "type": "boolean",
+      "default": "true",
+      "description": "Предотвращать распространение событий клика во время анимации"
+    },
+    {
+      "name": "arrows",
+      "type": "boolean | boolean",
+      "default": "false",
+      "description": "Навигационные стрелки. true - автоматическое создание, объект - кастомная настройка",
+      "nested": [
+        {
+          "name": "arrows",
+          "type": "boolean | {",
+          "description": ""
+        },
+        {
+          "name": "prev",
+          "type": "string | HTMLElement",
+          "description": ""
+        },
+        {
+          "name": "next",
+          "type": "string | HTMLElement",
+          "description": ""
+        },
+        {
+          "name": "disabledClass",
+          "type": "string",
+          "description": ""
+        },
+        {
+          "name": "hiddenClass",
+          "type": "string",
+          "description": ""
+        },
+        {
+          "name": "addIcons",
+          "type": "boolean",
+          "description": ""
+        },
+        {
+          "name": "hideWhenSinglePage",
+          "type": "boolean",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "pagination",
+      "type": "boolean | boolean",
+      "default": "false",
+      "description": "Пагинация. true - автоматическое создание буллетов, объект - кастомная настройка",
+      "nested": [
+        {
+          "name": "pagination",
+          "type": "boolean | {",
+          "description": ""
+        },
+        {
+          "name": "container",
+          "type": "string | HTMLElement",
+          "description": ""
+        },
+        {
+          "name": "type",
+          "type": "'bullets' | 'fraction' | 'progress' | 'custom'",
+          "description": ""
+        },
+        {
+          "name": "clickable",
+          "type": "boolean",
+          "description": ""
+        },
+        {
+          "name": "bulletClass",
+          "type": "string",
+          "description": ""
+        },
+        {
+          "name": "bulletActiveClass",
+          "type": "string",
+          "description": ""
+        },
+        {
+          "name": "renderBullet",
+          "type": "(index: number, className: string) => string",
+          "description": ""
+        },
+        {
+          "name": "renderFraction",
+          "type": "(current: number, total: number) => string",
+          "description": ""
+        },
+        {
+          "name": "renderCustom",
+          "type": "(current: number, total: number) => string",
+          "description": ""
+        },
+        {
+          "name": "hideWhenSinglePage",
+          "type": "boolean",
+          "description": ""
+        },
+        {
+          "name": "limit",
+          "type": "number",
+          "description": "Максимальное количество видимых точек (только для type: 'bullets') Если не указано - показываются все точки"
+        },
+        {
+          "name": "strategy",
+          "type": "'even' | 'center'",
+          "default": "'even'",
+          "description": "Стратегия распределения слайдов по точкам при использовании limit - 'even': равномерное распределение - каждая точка представляет равное количество слайдов - 'center': центральное распределение - крайние точки по 1 слайду, остальные группируются в центре"
+        },
+        {
+          "name": "remainderStrategy",
+          "type": "'left' | 'center' | 'right'",
+          "default": "'center'",
+          "description": "Стратегия распределения остатка при равномерном делении (только для strategy: 'even') - 'left': остаток добавляется к левым точкам - 'center': остаток добавляется к центральным точкам - 'right': остаток добавляется к правым точкам"
+        }
+      ]
+    },
+    {
+      "name": "autoplay",
+      "type": "boolean | number | AutoplayOptions",
+      "default": "false",
+      "description": "Автопрокрутка слайдов. - `false` — выключена (по умолчанию) - `true` — включена с задержкой 3000мс и дефолтными настройками - `number` — включена с указанной задержкой в миллисекундах - `AutoplayOptions` — полный контроль: delay, pauseOnHover, pauseOnInteraction, disableOnInteraction, waitForVideo"
+    },
+    {
+      "name": "video",
+      "type": "boolean | VideoOptions",
+      "default": "false",
+      "description": "Управление видео внутри слайдов (HTML `<video>` и iframe YouTube/Vimeo). - `false` — выключено (по умолчанию) - `true` — включено с дефолтными настройками - `VideoOptions` — полный контроль"
+    },
+    {
+      "name": "visibility",
+      "type": "boolean | VisibilityOptions",
+      "default": "true",
+      "description": "Отслеживание видимости слайдера для приостановки autoplay/marquee. - `false` — выключено - `true` — включено с дефолтными настройками (по умолчанию) - `VisibilityOptions` — полный контроль"
+    },
+    {
+      "name": "loop",
+      "type": "boolean | 'auto'",
+      "default": "false",
+      "description": "Бесконечная прокрутка. 'auto' - определяется автоматически на основе количества слайдов"
+    },
+    {
+      "name": "rewind",
+      "type": "boolean",
+      "default": "false",
+      "description": "Автоматически возвращаться к первому слайду после достижения последнего (работает без loop) Применяется к навигации, autoplay и другим способам перехода между слайдами"
+    },
+    {
+      "name": "lazy",
+      "type": "boolean | boolean",
+      "default": "false",
+      "description": "Ленивая загрузка изображений",
+      "nested": [
+        {
+          "name": "lazy",
+          "type": "boolean | {",
+          "description": ""
+        },
+        {
+          "name": "preloadPrevNext",
+          "type": "number",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "effect",
+      "type": "'slide' | 'fade' | 'cube' | 'card'",
+      "default": "'slide'",
+      "description": "Эффект перехода между слайдами"
+    },
+    {
+      "name": "fadeEffect",
+      "type": "object",
+      "default": "undefined",
+      "description": "Настройки fade эффекта",
+      "nested": [
+        {
+          "name": "fadeEffect",
+          "type": "{",
+          "description": ""
+        },
+        {
+          "name": "crossFade",
+          "type": "boolean",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "cubeEffect",
+      "type": "object",
+      "default": "undefined",
+      "description": "Настройки cube эффекта",
+      "nested": [
+        {
+          "name": "cubeEffect",
+          "type": "{",
+          "description": ""
+        },
+        {
+          "name": "slideShadows",
+          "type": "boolean",
+          "description": ""
+        },
+        {
+          "name": "shadow",
+          "type": "boolean",
+          "description": ""
+        },
+        {
+          "name": "shadowOffset",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "shadowScale",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "perspective",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "perspectiveOriginY",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "viewportPadding",
+          "type": "number",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "thumbs",
+      "type": "object",
+      "default": "undefined",
+      "description": "Связь с thumbnail-слайдером",
+      "nested": [
+        {
+          "name": "thumbs",
+          "type": "{",
+          "description": ""
+        },
+        {
+          "name": "slider",
+          "type": "Tvist",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "isNavigation",
+      "type": "boolean",
+      "default": "false",
+      "description": "Если true, слайдер будет вести себя как навигация (клики по слайдам делают их активными). Используется для создания thumbnail-слайдеров"
+    },
+    {
+      "name": "virtual",
+      "type": "boolean | boolean",
+      "default": "false",
+      "description": "Виртуальные слайды для работы с большими списками",
+      "nested": [
+        {
+          "name": "virtual",
+          "type": "boolean | {",
+          "description": ""
+        },
+        {
+          "name": "addSlidesBefore",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "addSlidesAfter",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "renderSlide",
+          "type": "(data: any, index: number) => string",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "grid",
+      "type": "object",
+      "default": "undefined",
+      "description": "Сетка слайдов",
+      "nested": [
+        {
+          "name": "grid",
+          "type": "{",
+          "description": ""
+        },
+        {
+          "name": "rows",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "cols",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "gap",
+          "type": "{",
+          "description": "Отступы сетки. Можно задать отдельно для строк и колонок. Если не задано, используется глобальный gap."
+        },
+        {
+          "name": "row",
+          "type": "number | string",
+          "description": ""
+        },
+        {
+          "name": "col",
+          "type": "number | string",
+          "description": ""
+        },
+        {
+          "name": "dimensions",
+          "type": "[number, number][]",
+          "description": "Размеры ячеек для каждого слайда [colSpan, rowSpan] Массив повторяется, если слайдов больше, чем определений"
+        }
+      ]
+    },
+    {
+      "name": "marquee",
+      "type": "boolean | boolean",
+      "default": "false",
+      "description": "Режим бегущей строки (непрерывная прокрутка)",
+      "nested": [
+        {
+          "name": "marquee",
+          "type": "boolean | {",
+          "description": ""
+        },
+        {
+          "name": "speed",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "direction",
+          "type": "'left' | 'right' | 'up' | 'down'",
+          "description": ""
+        },
+        {
+          "name": "pauseOnHover",
+          "type": "boolean",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "keyboard",
+      "type": "boolean | boolean",
+      "default": "false",
+      "description": "Управление с клавиатуры (стрелки)",
+      "nested": [
+        {
+          "name": "keyboard",
+          "type": "boolean | {",
+          "description": ""
+        },
+        {
+          "name": "enabled",
+          "type": "boolean",
+          "description": ""
+        },
+        {
+          "name": "onlyInViewport",
+          "type": "boolean",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "wheel",
+      "type": "boolean | boolean",
+      "default": "false",
+      "description": "Управление колёсиком мыши",
+      "nested": [
+        {
+          "name": "wheel",
+          "type": "boolean | {",
+          "description": ""
+        },
+        {
+          "name": "sensitivity",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "releaseOnEdges",
+          "type": "boolean",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "scrollbar",
+      "type": "boolean | boolean",
+      "default": "false",
+      "description": "Кастомный скроллбар для навигации",
+      "nested": [
+        {
+          "name": "scrollbar",
+          "type": "boolean | {",
+          "description": ""
+        },
+        {
+          "name": "container",
+          "type": "string | HTMLElement",
+          "description": ""
+        },
+        {
+          "name": "hide",
+          "type": "boolean",
+          "description": ""
+        },
+        {
+          "name": "hideDelay",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "scrollbarClass",
+          "type": "string",
+          "description": ""
+        },
+        {
+          "name": "trackClass",
+          "type": "string",
+          "description": ""
+        },
+        {
+          "name": "thumbClass",
+          "type": "string",
+          "description": ""
+        },
+        {
+          "name": "draggable",
+          "type": "boolean",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "breakpoints",
+      "type": "boolean | object",
+      "default": "undefined",
+      "description": "Адаптивные настройки по breakpoints. Ключ - ширина экрана в пикселях"
+    },
+    {
+      "name": "breakpointsBase",
+      "type": "'window' | 'container'",
+      "default": "'window'",
+      "description": "База для расчёта breakpoints"
+    },
+    {
+      "name": "enabled",
+      "type": "boolean",
+      "default": "true",
+      "description": "Включить/выключить слайдер. При false слайдер не инициализируется (статичный контент)"
+    },
+    {
+      "name": "on",
+      "type": "object",
+      "default": "undefined",
+      "description": "Обработчики событий слайдера",
+      "nested": [
+        {
+          "name": "on",
+          "type": "{",
+          "description": ""
+        },
+        {
+          "name": "created",
+          "type": "(tvist: Tvist) => void",
+          "description": ""
+        },
+        {
+          "name": "beforeDestroy",
+          "type": "(tvist: Tvist) => void",
+          "description": ""
+        },
+        {
+          "name": "destroyed",
+          "type": "(tvist: Tvist) => void",
+          "description": ""
+        },
+        {
+          "name": "click",
+          "type": "(index: number, slide: HTMLElement, event: MouseEvent) => void",
+          "description": ""
+        },
+        {
+          "name": "refresh",
+          "type": "() => void",
+          "description": ""
+        },
+        {
+          "name": "resized",
+          "type": "() => void",
+          "description": ""
+        },
+        {
+          "name": "beforeSlideChange",
+          "type": "(index: number) => void",
+          "description": ""
+        },
+        {
+          "name": "slideChangeStart",
+          "type": "(index: number) => void",
+          "description": ""
+        },
+        {
+          "name": "slideChangeEnd",
+          "type": "(index: number) => void",
+          "description": ""
+        },
+        {
+          "name": "beforeTransitionStart",
+          "type": "(data: { index: number",
+          "description": ""
+        },
+        {
+          "name": "transitionStart",
+          "type": "(index: number) => void",
+          "description": ""
+        },
+        {
+          "name": "transitionEnd",
+          "type": "(index: number) => void",
+          "description": ""
+        },
+        {
+          "name": "visible",
+          "type": "(slide: HTMLElement, index: number) => void",
+          "description": ""
+        },
+        {
+          "name": "hidden",
+          "type": "(slide: HTMLElement, index: number) => void",
+          "description": ""
+        },
+        {
+          "name": "scroll",
+          "type": "() => void",
+          "description": ""
+        },
+        {
+          "name": "progress",
+          "type": "(progress: number) => void",
+          "description": ""
+        },
+        {
+          "name": "reachBeginning",
+          "type": "() => void",
+          "description": ""
+        },
+        {
+          "name": "reachEnd",
+          "type": "() => void",
+          "description": ""
+        },
+        {
+          "name": "dragStart",
+          "type": "() => void",
+          "description": ""
+        },
+        {
+          "name": "drag",
+          "type": "() => void",
+          "description": ""
+        },
+        {
+          "name": "dragEnd",
+          "type": "() => void",
+          "description": ""
+        },
+        {
+          "name": "breakpoint",
+          "type": "(breakpoint: number | null) => void",
+          "description": ""
+        },
+        {
+          "name": "lock",
+          "type": "() => void",
+          "description": ""
+        },
+        {
+          "name": "unlock",
+          "type": "() => void",
+          "description": ""
+        },
+        {
+          "name": "optionsUpdated",
+          "type": "(tvist: Tvist, newOptions: Partial<TvistOptions>) => void",
+          "description": ""
+        },
+        {
+          "name": "videoReady",
+          "type": "(data: VideoEvent) => void",
+          "description": ""
+        },
+        {
+          "name": "videoPlay",
+          "type": "(data: VideoEvent) => void",
+          "description": ""
+        },
+        {
+          "name": "videoPause",
+          "type": "(data: VideoEvent) => void",
+          "description": ""
+        },
+        {
+          "name": "videoEnded",
+          "type": "(data: VideoEvent) => void",
+          "description": ""
+        },
+        {
+          "name": "videoProgress",
+          "type": "(data: VideoProgressEvent) => void",
+          "description": ""
+        },
+        {
+          "name": "autoplayProgress",
+          "type": "(data: { progress: number",
+          "description": ""
+        },
+        {
+          "name": "sliderVisible",
+          "type": "() => void",
+          "description": ""
+        },
+        {
+          "name": "sliderHidden",
+          "type": "() => void",
+          "description": ""
+        }
+      ]
     }
   ]
 }

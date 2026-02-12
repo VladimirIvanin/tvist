@@ -89,6 +89,25 @@ function isObjectType(type: string): boolean {
 }
 
 /**
+ * Пропускает до строки с последней закрывающей скобкой типа (для union с несколькими объектами)
+ */
+function skipToEndOfType(lines: string[], startIndex: number): number {
+  let depth = 0
+  for (let idx = startIndex; idx < lines.length; idx++) {
+    const line = lines[idx]
+    const openBraces = (line.match(/\{/g) || []).length
+    const closeBraces = (line.match(/\}/g) || []).length
+    depth += openBraces - closeBraces
+    if (depth === 0) {
+      const nextLine = lines[idx + 1]?.trim() ?? ''
+      if (nextLine.includes('|') && nextLine.includes('{')) continue
+      return idx
+    }
+  }
+  return startIndex
+}
+
+/**
  * Парсит вложенные свойства объекта
  */
 function parseNestedProperties(lines: string[], startIndex: number): { nested: NestedOption[], endIndex: number } {
@@ -165,21 +184,20 @@ function parseTypesFile(filePath: string): OptionsMeta {
     const line = lines[i]
     const trimmedLine = line.trim()
     
-    // Определяем начало TvistOptions
+    // Определяем начало TvistOptions (открывающая скобка интерфейса на той же строке)
     if (trimmedLine.includes('export interface TvistOptions')) {
       insideInterface = true
-      interfaceDepth = 0
+      interfaceDepth = 1
       continue
     }
     
     if (!insideInterface) continue
     
-    // Отслеживаем вложенность
-    if (trimmedLine.includes('{')) interfaceDepth++
-    if (trimmedLine.includes('}')) {
-      interfaceDepth--
-      if (interfaceDepth === 0) break
-    }
+    // Отслеживаем вложенность: считаем все { и } в строке (для многострочных типов вроде peek)
+    const openBraces = (trimmedLine.match(/\{/g) || []).length
+    const closeBraces = (trimmedLine.match(/\}/g) || []).length
+    interfaceDepth += openBraces - closeBraces
+    if (interfaceDepth === 0) break
     
     // Игнорируем комментарии-разделители
     if (trimmedLine.startsWith('//')) {
@@ -219,7 +237,8 @@ function parseTypesFile(filePath: string): OptionsMeta {
         
         const parseResult = parseNestedProperties(lines, objStart)
         nested = parseResult.nested.length > 0 ? parseResult.nested : undefined
-        i = parseResult.endIndex
+        // Пропускаем до конца всего типа (для union с несколькими объектами, напр. peek)
+        i = skipToEndOfType(lines, objStart)
         
         // Упрощаем тип для объектов
         if (type.includes('|')) {

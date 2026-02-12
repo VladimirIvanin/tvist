@@ -6,70 +6,71 @@
 
 ## Группировка опций
 
+Таблица выше содержит все опции; ниже они сгруппированы по смыслу.
+
 ### Базовые настройки
 
-Основные параметры, определяющие поведение слайдера:
-
-- `perPage` - количество видимых слайдов
-- `slidesPerGroup` - количество слайдов, пролистываемых за раз (next/prev)
-- `slideMinSize` - минимальный размер слайда для авто-расчёта
-- `center` - центрирование активного слайда
-- `autoWidth` - ширина слайдов по содержимому (горизонтальный слайдер)
-- `autoHeight` - высота слайдов по содержимому (вертикальный слайдер)
-- `gap` - расстояние между слайдами
-- `peek` - отступы, показывающие часть соседних слайдов (left/right или top/bottom)
-- `speed` - скорость анимации
-- `direction` - направление прокрутки
-- `start` - начальный слайд
-- `debug` - режим отладки (предупреждения в консоль только при `debug: true`)
+- `perPage` — количество видимых слайдов
+- `slidesPerGroup` — количество слайдов, пролистываемых за раз (next/prev)
+- `slideMinSize` — минимальный размер слайда для авто-расчёта perPage
+- `center` — центрирование активного слайда
+- `autoWidth` — ширина слайдов по содержимому (горизонтальный слайдер)
+- `autoHeight` — высота слайдов по содержимому (вертикальный слайдер)
+- `gap` — расстояние между слайдами
+- `peek` — отступы, показывающие часть соседних слайдов (число, строка или объект `left`/`right` / `top`/`bottom`)
+- `peekTrim` — прижатие концовки к краю при peek (по умолчанию `true`; при loop не применяется)
+- `speed` — скорость анимации (мс)
+- `direction` — направление прокрутки (`horizontal` | `vertical`)
+- `start` — индекс начального слайда
+- `debug` — режим отладки (предупреждения в консоль только при `debug: true`)
 
 ### Управление перетаскиванием
 
-Настройки drag-функциональности:
-
-- `drag` - включение/отключение перетаскивания (`true` | `false` | `'free'`)
-- `dragSpeed` - скорость перетаскивания
-- `rubberband` - эффект резинки на краях
-- `freeSnap` - snap к слайдам в free режиме (только для `drag: 'free'`)
-- `focusableElements` - элементы с сохранением фокуса
+- `drag` — включение/отключение перетаскивания (`true` | `false` | `'free'`)
+- `dragSpeed` — множитель скорости перетаскивания
+- `rubberband` — эффект резинки на краях
+- `freeSnap` — snap к слайдам в режиме `drag: 'free'`
+- `flickPower` — сила инерции (множитель для momentum scroll)
+- `flickMaxPages` — максимум страниц за один flick
+- `focusableElements` — CSS-селектор элементов, сохраняющих фокус при перетаскивании
+- `preventClicks` — блокировать клики по слайдам во время перетаскивания
+- `preventClicksPropagation` — не всплывать клику во время анимации
 
 ### Навигация
 
-Элементы управления навигацией:
+- `arrows` — стрелки (true или объект с `prev`, `next`, `disabledClass`, `hiddenClass`, `addIcons`, `hideWhenSinglePage`; селекторы/элементы могут быть **вне root**, см. [Примеры навигации](/examples/navigation))
+- `pagination` — пагинация (true или объект с `container`, `type`, `clickable`, `bulletClass`, `bulletActiveClass`, `renderBullet` / `renderFraction` / `renderCustom`, `hideWhenSinglePage`, `limit`, `strategy`, `remainderStrategy`; `container` может быть **вне root**)
+- `keyboard` — управление с клавиатуры (true или объект с `enabled`, `onlyInViewport`)
+- `wheel` — управление колёсиком мыши (true или объект с `sensitivity`, `releaseOnEdges`)
+- `scrollbar` — кастомный скроллбар (true или объект с `container`, `hide`, `hideDelay`, `scrollbarClass`, `trackClass`, `thumbClass`, `draggable`)
 
-- `arrows` - навигационные стрелки (`prev` / `next` — селекторы или элементы; могут быть **вне root**, см. [Примеры навигации](/examples/navigation))
-- `pagination` - пагинация (буллеты, дроби и т.д.; `container` может быть **вне root**)
-- `keyboard` - управление с клавиатуры
-- `wheel` - управление колёсиком мыши
+### Автоматизация и медиа
 
-### Автоматизация
-
-Автоматическое поведение слайдера:
-
-- `autoplay` - автоматическая прокрутка (число, `true` или объект с `delay`, `pauseOnHover`, `pauseOnInteraction`, `disableOnInteraction`, `waitForVideo`)
+- `autoplay` — автопрокрутка (`false` | `true` | число мс или объект с `delay`, `pauseOnHover`, `pauseOnInteraction`, `disableOnInteraction`, `waitForVideo`)
+- `video` — управление видео в слайдах (`false` | `true` или объект с `autoplay`, `muted`, `loop`, `playsinline`, `pauseOnLeave`, `resetOnLeave`)
+- `visibility` — учёт видимости слайдера в viewport для паузы autoplay/marquee (`true` по умолчанию или объект с `pauseAutoplay`, `pauseMarquee`, `threshold`)
 
 ### Режимы отображения
 
-Специальные режимы работы:
-
-- `autoWidth` / `autoHeight` - размер слайдов по содержимому
-- `loop` - бесконечная прокрутка
-- `effect` - эффекты переходов
-- `fadeEffect` - настройки fade эффекта
-- `cubeEffect` - настройки cube эффекта
-- `virtual` - виртуальные слайды
+- `autoWidth` / `autoHeight` — размер слайдов по содержимому
+- `loop` — бесконечная прокрутка (`true` | `false` | `'auto'`)
+- `rewind` — возврат к первому слайду после последнего (без loop)
+- `effect` — эффект перехода (`slide` | `fade` | `cube` | `card`)
+- `fadeEffect` — настройки fade (например `crossFade`)
+- `cubeEffect` — настройки cube (`slideShadows`, `shadow`, `shadowOffset`, `shadowScale`, `perspective`, `perspectiveOriginY`, `viewportPadding`)
+- `virtual` — виртуальные слайды (объект с `addSlidesBefore`, `addSlidesAfter`, `renderSlide`)
+- `grid` — сетка (объект с `rows`, `cols`, `gap`, `dimensions`)
+- `marquee` — бегущая строка (`true` | объект с `speed`, `direction`, `pauseOnHover`)
 
 ### Дополнительно
 
-Прочие настройки:
-
-- `enabled` - включение/отключение слайдера
-- `lazy` - ленивая загрузка изображений
-- `thumbs` - связь с миниатюрами
-- `isNavigation` - режим навигации
-- `breakpoints` - адаптивные настройки
-- `breakpointsBase` - база для breakpoints
-- `on` - обработчики событий
+- `enabled` — включение/отключение слайдера (при `false` — статичный контент)
+- `lazy` — ленивая загрузка изображений (true или объект с `preloadPrevNext`)
+- `thumbs` — связь с слайдером-миниатюрами (`{ slider: Tvist }`)
+- `isNavigation` — режим навигации (клики по слайдам переключают слайд)
+- `breakpoints` — адаптивные настройки (ключ — ширина в px, в т.ч. `enabled` внутри брейкпоинта)
+- `breakpointsBase` — база для расчёта breakpoints (`'window'` | `'container'`)
+- `on` — объект с обработчиками событий (см. [События](/api/events))
 
 ## Примеры использования
 
