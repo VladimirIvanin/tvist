@@ -449,7 +449,7 @@ export class LoopModule extends Module {
     if (realIndexAttr) {
       const parsed = parseInt(realIndexAttr, 10)
       if (LOOP_DEBUG) {
-        console.log('[Loop] getRealIndex', { activeIndex, attr: realIndexAttr, parsed })
+        console.warn('[Loop] getRealIndex', { activeIndex, attr: realIndexAttr, parsed })
       }
       return parsed
     }

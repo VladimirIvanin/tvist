@@ -10,6 +10,7 @@ import { getElement, children } from '../utils/dom'
 import { TVIST_CLASSES } from './constants'
 import type { TvistOptions, AutoplayModuleAPI, VideoModuleAPI } from './types'
 import type { Module, ModuleConstructor } from '../modules/Module'
+import { BreakpointsModule } from '../modules/breakpoints/BreakpointsModule'
 import { throttle } from './Animator'
 import { applyInitialBreakpoint } from '../utils/breakpoints'
 
@@ -110,7 +111,7 @@ export class Tvist {
     // Это нужно для BreakpointsModule чтобы восстанавливать базовые опции
     if (this.options.breakpoints && Object.keys(this.options.breakpoints).length > 0) {
       // Deep clone оригинальных опций
-      const cloned = JSON.parse(JSON.stringify(this.options))
+      const cloned = JSON.parse(JSON.stringify(this.options)) as TvistOptions
       // Убеждаемся что breakpointsBase сохранен
       if (this.options.breakpointsBase) {
         cloned.breakpointsBase = this.options.breakpointsBase
@@ -319,7 +320,7 @@ export class Tvist {
       // Если есть _originalOptions, восстанавливаем базовые опции
       if (this._originalOptions) {
         // Восстанавливаем базовые опции (без breakpoints)
-        const baseOptions = JSON.parse(JSON.stringify(this._originalOptions))
+        const baseOptions = JSON.parse(JSON.stringify(this._originalOptions)) as TvistOptions
         delete baseOptions.breakpoints
         delete baseOptions.on
         
@@ -336,7 +337,7 @@ export class Tvist {
       Object.assign(this.options, newOptions)
       
       // Обновляем _originalOptions
-      const cloned = JSON.parse(JSON.stringify(this.options))
+      const cloned = JSON.parse(JSON.stringify(this.options)) as TvistOptions
       if (this.options.breakpointsBase) {
         cloned.breakpointsBase = this.options.breakpointsBase
       }
@@ -344,8 +345,8 @@ export class Tvist {
 
       // Сбрасываем текущий breakpoint в BreakpointsModule чтобы он пересчитался
       const breakpointsModule = this.modules.get('breakpoints')
-      if (breakpointsModule) {
-        ;(breakpointsModule as any).currentBreakpoint = null
+      if (breakpointsModule instanceof BreakpointsModule) {
+        breakpointsModule.resetCurrentBreakpoint()
       }
     } else {
       // Обычный merge для остальных опций

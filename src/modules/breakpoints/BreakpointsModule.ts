@@ -33,6 +33,12 @@ export class BreakpointsModule extends Module {
     return this.tvist._originalOptions ?? { ...this.options }
   }
 
+  /**
+   * Сбросить текущий breakpoint (для пересчёта при updateOptions).
+   */
+  resetCurrentBreakpoint(): void {
+    this.currentBreakpoint = null
+  }
 
   override init(): void {
     if (!this.shouldBeActive()) return
@@ -136,7 +142,7 @@ export class BreakpointsModule extends Module {
     const originalOptions = this.getOriginalOptions()
     
     // Начинаем с оригинальных опций (deep clone)
-    const newOptions: TvistOptions = JSON.parse(JSON.stringify(originalOptions))
+    const newOptions = JSON.parse(JSON.stringify(originalOptions)) as TvistOptions
 
     // Если есть breakpoint - мёрджим его опции
     if (bp !== null && originalOptions.breakpoints?.[bp]) {
