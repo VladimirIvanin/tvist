@@ -4,6 +4,17 @@
     description="Container-first: размеры и perPage считаются от контейнера слайдера. Breakpoints и slideMinSize подстраивают количество слайдов под ширину контейнера (или окна — по умолчанию)."
   >
     <div class="demo-wrapper">
+      <!-- Пояснение логики breakpoints -->
+      <div class="demo-section breakpoints-logic">
+        <h3>Как работают breakpoints</h3>
+        <p class="description logic-description">
+          Логика — <strong>desktop first</strong>, по аналогии с <code>max-width</code> в CSS.
+          Базовые опции (perPage, gap и т.д.) задают поведение на самом широком экране.
+          В объекте <code>breakpoints</code> ключ — это ширина в пикселях, значение — опции, которые применяются, <strong>когда ширина окна (или контейнера) не больше этой величины</strong>.
+          Например: <code>1200: { perPage: 3 }</code> значит «при ширине ≤ 1200px показывать по 3 слайда»; <code>768: { perPage: 1 }</code> — «при ширине ≤ 768px по одному». То есть как в медиа-запросе <code>@media (max-width: 1200px)</code>.
+        </p>
+      </div>
+
       <!-- Breakpoints Example -->
       <div class="demo-section">
         <h3>С использованием breakpoints (по умолчанию — по окну)</h3>
@@ -466,6 +477,22 @@ onUnmounted(() => {
 .description strong {
   color: #667eea;
   font-weight: 600;
+}
+
+.breakpoints-logic {
+  padding: 16px;
+  background: #f0f4ff;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.breakpoints-logic .description code {
+  padding: 2px 6px;
+  font-size: 13px;
+  color: #1e3a5f;
+  background: rgba(102, 126, 234, 0.22);
+  border-radius: 4px;
+  font-weight: 500;
 }
 
 .tvist-v1 {
