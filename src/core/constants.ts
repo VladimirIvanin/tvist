@@ -29,6 +29,8 @@ export const TVIST_CLASSES = {
   draggable: `${P}--draggable`,
   dragging: `${P}--dragging`,
   locked: `${P}--locked`,
+  created: `${P}--created`,
+  destroyed: `${P}--destroyed`,
   singlePage: `${P}--single-page`,
   nav: `${P}--nav`,
   cube: `${P}--cube`,

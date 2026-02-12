@@ -22,6 +22,8 @@ import LockExample from '../.vitepress/theme/examples/LockExample.vue'
 | Заблокирован | `tvist-v1--locked` | `lock`    | Стрелки disabled, drag не стартует |
 | Разблокирован | —                 | `unlock`  | Работают как обычно   |
 
+Полный список классов состояний на root (`--created`, `--destroyed`, `--locked`) см. в [Свойства → root](/api/properties#root).
+
 ## Проверка состояния
 
 - **Свойство**: `slider.engine.isLocked` — `true` / `false`.

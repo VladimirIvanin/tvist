@@ -145,7 +145,7 @@ slider.once('slideChangeStart', (index) => {
 created: (tvist: Tvist) => void
 ```
 
-Вызывается после создания и инициализации слайдера.
+Вызывается после создания и инициализации слайдера. К этому моменту на `root` уже добавлен класс `Tvist.CLASSES.created` (например, `tvist-v1--created`). См. [Классы состояний на root](/api/properties#root).
 
 **Параметры:**
 - `tvist` - экземпляр слайдера
@@ -172,7 +172,7 @@ const slider = new Tvist('.slider', {
 beforeDestroy: (tvist: Tvist) => void
 ```
 
-Вызывается перед уничтожением (до очистки модулей и DOM).
+Вызывается перед уничтожением (до очистки модулей и DOM). Класс `Tvist.CLASSES.destroyed` на `root` добавляется сразу после этого события.
 
 ### destroyed
 
@@ -180,7 +180,7 @@ beforeDestroy: (tvist: Tvist) => void
 destroyed: (tvist: Tvist) => void
 ```
 
-Вызывается при уничтожении слайдера.
+Вызывается при уничтожении слайдера. На `root` к этому моменту уже висит класс `Tvist.CLASSES.destroyed` (`tvist-v1--destroyed`). См. [Классы состояний на root](/api/properties#root).
 
 **Параметры:**
 - `tvist` — экземпляр слайдера
@@ -500,7 +500,7 @@ slider.on('breakpoint', (breakpoint) => {
 lock: () => void
 ```
 
-Вызывается при блокировке слайдера (когда весь контент помещается в контейнер и прокрутка не нужна).
+Вызывается при блокировке слайдера (когда весь контент помещается в контейнер и прокрутка не нужна). На `root` при этом уже висит класс `Tvist.CLASSES.locked` (например, `tvist-v1--locked`). Подробнее см. [Свойства → root, классы состояний](/api/properties#root).
 
 **Примеры:**
 
@@ -511,8 +511,8 @@ slider.on('lock', () => {
   // Скрыть навигационные элементы
   document.querySelector('.slider-nav').style.display = 'none'
   
-  // Добавить класс
-  slider.root.classList.add('is-locked')
+  // Класс tvist-v1--locked уже добавлен на root; при необходимости можно добавить свой
+  slider.root.classList.add('my-locked-state')
 })
 ```
 
@@ -522,7 +522,7 @@ slider.on('lock', () => {
 unlock: () => void
 ```
 
-Вызывается при разблокировке слайдера.
+Вызывается при разблокировке слайдера. Класс `Tvist.CLASSES.locked` с `root` при этом снимается автоматически.
 
 **Примеры:**
 
@@ -533,8 +533,8 @@ slider.on('unlock', () => {
   // Показать навигационные элементы
   document.querySelector('.slider-nav').style.display = ''
   
-  // Убрать класс
-  slider.root.classList.remove('is-locked')
+  // Убрать свой класс (tvist-v1--locked снимается библиотекой)
+  slider.root.classList.remove('my-locked-state')
 })
 ```
 

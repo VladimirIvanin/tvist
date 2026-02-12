@@ -176,6 +176,7 @@ export class Tvist {
       this.clearSliderStyles()
     }
 
+    this.root.classList.add(TVIST_CLASSES.created)
     this.emit('created', this)
     this.setupSlideClick()
   }
@@ -559,6 +560,7 @@ export class Tvist {
    */
   destroy(): this {
     this.emit('beforeDestroy', this)
+    this.root.classList.add(TVIST_CLASSES.destroyed)
     this.container.removeEventListener('click', this.slideClickHandler)
     this.emit('destroyed', this)
 
