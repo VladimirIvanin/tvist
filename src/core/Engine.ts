@@ -681,6 +681,17 @@ export class Engine {
     this.calculateSizes()
     this.calculatePositions()
     
+    // Обновляем Counter.endIndex после изменения perPage
+    const slideCount = this.tvist.slides.length
+    const perPage = this.options.perPage ?? 1
+    const isLoop = this.options.loop === true
+    const counterEndIndex = (isLoop || this.options.isNavigation || this.options.center)
+      ? slideCount - 1 
+      : Math.max(0, slideCount - perPage)
+    
+    this.index.endIndex = counterEndIndex
+    this.index.max = slideCount
+    
     // Проверяем блокировку после обновления (важно для resize)
     this.checkLock()
 

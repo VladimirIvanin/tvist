@@ -312,9 +312,45 @@ export class Tvist {
    * @param newOptions - новые опции для применения
    */
   updateOptions(newOptions: Partial<TvistOptions>): this {
-    // Мёрджим новые опции с текущими
     const oldOptions = { ...this.options }
-    Object.assign(this.options, newOptions)
+    
+    // Обработка изменения breakpoints
+    if (newOptions.breakpoints !== undefined || newOptions.breakpointsBase !== undefined) {
+      // Если есть _originalOptions, восстанавливаем базовые опции
+      if (this._originalOptions) {
+        // Восстанавливаем базовые опции (без breakpoints)
+        const baseOptions = JSON.parse(JSON.stringify(this._originalOptions))
+        delete baseOptions.breakpoints
+        delete baseOptions.on
+        
+        // Применяем базовые опции
+        Object.keys(this.options).forEach(key => {
+          if (key !== 'breakpoints' && key !== 'on') {
+            delete (this.options as Record<string, unknown>)[key]
+          }
+        })
+        Object.assign(this.options, baseOptions)
+      }
+      
+      // Применяем новые опции
+      Object.assign(this.options, newOptions)
+      
+      // Обновляем _originalOptions
+      const cloned = JSON.parse(JSON.stringify(this.options))
+      if (this.options.breakpointsBase) {
+        cloned.breakpointsBase = this.options.breakpointsBase
+      }
+      ;(this as { _originalOptions?: TvistOptions })._originalOptions = cloned
+
+      // Сбрасываем текущий breakpoint в BreakpointsModule чтобы он пересчитался
+      const breakpointsModule = this.modules.get('breakpoints')
+      if (breakpointsModule) {
+        ;(breakpointsModule as any).currentBreakpoint = null
+      }
+    } else {
+      // Обычный merge для остальных опций
+      Object.assign(this.options, newOptions)
+    }
 
     // Обработка изменения direction
     if (newOptions.direction !== undefined && newOptions.direction !== oldOptions.direction) {
@@ -357,7 +393,9 @@ export class Tvist {
       newOptions.peek !== undefined ||
       newOptions.peekTrim !== undefined ||
       newOptions.direction !== undefined ||
-      newOptions.center !== undefined
+      newOptions.center !== undefined ||
+      newOptions.breakpoints !== undefined ||
+      newOptions.breakpointsBase !== undefined
 
     if (needsRecalculation) {
       this.update()

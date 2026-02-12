@@ -18,17 +18,19 @@ export class BreakpointsModule extends Module {
 
   private mediaQueries = new Map<number, MediaQueryList>()
   private currentBreakpoint: number | null = null
-  private originalOptions: TvistOptions
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
     
-    // Используем сохраненные оригинальные опции из Tvist (до применения breakpoint)
-    // Если их нет - значит breakpoints не использовались
-    this.originalOptions = tvist._originalOptions ?? { ...options }
-    
     // Сохраняем текущий breakpoint чтобы не применять его повторно при init
     this.currentBreakpoint = findMatchingBreakpoint(tvist.root, options)
+  }
+  
+  /**
+   * Получить оригинальные опции (до применения breakpoint)
+   */
+  private getOriginalOptions(): TvistOptions {
+    return this.tvist._originalOptions ?? { ...this.options }
   }
 
 
@@ -72,8 +74,11 @@ export class BreakpointsModule extends Module {
       return
     }
 
+    const originalOptions = this.getOriginalOptions()
+    if (!originalOptions.breakpoints) return
+
     // Сортируем breakpoints от большего к меньшему
-    const breakpoints = Object.keys(this.options.breakpoints)
+    const breakpoints = Object.keys(originalOptions.breakpoints)
       .map(Number)
       .sort((a, b) => b - a)
 
@@ -98,10 +103,12 @@ export class BreakpointsModule extends Module {
    * Проверка текущего breakpoint
    */
   private checkBreakpoints(): void {
+    const originalOptions = this.getOriginalOptions()
+    
     // Создаем временный объект опций с breakpointsBase для findMatchingBreakpoint
     const optionsForCheck: TvistOptions = {
-      ...this.originalOptions,
-      breakpointsBase: this.originalOptions.breakpointsBase
+      ...originalOptions,
+      breakpointsBase: originalOptions.breakpointsBase
     }
     
     const newBreakpoint = findMatchingBreakpoint(this.tvist.root, optionsForCheck)
@@ -116,8 +123,8 @@ export class BreakpointsModule extends Module {
       this.emit('breakpoint', newBreakpoint)
 
       // Вызываем callback из опций
-      if (this.originalOptions.on?.breakpoint) {
-        this.originalOptions.on.breakpoint(newBreakpoint)
+      if (originalOptions.on?.breakpoint) {
+        originalOptions.on.breakpoint(newBreakpoint)
       }
     }
   }
@@ -126,12 +133,14 @@ export class BreakpointsModule extends Module {
    * Применение опций breakpoint
    */
   private applyBreakpoint(bp: number | null): void {
+    const originalOptions = this.getOriginalOptions()
+    
     // Начинаем с оригинальных опций (deep clone)
-    const newOptions: TvistOptions = JSON.parse(JSON.stringify(this.originalOptions))
+    const newOptions: TvistOptions = JSON.parse(JSON.stringify(originalOptions))
 
     // Если есть breakpoint - мёрджим его опции
-    if (bp !== null && this.originalOptions.breakpoints?.[bp]) {
-      mergeBreakpointOptions(newOptions, this.originalOptions.breakpoints[bp])
+    if (bp !== null && originalOptions.breakpoints?.[bp]) {
+      mergeBreakpointOptions(newOptions, originalOptions.breakpoints[bp])
     }
 
     // Проверяем enabled флаг
