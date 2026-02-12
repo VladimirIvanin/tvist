@@ -17,6 +17,10 @@ export class SlideStatesModule extends Module {
   private readonly CLASS_NEXT = TVIST_CLASSES.slideNext
   private readonly CLASS_VISIBLE = TVIST_CLASSES.slideVisible
 
+  // RAF батчинг для updateVisibleClasses
+  private visibilityUpdateScheduled = false
+  private visibilityRafId: number | null = null
+
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
   }
@@ -28,11 +32,27 @@ export class SlideStatesModule extends Module {
     // Слушаем события изменения слайдов
     this.tvist.on('slideChangeStart', () => this.updateClasses())
     this.tvist.on('slideChangeEnd', () => this.updateClasses())
-    this.tvist.on('scroll', () => this.updateVisibleClasses())
+    // Используем throttled версию для scroll событий (RAF батчинг)
+    this.tvist.on('scroll', () => this.scheduleVisibilityUpdate())
   }
 
   override onUpdate(): void {
     this.updateClasses()
+  }
+
+
+  /**
+   * Запланировать обновление видимости через RAF (батчинг)
+   * Гарантирует максимум один вызов updateVisibleClasses на кадр
+   */
+  private scheduleVisibilityUpdate(): void {
+    if (this.visibilityUpdateScheduled) return
+
+    this.visibilityUpdateScheduled = true
+    this.visibilityRafId = requestAnimationFrame(() => {
+      this.visibilityUpdateScheduled = false
+      this.updateVisibleClasses()
+    })
   }
 
   /**
@@ -40,7 +60,8 @@ export class SlideStatesModule extends Module {
    */
   private updateClasses(): void {
     this.updateActiveClasses()
-    this.updateVisibleClasses()
+    // Вместо прямого вызова используем throttled версию
+    this.scheduleVisibilityUpdate()
   }
 
   /**
@@ -120,6 +141,9 @@ export class SlideStatesModule extends Module {
   /**
    * Обновление классов видимости слайдов
    * Проверяет, находится ли слайд (полностью или частично) в видимой области
+   * 
+   * Оптимизация: вызывается через scheduleVisibilityUpdate с RAF батчингом
+   * для предотвращения layout thrashing (максимум один вызов getBoundingClientRect на кадр)
    */
   private updateVisibleClasses(): void {
     const slides = this.tvist.slides
@@ -191,6 +215,12 @@ export class SlideStatesModule extends Module {
   }
 
   override destroy(): void {
+    // Отменяем запланированное обновление видимости
+    if (this.visibilityRafId !== null) {
+      cancelAnimationFrame(this.visibilityRafId)
+      this.visibilityRafId = null
+    }
+
     // Удаляем все классы состояний
     const slides = this.tvist.slides
     slides.forEach((slide) => {

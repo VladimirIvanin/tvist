@@ -9,6 +9,10 @@
   overflow: hidden;
   width: 100%;
   
+  // Performance: изолируем layout перерасчёты внутри слайдера от остальной страницы
+  // Изменения внутри слайдера не затрагивают layout страницы
+  contain: layout;
+  
   &__container {
     display: flex;
     will-change: transform;
@@ -19,6 +23,10 @@
     
     // GPU acceleration
     transform: translate3d(0, 0, 0);
+    
+    // Performance: изолируем layout и paint для track
+    // Анимация transform не затрагивает layout родителя
+    contain: layout style;
   }
   
   &__slide {
@@ -30,9 +38,13 @@
     list-style-type: none !important;
     margin: 0;
     
-    // Performance optimization: рендерим только видимые слайды
-    //content-visibility: auto;
-    // contain-intrinsic-size: auto 500px;
+    // Performance optimization: изолируем layout для каждого слайда
+    // Изменения внутри слайда не затрагивают соседние слайды
+    contain: layout style;
+    
+    // Для уменьшения CLS при ленивой загрузке изображений
+    // рекомендуется использовать aspect-ratio на самих изображениях:
+    // img { aspect-ratio: 16 / 9; width: 100%; height: auto; }
 
     // Классы состояний слайдов
     // Эти классы применяются модулем SlideStatesModule

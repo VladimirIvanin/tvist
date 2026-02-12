@@ -45,6 +45,9 @@ export class PaginationModule extends Module {
   // Группы слайдов для каждой точки (используется при limit)
   private bulletGroups: BulletGroup[] = []
   
+  // Кэш для progress bar элемента (оптимизация производительности)
+  private progressBarEl: HTMLElement | null = null
+  
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
   }
@@ -123,6 +126,8 @@ export class PaginationModule extends Module {
     }
     this.container = null
     this.bullets = []
+    // Очищаем кэш progress bar
+    this.progressBarEl = null
   }
 
   public override shouldBeActive(): boolean {
@@ -459,6 +464,9 @@ export class PaginationModule extends Module {
   private render(): void {
     if (!this.container) return
 
+    // Сбрасываем кэш при пересоздании разметки
+    this.progressBarEl = null
+
     const type = this.getType()
 
     switch (type) {
@@ -628,6 +636,9 @@ export class PaginationModule extends Module {
         <div class="${TVIST_CLASSES.paginationProgressBar}" style="width: ${progress}%"></div>
       </div>
     `
+
+    // Кэшируем элемент progress bar после создания
+    this.progressBarEl = this.container.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`)
   }
 
   /**
@@ -750,10 +761,13 @@ export class PaginationModule extends Module {
 
   /**
    * Обновление progress bar
+   * Использует кэшированный элемент progressBarEl вместо querySelector
    */
   private updateProgressActive(): void {
-    const progressBar = this.container?.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`)
-    if (progressBar) {
+    // Используем кэшированный элемент вместо querySelector
+    this.progressBarEl ??= this.container?.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`) ?? null
+
+    if (this.progressBarEl) {
       const { slides } = this.tvist
       const perPage = this.options.perPage ?? 1
       const slideCount = slides.length
@@ -763,7 +777,7 @@ export class PaginationModule extends Module {
       const currentPage = this.getCurrentSlideIndex() + 1
       const totalPages = slideCount === 0 ? 0 : endIndex + 1
       const progress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0
-      progressBar.style.width = `${progress}%`
+      this.progressBarEl.style.width = `${progress}%`
     }
   }
 
