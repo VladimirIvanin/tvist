@@ -70,6 +70,7 @@ export class PaginationModule extends Module {
 
     this.render()
     this.updateActive()
+    this.updateVisibility()
     this.emit('pagination:mounted')
 
     // Обновляем при изменении слайда СИНХРОННО (slideChangeStart эмитится ДО анимации),
@@ -122,6 +123,28 @@ export class PaginationModule extends Module {
   protected override shouldBeActive(): boolean {
     const { pagination } = this.options
     return !!pagination
+  }
+
+  /**
+   * Вычисляет количество страниц с учетом perPage и slidesPerGroup
+   */
+  private calculatePageCount(): number {
+    const { slides } = this.tvist
+    const perPage = this.options.perPage ?? 1
+    const slidesPerGroup = this.options.slidesPerGroup ?? 1
+    const slideCount = slides.length
+    const isLoop = this.options.loop === true
+
+    if (slideCount === 0) return 0
+
+    // В loop режиме можно листать по всем слайдам
+    if (isLoop) {
+      return Math.ceil(slideCount / slidesPerGroup)
+    }
+
+    // Без loop: вычисляем количество возможных позиций
+    const endIndex = Math.max(0, slideCount - perPage)
+    return Math.ceil((endIndex + 1) / slidesPerGroup)
   }
 
   /**
@@ -620,6 +643,34 @@ export class PaginationModule extends Module {
   }
 
   /**
+   * Обновление видимости пагинации
+   */
+  private updateVisibility(): void {
+    if (!this.container) return
+
+    const pagination = this.options.pagination
+    const hideWhenSinglePage = typeof pagination === 'object' && pagination !== null
+      ? pagination.hideWhenSinglePage ?? true
+      : true
+
+    // Проверяем условия для скрытия
+    const pageCount = this.calculatePageCount()
+    
+    // Скрываем если:
+    // 1. Слайдер заблокирован И hideWhenSinglePage включен
+    // 2. Всего одна страница И hideWhenSinglePage включен
+    const shouldHide = hideWhenSinglePage && (this.tvist.engine.isLocked || pageCount <= 1)
+
+    if (shouldHide) {
+      this.container.classList.add(TVIST_CLASSES.paginationHidden)
+      this.container.setAttribute('aria-hidden', 'true')
+    } else {
+      this.container.classList.remove(TVIST_CLASSES.paginationHidden)
+      this.container.setAttribute('aria-hidden', 'false')
+    }
+  }
+
+  /**
    * Обновление активного элемента
    */
   private updateActive(): void {
@@ -634,6 +685,8 @@ export class PaginationModule extends Module {
       type: this.getType()
     })
 
+    // Обновляем видимость
+    this.updateVisibility()
 
     const type = this.getType()
 

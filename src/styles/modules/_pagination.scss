@@ -16,6 +16,11 @@
   justify-content: center;
   gap: var(--#{$tvist-block}-pagination-gap, 8px);
 
+  // Hidden состояние (БЭМ модификатор)
+  &--hidden {
+    display: none !important;
+  }
+
   // Bullets
   .#{$tvist-block}__bullet {
     width: var(--#{$tvist-block}-bullet-size, 8px);

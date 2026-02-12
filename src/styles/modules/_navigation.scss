@@ -35,17 +35,17 @@
     opacity: 0.6;
   }
 
-  // Disabled состояние
+  // Disabled состояние (БЭМ модификатор)
   &:disabled,
-  &.disabled {
+  &--disabled {
     opacity: 0.3;
     cursor: not-allowed;
     pointer-events: none;
   }
 
-  // Hidden состояние
-  &.hidden {
-    display: none;
+  // Hidden состояние (БЭМ модификатор)
+  &--hidden {
+    display: none !important;
   }
 
   // Позиционирование

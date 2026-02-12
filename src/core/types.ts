@@ -316,12 +316,14 @@ export interface TvistOptions {
     prev?: string | HTMLElement
     /** Селектор или элемент для кнопки "вперёд". Может быть вне root */
     next?: string | HTMLElement
-    /** CSS класс для неактивных стрелок */
+    /** CSS класс для неактивных стрелок (по умолчанию БЭМ: tvist-v1__arrow--disabled) */
     disabledClass?: string
-    /** CSS класс для скрытых стрелок */
+    /** CSS класс для скрытых стрелок (по умолчанию БЭМ: tvist-v1__arrow--hidden) */
     hiddenClass?: string
     /** Автоматически добавлять SVG иконки в кнопки навигации. @default true */
     addIcons?: boolean
+    /** Автоматически скрывать стрелки когда всего одна страница (нечего листать). @default true */
+    hideWhenSinglePage?: boolean
   }
   
   // Pagination
@@ -347,6 +349,8 @@ export interface TvistOptions {
     renderFraction?: (current: number, total: number) => string
     /** Функция рендеринга кастомной пагинации */
     renderCustom?: (current: number, total: number) => string
+    /** Автоматически скрывать пагинацию когда всего одна страница (нечего листать). @default true */
+    hideWhenSinglePage?: boolean
     
     // Лимит точек
     /** 

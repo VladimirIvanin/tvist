@@ -224,12 +224,12 @@ describe('NavigationModule', () => {
 
       // Prev должна быть disabled на первом слайде
       expect(prevButton?.hasAttribute('disabled')).toBe(true)
-      expect(prevButton?.classList.contains('disabled')).toBe(true)
+      expect(prevButton?.classList.contains(TVIST_CLASSES.arrowDisabled)).toBe(true)
       expect(prevButton?.getAttribute('aria-disabled')).toBe('true')
 
       // Next должна быть enabled
       expect(nextButton?.hasAttribute('disabled')).toBe(false)
-      expect(nextButton?.classList.contains('disabled')).toBe(false)
+      expect(nextButton?.classList.contains(TVIST_CLASSES.arrowDisabled)).toBe(false)
     })
 
     it('should disable next arrow at end without loop', async () => {
@@ -260,11 +260,11 @@ describe('NavigationModule', () => {
 
       // Prev должна быть enabled
       expect(prevButton?.hasAttribute('disabled')).toBe(false)
-      expect(prevButton?.classList.contains('disabled')).toBe(false)
+      expect(prevButton?.classList.contains(TVIST_CLASSES.arrowDisabled)).toBe(false)
 
       // Next должна быть disabled на последнем слайде
       expect(nextButton?.hasAttribute('disabled')).toBe(true)
-      expect(nextButton?.classList.contains('disabled')).toBe(true)
+      expect(nextButton?.classList.contains(TVIST_CLASSES.arrowDisabled)).toBe(true)
       expect(nextButton?.getAttribute('aria-disabled')).toBe('true')
     })
 
@@ -342,8 +342,8 @@ describe('NavigationModule', () => {
       const nextButton = container.querySelector(`.${TVIST_CLASSES.arrowNext}`)
 
       // Стрелки должны быть скрыты, когда слайдов не больше чем perPage
-      expect(prevButton?.classList.contains('hidden')).toBe(true)
-      expect(nextButton?.classList.contains('hidden')).toBe(true)
+      expect(prevButton?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(true)
+      expect(nextButton?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(true)
     })
   })
 

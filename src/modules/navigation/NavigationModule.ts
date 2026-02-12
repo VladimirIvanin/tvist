@@ -174,6 +174,28 @@ export class NavigationModule extends Module {
   }
 
   /**
+   * Вычисляет количество страниц с учетом perPage и slidesPerGroup
+   */
+  private calculatePageCount(): number {
+    const { slides, options } = this.tvist
+    const perPage = options.perPage ?? 1
+    const slidesPerGroup = options.slidesPerGroup ?? 1
+    const slideCount = slides.length
+    const isLoop = options.loop === true
+
+    if (slideCount === 0) return 0
+
+    // В loop режиме можно листать по всем слайдам
+    if (isLoop) {
+      return Math.ceil(slideCount / slidesPerGroup)
+    }
+
+    // Без loop: вычисляем количество возможных позиций
+    const endIndex = Math.max(0, slideCount - perPage)
+    return Math.ceil((endIndex + 1) / slidesPerGroup)
+  }
+
+  /**
    * Обновление состояния стрелок
    */
   private updateArrowsState(): void {
@@ -182,20 +204,44 @@ export class NavigationModule extends Module {
     const { canScrollPrev, canScrollNext } = this.tvist
     const arrows = this.options.arrows
     const disabledClass = typeof arrows === 'object' && arrows !== null
-      ? arrows.disabledClass ?? 'disabled'
-      : 'disabled'
+      ? arrows.disabledClass ?? TVIST_CLASSES.arrowDisabled
+      : TVIST_CLASSES.arrowDisabled
     const hiddenClass = typeof arrows === 'object' && arrows !== null
-      ? arrows.hiddenClass ?? 'hidden'
-      : 'hidden'
+      ? arrows.hiddenClass ?? TVIST_CLASSES.arrowHidden
+      : TVIST_CLASSES.arrowHidden
+    const hideWhenSinglePage = typeof arrows === 'object' && arrows !== null
+      ? arrows.hideWhenSinglePage ?? true
+      : true
 
-    // Если слайдер заблокирован (контент влезает), отключаем и скрываем стрелки
+    // Если слайдер заблокирован (контент влезает), отключаем стрелки
     if (this.tvist.engine.isLocked) {
       this.disableArrow(this.prevButton, disabledClass)
       this.disableArrow(this.nextButton, disabledClass)
-      this.hideArrow(this.prevButton, hiddenClass)
-      this.hideArrow(this.nextButton, hiddenClass)
+      
+      // Скрываем только если hideWhenSinglePage включен
+      if (hideWhenSinglePage) {
+        this.hideArrow(this.prevButton, hiddenClass)
+        this.hideArrow(this.nextButton, hiddenClass)
+        this.updateRootClass(true)
+      } else {
+        this.showArrow(this.prevButton, hiddenClass)
+        this.showArrow(this.nextButton, hiddenClass)
+        this.updateRootClass(false)
+      }
       return
     }
+
+    // Проверяем количество страниц для hideWhenSinglePage
+    const pageCount = this.calculatePageCount()
+    if (hideWhenSinglePage && pageCount <= 1) {
+      this.hideArrow(this.prevButton, hiddenClass)
+      this.hideArrow(this.nextButton, hiddenClass)
+      this.updateRootClass(true)
+      return
+    }
+
+    // Показываем стрелки (убираем класс single-page)
+    this.updateRootClass(false)
 
     // С loop или rewind всегда можно листать (если не заблокирован)
     if (this.options.loop || this.options.rewind) {
@@ -220,13 +266,16 @@ export class NavigationModule extends Module {
     } else {
       this.disableArrow(this.nextButton, disabledClass)
     }
+  }
 
-    // Скрываем если слайдов мало
-    const { slides, options } = this.tvist
-    const perPage = options.perPage ?? 1
-    if (slides.length <= perPage) {
-      this.hideArrow(this.prevButton, hiddenClass)
-      this.hideArrow(this.nextButton, hiddenClass)
+  /**
+   * Обновление класса single-page на root элементе
+   */
+  private updateRootClass(isSinglePage: boolean): void {
+    if (isSinglePage) {
+      this.tvist.root.classList.add(TVIST_CLASSES.singlePage)
+    } else {
+      this.tvist.root.classList.remove(TVIST_CLASSES.singlePage)
     }
   }
 

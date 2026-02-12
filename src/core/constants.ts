@@ -29,6 +29,7 @@ export const TVIST_CLASSES = {
   draggable: `${P}--draggable`,
   dragging: `${P}--dragging`,
   locked: `${P}--locked`,
+  singlePage: `${P}--single-page`,
   nav: `${P}--nav`,
   cube: `${P}--cube`,
 
@@ -42,8 +43,11 @@ export const TVIST_CLASSES = {
 
   arrowPrev: `${P}__arrow--prev`,
   arrowNext: `${P}__arrow--next`,
+  arrowDisabled: `${P}__arrow--disabled`,
+  arrowHidden: `${P}__arrow--hidden`,
 
   pagination: `${P}__pagination`,
+  paginationHidden: `${P}__pagination--hidden`,
   bullet: `${P}__bullet`,
   bulletActive: `${P}__bullet--active`,
   paginationCurrent: `${P}__pagination-current`,
