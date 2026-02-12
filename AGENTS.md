@@ -42,6 +42,19 @@ npm run typecheck       # Проверка типов
 - Тестовые данные в отдельных файлах
 - Используем Vitest + happy-dom
 
+#### Тестирование window-based брейкпоинтов
+При тестировании функционала, который зависит от `window.innerWidth` (например, breakpoints с `breakpointsBase: 'window'`), используй `window.happyDOM.setViewport()`:
+
+```typescript
+// Изменение viewport в тестах
+window.happyDOM.setViewport({ width: 800, height: 600 })
+
+// Это изменит window.innerWidth и window.innerHeight
+// И триггернет resize события и matchMedia
+```
+
+**Важно:** Простое изменение `window.innerWidth` через `Object.defineProperty` НЕ триггерит события resize и не обновляет matchMedia. Всегда используй `setViewport()`.
+
 ### Стили
 - BEM нотация: `.tvist-v1__element--modifier`
 - SCSS с modern-compiler API
