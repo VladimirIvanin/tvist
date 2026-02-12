@@ -49,34 +49,30 @@ function normalizeVisibility(raw: TvistOptions['visibility']): Required<Visibili
   }
 }
 
+/** Элемент с опциональным checkVisibility (браузерный API, не везде есть) */
+type ElementWithCheckVisibility = Element & {
+  checkVisibility?(options?: { visibilityProperty?: boolean }): boolean
+}
+
 /**
- * Проверяет, виден ли элемент через CSS (display, visibility)
- * Проверяет элемент и всех его родителей до document.body
+ * Проверяет, виден ли элемент через CSS (display, visibility, content-visibility).
+ * Использует Element.checkVisibility() при наличии (см. https://developer.mozilla.org/en-US/docs/Web/API/Element/checkVisibility),
+ * иначе — рекурсивный обход от элемента до document.body.
  */
 function isElementVisibleCSS(element: HTMLElement): boolean {
+  const el = element as ElementWithCheckVisibility
+  if (typeof el.checkVisibility === 'function') {
+    return el.checkVisibility({ visibilityProperty: true })
+  }
+
+  // Fallback: обход элемента и всех родителей до document.body
   let current: HTMLElement | null = element
-  
   while (current && current !== document.body) {
     const style = window.getComputedStyle(current)
-    
-    // Проверяем display: none
-    if (style.display === 'none') {
-      return false
-    }
-    
-    // Проверяем visibility: hidden
-    if (style.visibility === 'hidden') {
-      return false
-    }
-    
-    // Проверяем opacity: 0 (опционально, можно считать видимым)
-    // if (parseFloat(style.opacity) === 0) {
-    //   return false
-    // }
-    
+    if (style.display === 'none') return false
+    if (style.visibility === 'hidden') return false
     current = current.parentElement
   }
-  
   return true
 }
 
