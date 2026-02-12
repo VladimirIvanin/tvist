@@ -36,18 +36,50 @@
 - [`breakpoint`](#breakpoint) — смена breakpoint
 - [`lock`](#lock) — слайдер заблокирован
 - [`unlock`](#unlock) — слайдер разблокирован
+- [`disabled`](#disabled) — слайдер отключён (вызван `disable()`)
+- [`enabled`](#enabled) — слайдер включён (вызван `enable()`)
 
 ### Видимость слайдов
 - [`visible`](#visible) — слайд вошёл в видимую область
 - [`hidden`](#hidden) — слайд вышел из видимой области
 
+### Видимость слайдера (viewport)
+- [`sliderVisible`](#slidervisible) — слайдер вошёл в viewport (модуль visibility)
+- [`sliderHidden`](#sliderhidden) — слайдер вышел из viewport
+
+### Автопрокрутка (модуль autoplay)
+- [`autoplayStart`](#autoplaystart) — автопрокрутка запущена
+- [`autoplayStop`](#autoplaystop) — автопрокрутка остановлена
+- [`autoplayPause`](#autoplaypause) — автопрокрутка на паузе
+- [`autoplayResume`](#autoplayresume) — автопрокрутка возобновлена
+- [`autoplayProgress`](#autoplayprogress) — прогресс автопрокрутки 0..1
+
+### Бескрутящаяся лента (модуль marquee)
+- [`marqueeStart`](#marqueestart) — marquee запущен
+- [`marqueeStop`](#marqueestop) — marquee остановлен
+- [`marqueePause`](#marqueepause) — marquee на паузе
+- [`marqueeResume`](#marqueeresume) — marquee возобновлён
+
+### Видео (модуль video)
+- [`videoReady`](#videoready) — видео готово к воспроизведению
+- [`videoPlay`](#videoplay) — видео начало воспроизведение
+- [`videoPause`](#videopause) — видео на паузе
+- [`videoEnded`](#videoended) — видео завершило воспроизведение
+- [`videoProgress`](#videoprogress) — прогресс воспроизведения видео 0..1
+
 ### Ленивая загрузка
 - [`lazyLoaded`](#lazyloaded) — изображение успешно загружено
 - [`lazyLoadError`](#lazyloaderror) — ошибка загрузки изображения
 
-### Модули (при наличии опций)
-- `navigation:mounted` — стрелки смонтированы
-- `pagination:mounted` — пагинация смонтирована
+### Модули навигации
+- [`navigation:mounted`](#navigationmounted) — стрелки смонтированы
+- [`pagination:mounted`](#paginationmounted) — пагинация смонтирована
+- [`navigation:click`](#navigationclick) — клик по миниатюре (модуль thumbs, аргумент: индекс)
+
+### Внутренние / для расширений
+- [`setTranslate`](#settranslate) — перед применением transform к контейнеру (для эффектов)
+- [`beforeLoopFix`](#beforeloopfix) — перед коррекцией loop
+- [`loopFix`](#loopfix) — после коррекции loop
 
 ---
 
@@ -506,6 +538,28 @@ slider.on('unlock', () => {
 })
 ```
 
+### disabled
+
+```typescript
+disabled: (tvist: Tvist) => void
+```
+
+Вызывается при отключении слайдера через `disable()` (добавляется класс, блокируются события).
+
+**Параметры:**
+- `tvist` — экземпляр слайдера
+
+### enabled
+
+```typescript
+enabled: (tvist: Tvist) => void
+```
+
+Вызывается при включении слайдера через `enable()` после вызова `disable()`.
+
+**Параметры:**
+- `tvist` — экземпляр слайдера
+
 ### visible / hidden
 
 ```typescript
@@ -514,6 +568,217 @@ hidden: (slide: HTMLElement, index: number) => void
 ```
 
 Слайд вошёл в видимую область или вышел из неё (по viewport контейнера). Эмитит модуль slide-states.
+
+### sliderVisible / sliderHidden
+
+```typescript
+sliderVisible: () => void
+sliderHidden: () => void
+```
+
+Слайдер целиком вошёл в viewport страницы или вышел из него. Эмитит модуль visibility (при опции `visibility: true`). Используется для паузы/возобновления autoplay и marquee при уходе слайдера из зоны видимости.
+
+**Примеры:**
+
+```javascript
+slider.on('sliderVisible', () => {
+  console.log('Слайдер виден на экране')
+  // Можно возобновить фоновые процессы
+})
+
+slider.on('sliderHidden', () => {
+  console.log('Слайдер скрыт (вкладка или прокрутка)')
+  // Автопрокрутка и marquee приостанавливаются модулем автоматически
+})
+```
+
+## События Autoplay модуля
+
+События модуля автопрокрутки (при опции `autoplay: true` или объекте настроек).
+
+### autoplayStart
+
+```typescript
+autoplayStart: () => void
+```
+
+Вызывается при запуске автопрокрутки (вызов `getModule('autoplay').getAutoplay().start()` или старт по опциям).
+
+### autoplayStop
+
+```typescript
+autoplayStop: () => void
+```
+
+Вызывается при полной остановке автопрокрутки.
+
+### autoplayPause
+
+```typescript
+autoplayPause: () => void
+```
+
+Вызывается при постановке автопрокрутки на паузу (например, при наведении, если `pauseOnHover: true`).
+
+### autoplayResume
+
+```typescript
+autoplayResume: () => void
+```
+
+Вызывается при возобновлении автопрокрутки после паузы.
+
+### autoplayProgress
+
+```typescript
+autoplayProgress: (data: { progress: number; index: number }) => void
+```
+
+Прогресс до следующего перехода: `progress` от 0 до 1, `index` — текущий активный слайд. Вызывается во время ожидания перед сменой слайда (и при ожидании окончания видео, если `waitForVideo: true`).
+
+**Примеры:**
+
+```javascript
+slider.on('autoplayProgress', ({ progress, index }) => {
+  document.querySelector('.progress-bar').style.width = `${progress * 100}%`
+})
+```
+
+## События Marquee модуля
+
+События бескрутящейся ленты (при опции `marquee: true` или объекте настроек).
+
+### marqueeStart
+
+```typescript
+marqueeStart: () => void
+```
+
+Вызывается при запуске marquee.
+
+### marqueeStop
+
+```typescript
+marqueeStop: () => void
+```
+
+Вызывается при остановке marquee.
+
+### marqueePause
+
+```typescript
+marqueePause: () => void
+```
+
+Вызывается при постановке marquee на паузу (например, при выходе слайдера из viewport).
+
+### marqueeResume
+
+```typescript
+marqueeResume: () => void
+```
+
+Вызывается при возобновлении marquee.
+
+## События Video модуля
+
+События модуля видео (при опции `video: true` или объекте настроек). Полезны для синхронизации с внешним UI или аналитикой.
+
+### videoReady
+
+```typescript
+videoReady: (data: VideoEvent) => void
+```
+
+Вызывается, когда видео готово к воспроизведению (событие `canplay`). `VideoEvent`: `{ slide, video, index }`.
+
+### videoPlay
+
+```typescript
+videoPlay: (data: VideoEvent) => void
+```
+
+Вызывается при начале воспроизведения видео.
+
+### videoPause
+
+```typescript
+videoPause: (data: VideoEvent) => void
+```
+
+Вызывается при постановке видео на паузу.
+
+### videoEnded
+
+```typescript
+videoEnded: (data: VideoEvent) => void
+```
+
+Вызывается при окончании воспроизведения видео.
+
+### videoProgress
+
+```typescript
+videoProgress: (data: VideoProgressEvent) => void
+```
+
+Прогресс воспроизведения: `VideoProgressEvent` содержит `slide`, `video`, `index`, `progress` (0..1), `currentTime`, `duration`.
+
+**Примеры:**
+
+```javascript
+slider.on('videoPlay', ({ video, index }) => {
+  console.log('Воспроизведение слайда', index)
+})
+
+slider.on('videoProgress', ({ progress, currentTime, duration }) => {
+  document.querySelector('.video-progress').style.width = `${progress * 100}%`
+})
+```
+
+## События навигации и модулей
+
+### navigation:mounted
+
+Вызывается после монтирования стрелок навигации (модуль navigation). Без параметров.
+
+### pagination:mounted
+
+Вызывается после монтирования пагинации (модуль pagination). Без параметров.
+
+### navigation:click
+
+```typescript
+'navigation:click': (index: number) => void
+```
+
+Вызывается при клике по миниатюре в режиме thumbs (модуль thumbs). Передаётся индекс слайда, к которому выполняется переход.
+
+**Примеры:**
+
+```javascript
+slider.on('navigation:click', (index) => {
+  console.log('Выбрана миниатюра:', index)
+})
+```
+
+## События для расширений
+
+### setTranslate
+
+```typescript
+setTranslate: (tvist: Tvist, position: number) => void
+```
+
+Вызывается в Engine перед применением `transform` к контейнеру слайдов. Позиция в пикселях. Используется модулем эффектов (fade, cube и т.д.) для кастомной отрисовки. Подписываться только если нужно изменить способ применения трансформа (например, кастомный эффект).
+
+### beforeLoopFix
+
+Вызывается в LoopModule перед выполнением коррекции индекса/позиции в режиме loop. Используется внутренне модулями (pagination, drag). Обычно не нужен в пользовательском коде.
+
+### loopFix
+
+Вызывается в LoopModule после выполнения коррекции loop. Модули (pagination, drag) подписываются для обновления состояния. Обычно не нужен в пользовательском коде.
 
 ## События LazyLoad модуля
 
