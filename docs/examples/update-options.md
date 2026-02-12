@@ -45,6 +45,144 @@ updateOptions(newOptions: Partial<TvistOptions>): this
 #### События
 - `on` - обработчики событий (заменяют предыдущие)
 
+#### Адаптивность (breakpoints)
+- `breakpoints` - объект с настройками по ширине (полная замена при обновлении)
+- `breakpointsBase` - база для сравнения ширины (`'container'` или `'window'`)
+
+## updateOptions с breakpoints
+
+При передаче `breakpoints` в `updateOptions()` они **полностью заменяют** существующие breakpoints (мёрдж не выполняется).
+
+### Полная замена и удаление
+
+```typescript
+const slider = new Tvist('.slider', {
+  perPage: 4,
+  breakpoints: {
+    992: { perPage: 3 },
+    768: { perPage: 2 },
+    480: { perPage: 1 }
+  }
+})
+
+// Заменяем breakpoints полностью
+slider.updateOptions({
+  breakpoints: {
+    1024: { perPage: 2 },
+    600: { perPage: 1 }
+  }
+})
+// Теперь используются только новые breakpoints (992, 768, 480 удалены)
+
+// Удалить все breakpoints
+slider.updateOptions({ breakpoints: {} })
+```
+
+### Сохранение базовых опций
+
+Базовые опции (не из breakpoint) при обновлении breakpoints сохраняются:
+
+```typescript
+const slider = new Tvist('.slider', {
+  perPage: 4,
+  gap: 16,
+  speed: 500,
+  loop: true,
+  breakpoints: { 768: { perPage: 2 } }
+})
+
+slider.updateOptions({
+  breakpoints: { 600: { perPage: 1 } }
+})
+// gap, speed, loop остались без изменений
+```
+
+### Обновление breakpoints вместе с другими опциями
+
+```typescript
+slider.updateOptions({
+  gap: 32,
+  breakpoints: {
+    600: { perPage: 1, gap: 8 }
+  }
+})
+// При ширине > 600px: gap = 32; при ширине ≤ 600px: gap = 8
+```
+
+### Вложенные опции в breakpoints
+
+Вложенные опции (например, `pagination`) корректно мёрджатся с базовыми:
+
+```typescript
+const slider = new Tvist('.slider', {
+  perPage: 4,
+  pagination: { limit: 7, type: 'bullets', clickable: true },
+  breakpoints: { 768: { perPage: 2, pagination: { limit: 5 } } }
+})
+
+slider.updateOptions({
+  breakpoints: {
+    600: { perPage: 1, pagination: { limit: 3 } }
+  }
+})
+// При ширине ≤ 600px: limit = 3, type и clickable — из базовых опций
+```
+
+### Важно: полная замена, не мёрдж
+
+Чтобы **добавить** один breakpoint, нужно передать **все** нужные breakpoints:
+
+```typescript
+// ❌ Неправильно: старые 992 и 768 будут удалены
+slider.updateOptions({
+  breakpoints: { 480: { perPage: 1 } }
+})
+
+// ✅ Правильно: передаём все breakpoints
+slider.updateOptions({
+  breakpoints: {
+    992: { perPage: 3 },
+    768: { perPage: 2 },
+    480: { perPage: 1 }
+  }
+})
+```
+
+После `updateOptions()` с breakpoints применяется новый breakpoint, пересчитываются размеры; при смене breakpoint эмитится событие `breakpoint`.
+
+### Примеры с breakpoints
+
+**Динамическая смена набора breakpoints:**
+
+```javascript
+document.querySelector('.toggle-detailed').addEventListener('click', () => {
+  slider.updateOptions({
+    breakpoints: {
+      1200: { perPage: 3 },
+      992: { perPage: 2 },
+      768: { perPage: 1 }
+    }
+  })
+})
+```
+
+**Адаптация под устройство:**
+
+```javascript
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+if (isMobile) {
+  slider.updateOptions({
+    breakpointsBase: 'window',
+    breakpoints: { 768: { perPage: 2 }, 480: { perPage: 1 } }
+  })
+} else {
+  slider.updateOptions({
+    breakpointsBase: 'container',
+    breakpoints: { 1200: { perPage: 3 }, 992: { perPage: 2 } }
+  })
+}
+```
+
 ## Примеры использования
 
 ### Простое изменение опций
@@ -360,4 +498,5 @@ watch(() => [props.perPage, props.gap, props.speed], ([perPage, gap, speed]) => 
 
 - [Методы API](/api/methods) - Все методы слайдера
 - [Опции](/api/options) - Полный список опций
-- [События](/api/events) - Работа с событиями
+- [Breakpoints API](/api/breakpoints) - Настройка breakpoints
+- [События](/api/events) - Работа с событиями, включая `breakpoint`
