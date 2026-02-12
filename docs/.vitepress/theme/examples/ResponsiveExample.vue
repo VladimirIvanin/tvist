@@ -176,7 +176,7 @@ const breakpointPresets = [
     perPage: 2,
     gap: 12,
     breakpoints: {
-      600: { perPage: 1, gap: 8 }
+      600: { perPage: 2, gap: 8 }
     }
   }
 ]
