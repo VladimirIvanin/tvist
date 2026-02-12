@@ -39,7 +39,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import Tvist from 'tvist'
 
 const sliderContainer = ref<HTMLElement | null>(null)
-const isVisible = ref(true)
+const isVisible = ref(false)
 let slider: Tvist | null = null
 
 const toggleVisibility = () => {

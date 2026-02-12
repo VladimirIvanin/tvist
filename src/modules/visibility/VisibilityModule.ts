@@ -76,6 +76,13 @@ function isElementVisibleCSS(element: HTMLElement): boolean {
   return true
 }
 
+/** Учитывает видимость вкладки (скрытая вкладка = не видим). */
+function isPageVisible(): boolean {
+  return typeof document.visibilityState !== 'undefined'
+    ? document.visibilityState === 'visible'
+    : !(document as Document & { hidden?: boolean }).hidden
+}
+
 export class VisibilityModule extends Module {
   readonly name = 'visibility'
 
@@ -94,9 +101,6 @@ export class VisibilityModule extends Module {
   /** Флаг: был ли marquee запущен до паузы */
   private marqueeWasRunning = false
 
-  /** Интервал для проверки CSS видимости (fallback для display:none) */
-  private cssCheckInterval: number | null = null
-
   /** MutationObserver для отслеживания изменений style атрибута */
   private mutationObserver: MutationObserver | null = null
 
@@ -110,13 +114,11 @@ export class VisibilityModule extends Module {
 
     this.setupObserver()
     this.setupMutationObserver()
-    this.startCSSCheck()
   }
 
   override destroy(): void {
     this.stopObserver()
     this.stopMutationObserver()
-    this.stopCSSCheck()
     // Восстанавливаем видимость при уничтожении модуля
     this.tvist._isVisible = true
   }
@@ -141,13 +143,11 @@ export class VisibilityModule extends Module {
       if (!wasActive && isNowActive) {
         this.setupObserver()
         this.setupMutationObserver()
-        this.startCSSCheck()
       }
       // Если visibility был включен, а теперь выключен
       else if (wasActive && !isNowActive) {
         this.stopObserver()
         this.stopMutationObserver()
-        this.stopCSSCheck()
         // Восстанавливаем видимость
         this.tvist._isVisible = true
         // Возобновляем модули если они были приостановлены
@@ -172,11 +172,9 @@ export class VisibilityModule extends Module {
         entries.forEach((entry) => {
           // Проверяем видимость через IntersectionObserver
           const isIntersecting = entry.isIntersecting
-          
-          // Дополнительно проверяем CSS видимость
+          // Дополнительно проверяем CSS видимость и видимость вкладки
           const isCSSVisible = isElementVisibleCSS(this.tvist.root)
-          
-          const newVisibility = isIntersecting && isCSSVisible
+          const newVisibility = isIntersecting && isCSSVisible && isPageVisible()
           
           if (newVisibility !== this.isVisible) {
             this.isVisible = newVisibility
@@ -232,39 +230,15 @@ export class VisibilityModule extends Module {
   }
 
   /**
-   * Проверка видимости (вынесено в отдельный метод)
+   * Проверка видимости (CSS + видимость вкладки).
+   * Вызывается из MutationObserver при изменении style/class у root и родителей.
    */
   private checkVisibility(): void {
     const isCSSVisible = isElementVisibleCSS(this.tvist.root)
-    
-    // Если CSS видимость изменилась
-    if (isCSSVisible !== this.isVisible) {
-      this.isVisible = isCSSVisible
-      this.handleVisibilityChange(isCSSVisible)
-    }
-  }
-
-  /**
-   * Запуск периодической проверки CSS видимости
-   * IntersectionObserver не реагирует на display:none, поэтому нужен fallback
-   * MutationObserver может пропустить изменения через JS, поэтому оставляем интервал
-   */
-  private startCSSCheck(): void {
-    this.stopCSSCheck()
-
-    // Проверяем каждые 500ms (fallback если MutationObserver пропустил)
-    this.cssCheckInterval = window.setInterval(() => {
-      this.checkVisibility()
-    }, 500)
-  }
-
-  /**
-   * Остановка проверки CSS видимости
-   */
-  private stopCSSCheck(): void {
-    if (this.cssCheckInterval !== null) {
-      window.clearInterval(this.cssCheckInterval)
-      this.cssCheckInterval = null
+    const visible = isCSSVisible && isPageVisible()
+    if (visible !== this.isVisible) {
+      this.isVisible = visible
+      this.handleVisibilityChange(visible)
     }
   }
 
@@ -347,9 +321,10 @@ export class VisibilityModule extends Module {
       isVisible: () => this.isVisible,
       check: () => {
         const isCSSVisible = isElementVisibleCSS(this.tvist.root)
-        if (isCSSVisible !== this.isVisible) {
-          this.isVisible = isCSSVisible
-          this.handleVisibilityChange(isCSSVisible)
+        const visible = isCSSVisible && isPageVisible()
+        if (visible !== this.isVisible) {
+          this.isVisible = visible
+          this.handleVisibilityChange(visible)
         }
         return this.isVisible
       }

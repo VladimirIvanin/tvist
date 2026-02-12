@@ -113,6 +113,7 @@ export class Tvist {
       enabled: true,
       preventClicks: true,
       preventClicksPropagation: true,
+      visibility: true,
       ...options,
     }
 

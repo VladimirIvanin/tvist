@@ -441,10 +441,10 @@ export interface TvistOptions {
   
   /**
    * Отслеживание видимости слайдера для приостановки autoplay/marquee.
-   * - `false` — выключено (по умолчанию)
-   * - `true` — включено с дефолтными настройками
+   * - `false` — выключено
+   * - `true` — включено с дефолтными настройками (по умолчанию)
    * - `VisibilityOptions` — полный контроль
-   * @default false
+   * @default true
    */
   visibility?: boolean | VisibilityOptions
   
