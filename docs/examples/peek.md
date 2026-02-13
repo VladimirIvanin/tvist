@@ -18,6 +18,7 @@ import Tvist from 'tvist'
 
 new Tvist('.tvist', {
   peek: 50, // 50px с каждой стороны
+  gap: 20,
   perPage: 1
 })
 ```

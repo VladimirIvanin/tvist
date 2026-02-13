@@ -22,10 +22,7 @@ let slider: Tvist | null = null
 onMounted(() => {
   if (sliderRef.value) {
     slider = new Tvist(sliderRef.value, {
-      peek: {
-        left: 0,
-        right: 60
-      },
+      peek: 50,
       gap: 20,
       perPage: 1,
       arrows: true,
