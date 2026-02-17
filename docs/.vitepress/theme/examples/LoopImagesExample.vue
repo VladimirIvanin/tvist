@@ -24,7 +24,7 @@ let slider: Tvist | null = null
 onMounted(() => {
   if (sliderRef.value) {
     slider = new Tvist(sliderRef.value, {
-      gap: 0,
+      gap: 10,
       perPage: 1,
       loop: true,
       arrows: true,
