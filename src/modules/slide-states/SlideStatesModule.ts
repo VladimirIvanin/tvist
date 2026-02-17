@@ -24,6 +24,9 @@ export class SlideStatesModule extends Module {
 
   // Кеш декодированных изображений (WeakMap для автоматической очистки памяти)
   private decodedImages = new WeakMap<HTMLImageElement, boolean>()
+  
+  // Флаги полностью предзагруженных слайдов (WeakMap для автоматической очистки памяти)
+  private preloadedSlides = new WeakMap<HTMLElement, boolean>()
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
@@ -71,9 +74,14 @@ export class SlideStatesModule extends Module {
    * Поддерживает <img> и <picture> элементы. Использует кеш.
    */
   private async preloadSlideImages(slide: HTMLElement): Promise<void> {
+    // Если слайд уже полностью предзагружен, пропускаем
+    if (this.preloadedSlides.has(slide)) {
+      return
+    }
+    
     const images = slide.querySelectorAll<HTMLImageElement>('img')
     const decodePromises: Promise<void>[] = []
-
+    
     images.forEach((img) => {
       // Декодируем только загруженные и ещё не декодированные изображения
       if (img.complete && img.naturalWidth > 0 && !this.decodedImages.has(img)) {
@@ -95,6 +103,10 @@ export class SlideStatesModule extends Module {
     })
 
     await Promise.all(decodePromises).catch(() => undefined)
+    
+    // Помечаем слайд как полностью предзагруженный, если все изображения обработаны
+    // (либо декодированы, либо не требуют декодирования)
+    this.preloadedSlides.set(slide, true)
   }
 
   /**
@@ -232,6 +244,6 @@ export class SlideStatesModule extends Module {
       )
     })
     
-    // decodedImages (WeakMap) очистится автоматически при удалении изображений
+    // decodedImages и preloadedSlides (WeakMap) очистятся автоматически при удалении элементов
   }
 }
