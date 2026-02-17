@@ -97,6 +97,11 @@ export class AutoplayModule extends Module {
   private videoEndedWhilePaused = false  // видео закончилось пока autoplay на паузе (hover)
   private videoEndedHandler?: () => void
 
+  /** Переход был инициирован autoplay (next() из таймера или videoEnded). Не сбрасываем таймер на slideChangeEnd. */
+  private transitionByAutoplay = false
+  /** Таймаут для сброса transitionByAutoplay, если next() не привёл к переходу (например, слайдер на границе). */
+  private clearTransitionByAutoplayTimeout: number | null = null
+
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
     this.config = normalizeAutoplay(this.options.autoplay)
@@ -113,6 +118,7 @@ export class AutoplayModule extends Module {
   override destroy(): void {
     this.stop()
     this.clearDragEndTimeout()
+    this.clearTransitionByAutoplayFallback()
     this.stopProgressTracking()
     this.detachHoverEvents()
     this.detachVisibilityEvents()
@@ -161,6 +167,39 @@ export class AutoplayModule extends Module {
         this.start() // Перезапускаем с новой задержкой
       }
     }
+  }
+
+  /**
+   * Отменить отложенный сброс transitionByAutoplay.
+   * Вызываем при destroy и когда slideChangeEnd сбрасывает флаг (переход действительно произошёл).
+   */
+  private clearTransitionByAutoplayFallback(): void {
+    if (this.clearTransitionByAutoplayTimeout !== null) {
+      window.clearTimeout(this.clearTransitionByAutoplayTimeout)
+      this.clearTransitionByAutoplayTimeout = null
+    }
+  }
+
+  /**
+   * Запланировать сброс transitionByAutoplay через (speed * множитель) мс.
+   * Если к тому моменту transitionEnd не сработал (next() не привёл к переходу, напр. граница без loop),
+   * флаг сбросится и следующая ручная навигация корректно сбросит таймер.
+   * 
+   * Множитель 5 обеспечивает надёжный запас времени даже для очень медленных анимаций,
+   * сложных CSS transitions или при сильной загрузке браузера. В нормальных условиях
+   * флаг сбрасывается через transitionEnd задолго до срабатывания fallback.
+   */
+  private static readonly TRANSITION_FALLBACK_MULTIPLIER = 5
+
+  private scheduleTransitionByAutoplayFallback(): void {
+    this.clearTransitionByAutoplayFallback()
+    const speed = this.options.speed ?? 300
+    this.clearTransitionByAutoplayTimeout = window.setTimeout(() => {
+      this.clearTransitionByAutoplayTimeout = null
+      if (this.transitionByAutoplay) {
+        this.transitionByAutoplay = false
+      }
+    }, speed * AutoplayModule.TRANSITION_FALLBACK_MULTIPLIER)
   }
 
   /**
@@ -235,6 +274,14 @@ export class AutoplayModule extends Module {
     // и next() может сработать во время или сразу после snap,
     // что приводит к багу с пагинацией (activeBullet != activeIndex).
     this.on('transitionEnd', () => {
+      // Сбрасываем transitionByAutoplay и отменяем fallback, если переход был от autoplay.
+      // transitionEnd всегда срабатывает после завершения анимации, независимо от её длительности,
+      // поэтому это более надёжное место для сброса флага, чем slideChangeEnd.
+      if (this.transitionByAutoplay) {
+        this.transitionByAutoplay = false
+        this.clearTransitionByAutoplayFallback()
+      }
+      
       // Если был drag — resume через resumeAfterDrag
       if (this.isDragging) {
         this.resumeAfterDrag()
@@ -247,10 +294,27 @@ export class AutoplayModule extends Module {
       }
     })
 
-    // При смене слайда — определяем, нужно ли ждать видео
+    // При смене слайда: при ручной навигации (стрелки, пагинация и т.д.) сбрасываем таймер,
+    // чтобы новый слайд показывался полное время delay, а не остаток от предыдущего счётчика
     this.on('slideChangeEnd', (index: number) => {
-      if (!this.config?.waitForVideo) return
-      this.handleSlideChangedForVideo(index)
+      const byAutoplay = this.transitionByAutoplay
+      if (this.transitionByAutoplay) {
+        this.transitionByAutoplay = false
+        this.clearTransitionByAutoplayFallback()
+      }
+      if (!byAutoplay && !this.paused && !this.stopped) {
+        this.cancelTimer()
+        this.timeLeft = null
+        this.progressStartOffset = 0
+        this.stopProgressTracking()
+        if (this.config?.waitForVideo) {
+          this.handleSlideChangedForVideo(index)
+        } else {
+          this.run()
+        }
+      } else if (this.config?.waitForVideo) {
+        this.handleSlideChangedForVideo(index)
+      }
     })
   }
 
@@ -268,11 +332,27 @@ export class AutoplayModule extends Module {
     // index = realIndex. Ищем слайд по data-tvist-slide-index (loop) или по DOM-позиции (обычный)
     const slide = this.findSlideByRealIndex(index)
 
-    if (!slide) return
+    // Если слайд не найден (некорректный индекс или проблема с DOM), запускаем обычный таймер
+    // чтобы autoplay продолжил работу, а не остановился навсегда
+    if (!slide) {
+      this.cancelTimer()
+      this.stopProgressTracking()
+      this.timeLeft = null
+      this.progressStartOffset = 0
+      this.run()
+      return
+    }
 
     const video = slide.querySelector('video')
     if (!video) {
-      // Нет видео — запускаем таймер (он мог быть отменён предыдущим waitingForVideo)
+      // Нет видео — запускаем таймер. Отменяем существующий, чтобы не было двух таймеров:
+      // при переходе по autoplay с waitForVideo run() уже вызван в колбеке таймера, затем
+      // slideChangeEnd вызывает handleSlideChangedForVideo → run() — без отмены остался бы
+      // «сиротский» таймер и лишний next().
+      this.cancelTimer()
+      this.stopProgressTracking()
+      this.timeLeft = null
+      this.progressStartOffset = 0
       this.run()
       return
     }
@@ -293,7 +373,9 @@ export class AutoplayModule extends Module {
         return
       }
       this.waitingForVideo = false
+      this.transitionByAutoplay = true
       this.tvist.next()
+      this.scheduleTransitionByAutoplayFallback()
     }
 
     this.on('videoEnded', this.videoEndedHandler)
@@ -418,7 +500,9 @@ export class AutoplayModule extends Module {
         this.timeLeft = null // Сбрасываем timeLeft для следующего шага
         this.progressStartOffset = 0
         this.stopProgressTracking()
+        this.transitionByAutoplay = true
         this.tvist.next()
+        this.scheduleTransitionByAutoplayFallback()
         this.run() // Рекурсивный вызов после переключения
       }
     }, delay)
@@ -506,6 +590,7 @@ export class AutoplayModule extends Module {
    */
   stop(): void {
     this.cancelTimer()
+    this.clearTransitionByAutoplayFallback()
     this.stopProgressTracking()
     this.emit('autoplayStop')
   }
@@ -554,7 +639,9 @@ export class AutoplayModule extends Module {
       if (this.videoEndedWhilePaused && this.waitingForVideo) {
         this.videoEndedWhilePaused = false
         this.waitingForVideo = false
+        this.transitionByAutoplay = true
         this.tvist.next()
+        this.scheduleTransitionByAutoplayFallback()
         this.emit('autoplayResume')
         return
       }
