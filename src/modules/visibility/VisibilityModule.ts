@@ -15,6 +15,7 @@
  */
 
 import { Module } from '../Module'
+import { throttle } from '../../core/Animator'
 import type { Tvist } from '../../core/Tvist'
 import type {
   TvistOptions,
@@ -65,13 +66,17 @@ function isElementVisibleCSS(element: HTMLElement): boolean {
     return el.checkVisibility({ visibilityProperty: true })
   }
 
-  // Fallback: обход элемента и всех родителей до document.body
+  // Fallback: обход элемента и всех родителей до document.body с ограничением глубины
   let current: HTMLElement | null = element
-  while (current && current !== document.body) {
+  let depth = 0
+  const MAX_DEPTH = 10 // Ограничиваем глубину для производительности
+  
+  while (current && current !== document.body && depth < MAX_DEPTH) {
     const style = window.getComputedStyle(current)
     if (style.display === 'none') return false
     if (style.visibility === 'hidden') return false
     current = current.parentElement
+    depth++
   }
   return true
 }
@@ -104,9 +109,17 @@ export class VisibilityModule extends Module {
   /** MutationObserver для отслеживания изменений style атрибута */
   private mutationObserver: MutationObserver | null = null
 
+  /** Throttled версия checkVisibility для оптимизации производительности */
+  private throttledCheckVisibility: () => void
+
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
     this.config = normalizeVisibility(this.options.visibility)
+    
+    // Создаем throttled версию с задержкой 100ms
+    this.throttledCheckVisibility = throttle(() => {
+      this.checkVisibility()
+    }, 100)
   }
 
   override init(): void {
@@ -205,7 +218,8 @@ export class VisibilityModule extends Module {
    */
   private setupMutationObserver(): void {
     this.mutationObserver = new MutationObserver(() => {
-      this.checkVisibility()
+      // Используем throttled версию вместо прямого вызова
+      this.throttledCheckVisibility()
     })
 
     // Отслеживаем изменения атрибута style у root элемента и его родителей

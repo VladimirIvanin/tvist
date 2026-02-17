@@ -114,7 +114,7 @@ export function throttle<Args extends unknown[]>(
     const timeSinceLastCall = now - lastCall
 
     const callFunction = () => {
-      lastCall = now
+      lastCall = Date.now() // Обновляем время вызова
       fn(...args)
     }
 

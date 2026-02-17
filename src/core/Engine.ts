@@ -44,6 +44,12 @@ export class Engine {
   private cachedRootSize = 0
   private scrollCacheValid = false
 
+  // Кэш размера root элемента (для оптимизации производительности)
+  private cachedRootWidth = 0
+  private cachedRootHeight = 0
+  private rootSizeCacheValid = false
+  private slideSizesCacheValid = false
+
   // Состояние блокировки (когда контент меньше контейнера)
   private _isLocked = false
 
@@ -189,6 +195,33 @@ export class Engine {
   }
 
   /**
+   * Обновляет кеш размера root элемента
+   */
+  private updateRootSizeCache(): void {
+    this.cachedRootWidth = getOuterWidth(this.tvist.root)
+    this.cachedRootHeight = getOuterHeight(this.tvist.root)
+    this.rootSizeCacheValid = true
+  }
+
+  /**
+   * Получает размер root элемента (с кешированием)
+   */
+  private getRootSize(): number {
+    if (!this.rootSizeCacheValid) {
+      this.updateRootSizeCache()
+    }
+    const isVertical = this.options.direction === 'vertical'
+    return isVertical ? this.cachedRootHeight : this.cachedRootWidth
+  }
+
+  /**
+   * Инвалидирует кеш размера root элемента
+   */
+  private invalidateRootSizeCache(): void {
+    this.rootSizeCacheValid = false
+  }
+
+  /**
    * Применяет peek к контейнеру слайдов
    */
   private applyPeek(): void {
@@ -241,9 +274,7 @@ export class Engine {
       }
     }
 
-    const rootSize = isVertical
-      ? getOuterHeight(this.tvist.root)
-      : getOuterWidth(this.tvist.root)
+    const rootSize = this.getRootSize()
 
     this.containerSize = rootSize - this.peekStart - this.peekEnd
 
@@ -286,10 +317,13 @@ export class Engine {
         }
       })
       
-      // Измеряем реальные размеры из DOM (CSS или инлайн стили)
-      this.slideSizes = slides.map((slide) =>
-        isVertical ? getOuterHeight(slide) : getOuterWidth(slide)
-      )
+      // Измеряем реальные размеры из DOM только если кеш невалиден
+      if (!this.slideSizesCacheValid) {
+        this.slideSizes = slides.map((slide) =>
+          isVertical ? getOuterHeight(slide) : getOuterWidth(slide)
+        )
+        this.slideSizesCacheValid = true
+      }
     } else {
       // В обычном режиме устанавливаем размеры принудительно
       slides.forEach((slide, i) => {
@@ -318,6 +352,7 @@ export class Engine {
       
       // Очищаем массив размеров (используем общий slideSize)
       this.slideSizes = []
+      this.slideSizesCacheValid = false
     }
   }
 
@@ -358,11 +393,7 @@ export class Engine {
       return
     }
 
-    const isVertical = this.options.direction === 'vertical'
-
-    this.cachedRootSize = isVertical
-      ? getOuterHeight(this.tvist.root)
-      : getOuterWidth(this.tvist.root)
+    this.cachedRootSize = this.getRootSize()
 
     // minScroll: используем peekStart (уже вычислен в calculateSizes)
     this.cachedMinScroll = -this.peekStart
@@ -707,6 +738,10 @@ export class Engine {
    * Обновление размеров (вызывается при resize)
    */
   update(): void {
+    // Инвалидируем кеши перед обновлением
+    this.invalidateRootSizeCache()
+    this.slideSizesCacheValid = false
+    
     this.applyPeek()
     
     this.calculateSizes()

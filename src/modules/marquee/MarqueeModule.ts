@@ -29,6 +29,9 @@ export class MarqueeModule extends Module {
   /** Текущая позиция прокрутки */
   private currentPosition = 0
 
+  /** Кеш размеров слайдов для оптимизации RAF цикла */
+  private cachedSlideSizes: number[] = []
+
   private mouseEnterHandler?: () => void
   private mouseLeaveHandler?: () => void
 
@@ -194,15 +197,17 @@ export class MarqueeModule extends Module {
     const count = this.tvist.slides.length
     if (count === 0) {
       this.totalSize = 0
+      this.cachedSlideSizes = []
       return
     }
-    if (isHorizontal) {
-      const slideWidth = this.tvist.slides[0]?.offsetWidth ?? 0
-      this.totalSize = (slideWidth + gap) * count
-    } else {
-      const slideHeight = this.tvist.slides[0]?.offsetHeight ?? 0
-      this.totalSize = (slideHeight + gap) * count
-    }
+    
+    // Кешируем размеры ВСЕХ слайдов для использования в RAF цикле
+    this.cachedSlideSizes = this.tvist.slides.map(slide =>
+      isHorizontal ? slide.offsetWidth : slide.offsetHeight
+    )
+    
+    // Вычисляем общий размер из кеша
+    this.totalSize = this.cachedSlideSizes.reduce((sum, size) => sum + size + gap, 0)
   }
 
   /**
@@ -277,7 +282,6 @@ export class MarqueeModule extends Module {
   private updatePosition(deltaTime: number): void {
     // Вычисляем смещение
     const distance = this.speed * deltaTime
-    const isHorizontal = this.options.direction !== 'vertical'
     const gap = this.options.gap ?? 0
 
     // Обновляем позицию в зависимости от направления
@@ -296,7 +300,9 @@ export class MarqueeModule extends Module {
         // Безопасность: если слайда нет, выходим
         if (!lastSlide) break
 
-        const slideSize = isHorizontal ? lastSlide.offsetWidth : lastSlide.offsetHeight
+        // Используем кешированный размер вместо чтения offsetWidth/Height
+        const slideIndex = slides.length - 1
+        const slideSize = this.cachedSlideSizes[slideIndex] ?? 0
         const totalSlideSize = slideSize + gap
         
         // Безопасность: предотвращаем бесконечный цикл при нулевом размере
@@ -305,6 +311,12 @@ export class MarqueeModule extends Module {
         // Переносим последний слайд в начало
         this.tvist.container.prepend(lastSlide)
         this.tvist.updateSlidesList()
+        
+        // Обновляем кеш: перемещаем последний размер в начало
+        const lastSize = this.cachedSlideSizes.pop()
+        if (lastSize !== undefined) {
+          this.cachedSlideSizes.unshift(lastSize)
+        }
         
         // Обновляем список слайдов для следующей итерации
         slides = this.tvist.slides
@@ -322,7 +334,8 @@ export class MarqueeModule extends Module {
       let firstSlide = slides[0]
 
       while (firstSlide) {
-        const slideSize = isHorizontal ? firstSlide.offsetWidth : firstSlide.offsetHeight
+        // Используем кешированный размер вместо чтения offsetWidth/Height
+        const slideSize = this.cachedSlideSizes[0] ?? 0
         const totalSlideSize = slideSize + gap
         
         // Безопасность: предотвращаем бесконечный цикл при нулевом размере
@@ -335,6 +348,12 @@ export class MarqueeModule extends Module {
         // Переносим первый слайд в конец
         this.tvist.container.appendChild(firstSlide)
         this.tvist.updateSlidesList()
+        
+        // Обновляем кеш: перемещаем первый размер в конец
+        const firstSize = this.cachedSlideSizes.shift()
+        if (firstSize !== undefined) {
+          this.cachedSlideSizes.push(firstSize)
+        }
         
         // Обновляем ссылку на (новый) первый слайд и список для следующей итерации
         slides = this.tvist.slides

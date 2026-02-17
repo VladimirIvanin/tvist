@@ -4,25 +4,59 @@
 
 import type { TvistOptions } from '../core/types'
 
+// Кеш размеров для оптимизации производительности
+let cachedContainerWidth = 0
+let cachedContainerElement: HTMLElement | null = null
+let cachedWindowWidth = 0
+let cacheTimestamp = 0
+const CACHE_DURATION = 16 // ~1 frame at 60fps (миллисекунды)
+
 /**
  * Находит подходящий breakpoint для текущей ширины
  * Desktop-first подход: max-width
  * 
  * @param root - корневой элемент слайдера
  * @param options - опции слайдера
+ * @param forceRefresh - принудительно обновить кеш размеров
  * @returns номер breakpoint или null
  */
-export function findMatchingBreakpoint(root: HTMLElement, options: TvistOptions): number | null {
+export function findMatchingBreakpoint(
+  root: HTMLElement, 
+  options: TvistOptions,
+  forceRefresh = false
+): number | null {
   if (!options.breakpoints || Object.keys(options.breakpoints).length === 0) {
     return null
   }
 
+  const now = Date.now()
+  const cacheExpired = now - cacheTimestamp > CACHE_DURATION
+
   let currentWidth: number
   
   if (options.breakpointsBase === 'container') {
-    currentWidth = root.clientWidth
+    // Используем кеш для container-based breakpoints
+    // Инвалидируем кеш если изменился элемент или истекло время
+    const containerChanged = cachedContainerElement !== root
+    if (forceRefresh || cacheExpired || containerChanged) {
+      cachedContainerWidth = root.clientWidth
+      cachedContainerElement = root
+      cacheTimestamp = now
+    }
+    currentWidth = cachedContainerWidth
   } else {
-    currentWidth = window.innerWidth
+    // Используем кеш для window-based breakpoints
+    // Проверяем наличие window для совместимости с тестовым окружением
+    if (typeof window !== 'undefined') {
+      // Инвалидируем кеш если размер окна изменился или истекло время
+      const actualWidth = window.innerWidth
+      const widthChanged = actualWidth !== cachedWindowWidth
+      if (forceRefresh || cacheExpired || widthChanged) {
+        cachedWindowWidth = actualWidth
+        cacheTimestamp = now
+      }
+    }
+    currentWidth = cachedWindowWidth
   }
 
   // Находим подходящий breakpoint (desktop-first, max-width)

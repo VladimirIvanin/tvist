@@ -9,6 +9,7 @@
  */
 
 import { Module } from '../Module'
+import { throttle } from '../../core/Animator'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 import { findMatchingBreakpoint, mergeBreakpointOptions } from '../../utils/breakpoints'
@@ -18,12 +19,18 @@ export class BreakpointsModule extends Module {
 
   private mediaQueries = new Map<number, MediaQueryList>()
   private currentBreakpoint: number | null = null
+  private throttledCheckBreakpoints: () => void
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
     
     // Сохраняем текущий breakpoint чтобы не применять его повторно при init
     this.currentBreakpoint = findMatchingBreakpoint(tvist.root, options)
+    
+    // Создаем throttled версию checkBreakpoints с задержкой 50ms для handleMediaChange
+    this.throttledCheckBreakpoints = throttle(() => {
+      this.checkBreakpoints()
+    }, 50)
   }
   
   /**
@@ -101,10 +108,11 @@ export class BreakpointsModule extends Module {
   /**
    * Обработчик изменения media query.
    * Проверяет breakpoints и при необходимости вызывает update().
+   * Использует throttle для оптимизации производительности при частых изменениях окна.
    */
   private handleMediaChange = (): void => {
-    // Проверяем breakpoints напрямую (не через update, т.к. слайдер может быть отключён)
-    this.checkBreakpoints()
+    // Используем throttled версию для оптимизации при window resize events
+    this.throttledCheckBreakpoints()
     
     // Если слайдер включён, вызываем update для пересчёта размеров
     if (this.tvist.isEnabled) {
@@ -129,7 +137,8 @@ export class BreakpointsModule extends Module {
       breakpointsBase: originalOptions.breakpointsBase
     }
 
-    const newBreakpoint = findMatchingBreakpoint(this.tvist.root, optionsForCheck)
+    // Форсируем обновление кеша при явной проверке breakpoints
+    const newBreakpoint = findMatchingBreakpoint(this.tvist.root, optionsForCheck, true)
 
     // Проверяем, был ли вручную изменён enabled
     const manualEnabledChange = this.tvist.checkAndResetManualEnabledChange()
@@ -204,7 +213,8 @@ export class BreakpointsModule extends Module {
    * Хук при resize
    */
   override onResize(): void {
-    // Проверяем breakpoints при resize
+    // Вызываем checkBreakpoints напрямую при явном update()
+    // Throttle применяется только для handleMediaChange (window resize events)
     this.checkBreakpoints()
   }
 }
