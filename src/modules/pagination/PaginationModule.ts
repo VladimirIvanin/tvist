@@ -136,6 +136,35 @@ export class PaginationModule extends Module {
   }
 
   /**
+   * Получает лимит буллетов из опций пагинации
+   */
+  private getBulletLimit(pageCount: number): number | undefined {
+    const pagination = this.options.pagination
+    const limit = typeof pagination === 'object' && pagination?.limit
+      ? Math.min(pagination.limit, pageCount)
+      : undefined
+    return limit
+  }
+
+  /**
+   * Ожидаемое количество буллетов при текущих опциях (для проверки, нужен ли полный render)
+   */
+  private getExpectedBulletCount(): number {
+    const { slides } = this.tvist
+    const perPage = this.options.perPage ?? 1
+    const slideCount = slides.length
+    const isLoop = this.options.loop === true
+    
+    if (slideCount === 0) return 0
+    
+    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
+    const pageCount = endIndex + 1
+    const limit = this.getBulletLimit(pageCount)
+    
+    return limit ?? pageCount
+  }
+
+  /**
    * Вычисляет количество страниц с учетом perPage и slidesPerGroup
    */
   private calculatePageCount(): number {
@@ -519,9 +548,7 @@ export class PaginationModule extends Module {
     const pageCount = slideCount === 0 ? 0 : endIndex + 1
 
     // Проверяем, используется ли лимит
-    const limit = typeof pagination === 'object' && pagination?.limit
-      ? Math.min(pagination.limit, pageCount)
-      : undefined
+    const limit = this.getBulletLimit(pageCount)
 
     // Если используется лимит, вычисляем группы слайдов
     if (limit && limit < pageCount) {
@@ -802,12 +829,16 @@ export class PaginationModule extends Module {
 
   /**
    * Хук при обновлении
+   * Для bullets при loop не пересоздаём DOM при каждом update() (после loopFix и т.д.),
+   * а только обновляем активный класс, если количество буллетов не изменилось.
    */
   override onUpdate(): void {
-    // При изменении количества слайдов - перерисовываем
     const type = this.getType()
     if (type === 'bullets') {
-      this.render()
+      const expectedCount = this.getExpectedBulletCount()
+      if (expectedCount !== this.bullets.length) {
+        this.render()
+      }
       this.updateActive()
     }
     // Обновляем видимость (для breakpoints и lock/unlock)
