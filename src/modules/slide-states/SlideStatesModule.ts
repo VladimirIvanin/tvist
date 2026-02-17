@@ -112,14 +112,8 @@ export class SlideStatesModule extends Module {
     if (activeAttr !== null) {
       activeLogicalIndex = parseInt(activeAttr, 10)
       
-      // Считаем количество оригинальных слайдов
-      const originalsCount = slides.reduce((count, slide) => {
-        return slide.hasAttribute('data-tvist-original') ? count + 1 : count
-      }, 0)
-      
-      if (originalsCount > 0) {
-        originalCount = originalsCount
-      }
+      // В loop режиме все слайды являются оригинальными (клоны не создаются)
+      // originalCount = slides.length уже установлен выше
     }
 
     // Вычисляем целевые логические индексы для prev/next
