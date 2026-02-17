@@ -38,6 +38,12 @@ export class Engine {
   private peekStart = 0 // peek слева/сверху
   private peekEnd = 0   // peek справа/снизу
 
+  // Кэш scroll-позиций (инвалидируется в updateScrollCache)
+  private cachedMinScroll = 0
+  private cachedMaxScroll = 0
+  private cachedRootSize = 0
+  private scrollCacheValid = false
+
   // Состояние блокировки (когда контент меньше контейнера)
   private _isLocked = false
 
@@ -106,10 +112,8 @@ export class Engine {
   public getCenterOffset(index: number): number {
     if (!this.options.center) return 0
 
-    const isVertical = this.options.direction === 'vertical'
-    const rootSize = isVertical
-      ? getOuterHeight(this.tvist.root)
-      : getOuterWidth(this.tvist.root)
+    if (!this.scrollCacheValid) this.updateScrollCache()
+    const rootSize = this.cachedRootSize
     const size = this.getSlideSize(index)
     return (rootSize - this.peekStart - this.peekEnd - size) / 2
   }
@@ -337,6 +341,51 @@ export class Engine {
         this.slidePositions.push(i * (this.slideSize + gap))
       }
     }
+
+    // Обновляем кэш scroll-позиций после пересчёта layout
+    this.updateScrollCache()
+  }
+
+  /**
+   * Пересчитывает кэш scroll-позиций (minScroll, maxScroll, rootSize).
+   * Вызывается после calculatePositions/calculateSizes и при любом изменении layout.
+   */
+  private updateScrollCache(): void {
+    if (this.options.loop) {
+      this.cachedMinScroll = -Infinity
+      this.cachedMaxScroll = -Infinity
+      this.scrollCacheValid = true
+      return
+    }
+
+    const isVertical = this.options.direction === 'vertical'
+
+    this.cachedRootSize = isVertical
+      ? getOuterHeight(this.tvist.root)
+      : getOuterWidth(this.tvist.root)
+
+    // minScroll: используем peekStart (уже вычислен в calculateSizes)
+    this.cachedMinScroll = -this.peekStart
+
+    // maxScroll: rootSize - peekStart - lastPageRight
+    const lastIndex = this.tvist.slides.length - 1
+    if (lastIndex >= 0) {
+      const lastPageRight =
+        this.getSlidePosition(lastIndex) + this.getSlideSize(lastIndex)
+      this.cachedMaxScroll = this.cachedRootSize - this.peekStart - lastPageRight
+    } else {
+      this.cachedMaxScroll = 0
+    }
+
+    this.scrollCacheValid = true
+  }
+
+  /**
+   * Инвалидирует кэш scroll-позиций.
+   * Следующий вызов getMinScrollPosition/getMaxScrollPosition пересчитает значения.
+   */
+  private invalidateScrollCache(): void {
+    this.scrollCacheValid = false
   }
 
   /**
@@ -344,6 +393,7 @@ export class Engine {
    */
   public setSlidePositions(positions: number[]): void {
     this.slidePositions = positions
+    this.invalidateScrollCache()
   }
 
   /**
@@ -375,38 +425,21 @@ export class Engine {
 
   /**
    * Минимальная позиция скролла (при trim — первый слайд прижат к левому краю, левый peek не показывается).
+   * Возвращает кэшированное значение; кэш обновляется при calculatePositions/update.
    */
   getMinScrollPosition(): number {
-    if (this.options.loop) return -Infinity
-    const isVertical = this.options.direction === 'vertical'
-    const peekStart = isVertical
-      ? getPeekValue(this.tvist.container, 'top')
-      : getPeekValue(this.tvist.container, 'left')
-    return -(peekStart || this.peekStart)
+    if (!this.scrollCacheValid) this.updateScrollCache()
+    return this.cachedMinScroll
   }
 
   /**
    * Максимальная позиция скролла (отрицательная).
    * При этой позиции правый край последнего слайда совпадает с правым краем root — правый peek не показывается (trim).
-   * Формула: чтобы контент lastPageRight был у правого края root: position = rootSize - peekStart - lastPageRight.
+   * Возвращает кэшированное значение; кэш обновляется при calculatePositions/update.
    */
   getMaxScrollPosition(): number {
-    if (this.options.loop) return -Infinity
-    
-    const lastIndex = this.tvist.slides.length - 1
-    const lastPageRight =
-      this.getSlidePosition(lastIndex) + this.getSlideSize(lastIndex)
-
-    const isVertical = this.options.direction === 'vertical'
-    const rootSize = isVertical
-      ? getOuterHeight(this.tvist.root)
-      : getOuterWidth(this.tvist.root)
-    let peekStart = isVertical
-      ? getPeekValue(this.tvist.container, 'top')
-      : getPeekValue(this.tvist.container, 'left')
-    if (peekStart === 0 && this.peekStart > 0) peekStart = this.peekStart
-    
-    return rootSize - peekStart - lastPageRight
+    if (!this.scrollCacheValid) this.updateScrollCache()
+    return this.cachedMaxScroll
   }
 
   /**
@@ -535,7 +568,6 @@ export class Engine {
       this.target.set(targetPosition)
       this.location.set(targetPosition)
       this.applyTransform()
-      this.emitProgress()
       
       if (indexChanged) {
         this.tvist.emit('slideChangeEnd', eventIndex)
@@ -573,7 +605,6 @@ export class Engine {
           (value) => {
             this.location.set(value)
             this.applyTransform()
-            this.emitProgress()
             this.tvist.emit('scroll')
           },
           () => {

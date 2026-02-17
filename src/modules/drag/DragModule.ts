@@ -52,6 +52,13 @@ export class DragModule extends Module {
   private minPosition = 0
   private maxPosition = 0
 
+  // Кеш размера viewport (избегаем layout thrashing при drag)
+  private cachedViewportSize = 0
+
+  // Кеш ссылок на модули и вычислений (избегаем повторных lookup на каждом pointermove)
+  private loopModuleRef: { fix?: (params: { direction?: 'next' | 'prev'; activeSlideIndex?: number; slideTo?: boolean; setTranslate?: boolean }) => void } | null = null
+  private isMarqueeActive = false
+
   // Настройки
   private readonly FRICTION = 0.92 // более плавное затухание
   private readonly MIN_VELOCITY = 0.05 // Снижен порог для более длинной инерции
@@ -80,6 +87,7 @@ export class DragModule extends Module {
     if (!this.shouldBeActive()) return
 
     this.attachEvents()
+    this.updateCachedRefs()
     this.updateBounds()
 
     // Обновляем границы при resize
@@ -90,6 +98,15 @@ export class DragModule extends Module {
     
     // Слушаем loopFix для обновления стартовой позиции
     this.on('loopFix', this.onLoopFix)
+  }
+
+  /**
+   * Кешируем ссылки на модули и вычисляемые флаги,
+   * чтобы не делать lookup на каждом pointermove.
+   */
+  private updateCachedRefs(): void {
+    this.loopModuleRef = this.tvist.getModule('loop') as typeof this.loopModuleRef
+    this.isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
   }
 
   private onLoopFix = (): void => {
@@ -137,9 +154,14 @@ export class DragModule extends Module {
   private updateBounds(): void {
     const { engine, slides } = this.tvist
     const perPage = this.options.perPage ?? 1
-    const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
 
-    if (this.options.loop || isMarqueeActive) {
+    // Кешируем размер viewport (читаем offsetWidth/offsetHeight один раз при resize, не на каждом pointermove)
+    const isHorizontal = this.options.direction !== 'vertical'
+    this.cachedViewportSize = isHorizontal
+      ? this.tvist.root.offsetWidth
+      : this.tvist.root.offsetHeight
+
+    if (this.options.loop || this.isMarqueeActive) {
       // При loop или marquee границ нет (бесконечная прокрутка)
       this.minPosition = Infinity
       this.maxPosition = -Infinity
@@ -332,18 +354,13 @@ export class DragModule extends Module {
         
         // КРИТИЧНО: вызываем loopFix ДО первого применения transform
         if (this.options.loop && this.isFirstMove) {
-          const isMarqueeActiveDrag = this.options.marquee !== false && this.options.marquee !== undefined
-          
-          if (isMarqueeActiveDrag) {
+          if (this.isMarqueeActive) {
             // В режиме marquee НЕ вызываем loopFix при драге.
             // engine.location уже синхронизирован с визуальной позицией в MarqueeModule.pause().
             // Слайды уже расставлены MarqueeModule для непрерывной прокрутки.
             this.isFirstMove = false
           } else {
-            const loopModule = this.tvist.getModule('loop') as { 
-              fix?: (params: { direction?: 'next' | 'prev'; slideTo?: boolean; setTranslate?: boolean }) => void 
-            }
-            if (loopModule?.fix) {
+            if (this.loopModuleRef?.fix) {
               // Определяем направление движения:
               // Движение вправо (delta > 0) = движение к началу = 'prev'
               // Движение влево (delta < 0) = движение к концу = 'next'
@@ -357,7 +374,7 @@ export class DragModule extends Module {
                 location: this.tvist.engine.location.get()
               })
               
-              loopModule.fix({ direction })
+              this.loopModuleRef.fix({ direction })
               this.isFirstMove = false
               
               // Для обычного режима: обновляем startPosition
@@ -409,10 +426,7 @@ export class DragModule extends Module {
     // Устанавливаем позицию
     let newPosition: number
     
-    // Проверяем активность marquee
-    const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
-    
-    if (isMarqueeActive) {
+    if (this.isMarqueeActive) {
       // startPosition уже синхронизирован с визуальной позицией marquee (через pause() в onPointerDown)
       // и корректируется в onLoopFix после перестановки слайдов
       newPosition = this.startPosition + distance
@@ -520,16 +534,14 @@ export class DragModule extends Module {
         currentX: this.currentX,
         startX: this.startX,
         dragDistance: this.currentX - this.startX,
-        willSnap: !(this.options.marquee !== false && this.options.marquee !== undefined),
+        willSnap: !this.isMarqueeActive,
         dragMode: this.options.drag,
         loop: this.options.loop,
         rewind: this.options.rewind
       })
       this.emit('dragEnd', e)
 
-      const isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined
-      
-      if (isMarqueeActive) {
+      if (this.isMarqueeActive) {
         // MarqueeModule сам подхватит позицию из engine.location через resume()
         // при получении события dragEnd (уже emitted выше).
         // Не делаем snap — marquee продолжит прокрутку.
@@ -566,18 +578,18 @@ export class DragModule extends Module {
    * Добавление document listeners (для move/up вне container)
    */
   private addDocumentEvents(): void {
-    // Non-passive для touchmove (нужен preventDefault)
-    document.addEventListener('touchmove', this.onPointerMove, { passive: false })
-    document.addEventListener('touchend', this.onPointerUp)
-    document.addEventListener('touchcancel', this.onPointerUp)
-
-    document.addEventListener('mousemove', this.onPointerMove)
-    document.addEventListener('mouseup', this.onPointerUp)
-
     if ('PointerEvent' in window) {
       document.addEventListener('pointermove', this.onPointerMove)
       document.addEventListener('pointerup', this.onPointerUp)
       document.addEventListener('pointercancel', this.onPointerUp)
+    } else {
+      // Fallback: touch + mouse для браузеров без Pointer Events
+      // Non-passive для touchmove (нужен preventDefault)
+      document.addEventListener('touchmove', this.onPointerMove, { passive: false })
+      document.addEventListener('touchend', this.onPointerUp)
+      document.addEventListener('touchcancel', this.onPointerUp)
+      document.addEventListener('mousemove', this.onPointerMove)
+      document.addEventListener('mouseup', this.onPointerUp)
     }
   }
 
@@ -585,17 +597,16 @@ export class DragModule extends Module {
    * Удаление document listeners
    */
   private removeDocumentEvents(): void {
-    document.removeEventListener('touchmove', this.onPointerMove)
-    document.removeEventListener('touchend', this.onPointerUp)
-    document.removeEventListener('touchcancel', this.onPointerUp)
-
-    document.removeEventListener('mousemove', this.onPointerMove)
-    document.removeEventListener('mouseup', this.onPointerUp)
-
     if ('PointerEvent' in window) {
       document.removeEventListener('pointermove', this.onPointerMove)
       document.removeEventListener('pointerup', this.onPointerUp)
       document.removeEventListener('pointercancel', this.onPointerUp)
+    } else {
+      document.removeEventListener('touchmove', this.onPointerMove)
+      document.removeEventListener('touchend', this.onPointerUp)
+      document.removeEventListener('touchcancel', this.onPointerUp)
+      document.removeEventListener('mousemove', this.onPointerMove)
+      document.removeEventListener('mouseup', this.onPointerUp)
     }
   }
 
@@ -632,15 +643,12 @@ export class DragModule extends Module {
     currentPosition: number,
     point: { x: number; y: number }
   ): void {
-    const loopModule = this.tvist.getModule('loop') as { 
-      fix?: (params: { direction?: 'next' | 'prev'; activeSlideIndex?: number }) => void 
-    }
+    const loopModule = this.loopModuleRef
     if (!loopModule?.fix) return
+    const loopFix = loopModule.fix.bind(loopModule)
 
-    const isHorizontal = this.options.direction !== 'vertical'
-    const viewportSize = isHorizontal 
-      ? this.tvist.root.offsetWidth 
-      : this.tvist.root.offsetHeight
+    // Используем закешированный размер viewport (обновляется в updateBounds)
+    const viewportSize = this.cachedViewportSize
 
     // Координаты viewport в пространстве контента
     const vpStart = -currentPosition
@@ -690,7 +698,7 @@ export class DragModule extends Module {
         activeIndex: this.tvist.engine.index.get(),
         realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined
       })
-      loopModule.fix({ direction: 'prev', activeSlideIndex: 0 })
+      loopFix({ direction: 'prev', activeSlideIndex: 0 })
       fixed = true
     } else if (dragDelta < 0 && vpEnd > contentEnd - buffer) {
       const coverageActiveIdx = this.findSlideNearViewportEdge(vpStart, slides)
@@ -700,7 +708,7 @@ export class DragModule extends Module {
         activeIndex: this.tvist.engine.index.get(),
         realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined
       })
-      loopModule.fix({ direction: 'next', activeSlideIndex: coverageActiveIdx })
+      loopFix({ direction: 'next', activeSlideIndex: coverageActiveIdx })
       fixed = true
     }
 
@@ -731,13 +739,13 @@ export class DragModule extends Module {
     slides: HTMLElement[]
   ): number {
     // Находим последний слайд, чья позиция <= viewport left.
-    // Это слайд, видимый у левого края viewport.
+    // Позиции слайдов отсортированы по возрастанию, поэтому выходим
+    // из цикла как только позиция превысила viewportLeft.
     let nearestIdx = 0
     for (let i = 0; i < slides.length; i++) {
       const pos = this.tvist.engine.getSlidePosition(i)
-      if (pos <= viewportLeft) {
-        nearestIdx = i
-      }
+      if (pos > viewportLeft) break
+      nearestIdx = i
     }
 
     // Гарантируем минимум 1, чтобы порог append-проверки в loopFix
@@ -1057,6 +1065,15 @@ export class DragModule extends Module {
    * Хук при resize
    */
   override onResize(): void {
+    this.updateCachedRefs()
+    this.updateBounds()
+  }
+
+  /**
+   * Хук при динамическом обновлении опций (updateOptions)
+   */
+  override onOptionsUpdate(): void {
+    this.updateCachedRefs()
     this.updateBounds()
   }
 }
