@@ -106,10 +106,7 @@ export class SlideStatesModule extends Module {
     
     const images = slide.querySelectorAll<HTMLImageElement>('img')
     const decodePromises: Promise<void>[] = []
-    
-    // Получаем настройку для Firefox фикса (по умолчанию true)
-    const firefoxFix = this.options.browserFixes?.firefoxImageDecoding ?? true
-    
+  
     images.forEach((img) => {
       // Декодируем только загруженные и ещё не декодированные изображения
       if (img.complete && img.naturalWidth > 0 && !this.decodedImages.has(img)) {
