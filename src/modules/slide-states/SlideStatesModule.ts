@@ -62,6 +62,44 @@ export class SlideStatesModule extends Module {
   }
 
   /**
+   * Предварительное декодирование изображений в слайде.
+   * Заставляет браузер декодировать изображения до начала анимации,
+   * предотвращая "белые вспышки" при переходе к следующему слайду.
+   * 
+   * Поддерживает:
+   * - <img> элементы
+   * - <picture> с <source> элементами (decode() вызывается на <img> внутри <picture>)
+   */
+  private async preloadSlideImages(slide: HTMLElement): Promise<void> {
+    // Находим все <img> элементы, включая те, что внутри <picture>
+    const images = slide.querySelectorAll('img')
+    const decodePromises: Promise<void>[] = []
+
+    images.forEach((img) => {
+      // Для <picture> элементов браузер автоматически выбирает
+      // правильный <source> на основе медиа-запросов и применяет его к <img>.
+      // Поэтому img.currentSrc будет содержать URL выбранного изображения.
+      // decode() вызывается на <img>, который уже содержит выбранное изображение.
+      
+      // Проверяем, что изображение загружено
+      if (img.complete && img.naturalWidth > 0) {
+        // decode() заставляет браузер декодировать изображение
+        // и подготовить его к рендерингу
+        if ('decode' in img) {
+          decodePromises.push(
+            img.decode().catch(() => {
+              // Игнорируем ошибки декодирования
+            })
+          )
+        }
+      }
+    })
+
+    // Ждём декодирования всех изображений (или игнорируем ошибки)
+    await Promise.all(decodePromises).catch(() => {})
+  }
+
+  /**
    * Обновление классов активного, предыдущего и следующего слайдов
    */
   private updateActiveClasses(): void {
@@ -132,6 +170,11 @@ export class SlideStatesModule extends Module {
       this.toggleClass(slide, this.CLASS_ACTIVE, isActive)
       this.toggleClass(slide, this.CLASS_PREV, isPrev)
       this.toggleClass(slide, this.CLASS_NEXT, isNext)
+
+      // Предзагружаем изображения в prev/next слайдах
+      if (isPrev || isNext) {
+        this.preloadSlideImages(slide)
+      }
     })
   }
 
