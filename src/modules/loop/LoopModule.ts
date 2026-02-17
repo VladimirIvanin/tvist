@@ -332,20 +332,23 @@ export class LoopModule extends Module {
       }
     }
     
-    // Сохраняем текущий location перед update (чтобы не было скачка)
-    const locationBeforeUpdate = this.tvist.engine.location.get()
-    const targetBeforeUpdate = this.tvist.engine.target.get()
-    
-    this.tvist.update()
-    
-    // КРИТИЧНО: Если не было перестановки, восстанавливаем location
-    // update() всегда сбрасывает location на позицию текущего индекса,
-    // но при быстрой смене направления во время анимации это вызывает визуальный скачок
+    // Если не было перестановки слайдов, НЕ вызываем update() вообще,
+    // чтобы не сбрасывать location/target во время drag или анимации.
+    // update() вызывается только когда реально изменился DOM (prepend/append).
     if (prependSlidesIndexes.length === 0 && appendSlidesIndexes.length === 0) {
+      log('No rearrangement - skipping update()')
+    } else {
+      // Сохраняем текущий location перед update (чтобы не было скачка)
+      const locationBeforeUpdate = this.tvist.engine.location.get()
+      const targetBeforeUpdate = this.tvist.engine.target.get()
+      
+      this.tvist.update()
+      
+      // После update() восстанавливаем location/target если они были изменены
+      // (update() сбрасывает их на позицию текущего индекса)
       this.tvist.engine.location.set(locationBeforeUpdate)
       this.tvist.engine.target.set(targetBeforeUpdate)
-      this.tvist.engine.applyTransformPublic()
-      log('Location restored after update (no rearrangement)')
+      log('Location preserved after update (with rearrangement)')
     }
 
     // Корректируем позицию, чтобы избежать визуального прыжка
