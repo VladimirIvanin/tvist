@@ -20,7 +20,7 @@ import type { TvistOptions } from '../../core/types'
 const DRAG_DEBUG = false
 const dragLog = (..._args: unknown[]) => {
   if (DRAG_DEBUG) {
-    console.warn(..._args)
+    console.warn('[DRAG]', ..._args)
   }
 }
 
@@ -73,6 +73,11 @@ export class DragModule extends Module {
   // coverageFix) пропускаем N pointermove событий. Это предотвращает каскадный
   // ping-pong (PREV→NEXT→PREV...) при быстрых drag-ах в маленьких каруселях.
   private coverageFixCooldown = 0
+  
+  // Накопленный delta до начала drag (для вычитания из первого движения)
+  private accumulatedDeltaBeforeDragStart = { x: 0, y: 0 }
+  // Флаг: нужно ли вычесть накопленный delta на следующем кадре
+  private shouldSubtractAccumulatedDelta = false
   
   // Для расчёта velocity
   private lastMoveTime = 0
@@ -287,6 +292,10 @@ export class DragModule extends Module {
     
     // Сбрасываем флаги для loop
     this.isFirstMove = true
+    
+    // Сбрасываем накопленный delta
+    this.accumulatedDeltaBeforeDragStart = { x: 0, y: 0 }
+    this.shouldSubtractAccumulatedDelta = false
 
     // Запоминаем состояние анимации для возможного восстановления
     this.wasAnimating = this.tvist.engine.animator.isAnimating()
@@ -336,8 +345,8 @@ export class DragModule extends Module {
 
     // Направление (horizontal/vertical)
     const isHorizontal = this.options.direction !== 'vertical'
-    const deltaX = point.x - this.startX
-    const deltaY = point.y - this.startY
+    let deltaX = point.x - this.startX
+    let deltaY = point.y - this.startY
     const absDelta = isHorizontal ? Math.abs(deltaX) : Math.abs(deltaY)
 
     // Если еще не начали драг, проверяем threshold
@@ -396,11 +405,22 @@ export class DragModule extends Module {
         
         this.baseEvent = { x: point.x, y: point.y, time: now }
         this.lastMoveTime = now
+        
+        // Запоминаем накопленный delta до начала drag
+        // Это delta накопился пока мы ждали превышения MIN_DRAG_DISTANCE
+        // Мы вычтем его на СЛЕДУЮЩЕМ кадре
+        this.accumulatedDeltaBeforeDragStart = {
+          x: deltaX,
+          y: deltaY
+        }
+        this.shouldSubtractAccumulatedDelta = true
+        
         dragLog('dragStart', {
           activeIndex: this.tvist.engine.index.get(),
           realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
           startIndex: this.startIndex,
-          startPosition: this.startPosition
+          startPosition: this.startPosition,
+          accumulatedDelta: this.accumulatedDeltaBeforeDragStart
         })
         this.emit('dragStart', e)
         // Добавляем класс dragging (отключает transition)
@@ -408,6 +428,16 @@ export class DragModule extends Module {
       } else {
         return // Ждем превышения порога
       }
+    }
+
+    // КРИТИЧНО: вычитаем накопленный delta на СЛЕДУЮЩЕМ кадре после dragStart
+    // Это предотвращает "перекидывание" слайда из-за delta, накопленного до превышения MIN_DRAG_DISTANCE
+    if (this.shouldSubtractAccumulatedDelta) {
+      deltaX -= this.accumulatedDeltaBeforeDragStart.x
+      deltaY -= this.accumulatedDeltaBeforeDragStart.y
+      // Сбрасываем флаг после первого применения
+      this.shouldSubtractAccumulatedDelta = false
+      this.accumulatedDeltaBeforeDragStart = { x: 0, y: 0 }
     }
 
     const delta = isHorizontal ? deltaX : deltaY
@@ -458,7 +488,14 @@ export class DragModule extends Module {
     this.tvist.engine.location.set(newPosition)
     
     // Применяем transform напрямую (без пересчёта размеров)
+    dragLog('applying transform', {
+      newPosition,
+      locationBefore: this.tvist.engine.location.get()
+    })
     this.tvist.engine.applyTransformPublic()
+    dragLog('transform applied', {
+      locationAfter: this.tvist.engine.location.get()
+    })
 
     // Проверяем покрытие viewport контентом и подставляем слайды при необходимости
     // Работает для всех loop-режимов (обычный loop и marquee + loop)
