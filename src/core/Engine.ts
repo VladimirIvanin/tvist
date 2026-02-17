@@ -717,6 +717,12 @@ export class Engine {
     const container = this.tvist.container
     const pos = this.location.get()
 
+    engineLog('applyTransform', {
+      position: pos,
+      activeIndex: this.index.get(),
+      target: this.target.get()
+    })
+
     if (this.options.direction === 'vertical') {
       container.style.transform = `translate3d(0, ${pos}px, 0)`
     } else {
