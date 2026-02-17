@@ -119,10 +119,6 @@ export class SlideStatesModule extends Module {
               .decode()
               .then(() => {
                 this.decodedImages.set(img, true)
-                // Firefox: принудительный reflow после decode, чтобы картинка отрисовалась без задержки
-                if (isFirefox && firefoxFix) {
-                  void img.offsetHeight
-                }
               })
               .catch(() => undefined) // Игнорируем ошибки
           )
