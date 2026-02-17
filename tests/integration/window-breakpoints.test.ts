@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { Tvist } from '../../src/index'
 import { createSliderFixture } from '../fixtures'
 import type { SliderFixture } from '../fixtures'
@@ -7,6 +7,9 @@ describe('Window-based breakpoints (matchMedia)', () => {
   let fixture: SliderFixture
 
   beforeEach(() => {
+    // Используем fake timers для контроля throttle
+    vi.useFakeTimers()
+    
     // Устанавливаем десктопную ширину окна
     window.innerWidth = 1200
     
@@ -18,6 +21,9 @@ describe('Window-based breakpoints (matchMedia)', () => {
     fixture.cleanup()
     // Возвращаем дефолтное значение
     window.innerWidth = 1024
+    
+    // Восстанавливаем реальные таймеры
+    vi.useRealTimers()
   })
 
   it('should use window.innerWidth for breakpoints by default', () => {
@@ -39,12 +45,14 @@ describe('Window-based breakpoints (matchMedia)', () => {
 
     // Сужаем окно до 800px
     window.innerWidth = 800
+    vi.advanceTimersByTime(50) // Ждем throttle (50ms)
 
     // Слайдер должен автоматически включиться через matchMedia
     expect(slider.isEnabled).toBe(true)
 
     // Расширяем обратно
     window.innerWidth = 1200
+    vi.advanceTimersByTime(50) // Ждем throttle (50ms)
 
     // Слайдер должен автоматически отключиться
     expect(slider.isEnabled).toBe(false)
@@ -67,23 +75,29 @@ describe('Window-based breakpoints (matchMedia)', () => {
 
     // Цикл 1
     window.innerWidth = 800
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(true)
 
     window.innerWidth = 1200
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(false)
 
     // Цикл 2
     window.innerWidth = 600
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(true)
 
     window.innerWidth = 1100
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(false)
 
     // Цикл 3
     window.innerWidth = 900
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(true)
 
     window.innerWidth = 1200
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(false)
   })
 
@@ -110,6 +124,7 @@ describe('Window-based breakpoints (matchMedia)', () => {
 
     // Сужаем окно
     window.innerWidth = 800
+    vi.advanceTimersByTime(50)
 
     expect(events).toContain('breakpoint:999')
     expect(events).toContain('enabled')
@@ -118,6 +133,7 @@ describe('Window-based breakpoints (matchMedia)', () => {
 
     // Расширяем окно
     window.innerWidth = 1200
+    vi.advanceTimersByTime(50)
 
     expect(events).toContain('breakpoint:null')
     expect(events).toContain('disabled')
@@ -148,15 +164,18 @@ describe('Window-based breakpoints (matchMedia)', () => {
 
     // Планшет (900px) - включен, perPage: 2
     window.innerWidth = 900
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(true)
     expect(slider.options.perPage).toBe(2)
 
     // Планшет (700px) - отключен
     window.innerWidth = 700
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(false)
 
     // Мобильный (400px) - включен, perPage: 1
     window.innerWidth = 400
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(true)
     expect(slider.options.perPage).toBe(1)
   })
@@ -181,6 +200,7 @@ describe('Window-based breakpoints (matchMedia)', () => {
 
     // Расширяем
     window.innerWidth = 1200
+    vi.advanceTimersByTime(50)
 
     // Должен отключиться
     expect(slider.isEnabled).toBe(false)
@@ -200,14 +220,17 @@ describe('Window-based breakpoints (matchMedia)', () => {
 
     // Ровно на брейкпоинте (999px) - должен включиться
     window.innerWidth = 999
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(true)
 
     // На 1px больше (1000px) - должен отключиться
     window.innerWidth = 1000
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(false)
 
     // На 1px меньше (998px) - должен включиться
     window.innerWidth = 998
+    vi.advanceTimersByTime(50)
     expect(slider.isEnabled).toBe(true)
   })
 })
