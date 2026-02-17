@@ -5,7 +5,7 @@
 import './styles/tvist.scss'
 
 // Core
-export { Tvist, Tvist as TvistV1 } from './core/Tvist'
+export { Tvist, Tvist as TvistV1, type TvistRootElement } from './core/Tvist'
 export { TVIST_CSS_PREFIX, TVIST_CLASSES } from './core/constants'
 export { Engine } from './core/Engine'
 export { Vector1D } from './core/Vector1D'

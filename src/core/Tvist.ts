@@ -14,6 +14,11 @@ import { BreakpointsModule } from '../modules/breakpoints/BreakpointsModule'
 import { throttle } from './Animator'
 import { applyInitialBreakpoint } from '../utils/breakpoints'
 
+/** Root-элемент слайдера с опциональной ссылкой на инстанс (для переиспользования одного root) */
+export interface TvistRootElement extends HTMLElement {
+  tvistInstance?: Tvist | null
+}
+
 export class Tvist {
   static readonly VERSION = pkg.version ?? '0.0.0'
 
@@ -78,6 +83,13 @@ export class Tvist {
   ) {
     // Парсинг DOM
     this.root = getElement(target)
+
+    // Если на этом root уже есть инстанс — уничтожаем его
+    const rootEl = this.root as TvistRootElement
+    if (rootEl.tvistInstance && typeof rootEl.tvistInstance.destroy === 'function') {
+      rootEl.tvistInstance.destroy()
+    }
+    rootEl.tvistInstance = this
 
     // Находим контейнер
     const containerSelector = `.${TVIST_CLASSES.container}`
@@ -586,6 +598,12 @@ export class Tvist {
 
     // Очищаем события
     this.events.clear()
+
+    // Сбрасываем ссылку на инстанс в root (только если это ещё наш инстанс)
+    const rootEl = this.root as TvistRootElement
+    if (rootEl.tvistInstance === this) {
+      rootEl.tvistInstance = null
+    }
 
     return this
   }
