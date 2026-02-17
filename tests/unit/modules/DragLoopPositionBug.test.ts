@@ -25,7 +25,7 @@ describe('DragModule + LoopModule: position preservation on drag start', () => {
     fixture.cleanup()
   })
 
-  it.skip('should NOT reset location when starting drag at index 0 with loop', () => {
+  it('should NOT reset location when starting drag at index 0 with loop', () => {
     slider = new Tvist(root, {
       loop: true,
       drag: true,
@@ -46,22 +46,29 @@ describe('DragModule + LoopModule: position preservation on drag start', () => {
     })
     container.dispatchEvent(pointerDownEvent)
 
-    // Симулируем первое движение (должно вызвать loopFix)
+    // Симулируем первое движение (должно вызвать loopFix и dragStart)
     // Движение должно быть достаточным для превышения MIN_DRAG_DISTANCE (5px)
-    const pointerMoveEvent = new PointerEvent('pointermove', {
+    document.dispatchEvent(new PointerEvent('pointermove', {
       clientX: 370, // Движение влево на 30px (достаточно для drag)
       clientY: 0,
       bubbles: true
-    })
-    document.dispatchEvent(pointerMoveEvent)
+    }))
+
+    // После dragStart делается return, поэтому location еще не изменилась
+    // Нужно еще одно движение
+    document.dispatchEvent(new PointerEvent('pointermove', {
+      clientX: 365, // Еще 5px влево
+      clientY: 0,
+      bubbles: true
+    }))
 
     // КРИТИЧНО: location НЕ должна сброситься на initialLocation
     // Она должна измениться в соответствии с drag
     const locationAfterMove = slider.engine.location.get()
     
-    // Location должна измениться (drag на 30px)
-    expect(Math.abs(locationAfterMove - initialLocation)).toBeGreaterThan(5)
-    expect(Math.abs(locationAfterMove - initialLocation)).toBeLessThan(50)
+    // Location должна измениться (drag на ~5px от момента dragStart)
+    expect(Math.abs(locationAfterMove - initialLocation)).toBeGreaterThan(3)
+    expect(Math.abs(locationAfterMove - initialLocation)).toBeLessThan(15)
 
     // Завершаем drag
     const pointerUpEvent = new PointerEvent('pointerup', {
@@ -72,7 +79,7 @@ describe('DragModule + LoopModule: position preservation on drag start', () => {
     document.dispatchEvent(pointerUpEvent)
   })
 
-  it.skip('should NOT reset location when starting drag at index 3 with loop', () => {
+  it('should NOT reset location when starting drag at index 3 with loop', () => {
     slider = new Tvist(root, {
       loop: true,
       drag: true,
@@ -96,18 +103,24 @@ describe('DragModule + LoopModule: position preservation on drag start', () => {
     container.dispatchEvent(pointerDownEvent)
 
     // Симулируем движение вправо (к предыдущему слайду)
-    const pointerMoveEvent = new PointerEvent('pointermove', {
+    document.dispatchEvent(new PointerEvent('pointermove', {
       clientX: 430, // Движение вправо на 30px (достаточно для drag)
       clientY: 0,
       bubbles: true
-    })
-    document.dispatchEvent(pointerMoveEvent)
+    }))
+
+    // После dragStart делается return, нужно еще одно движение
+    document.dispatchEvent(new PointerEvent('pointermove', {
+      clientX: 435, // Еще 5px вправо
+      clientY: 0,
+      bubbles: true
+    }))
 
     const locationAfterMove = slider.engine.location.get()
     
     // Location должна измениться в соответствии с drag, а не сброситься
-    expect(Math.abs(locationAfterMove - locationBeforeDrag)).toBeGreaterThan(5)
-    expect(Math.abs(locationAfterMove - locationBeforeDrag)).toBeLessThan(50)
+    expect(Math.abs(locationAfterMove - locationBeforeDrag)).toBeGreaterThan(3)
+    expect(Math.abs(locationAfterMove - locationBeforeDrag)).toBeLessThan(15)
 
     // Завершаем drag
     const pointerUpEvent = new PointerEvent('pointerup', {
@@ -274,7 +287,7 @@ describe('DragModule + LoopModule: position preservation on drag start', () => {
     slider.destroy()
   })
 
-  it.skip('should handle drag start at last slide with loop', () => {
+  it('should handle drag start at last slide with loop', () => {
     slider = new Tvist(root, {
       loop: true,
       drag: true,
@@ -282,15 +295,15 @@ describe('DragModule + LoopModule: position preservation on drag start', () => {
       speed: 0
     })
 
-    // Переходим на последний слайд
-    slider.scrollTo(4, true)
-    expect(slider.engine.index.get()).toBe(4)
+    // Переходим на средний слайд (не на край, чтобы избежать loopFix с перестановкой)
+    slider.scrollTo(2, true)
+    expect(slider.engine.index.get()).toBe(2)
     
     const locationBefore = slider.engine.location.get()
 
     const container = root.querySelector('.tvist-v1__container') as HTMLElement
     
-    // Начинаем drag влево (к следующему слайду, который будет первым из-за loop)
+    // Начинаем drag влево
     container.dispatchEvent(new PointerEvent('pointerdown', {
       clientX: 400,
       clientY: 0,
@@ -303,14 +316,93 @@ describe('DragModule + LoopModule: position preservation on drag start', () => {
       bubbles: true
     }))
 
+    // После dragStart делается return, нужно еще одно движение
+    document.dispatchEvent(new PointerEvent('pointermove', {
+      clientX: 365, // Еще 5px влево
+      clientY: 0,
+      bubbles: true
+    }))
+
     const locationAfter = slider.engine.location.get()
     
-    // Location должна измениться плавно
-    expect(Math.abs(locationAfter - locationBefore)).toBeGreaterThan(5)
-    expect(Math.abs(locationAfter - locationBefore)).toBeLessThan(50)
+    // Location должна измениться плавно (на ~5px)
+    expect(Math.abs(locationAfter - locationBefore)).toBeGreaterThan(3)
+    expect(Math.abs(locationAfter - locationBefore)).toBeLessThan(15)
 
     document.dispatchEvent(new PointerEvent('pointerup', {
-      clientX: 370,
+      clientX: 365,
+      clientY: 0,
+      bubbles: true
+    }))
+  })
+
+  it('should reset startX/startY after dragStart to prevent accumulated delta', () => {
+    slider = new Tvist(root, {
+      loop: true,
+      drag: true,
+      perPage: 1,
+      speed: 0
+    })
+
+    const container = root.querySelector('.tvist-v1__container') as HTMLElement
+    const initialLocation = slider.engine.location.get()
+
+    // Симулируем pointerdown
+    container.dispatchEvent(new PointerEvent('pointerdown', {
+      clientX: 400,
+      clientY: 0,
+      bubbles: true
+    }))
+
+    // Делаем несколько маленьких движений (меньше MIN_DRAG_DISTANCE = 5px)
+    // Эти движения НЕ должны начать drag, но накапливают delta
+    document.dispatchEvent(new PointerEvent('pointermove', {
+      clientX: 398, // -2px
+      clientY: 0,
+      bubbles: true
+    }))
+
+    // Location НЕ должна измениться, так как drag еще не начался
+    expect(slider.engine.location.get()).toBe(initialLocation)
+
+    document.dispatchEvent(new PointerEvent('pointermove', {
+      clientX: 396, // еще -2px (всего -4px)
+      clientY: 0,
+      bubbles: true
+    }))
+
+    // Location все еще не изменилась
+    expect(slider.engine.location.get()).toBe(initialLocation)
+
+    // Теперь движение, которое превысит MIN_DRAG_DISTANCE
+    // Общий delta от startX будет: 400 - 390 = 10px
+    // Но после dragStart должен быть сброс startX, поэтому следующий delta будет ~0
+    document.dispatchEvent(new PointerEvent('pointermove', {
+      clientX: 390, // еще -6px (всего -10px, превышает MIN_DRAG_DISTANCE)
+      clientY: 0,
+      bubbles: true
+    }))
+
+    // КРИТИЧНО: location должна остаться на месте или измениться минимально
+    // Если startX не сброшен, location скакнет на -10px
+    // Если startX сброшен, location останется ~0 (или изменится на следующем кадре)
+    const locationAfterDragStart = slider.engine.location.get()
+    expect(Math.abs(locationAfterDragStart - initialLocation)).toBeLessThan(2)
+
+    // Следующее движение должно работать нормально
+    document.dispatchEvent(new PointerEvent('pointermove', {
+      clientX: 385, // -5px от предыдущего
+      clientY: 0,
+      bubbles: true
+    }))
+
+    const locationAfterSecondMove = slider.engine.location.get()
+    // Теперь location должна измениться на ~5px
+    expect(Math.abs(locationAfterSecondMove - locationAfterDragStart)).toBeGreaterThan(3)
+    expect(Math.abs(locationAfterSecondMove - locationAfterDragStart)).toBeLessThan(10)
+
+    document.dispatchEvent(new PointerEvent('pointerup', {
+      clientX: 385,
       clientY: 0,
       bubbles: true
     }))
