@@ -160,6 +160,18 @@ export interface VisibilityOptions {
   threshold?: number
 }
 
+/**
+ * Опции для специфичных браузерных фиксов
+ */
+export interface BrowserFixesOptions {
+  /**
+   * Firefox: добавлять атрибут decoding="sync" к изображениям при предзагрузке.
+   * Предотвращает задержку отрисовки декодированных изображений в Firefox.
+   * @default true
+   */
+  firefoxImageDecoding?: boolean
+}
+
 /** Payload события videoProgress */
 export interface VideoProgressEvent {
   /** DOM-элемент слайда */
@@ -447,6 +459,12 @@ export interface TvistOptions {
    * @default true
    */
   visibility?: boolean | VisibilityOptions
+  
+  /**
+   * Специфичные фиксы для браузеров
+   * @default { firefoxImageDecoding: true }
+   */
+  browserFixes?: BrowserFixesOptions
   
   // Loop
   

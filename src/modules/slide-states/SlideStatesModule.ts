@@ -82,17 +82,25 @@ export class SlideStatesModule extends Module {
     const images = slide.querySelectorAll<HTMLImageElement>('img')
     const decodePromises: Promise<void>[] = []
     
+    // Получаем настройку для Firefox фикса (по умолчанию true)
+    const firefoxFix = this.options.browserFixes?.firefoxImageDecoding ?? true
+    
     images.forEach((img) => {
       // Декодируем только загруженные и ещё не декодированные изображения
       if (img.complete && img.naturalWidth > 0 && !this.decodedImages.has(img)) {
         if ('decode' in img) {
+          // Firefox: добавляем атрибут decoding="sync" для предотвращения задержки отрисовки
+          if (isFirefox && firefoxFix && !img.hasAttribute('decoding')) {
+            img.setAttribute('decoding', 'sync')
+          }
+          
           decodePromises.push(
             img
               .decode()
               .then(() => {
                 this.decodedImages.set(img, true)
                 // Firefox: принудительный reflow после decode, чтобы картинка отрисовалась без задержки
-                if (isFirefox) {
+                if (isFirefox && firefoxFix) {
                   void img.offsetHeight
                 }
               })

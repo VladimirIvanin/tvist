@@ -137,6 +137,10 @@ export class Tvist {
     }
 
     // Мёрджим опции с дефолтными
+    const defaultBrowserFixes = {
+      firefoxImageDecoding: true,
+    }
+    
     this.options = {
       perPage: 1,
       slidesPerGroup: 1,
@@ -151,6 +155,11 @@ export class Tvist {
       preventClicksPropagation: true,
       visibility: true,
       ...options,
+      // Мерджим browserFixes отдельно для правильного объединения
+      browserFixes: {
+        ...defaultBrowserFixes,
+        ...options.browserFixes,
+      },
     }
 
     // Сохраняем оригинальные опции ДО применения breakpoints
@@ -400,7 +409,18 @@ export class Tvist {
       }
     } else {
       // Обычный merge для остальных опций
-      Object.assign(this.options, newOptions)
+      // Специальная обработка для browserFixes - мерджим вложенный объект
+      if (newOptions.browserFixes) {
+        this.options.browserFixes = {
+          ...this.options.browserFixes,
+          ...newOptions.browserFixes,
+        }
+        // Удаляем из newOptions чтобы не перезаписать при Object.assign
+        const { browserFixes: _unused, ...restOptions } = newOptions
+        Object.assign(this.options, restOptions)
+      } else {
+        Object.assign(this.options, newOptions)
+      }
     }
 
     // Обработка изменения direction
