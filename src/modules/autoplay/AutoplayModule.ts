@@ -135,7 +135,8 @@ export class AutoplayModule extends Module {
   override onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
     // Если autoplay изменился
     if (newOptions.autoplay !== undefined) {
-      const wasActive = this.config !== null && this.timer !== null
+      const wasActive = this.config !== null
+      const oldConfig = this.config
       
       // Перенормализуем
       this.config = normalizeAutoplay(newOptions.autoplay)
@@ -164,6 +165,14 @@ export class AutoplayModule extends Module {
         if (this.config.pauseOnHover) {
           this.attachHoverEvents()
         }
+        
+        // Если waitForVideo был отключен, сбрасываем связанные флаги
+        if (oldConfig?.waitForVideo && !this.config.waitForVideo && this.waitingForVideo) {
+          this.waitingForVideo = false
+          this.videoEndedWhilePaused = false
+          this.detachVideoEndedListener()
+        }
+        
         this.start() // Перезапускаем с новой задержкой
       }
     }
@@ -679,6 +688,18 @@ export class AutoplayModule extends Module {
         if (this.tvist.activeIndex === indexBefore) {
           this.transitionByAutoplay = false
           // Не планируем fallback, т.к. переход не произошёл
+          
+          // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Если навигация не произошла (граница без loop),
+          // нужно перезапустить autoplay, иначе он останется застрявшим.
+          // slideChangeEnd не будет эмититься, т.к. индекс не изменился,
+          // поэтому handleSlideChangedForVideo не будет вызван.
+          // Если включен waitForVideo, вызываем handleSlideChangedForVideo для текущего слайда,
+          // иначе просто запускаем таймер.
+          if (this.config?.waitForVideo) {
+            this.handleSlideChangedForVideo(this.tvist.realIndex ?? this.tvist.activeIndex)
+          } else {
+            this.run()
+          }
         } else {
           this.scheduleTransitionByAutoplayFallback()
         }
