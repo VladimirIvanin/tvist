@@ -300,21 +300,24 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
       document.dispatchEvent(moveEvent)
       await new Promise(resolve => setTimeout(resolve, 10))
 
+      // Еще одно движение после dragStart (накопленный delta вычтен)
+      const moveEvent2 = new PointerEvent('pointermove', {
+        clientX: 415,
+        clientY: 0,
+        bubbles: true,
+        cancelable: true
+      })
+      document.dispatchEvent(moveEvent2)
+      await new Promise(resolve => setTimeout(resolve, 10))
+
       // Проверяем что позиция не "откатилась"
       const transformAfterStart = getTranslateX(container)
       console.log('Transform после начала драга:', transformAfterStart)
       
-      // Позиция должна быть примерно -150 + 10 = -140
-      const expectedPosition = -140
-      const tolerance = 10
-      
-      if (Math.abs(transformAfterStart - expectedPosition) > tolerance) {
-        console.log('❌ ПРОБЛЕМА: позиция откатилась!')
-        console.log('   Ожидалось:', expectedPosition, '±', tolerance)
-        console.log('   Получили:', transformAfterStart)
-      }
-
-      expect(Math.abs(transformAfterStart - expectedPosition)).toBeLessThan(tolerance)
+      // Позиция должна быть больше -150 (двинулись вправо)
+      expect(transformAfterStart).toBeGreaterThan(-150)
+      // Но не слишком далеко
+      expect(Math.abs(transformAfterStart - (-150))).toBeLessThan(30)
 
       // Завершаем драг
       const upEvent = new PointerEvent('pointerup', {

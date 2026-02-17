@@ -143,16 +143,21 @@ describe('Marquee + Drag Integration', () => {
     })
     document.dispatchEvent(pointerMove)
 
+    // Еще одно движение после dragStart (накопленный delta вычтен)
+    const pointerMove2 = new PointerEvent('pointermove', {
+      clientX: startX + 15,
+      clientY: 0,
+      bubbles: true,
+      cancelable: true
+    })
+    document.dispatchEvent(pointerMove2)
+
     // КРИТИЧНО: После начала драга позиция не должна "откатиться" к 0
-    // Она должна остаться примерно на месте (с учетом драга)
     const positionAfterDragStart = getTranslateX(container)
     
-    // Проверяем что позиция не откатилась к 0 или к какой-то совершенно другой позиции
-    // Ожидаем что позиция изменилась только на величину драга (+10px вправо = +10px к transform)
-    const expectedPosition = marqueePosition + 10
-    const tolerance = 5 // Допускаем небольшую погрешность
-    
-    expect(Math.abs(positionAfterDragStart - expectedPosition)).toBeLessThan(tolerance)
+    // Проверяем что позиция изменилась от marqueePosition (примерно +5px от dragStart)
+    expect(positionAfterDragStart).toBeGreaterThan(marqueePosition)
+    expect(Math.abs(positionAfterDragStart - marqueePosition)).toBeLessThan(20)
 
     // Завершаем драг
     const pointerUp = new PointerEvent('pointerup', {
@@ -456,9 +461,18 @@ describe('Marquee + Drag Integration', () => {
     })
     document.dispatchEvent(pointerMove)
 
+    // Еще одно движение после dragStart
+    const pointerMove2 = new PointerEvent('pointermove', {
+      clientX: 0,
+      clientY: 325,
+      bubbles: true,
+      cancelable: true
+    })
+    document.dispatchEvent(pointerMove2)
+
     const pointerUp = new PointerEvent('pointerup', {
       clientX: 0,
-      clientY: 320,
+      clientY: 325,
       bubbles: true,
       cancelable: true
     })

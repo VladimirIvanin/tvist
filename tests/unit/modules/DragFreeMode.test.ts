@@ -504,17 +504,22 @@ describe('DragModule Free Mode', () => {
         createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
       )
 
-      // Драгаем вправо за границу
+      // Драгаем вправо за границу (превышает MIN_DRAG_DISTANCE)
       document.dispatchEvent(
         createMouseEvent('mousemove', { clientX: 300, clientY: 100 })
+      )
+
+      // Еще одно движение после dragStart
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 310, clientY: 100 })
       )
 
       const positionDuringDrag = slider.engine.location.get()
 
       // Должны немного двинуться, но с сопротивлением
       expect(positionDuringDrag).toBeGreaterThan(0)
-      // Но не на полные 100px (из-за rubberband)
-      expect(positionDuringDrag).toBeLessThan(100)
+      // Но не на полные 110px (из-за rubberband)
+      expect(positionDuringDrag).toBeLessThan(110)
 
       document.dispatchEvent(
         createMouseEvent('mouseup', { clientX: 300, clientY: 100 })
