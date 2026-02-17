@@ -274,13 +274,11 @@ export class AutoplayModule extends Module {
     // и next() может сработать во время или сразу после snap,
     // что приводит к багу с пагинацией (activeBullet != activeIndex).
     this.on('transitionEnd', () => {
-      // Сбрасываем transitionByAutoplay и отменяем fallback, если переход был от autoplay.
-      // transitionEnd всегда срабатывает после завершения анимации, независимо от её длительности,
-      // поэтому это более надёжное место для сброса флага, чем slideChangeEnd.
-      if (this.transitionByAutoplay) {
-        this.transitionByAutoplay = false
-        this.clearTransitionByAutoplayFallback()
-      }
+      // НЕ сбрасываем transitionByAutoplay здесь!
+      // transitionEnd срабатывает РАНЬШЕ slideChangeEnd (см. Engine.ts:650-653),
+      // поэтому если сбросить флаг здесь, slideChangeEnd всегда увидит его как false.
+      // Это приводит к тому, что каждый autoplay-переход обрабатывается как ручная навигация,
+      // вызывая cancelTimer() + run(), что добавляет animation duration к каждому циклу.
       
       // Если был drag — resume через resumeAfterDrag
       if (this.isDragging) {
@@ -297,11 +295,16 @@ export class AutoplayModule extends Module {
     // При смене слайда: при ручной навигации (стрелки, пагинация и т.д.) сбрасываем таймер,
     // чтобы новый слайд показывался полное время delay, а не остаток от предыдущего счётчика
     this.on('slideChangeEnd', (index: number) => {
+      // Сохраняем значение флага ДО его сброса
       const byAutoplay = this.transitionByAutoplay
+      
+      // Сбрасываем флаг и отменяем fallback
       if (this.transitionByAutoplay) {
         this.transitionByAutoplay = false
         this.clearTransitionByAutoplayFallback()
       }
+      
+      // Если переход был НЕ от autoplay (ручная навигация), сбрасываем таймер
       if (!byAutoplay && !this.paused && !this.stopped) {
         this.cancelTimer()
         this.timeLeft = null
@@ -373,9 +376,21 @@ export class AutoplayModule extends Module {
         return
       }
       this.waitingForVideo = false
+      
+      // Запоминаем индекс до навигации
+      const indexBefore = this.tvist.activeIndex
+      
       this.transitionByAutoplay = true
       this.tvist.next()
-      this.scheduleTransitionByAutoplayFallback()
+      
+      // Проверяем, изменился ли индекс (произошла ли навигация)
+      // Если индекс не изменился (граница без loop), сбрасываем флаг немедленно
+      if (this.tvist.activeIndex === indexBefore) {
+        this.transitionByAutoplay = false
+        // Не планируем fallback, т.к. переход не произошёл
+      } else {
+        this.scheduleTransitionByAutoplayFallback()
+      }
     }
 
     this.on('videoEnded', this.videoEndedHandler)
@@ -500,9 +515,22 @@ export class AutoplayModule extends Module {
         this.timeLeft = null // Сбрасываем timeLeft для следующего шага
         this.progressStartOffset = 0
         this.stopProgressTracking()
+        
+        // Запоминаем индекс до навигации
+        const indexBefore = this.tvist.activeIndex
+        
         this.transitionByAutoplay = true
         this.tvist.next()
-        this.scheduleTransitionByAutoplayFallback()
+        
+        // Проверяем, изменился ли индекс (произошла ли навигация)
+        // Если индекс не изменился (граница без loop), сбрасываем флаг немедленно
+        if (this.tvist.activeIndex === indexBefore) {
+          this.transitionByAutoplay = false
+          // Не планируем fallback, т.к. переход не произошёл
+        } else {
+          this.scheduleTransitionByAutoplayFallback()
+        }
+        
         this.run() // Рекурсивный вызов после переключения
       }
     }, delay)
@@ -639,9 +667,22 @@ export class AutoplayModule extends Module {
       if (this.videoEndedWhilePaused && this.waitingForVideo) {
         this.videoEndedWhilePaused = false
         this.waitingForVideo = false
+        
+        // Запоминаем индекс до навигации
+        const indexBefore = this.tvist.activeIndex
+        
         this.transitionByAutoplay = true
         this.tvist.next()
-        this.scheduleTransitionByAutoplayFallback()
+        
+        // Проверяем, изменился ли индекс (произошла ли навигация)
+        // Если индекс не изменился (граница без loop), сбрасываем флаг немедленно
+        if (this.tvist.activeIndex === indexBefore) {
+          this.transitionByAutoplay = false
+          // Не планируем fallback, т.к. переход не произошёл
+        } else {
+          this.scheduleTransitionByAutoplayFallback()
+        }
+        
         this.emit('autoplayResume')
         return
       }
