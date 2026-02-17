@@ -8,6 +8,23 @@ import LoopExample from '../.vitepress/theme/examples/LoopExample.vue'
 
 <LoopExample />
 
+## Loop + perPage: 1 с изображениями
+
+Бесконечная прокрутка по одному слайду с картинками, без зазора между слайдами:
+
+<LoopImagesExample />
+
+```js
+new Tvist('.tvist', {
+  gap: 0,
+  perPage: 1,
+  loop: true,
+  arrows: true,
+  pagination: true,
+  drag: true
+})
+```
+
 ## Код примера
 
 **HTML:**

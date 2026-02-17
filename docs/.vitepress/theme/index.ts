@@ -15,6 +15,7 @@ import PeekVerticalExample from './examples/PeekVerticalExample.vue'
 import PeekBreakpointsExample from './examples/PeekBreakpointsExample.vue'
 import PeekMixedUnitsExample from './examples/PeekMixedUnitsExample.vue'
 import PeekTrimExample from './examples/PeekTrimExample.vue'
+import LoopImagesExample from './examples/LoopImagesExample.vue'
 
 // Center examples
 import CenterBasicExample from './examples/CenterBasicExample.vue'
@@ -57,6 +58,7 @@ export default {
     app.component('PeekBreakpointsExample', PeekBreakpointsExample)
     app.component('PeekMixedUnitsExample', PeekMixedUnitsExample)
     app.component('PeekTrimExample', PeekTrimExample)
+    app.component('LoopImagesExample', LoopImagesExample)
     
     // Center examples
     app.component('CenterBasicExample', CenterBasicExample)
