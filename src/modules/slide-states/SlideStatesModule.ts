@@ -33,6 +33,9 @@ export class SlideStatesModule extends Module {
   }
 
   override init(): void {
+    // Применяем Firefox фикс ко всем изображениям при инициализации
+    this.applyFirefoxImageFix()
+    
     // Обновляем классы при создании
     this.updateActiveClasses()
     this.updateVisibleClasses()
@@ -69,6 +72,28 @@ export class SlideStatesModule extends Module {
   }
 
   /**
+   * Применить Firefox фикс ко всем изображениям в слайдере.
+   * Добавляет атрибут decoding="sync" для предотвращения задержки отрисовки.
+   */
+  private applyFirefoxImageFix(): void {
+    const firefoxFix = this.options.browserFixes?.firefoxImageDecoding ?? true
+    
+    if (!isFirefox || !firefoxFix) {
+      return
+    }
+    
+    // Проходим по всем слайдам и добавляем атрибут ко всем изображениям
+    this.tvist.slides.forEach((slide) => {
+      const images = slide.querySelectorAll<HTMLImageElement>('img')
+      images.forEach((img) => {
+        if (!img.hasAttribute('decoding')) {
+          img.setAttribute('decoding', 'sync')
+        }
+      })
+    })
+  }
+
+  /**
    * Предварительное декодирование изображений в слайде.
    * Предотвращает "белые вспышки" при переходе между слайдами.
    * Поддерживает <img> и <picture> элементы. Использует кеш.
@@ -89,11 +114,6 @@ export class SlideStatesModule extends Module {
       // Декодируем только загруженные и ещё не декодированные изображения
       if (img.complete && img.naturalWidth > 0 && !this.decodedImages.has(img)) {
         if ('decode' in img) {
-          // Firefox: добавляем атрибут decoding="sync" для предотвращения задержки отрисовки
-          if (isFirefox && firefoxFix && !img.hasAttribute('decoding')) {
-            img.setAttribute('decoding', 'sync')
-          }
-          
           decodePromises.push(
             img
               .decode()
