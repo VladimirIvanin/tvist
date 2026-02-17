@@ -516,6 +516,7 @@ function applyPreset(preset: string) {
   border-radius: 12px;
   text-align: center;
   color: white;
+  width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
