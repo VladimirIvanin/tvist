@@ -21,6 +21,9 @@ export class SlideStatesModule extends Module {
   private visibilityUpdateScheduled = false
   private visibilityRafId: number | null = null
 
+  // Кеш декодированных изображений (WeakMap для автоматической очистки памяти)
+  private decodedImages = new WeakMap<HTMLImageElement, boolean>()
+
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
   }
@@ -69,6 +72,8 @@ export class SlideStatesModule extends Module {
    * Поддерживает:
    * - <img> элементы
    * - <picture> с <source> элементами (decode() вызывается на <img> внутри <picture>)
+   * 
+   * Использует кеш для предотвращения повторного декодирования одних и тех же изображений.
    */
   private async preloadSlideImages(slide: HTMLElement): Promise<void> {
     // Находим все <img> элементы, включая те, что внутри <picture>
@@ -83,14 +88,26 @@ export class SlideStatesModule extends Module {
       
       // Проверяем, что изображение загружено
       if (img.complete && img.naturalWidth > 0) {
+        // Проверяем, было ли изображение уже декодировано
+        if (this.decodedImages.has(img)) {
+          // Уже декодировано, пропускаем
+          return
+        }
+
         // decode() заставляет браузер декодировать изображение
         // и подготовить его к рендерингу
         if ('decode' in img) {
-          decodePromises.push(
-            img.decode().catch(() => {
+          const decodePromise = img
+            .decode()
+            .then(() => {
+              // Помечаем изображение как декодированное
+              this.decodedImages.set(img, true)
+            })
+            .catch(() => {
               // Игнорируем ошибки декодирования
             })
-          )
+          
+          decodePromises.push(decodePromise)
         }
       }
     })
@@ -233,5 +250,8 @@ export class SlideStatesModule extends Module {
         this.CLASS_VISIBLE
       )
     })
+
+    // WeakMap автоматически очистится, когда изображения будут удалены из DOM
+    // Явная очистка не требуется
   }
 }
