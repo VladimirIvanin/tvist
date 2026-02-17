@@ -294,9 +294,12 @@ export class LoopModule extends Module {
       const fragment = document.createDocumentFragment()
       // Собираем слайды в обратном порядке для prepend
       for (let i = prependSlidesIndexes.length - 1; i >= 0; i--) {
-        const slide = slides[prependSlidesIndexes[i]]
-        if (slide) {
-          fragment.appendChild(slide)
+        const index = prependSlidesIndexes[i]
+        if (index !== undefined) {
+          const slide = slides[index]
+          if (slide) {
+            fragment.appendChild(slide)
+          }
         }
       }
       container.prepend(fragment)
