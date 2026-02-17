@@ -107,7 +107,7 @@ export class SlideStatesModule extends Module {
     const isLoop = activeAttr !== null || this.options.loop === true
 
     let activeLogicalIndex = activeIndex
-    let originalCount = slides.length
+    const originalCount = slides.length
 
     if (activeAttr !== null) {
       activeLogicalIndex = parseInt(activeAttr, 10)
