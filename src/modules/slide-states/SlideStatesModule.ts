@@ -27,23 +27,29 @@ export class SlideStatesModule extends Module {
 
   override init(): void {
     // Обновляем классы при создании
-    this.updateClasses()
+    this.updateActiveClasses()
+    this.updateVisibleClasses()
 
-    // Слушаем события изменения слайдов
-    this.tvist.on('slideChangeStart', () => this.updateClasses())
-    this.tvist.on('slideChangeEnd', () => this.updateClasses())
-    // Используем throttled версию для scroll событий (RAF батчинг)
+    // slideChangeStart: обновляем active/prev/next + visible (синхронно)
+    this.tvist.on('slideChangeStart', () => {
+      this.updateActiveClasses()
+      this.updateVisibleClasses()
+    })
+    // slideChangeEnd: обновляем только visible (финальная позиция после анимации)
+    this.tvist.on('slideChangeEnd', () => this.updateVisibleClasses())
+    // scroll (каждый тик анимации): обновляем visible через RAF-батчинг для экономии CPU
     this.tvist.on('scroll', () => this.scheduleVisibilityUpdate())
   }
 
   override onUpdate(): void {
-    this.updateClasses()
+    this.updateActiveClasses()
+    this.updateVisibleClasses()
   }
 
-
   /**
-   * Запланировать обновление видимости через RAF (батчинг)
-   * Гарантирует максимум один вызов updateVisibleClasses на кадр
+   * Запланировать обновление видимости через RAF (батчинг).
+   * Математический расчёт не вызывает reflow, но RAF гарантирует
+   * максимум один пересчёт классов на кадр при частых scroll-событиях.
    */
   private scheduleVisibilityUpdate(): void {
     if (this.visibilityUpdateScheduled) return
@@ -53,15 +59,6 @@ export class SlideStatesModule extends Module {
       this.visibilityUpdateScheduled = false
       this.updateVisibleClasses()
     })
-  }
-
-  /**
-   * Обновление всех классов состояний
-   */
-  private updateClasses(): void {
-    this.updateActiveClasses()
-    // Вместо прямого вызова используем throttled версию
-    this.scheduleVisibilityUpdate()
   }
 
   /**
@@ -139,22 +136,16 @@ export class SlideStatesModule extends Module {
   }
 
   /**
-   * Обновление классов видимости слайдов
-   * Проверяет, находится ли слайд (полностью или частично) в видимой области
-   * 
-   * Оптимизация: вызывается через scheduleVisibilityUpdate с RAF батчингом
-   * для предотвращения layout thrashing (максимум один вызов getBoundingClientRect на кадр)
+   * Обновление классов видимости слайдов.
+   * Использует математический расчёт через Engine.getVisibleSlides() вместо
+   * getBoundingClientRect(), что исключает forced reflow во время анимации.
    */
   private updateVisibleClasses(): void {
     const slides = this.tvist.slides
-    const rootRect = this.tvist.root.getBoundingClientRect()
-    const isVertical = this.options.direction === 'vertical'
+    const visibleFlags = this.tvist.engine.getVisibleSlides()
 
     slides.forEach((slide, index) => {
-      const slideRect = slide.getBoundingClientRect()
-      const isVisible = isVertical
-        ? this.isVerticallyVisible(slideRect, rootRect)
-        : this.isHorizontallyVisible(slideRect, rootRect)
+      const isVisible = visibleFlags[index] ?? false
 
       const hadVisible = slide.classList.contains(this.CLASS_VISIBLE)
       if (isVisible && !hadVisible) {
@@ -165,38 +156,6 @@ export class SlideStatesModule extends Module {
         this.tvist.emit('hidden', slide, index)
       }
     })
-  }
-
-  /**
-   * Проверка горизонтальной видимости слайда
-   */
-  private isHorizontallyVisible(
-    slideRect: DOMRect,
-    rootRect: DOMRect
-  ): boolean {
-    // Слайд видим, если он имеет значительное пересечение с viewport
-    // Используем порог 1px чтобы избежать ложных срабатываний при касании краев
-    const THRESHOLD = 1
-    return (
-      slideRect.left < rootRect.right - THRESHOLD &&
-      slideRect.right > rootRect.left + THRESHOLD
-    )
-  }
-
-  /**
-   * Проверка вертикальной видимости слайда
-   */
-  private isVerticallyVisible(
-    slideRect: DOMRect,
-    rootRect: DOMRect
-  ): boolean {
-    // Слайд видим, если он имеет значительное пересечение с viewport
-    // Используем порог 1px чтобы избежать ложных срабатываний при касании краев
-    const THRESHOLD = 1
-    return (
-      slideRect.top < rootRect.bottom - THRESHOLD &&
-      slideRect.bottom > rootRect.top + THRESHOLD
-    )
   }
 
   /**

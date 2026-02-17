@@ -811,6 +811,35 @@ export class Engine {
   }
 
   /**
+   * Вычисляет видимость каждого слайда математически (без DOM-запросов).
+   * Использует закэшированные slidePositions, slideSizes и текущий location.
+   * @returns массив булевых значений видимости для каждого слайда
+   */
+  public getVisibleSlides(): boolean[] {
+    const currentPos = this.location.get()
+    const viewportSize = this.containerSize
+    const slides = this.tvist.slides
+    const result: boolean[] = []
+    const THRESHOLD = 1
+
+    for (let i = 0; i < slides.length; i++) {
+      // slidePosition — позиция слайда в координатах контента
+      // currentPos — отрицательное смещение (translate), поэтому видимая область:
+      // от -currentPos до -currentPos + viewportSize
+      const viewportStart = -currentPos
+      const viewportEnd = viewportStart + viewportSize
+
+      const slideStart = this.getSlidePosition(i)
+      const slideEnd = slideStart + this.getSlideSize(i)
+
+      const isVisible = slideStart < viewportEnd - THRESHOLD && slideEnd > viewportStart + THRESHOLD
+      result.push(isVisible)
+    }
+
+    return result
+  }
+
+  /**
    * Получить текущий индекс
    */
   get activeIndex(): number {

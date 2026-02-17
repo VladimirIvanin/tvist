@@ -137,9 +137,10 @@ describe('SlideStatesModule', () => {
   })
 
   describe('Visible class', () => {
-    it('класс visible не проставляется в happy-dom (нулевые размеры)', async () => {
-      // В happy-dom getBoundingClientRect возвращает нули, поэтому
-      // canCheckVisibility = false и класс visible не проставляется
+    it('класс visible проставляется через математический расчёт Engine (без getBoundingClientRect)', async () => {
+      // Видимость рассчитывается математически через Engine.getVisibleSlides(),
+      // используя закэшированные позиции и размеры слайдов — без DOM-запросов.
+      // В happy-dom это работает корректно, т.к. Engine сам управляет размерами.
       tvist = new Tvist(root, {
         perPage: 1,
         start: 0,
@@ -149,10 +150,9 @@ describe('SlideStatesModule', () => {
 
       const slides = tvist.slides
       
-      // В happy-dom класс visible не проставляется из-за нулевых размеров
-      // Это ограничение тестового окружения, в реальном браузере будет работать
+      // Активный слайд (индекс 0) должен быть видимым
       const hasVisible = slides.some(s => s.classList.contains(`${TVIST_CSS_PREFIX}__slide--visible`))
-      expect(hasVisible).toBe(false)
+      expect(hasVisible).toBe(true)
     })
   })
 
