@@ -34,6 +34,7 @@
     position: relative;
     width: 100%;
     backface-visibility: hidden;
+    transform: translateZ(0);
     box-sizing: border-box;
     list-style-type: none !important;
     margin: 0;
