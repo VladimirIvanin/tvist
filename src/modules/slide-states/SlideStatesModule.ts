@@ -80,13 +80,13 @@ export class SlideStatesModule extends Module {
           decodePromises.push(
             img.decode()
               .then(() => { this.decodedImages.set(img, true) })
-              .catch(() => {}) // Игнорируем ошибки
+              .catch(() => undefined) // Игнорируем ошибки
           )
         }
       }
     })
 
-    await Promise.all(decodePromises).catch(() => {})
+    await Promise.all(decodePromises).catch(() => undefined)
   }
 
   /**
@@ -173,7 +173,7 @@ export class SlideStatesModule extends Module {
     // Запускаем декодирование в фоне (не блокируем основной поток)
     // Промисы выполнятся асинхронно, но мы не ждём их завершения
     if (preloadPromises.length > 0) {
-      Promise.all(preloadPromises).catch(() => {})
+      Promise.all(preloadPromises).catch(() => undefined)
     }
   }
 
