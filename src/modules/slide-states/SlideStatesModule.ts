@@ -5,6 +5,7 @@
 
 import { Module } from '../Module'
 import { TVIST_CLASSES } from '../../core/constants'
+import { isFirefox } from '../../utils/browser'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -78,8 +79,15 @@ export class SlideStatesModule extends Module {
       if (img.complete && img.naturalWidth > 0 && !this.decodedImages.has(img)) {
         if ('decode' in img) {
           decodePromises.push(
-            img.decode()
-              .then(() => { this.decodedImages.set(img, true) })
+            img
+              .decode()
+              .then(() => {
+                this.decodedImages.set(img, true)
+                // Firefox: принудительный reflow после decode, чтобы картинка отрисовалась без задержки
+                if (isFirefox) {
+                  void img.offsetHeight
+                }
+              })
               .catch(() => undefined) // Игнорируем ошибки
           )
         }
