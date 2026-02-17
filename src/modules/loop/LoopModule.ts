@@ -290,22 +290,27 @@ export class LoopModule extends Module {
     }
 
     // Перемещаем слайды в DOM
-    if (isPrev) {
-      prependSlidesIndexes.forEach((index) => {
-        const slide = slides[index]
+    if (isPrev && prependSlidesIndexes.length > 0) {
+      const fragment = document.createDocumentFragment()
+      // Собираем слайды в обратном порядке для prepend
+      for (let i = prependSlidesIndexes.length - 1; i >= 0; i--) {
+        const slide = slides[prependSlidesIndexes[i]]
         if (slide) {
-          container.prepend(slide)
+          fragment.appendChild(slide)
         }
-      })
+      }
+      container.prepend(fragment)
     }
 
-    if (isNext) {
+    if (isNext && appendSlidesIndexes.length > 0) {
+      const fragment = document.createDocumentFragment()
       appendSlidesIndexes.forEach((index) => {
         const slide = slides[index]
         if (slide) {
-          container.append(slide)
+          fragment.appendChild(slide)
         }
       })
+      container.append(fragment)
     }
 
     // Принудительный reflow для синхронизации DOM 
@@ -487,11 +492,13 @@ export class LoopModule extends Module {
     })
 
     // Перестраиваем DOM в правильном порядке
+    const fragment = document.createDocumentFragment()
     newSlidesOrder.forEach((slideEl) => {
       if (slideEl) {
-        container.append(slideEl)
+        fragment.appendChild(slideEl)
       }
     })
+    container.appendChild(fragment)
 
     // Обновляем список слайдов
     this.tvist.updateSlidesList()

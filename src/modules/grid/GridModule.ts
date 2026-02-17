@@ -117,11 +117,14 @@ export class GridModule extends Module {
     
     let slideIndex = 0
     
+    const containerFragment = document.createDocumentFragment()
+    
     for (let pageIndex = 0; pageIndex < pagesCount; pageIndex++) {
       const outerSlide = this.createOuterSlide()
       
       for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
         const rowEl = this.createRowElement(rowIndex, rows)
+        const rowFragment = document.createDocumentFragment()
         
         for (let colIndex = 0; colIndex < cols; colIndex++) {
           if (slideIndex < this.originalSlides.length) {
@@ -129,18 +132,21 @@ export class GridModule extends Module {
             if (originalSlide) {
               const colWrapper = this.createColWrapper(colIndex, cols)
               this.wrapSlide(originalSlide, colWrapper)
-              rowEl.appendChild(colWrapper)
+              rowFragment.appendChild(colWrapper)
             }
             slideIndex++
           }
         }
         
+        rowEl.appendChild(rowFragment)
         outerSlide.appendChild(rowEl)
       }
       
       this.wrapperSlides.push(outerSlide)
-      this.tvist.container.appendChild(outerSlide)
+      containerFragment.appendChild(outerSlide)
     }
+    
+    this.tvist.container.appendChild(containerFragment)
   }
 
   /**
@@ -155,6 +161,7 @@ export class GridModule extends Module {
     const dimensions = grid.dimensions
     let slideIndex = 0
     let dimensionIndex = 0
+    const containerFragment = document.createDocumentFragment()
     
     // Создаем страницы пока есть слайды
     while (slideIndex < this.originalSlides.length) {
@@ -165,6 +172,7 @@ export class GridModule extends Module {
       
       for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
         const rowEl = this.createRowElement(rowIndex, rows)
+        const rowFragment = document.createDocumentFragment()
         
         for (let colIndex = 0; colIndex < cols; colIndex++) {
           if (slideIndex < this.originalSlides.length) {
@@ -172,19 +180,22 @@ export class GridModule extends Module {
             if (originalSlide) {
               const colWrapper = this.createColWrapper(colIndex, cols)
               this.wrapSlide(originalSlide, colWrapper)
-              rowEl.appendChild(colWrapper)
+              rowFragment.appendChild(colWrapper)
             }
             slideIndex++
           }
         }
         
+        rowEl.appendChild(rowFragment)
         outerSlide.appendChild(rowEl)
       }
       
       this.wrapperSlides.push(outerSlide)
-      this.tvist.container.appendChild(outerSlide)
+      containerFragment.appendChild(outerSlide)
       dimensionIndex++
     }
+    
+    this.tvist.container.appendChild(containerFragment)
   }
 
   /**
@@ -268,14 +279,16 @@ originalSlide.classList.remove(TVIST_CLASSES.slide)
       container.style.display = ''
       container.innerHTML = ''
       
+      const fragment = document.createDocumentFragment()
       this.originalSlides.forEach(slide => {
         // Восстанавливаем класс tvist-v1__slide
         slide.classList.remove(TVIST_CLASSES.gridItem)
         slide.classList.add(TVIST_CLASSES.slide)
         slide.style.width = ''
         slide.style.height = ''
-        container.appendChild(slide)
+        fragment.appendChild(slide)
       })
+      container.appendChild(fragment)
       
       // Обновляем список слайдов
       this.tvist.updateSlidesList()
