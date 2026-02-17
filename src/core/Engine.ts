@@ -386,14 +386,15 @@ export class Engine {
    * Вызывается после calculatePositions/calculateSizes и при любом изменении layout.
    */
   private updateScrollCache(): void {
+    // ВАЖНО: cachedRootSize нужен для getCenterOffset даже при loop
+    this.cachedRootSize = this.getRootSize()
+
     if (this.options.loop) {
       this.cachedMinScroll = -Infinity
       this.cachedMaxScroll = -Infinity
       this.scrollCacheValid = true
       return
     }
-
-    this.cachedRootSize = this.getRootSize()
 
     // minScroll: используем peekStart (уже вычислен в calculateSizes)
     this.cachedMinScroll = -this.peekStart
