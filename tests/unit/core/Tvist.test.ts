@@ -73,6 +73,111 @@ describe('Tvist', () => {
     it('should have version', () => {
       expect(Tvist.VERSION).toBe(pkg.version)
     })
+
+    it('should generate unique id for each instance', () => {
+      const slider1 = new Tvist(fixture.root)
+      const id1 = slider1.id
+
+      // Создаём второй слайдер
+      const fixture2 = createSliderFixture({ slidesCount: 3, width: 800 })
+      const slider2 = new Tvist(fixture2.root)
+      const id2 = slider2.id
+
+      // ID должны быть уникальными
+      expect(id1).not.toBe(id2)
+      
+      // ID должны быть в формате tvist-{UUID}
+      const uuidRegex = /^tvist-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+      expect(id1).toMatch(uuidRegex)
+      expect(id2).toMatch(uuidRegex)
+
+      fixture2.cleanup()
+    })
+
+    it('should store instance in root.tvistInstance', () => {
+      const slider = new Tvist(fixture.root)
+      
+      expect(fixture.root.tvistInstance).toBe(slider)
+    })
+
+    it('should destroy old instance when creating new one on same element', () => {
+      const slider1 = new Tvist(fixture.root)
+      const id1 = slider1.id
+      const destroySpy = vi.spyOn(slider1, 'destroy')
+
+      // Создаём новый инстанс на том же элементе
+      const slider2 = new Tvist(fixture.root)
+      const id2 = slider2.id
+
+      // Старый инстанс должен быть уничтожен
+      expect(destroySpy).toHaveBeenCalled()
+      
+      // ID должны быть разными
+      expect(id1).not.toBe(id2)
+      
+      // В root должен быть новый инстанс
+      expect(fixture.root.tvistInstance).toBe(slider2)
+    })
+
+    it('should set tvistInstance to null after destroy', () => {
+      const slider = new Tvist(fixture.root)
+      
+      expect(fixture.root.tvistInstance).toBe(slider)
+      
+      slider.destroy()
+      
+      expect(fixture.root.tvistInstance).toBeNull()
+    })
+
+    it('should generate UUID-based IDs that are collision-resistant', () => {
+      // Создаём много слайдеров для проверки уникальности
+      const ids = new Set<string>()
+      const fixtures: Array<{ root: HTMLElement; cleanup: () => void }> = []
+      
+      for (let i = 0; i < 100; i++) {
+        const f = createSliderFixture({ slidesCount: 3, width: 800 })
+        const slider = new Tvist(f.root)
+        ids.add(slider.id)
+        fixtures.push(f)
+      }
+      
+      // Все ID должны быть уникальными
+      expect(ids.size).toBe(100)
+      
+      // Все ID должны соответствовать формату UUID
+      const uuidRegex = /^tvist-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+      ids.forEach(id => {
+        expect(id).toMatch(uuidRegex)
+      })
+      
+      fixtures.forEach(f => f.cleanup())
+    })
+
+    it('should maintain unique IDs even with rapid instance creation', () => {
+      // Симулируем быстрое создание инстансов (как при двойном подключении скриптов)
+      const ids: string[] = []
+      const fixtures: Array<{ root: HTMLElement; cleanup: () => void }> = []
+      
+      // Создаём 10 слайдеров практически одновременно
+      for (let i = 0; i < 10; i++) {
+        const f = createSliderFixture({ slidesCount: 3, width: 800 })
+        const slider = new Tvist(f.root)
+        ids.push(slider.id)
+        fixtures.push(f)
+      }
+      
+      // Проверяем что все ID уникальны
+      const uniqueIds = new Set(ids)
+      expect(uniqueIds.size).toBe(10)
+      
+      // Проверяем формат
+      const uuidRegex = /^tvist-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+      ids.forEach(id => {
+        expect(id).toMatch(uuidRegex)
+      })
+      
+      fixtures.forEach(f => f.cleanup())
+    })
   })
 
   describe('navigation', () => {

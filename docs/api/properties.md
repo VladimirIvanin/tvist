@@ -4,6 +4,10 @@
 
 ## Список свойств
 
+### Идентификация
+- [`id`](#id) - Уникальный ID инстанса
+- [`tvistInstance`](#tvistinstance) - Доступ к инстансу через root элемент
+
 ### Доступ к элементам
 - [`root`](#root) - Корневой элемент слайдера
 - [`container`](#container) - Контейнер слайдов
@@ -20,6 +24,140 @@
 - [`options`](#options) - Текущие опции слайдера
 
 ---
+
+## Идентификация
+
+### id
+
+```typescript
+readonly id: string
+```
+
+Уникальный идентификатор инстанса слайдера. Генерируется автоматически при создании в формате `tvist-{UUID}`.
+
+**Особенности:**
+- ID гарантированно уникален (использует UUID v4)
+- В современных браузерах использует `crypto.randomUUID()` для криптографически стойкой генерации
+- Fallback для старых браузеров: генерация UUID v4 через `Math.random()`
+- Уникальность гарантирована даже при:
+  - Двойном подключении скриптов
+  - Использовании разных версий библиотеки на одной странице
+  - Быстром создании множества инстансов
+  - Работе в iframe
+- Формат: `tvist-xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`
+- Вероятность коллизии: практически нулевая (~1 на 5.3×10³⁶)
+
+**Примеры:**
+
+```javascript
+const slider1 = new Tvist('.slider-1')
+const slider2 = new Tvist('.slider-2')
+
+console.log(slider1.id) // 'tvist-a1b2c3d4-e5f6-4789-a012-3456789abcde'
+console.log(slider2.id) // 'tvist-f7e8d9c0-b1a2-4345-6789-0abcdef12345'
+
+// Использование для аналитики
+slider1.on('slideChangeStart', (index) => {
+  analytics.track('slide_change', {
+    sliderId: slider1.id,
+    slideIndex: index
+  })
+})
+
+// Использование для отладки
+console.log(`[${slider1.id}] Active index: ${slider1.activeIndex}`)
+
+// Хранение инстансов в Map
+const sliders = new Map()
+sliders.set(slider1.id, slider1)
+sliders.set(slider2.id, slider2)
+
+// Получение инстанса по ID
+const slider = sliders.get('tvist-a1b2c3d4-e5f6-4789-a012-3456789abcde')
+```
+
+### tvistInstance
+
+```typescript
+// Доступ через root элемент
+element.tvistInstance?: Tvist | null
+```
+
+Ссылка на инстанс Tvist, сохранённая в свойстве `tvistInstance` корневого элемента. Позволяет получить доступ к слайдеру через DOM элемент.
+
+**Примеры:**
+
+```javascript
+// Создание слайдера
+const slider = new Tvist('.slider')
+
+// Получение инстанса через DOM элемент
+const element = document.querySelector('.slider')
+const sliderInstance = element.tvistInstance
+
+console.log(sliderInstance.id) // 'tvist-a1b2c3d4-e5f6-4789-a012-3456789abcde'
+console.log(sliderInstance === slider) // true
+
+// Использование в обработчиках событий
+document.querySelectorAll('.slider').forEach(element => {
+  element.addEventListener('click', () => {
+    const slider = element.tvistInstance
+    if (slider) {
+      console.log(`Clicked on slider ${slider.id}`)
+      slider.next()
+    }
+  })
+})
+
+// Проверка существования инстанса
+const element = document.querySelector('.slider')
+if (element.tvistInstance) {
+  console.log('Слайдер уже инициализирован')
+  element.tvistInstance.update()
+} else {
+  // Создаём новый инстанс
+  new Tvist(element)
+}
+
+// Получение инстанса из события
+slider.root.addEventListener('custom-event', (e) => {
+  const slider = e.currentTarget.tvistInstance
+  if (slider) {
+    console.log(`Event from slider ${slider.id}`)
+  }
+})
+```
+
+**Важно:**
+- При создании нового инстанса на том же элементе старый автоматически уничтожается
+- После вызова `destroy()` свойство `tvistInstance` устанавливается в `null`
+- Это свойство полезно для избежания повторной инициализации
+
+```javascript
+// Безопасная инициализация
+function initSlider(element) {
+  // Если инстанс уже существует, не создаём новый
+  if (element.tvistInstance) {
+    return element.tvistInstance
+  }
+  
+  return new Tvist(element, {
+    perPage: 3,
+    gap: 20
+  })
+}
+
+// Переинициализация с новыми опциями
+function reinitSlider(element, newOptions) {
+  // Уничтожаем старый инстанс если есть
+  if (element.tvistInstance) {
+    element.tvistInstance.destroy()
+  }
+  
+  // Создаём новый
+  return new Tvist(element, newOptions)
+}
+```
 
 ## Доступ к элементам
 
@@ -374,5 +512,134 @@ slider.on('resized', () => {
   } else {
     slider.updateOptions({ perPage: 3, gap: 30 })
   }
+})
+```
+
+### Управление несколькими слайдерами через ID
+
+```javascript
+// Создаём несколько слайдеров
+const sliders = new Map()
+
+document.querySelectorAll('.slider').forEach(element => {
+  const slider = new Tvist(element, {
+    perPage: 3,
+    gap: 20
+  })
+  
+  // Сохраняем по ID
+  sliders.set(slider.id, slider)
+  
+  console.log(`Создан слайдер ${slider.id}`)
+})
+
+// Получение слайдера по ID
+const slider = sliders.get('tvist-1')
+if (slider) {
+  slider.next()
+}
+
+// Управление всеми слайдерами
+sliders.forEach((slider, id) => {
+  console.log(`Слайдер ${id}: активный слайд ${slider.activeIndex}`)
+})
+```
+
+### Получение инстанса через DOM элемент
+
+```javascript
+// Инициализация слайдеров
+document.querySelectorAll('.slider').forEach(element => {
+  new Tvist(element, {
+    perPage: 2,
+    gap: 15
+  })
+})
+
+// Позже получаем инстанс через элемент
+const element = document.querySelector('.slider')
+const slider = element.tvistInstance
+
+if (slider) {
+  console.log(`Слайдер ${slider.id} найден`)
+  slider.scrollTo(2)
+}
+
+// Безопасная переинициализация
+function reinitSlider(selector, newOptions) {
+  const element = document.querySelector(selector)
+  
+  if (element.tvistInstance) {
+    console.log(`Уничтожаем старый слайдер ${element.tvistInstance.id}`)
+    element.tvistInstance.destroy()
+  }
+  
+  return new Tvist(element, newOptions)
+}
+
+// Использование
+const slider = reinitSlider('.slider', {
+  perPage: 4,
+  gap: 30
+})
+```
+
+### Аналитика и отладка с использованием ID
+
+```javascript
+const slider = new Tvist('.slider', {
+  perPage: 3,
+  autoplay: 3000
+})
+
+// Логирование с ID слайдера
+slider.on('slideChangeStart', (index) => {
+  console.log(`[${slider.id}] Переход на слайд ${index}`)
+})
+
+// Отправка аналитики
+slider.on('slideChangeStart', (index) => {
+  analytics.track('slide_view', {
+    sliderId: slider.id,
+    slideIndex: index,
+    timestamp: Date.now()
+  })
+})
+
+// Отладка нескольких слайдеров
+const sliders = [
+  new Tvist('.slider-1'),
+  new Tvist('.slider-2'),
+  new Tvist('.slider-3')
+]
+
+sliders.forEach(slider => {
+  slider.on('slideChangeStart', (index) => {
+    console.log(`[${slider.id}] activeIndex: ${index}`)
+  })
+})
+```
+
+### Синхронизация слайдеров с отслеживанием
+
+```javascript
+const mainSlider = new Tvist('.main-slider', {
+  perPage: 1
+})
+
+const thumbsSlider = new Tvist('.thumbs-slider', {
+  perPage: 5,
+  gap: 10
+})
+
+console.log(`Главный слайдер: ${mainSlider.id}`)
+console.log(`Превью слайдер: ${thumbsSlider.id}`)
+
+// Синхронизация
+mainSlider.sync(thumbsSlider)
+
+// Отслеживание синхронизации
+mainSlider.on('slideChangeStart', (index) => {
+  console.log(`[${mainSlider.id}] → [${thumbsSlider.id}]: слайд ${index}`)
 })
 ```

@@ -30,6 +30,27 @@ export class Tvist {
   // Реестр модулей (статический)
   static readonly MODULES = new Map<string, ModuleConstructor>()
 
+  // Генератор уникальных ID с поддержкой crypto.randomUUID() и fallback
+  private static generateId(): string {
+    // Современные браузеры: используем crypto.randomUUID()
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return `tvist-${crypto.randomUUID()}`
+    }
+    
+    // Fallback: генерируем UUID v4 вручную
+    // Формат: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+    const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0
+      const v = c === 'x' ? r : (r & 0x3) | 0x8
+      return v.toString(16)
+    })
+    
+    return `tvist-${uuid}`
+  }
+
+  // Уникальный ID инстанса
+  readonly id: string
+
   // DOM элементы
   readonly root: HTMLElement
   readonly container: HTMLElement
@@ -81,6 +102,9 @@ export class Tvist {
     target: string | HTMLElement,
     options: TvistOptions = {}
   ) {
+    // Генерируем уникальный ID для инстанса
+    this.id = Tvist.generateId()
+
     // Парсинг DOM
     this.root = getElement(target)
 
