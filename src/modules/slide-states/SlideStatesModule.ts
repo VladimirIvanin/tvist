@@ -66,53 +66,26 @@ export class SlideStatesModule extends Module {
 
   /**
    * Предварительное декодирование изображений в слайде.
-   * Заставляет браузер декодировать изображения до начала анимации,
-   * предотвращая "белые вспышки" при переходе к следующему слайду.
-   * 
-   * Поддерживает:
-   * - <img> элементы
-   * - <picture> с <source> элементами (decode() вызывается на <img> внутри <picture>)
-   * 
-   * Использует кеш для предотвращения повторного декодирования одних и тех же изображений.
+   * Предотвращает "белые вспышки" при переходе между слайдами.
+   * Поддерживает <img> и <picture> элементы. Использует кеш.
    */
   private async preloadSlideImages(slide: HTMLElement): Promise<void> {
-    // Находим все <img> элементы, включая те, что внутри <picture>
-    const images = slide.querySelectorAll('img')
+    const images = slide.querySelectorAll<HTMLImageElement>('img')
     const decodePromises: Promise<void>[] = []
 
     images.forEach((img) => {
-      // Для <picture> элементов браузер автоматически выбирает
-      // правильный <source> на основе медиа-запросов и применяет его к <img>.
-      // Поэтому img.currentSrc будет содержать URL выбранного изображения.
-      // decode() вызывается на <img>, который уже содержит выбранное изображение.
-      
-      // Проверяем, что изображение загружено
-      if (img.complete && img.naturalWidth > 0) {
-        // Проверяем, было ли изображение уже декодировано
-        if (this.decodedImages.has(img)) {
-          // Уже декодировано, пропускаем
-          return
-        }
-
-        // decode() заставляет браузер декодировать изображение
-        // и подготовить его к рендерингу
+      // Декодируем только загруженные и ещё не декодированные изображения
+      if (img.complete && img.naturalWidth > 0 && !this.decodedImages.has(img)) {
         if ('decode' in img) {
-          const decodePromise = img
-            .decode()
-            .then(() => {
-              // Помечаем изображение как декодированное
-              this.decodedImages.set(img, true)
-            })
-            .catch(() => {
-              // Игнорируем ошибки декодирования
-            })
-          
-          decodePromises.push(decodePromise)
+          decodePromises.push(
+            img.decode()
+              .then(() => { this.decodedImages.set(img, true) })
+              .catch(() => {}) // Игнорируем ошибки
+          )
         }
       }
     })
 
-    // Ждём декодирования всех изображений (или игнорируем ошибки)
     await Promise.all(decodePromises).catch(() => {})
   }
 
@@ -125,6 +98,9 @@ export class SlideStatesModule extends Module {
     const activeSlide = slides[activeIndex]
 
     if (!activeSlide) return
+    
+    // Массив для сбора промисов декодирования
+    const preloadPromises: Promise<void>[] = []
 
     // Режим Loop: по атрибуту на слайде (после инита Loop) или по опции (до проставления атрибутов)
     const activeAttr = activeSlide.getAttribute('data-tvist-slide-index')
@@ -188,11 +164,17 @@ export class SlideStatesModule extends Module {
       this.toggleClass(slide, this.CLASS_PREV, isPrev)
       this.toggleClass(slide, this.CLASS_NEXT, isNext)
 
-      // Предзагружаем изображения в prev/next слайдах
+      // Собираем промисы декодирования для prev/next слайдов
       if (isPrev || isNext) {
-        this.preloadSlideImages(slide)
+        preloadPromises.push(this.preloadSlideImages(slide))
       }
     })
+    
+    // Запускаем декодирование в фоне (не блокируем основной поток)
+    // Промисы выполнятся асинхронно, но мы не ждём их завершения
+    if (preloadPromises.length > 0) {
+      Promise.all(preloadPromises).catch(() => {})
+    }
   }
 
   /**
@@ -234,15 +216,12 @@ export class SlideStatesModule extends Module {
   }
 
   override destroy(): void {
-    // Отменяем запланированное обновление видимости
     if (this.visibilityRafId !== null) {
       cancelAnimationFrame(this.visibilityRafId)
       this.visibilityRafId = null
     }
 
-    // Удаляем все классы состояний
-    const slides = this.tvist.slides
-    slides.forEach((slide) => {
+    this.tvist.slides.forEach((slide) => {
       slide.classList.remove(
         this.CLASS_ACTIVE,
         this.CLASS_PREV,
@@ -250,8 +229,7 @@ export class SlideStatesModule extends Module {
         this.CLASS_VISIBLE
       )
     })
-
-    // WeakMap автоматически очистится, когда изображения будут удалены из DOM
-    // Явная очистка не требуется
+    
+    // decodedImages (WeakMap) очистится автоматически при удалении изображений
   }
 }
