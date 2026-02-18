@@ -1,13 +1,6 @@
-/**
- * Autoplay Module
- * Auto-registration при импорте
- */
-
-import { Tvist } from '../../core/Tvist'
+import { TVIST_MODULE_REGISTRY } from '../../core/registry'
 import { AutoplayModule } from './AutoplayModule'
 
-// Автоматическая регистрация модуля
-Tvist.MODULES.set('autoplay', AutoplayModule)
+TVIST_MODULE_REGISTRY.set('autoplay', AutoplayModule)
 
 export { AutoplayModule }
-

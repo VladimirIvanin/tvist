@@ -1,13 +1,6 @@
-/**
- * Navigation Module
- * Auto-registration при импорте
- */
-
-import { Tvist } from '../../core/Tvist'
+import { TVIST_MODULE_REGISTRY } from '../../core/registry'
 import { NavigationModule } from './NavigationModule'
 
-// Автоматическая регистрация модуля
-Tvist.MODULES.set('navigation', NavigationModule)
+TVIST_MODULE_REGISTRY.set('navigation', NavigationModule)
 
 export { NavigationModule }
-

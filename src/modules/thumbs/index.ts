@@ -1,7 +1,6 @@
-import { Tvist } from '../../core/Tvist'
+import { TVIST_MODULE_REGISTRY } from '../../core/registry'
 import { ThumbsModule } from './ThumbsModule'
 
-// Автоматическая регистрация модуля
-Tvist.registerModule('thumbs', ThumbsModule)
+TVIST_MODULE_REGISTRY.set('thumbs', ThumbsModule)
 
 export { ThumbsModule }

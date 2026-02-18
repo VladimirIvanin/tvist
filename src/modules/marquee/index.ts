@@ -1,12 +1,6 @@
-/**
- * Marquee Module
- * Auto-registration при импорте
- */
-
-import { Tvist } from '../../core/Tvist'
+import { TVIST_MODULE_REGISTRY } from '../../core/registry'
 import { MarqueeModule } from './MarqueeModule'
 
-// Автоматическая регистрация модуля
-Tvist.MODULES.set('marquee', MarqueeModule)
+TVIST_MODULE_REGISTRY.set('marquee', MarqueeModule)
 
 export { MarqueeModule }

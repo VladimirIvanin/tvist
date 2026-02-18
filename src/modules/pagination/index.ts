@@ -1,13 +1,6 @@
-/**
- * Pagination Module
- * Auto-registration при импорте
- */
-
-import { Tvist } from '../../core/Tvist'
+import { TVIST_MODULE_REGISTRY } from '../../core/registry'
 import { PaginationModule } from './PaginationModule'
 
-// Автоматическая регистрация модуля
-Tvist.MODULES.set('pagination', PaginationModule)
+TVIST_MODULE_REGISTRY.set('pagination', PaginationModule)
 
 export { PaginationModule }
-

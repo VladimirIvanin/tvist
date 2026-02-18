@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -38,7 +39,15 @@ export default defineConfig({
       fileName: () => 'tvist.min.js',
     },
     rollupOptions: {
-      plugins: [bannerFirstPlugin()],
+      plugins: [
+        bannerFirstPlugin(),
+        visualizer({
+          filename: 'browser-build/stats.html',
+          gzipSize: true,
+          brotliSize: true,
+          open: false,
+        }),
+      ],
       output: {
         assetFileNames: (assetInfo) => {
           if (assetInfo.name === 'style.css') return 'tvist.css';
@@ -55,6 +64,14 @@ export default defineConfig({
         drop_console: true,
         drop_debugger: true,
         pure_funcs: ['console.log', 'console.debug'],
+        passes: 2,
+        unsafe: true,
+        unsafe_arrows: true,
+        unsafe_methods: true,
+        unsafe_proto: true,
+        unsafe_undefined: true,
+        collapse_vars: true,
+        reduce_vars: true,
       },
       format: {
         comments: false,

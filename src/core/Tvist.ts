@@ -13,6 +13,7 @@ import type { Module, ModuleConstructor } from '../modules/Module'
 import { BreakpointsModule } from '../modules/breakpoints/BreakpointsModule'
 import { throttle } from './Animator'
 import { applyInitialBreakpoint } from '../utils/breakpoints'
+import { TVIST_MODULE_REGISTRY } from './registry'
 
 /** Root-элемент слайдера с опциональной ссылкой на инстанс (для переиспользования одного root) */
 export interface TvistRootElement extends HTMLElement {
@@ -27,8 +28,8 @@ export class Tvist {
   /** Префикс BEM-блока для CSS. @deprecated Используйте Tvist.CLASSES.block */
   static readonly CSS_PREFIX = TVIST_CLASSES.block
 
-  // Реестр модулей (статический)
-  static readonly MODULES = new Map<string, ModuleConstructor>()
+  // Реестр модулей (статический) — shared с TVIST_MODULE_REGISTRY
+  static readonly MODULES: Map<string, ModuleConstructor> = TVIST_MODULE_REGISTRY
 
   // Генератор уникальных ID с поддержкой crypto.randomUUID() и fallback
   private static generateId(): string {
@@ -795,6 +796,101 @@ export class Tvist {
   }
 
   // ==================== СТАТИЧЕСКИЕ МЕТОДЫ ====================
+
+  /**
+   * Фабричный метод для ESM-сборки с динамической загрузкой модулей.
+   * В UMD-сборке эквивалентен new Tvist() — все модули уже зарегистрированы.
+   *
+   * @example
+   * // ESM (browser-build/esm/tvist.js):
+   * const slider = await Tvist.create('#my-slider', { pagination: true, loop: true })
+   *
+   * // UMD (browser-build/tvist.min.js) — тоже работает:
+   * const slider = await Tvist.create('#my-slider', { pagination: true })
+   */
+  static async create(
+    target: string | HTMLElement,
+    options: TvistOptions = {}
+  ): Promise<Tvist> {
+    await Tvist.loadModulesForOptions(options)
+    return new Tvist(target, options)
+  }
+
+  /**
+   * Загружает только те опциональные модули, которые нужны для данных опций.
+   * В UMD-сборке — no-op (модули уже зарегистрированы через side-effect импорты).
+   * Полезно для предзагрузки модулей перед синхронным new Tvist().
+   *
+   * @example
+   * await Tvist.loadModulesForOptions({ pagination: true, autoplay: 3000 })
+   * const slider = new Tvist('#my-slider', { pagination: true, autoplay: 3000 })
+   */
+  static async loadModulesForOptions(options: TvistOptions): Promise<void> {
+    const loads: Promise<void>[] = []
+
+    if (options.pagination) {
+      loads.push(
+        import('../modules/pagination/index.js').then(() => undefined)
+      )
+    }
+    if (options.autoplay !== false && options.autoplay !== undefined) {
+      loads.push(
+        import('../modules/autoplay/index.js').then(() => undefined)
+      )
+    }
+    if (options.loop) {
+      loads.push(
+        import('../modules/loop/index.js').then(() => undefined)
+      )
+    }
+    if (options.arrows) {
+      loads.push(
+        import('../modules/navigation/index.js').then(() => undefined)
+      )
+    }
+    if (options.video !== false && options.video !== undefined) {
+      loads.push(
+        import('../modules/video/index.js').then(() => undefined)
+      )
+    }
+    if (options.scrollbar) {
+      loads.push(
+        import('../modules/scrollbar/index.js').then(() => undefined)
+      )
+    }
+    if (options.marquee !== false && options.marquee !== undefined) {
+      loads.push(
+        import('../modules/marquee/index.js').then(() => undefined)
+      )
+    }
+    if (options.grid) {
+      loads.push(
+        import('../modules/grid/index.js').then(() => undefined)
+      )
+    }
+    if (options.lazy !== false && options.lazy !== undefined) {
+      loads.push(
+        import('../modules/lazyload/index.js').then(() => undefined)
+      )
+    }
+    if (options.wheel !== false && options.wheel !== undefined) {
+      loads.push(
+        import('../modules/scroll-control/index.js').then(() => undefined)
+      )
+    }
+    if (options.thumbs) {
+      loads.push(
+        import('../modules/thumbs/index.js').then(() => undefined)
+      )
+    }
+    if (options.effect) {
+      loads.push(
+        import('../modules/effects/index.js').then(() => undefined)
+      )
+    }
+
+    await Promise.all(loads)
+  }
 
   /**
    * Зарегистрировать модуль

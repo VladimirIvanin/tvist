@@ -1,9 +1,4 @@
-/**
- * Автоматическая регистрация SlideStatesModule
- */
-
-import { Tvist } from '../../core/Tvist'
+import { TVIST_MODULE_REGISTRY } from '../../core/registry'
 import { SlideStatesModule } from './SlideStatesModule'
 
-// Регистрируем модуль глобально
-Tvist.registerModule('slide-states', SlideStatesModule)
+TVIST_MODULE_REGISTRY.set('slide-states', SlideStatesModule)

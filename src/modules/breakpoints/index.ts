@@ -1,13 +1,6 @@
-/**
- * Breakpoints Module
- * Auto-registration при импорте
- */
-
-import { Tvist } from '../../core/Tvist'
+import { TVIST_MODULE_REGISTRY } from '../../core/registry'
 import { BreakpointsModule } from './BreakpointsModule'
 
-// Автоматическая регистрация модуля
-Tvist.MODULES.set('breakpoints', BreakpointsModule)
+TVIST_MODULE_REGISTRY.set('breakpoints', BreakpointsModule)
 
 export { BreakpointsModule }
-

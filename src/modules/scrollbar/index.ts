@@ -1,12 +1,6 @@
-/**
- * Scrollbar Module - кастомный скроллбар для слайдера
- * Автоматически регистрируется при импорте
- */
-
-import { Tvist } from '../../core/Tvist'
+import { TVIST_MODULE_REGISTRY } from '../../core/registry'
 import { ScrollbarModule } from './ScrollbarModule'
 
-// Регистрируем модуль
-Tvist.registerModule('scrollbar', ScrollbarModule)
+TVIST_MODULE_REGISTRY.set('scrollbar', ScrollbarModule)
 
 export { ScrollbarModule }

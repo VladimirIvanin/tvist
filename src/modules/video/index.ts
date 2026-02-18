@@ -1,12 +1,6 @@
-/**
- * Video Module
- * Auto-registration при импорте
- */
-
-import { Tvist } from '../../core/Tvist'
+import { TVIST_MODULE_REGISTRY } from '../../core/registry'
 import { VideoModule } from './VideoModule'
 
-// Автоматическая регистрация модуля
-Tvist.MODULES.set('video', VideoModule)
+TVIST_MODULE_REGISTRY.set('video', VideoModule)
 
 export { VideoModule }

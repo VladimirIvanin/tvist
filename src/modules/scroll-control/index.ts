@@ -1,12 +1,6 @@
-/**
- * ScrollControl Module - управление слайдером через скролл
- * Автоматически регистрируется при импорте
- */
-
-import { Tvist } from '../../core/Tvist'
+import { TVIST_MODULE_REGISTRY } from '../../core/registry'
 import { ScrollControlModule } from './ScrollControlModule'
 
-// Регистрируем модуль
-Tvist.registerModule('scroll-control', ScrollControlModule)
+TVIST_MODULE_REGISTRY.set('scroll-control', ScrollControlModule)
 
 export { ScrollControlModule }
