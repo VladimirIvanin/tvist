@@ -207,6 +207,9 @@ export class Tvist {
     // Создаём Engine
     this.engine = new Engine(this, this.options)
 
+    // Вычитываем модули, зарегистрированные до загрузки core-бандла
+    Tvist.flushModuleQueue()
+
     // Инициализируем модули (breakpoints должен работать всегда)
     this.initModules()
 
@@ -797,7 +800,9 @@ export class Tvist {
   // ==================== СТАТИЧЕСКИЕ МЕТОДЫ ====================
 
   /**
-   * Зарегистрировать модуль
+   * Зарегистрировать модуль.
+   * Безопасно вызывать до загрузки core — модули попадут в глобальную очередь
+   * и будут зарегистрированы автоматически при инициализации Tvist.
    */
   static registerModule(name: string, ModuleClass: ModuleConstructor): void {
     if (Tvist.MODULES.has(name)) {
@@ -805,6 +810,25 @@ export class Tvist {
       return
     }
     Tvist.MODULES.set(name, ModuleClass)
+  }
+
+  /**
+   * Вычитывает глобальную очередь модулей (window.__tvistV{N}Queue),
+   * которые были зарегистрированы до загрузки core-бандла.
+   * @internal
+   */
+  private static flushModuleQueue(): void {
+    if (typeof window === 'undefined') return
+    const major = parseInt(pkg.version.split('.')[0] ?? '0', 10) || 0
+    const queueKey = `__tvistV${major}Queue`
+    const win = window as unknown as Record<string, unknown>
+    const queue = win[queueKey] as [string, ModuleConstructor][] | undefined
+    if (!Array.isArray(queue) || queue.length === 0) return
+    queue.forEach(([name, ModuleClass]) => {
+      Tvist.registerModule(name, ModuleClass)
+    })
+    // Очищаем очередь, чтобы повторный вызов не задвоил регистрацию
+    win[queueKey] = []
   }
 
   /**
