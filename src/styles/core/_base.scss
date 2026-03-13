@@ -8,10 +8,15 @@
   position: relative;
   overflow: hidden;
   width: 100%;
+  visibility: hidden;
   
   // Performance: изолируем layout перерасчёты внутри слайдера от остальной страницы
   // Изменения внутри слайдера не затрагивают layout страницы
   contain: layout;
+  
+  &--created {
+    visibility: visible;
+  }
   
   &__container {
     display: flex;
@@ -32,7 +37,6 @@
   &__slide {
     flex-shrink: 0;
     position: relative;
-    width: 100%;
     backface-visibility: hidden;
     transform: translateZ(0);
     box-sizing: border-box;
