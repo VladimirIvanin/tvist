@@ -11,6 +11,7 @@ import {
   getOuterHeight,
   isFocusable,
   children,
+  cloneOptions,
 } from '../../../src/utils/dom'
 
 describe('dom utils', () => {
@@ -223,6 +224,108 @@ describe('dom utils', () => {
       const kids = children(container, '.target')
       expect(kids).toHaveLength(1)
       expect(kids[0]).toBe(div1)
+    })
+  })
+
+  describe('cloneOptions', () => {
+    it('должен клонировать примитивные значения', () => {
+      const options = { gap: 10, perPage: 2, speed: 300, loop: true }
+      const cloned = cloneOptions(options as Record<string, unknown>)
+
+      expect(cloned).not.toBe(options)
+      expect(cloned.gap).toBe(10)
+      expect(cloned.perPage).toBe(2)
+      expect(cloned.speed).toBe(300)
+      expect(cloned.loop).toBe(true)
+    })
+
+    it('должен сохранять DOM-элементы из arrows.prev и arrows.next', () => {
+      const prevBtn = document.createElement('button')
+      const nextBtn = document.createElement('button')
+
+      const options = {
+        gap: 10,
+        arrows: { prev: prevBtn, next: nextBtn, addIcons: false },
+      }
+      const cloned = cloneOptions(options as Record<string, unknown>)
+
+      expect((cloned as typeof options).arrows.prev).toBe(prevBtn)
+      expect((cloned as typeof options).arrows.next).toBe(nextBtn)
+      expect((cloned as typeof options).arrows.addIcons).toBe(false)
+    })
+
+    it('должен сохранять DOM-элемент из pagination.container', () => {
+      const paginationEl = document.createElement('div')
+
+      const options = {
+        pagination: { container: paginationEl, clickable: true },
+      }
+      const cloned = cloneOptions(options as Record<string, unknown>)
+
+      expect((cloned as typeof options).pagination.container).toBe(paginationEl)
+      expect((cloned as typeof options).pagination.clickable).toBe(true)
+    })
+
+    it('должен сохранять DOM-элемент из scrollbar.container', () => {
+      const scrollbarEl = document.createElement('div')
+
+      const options = {
+        scrollbar: { container: scrollbarEl, hide: true },
+      }
+      const cloned = cloneOptions(options as Record<string, unknown>)
+
+      expect((cloned as typeof options).scrollbar.container).toBe(scrollbarEl)
+      expect((cloned as typeof options).scrollbar.hide).toBe(true)
+    })
+
+    it('должен корректно работать когда arrows = true (не объект)', () => {
+      const options = { arrows: true, gap: 10 }
+      const cloned = cloneOptions(options as Record<string, unknown>)
+
+      expect(cloned.arrows).toBe(true)
+      expect(cloned.gap).toBe(10)
+    })
+
+    it('должен корректно работать когда arrows содержит строковые селекторы', () => {
+      const options = {
+        arrows: { prev: '#my-prev', next: '#my-next' },
+      }
+      const cloned = cloneOptions(options as Record<string, unknown>)
+
+      expect((cloned as typeof options).arrows.prev).toBe('#my-prev')
+      expect((cloned as typeof options).arrows.next).toBe('#my-next')
+    })
+
+    it('не должен мутировать оригинальный объект', () => {
+      const prevBtn = document.createElement('button')
+      const options = {
+        gap: 10,
+        arrows: { prev: prevBtn },
+      }
+      const cloned = cloneOptions(options as Record<string, unknown>)
+      ;(cloned as Record<string, unknown>).gap = 99
+
+      expect(options.gap).toBe(10)
+    })
+
+    it('должен работать со всеми тремя вложенными объектами одновременно', () => {
+      const prevBtn = document.createElement('button')
+      const nextBtn = document.createElement('button')
+      const paginationEl = document.createElement('div')
+      const scrollbarEl = document.createElement('div')
+
+      const options = {
+        gap: 20,
+        arrows: { prev: prevBtn, next: nextBtn },
+        pagination: { container: paginationEl },
+        scrollbar: { container: scrollbarEl },
+      }
+      const cloned = cloneOptions(options as Record<string, unknown>)
+
+      expect((cloned as typeof options).arrows.prev).toBe(prevBtn)
+      expect((cloned as typeof options).arrows.next).toBe(nextBtn)
+      expect((cloned as typeof options).pagination.container).toBe(paginationEl)
+      expect((cloned as typeof options).scrollbar.container).toBe(scrollbarEl)
     })
   })
 })
