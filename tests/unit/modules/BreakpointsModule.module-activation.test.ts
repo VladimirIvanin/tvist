@@ -14,6 +14,7 @@ import type { SliderFixture } from '../../fixtures'
 import '../../../src/modules/breakpoints'
 import '../../../src/modules/navigation'
 import '../../../src/modules/pagination'
+import '../../../src/modules/autoplay'
 
 function createSliderWithModuleContainers(slidesCount: number, width: number) {
   const fixture = createSliderFixture({ slidesCount, width })
@@ -253,6 +254,63 @@ describe('BreakpointsModule — реактивность модулей', () => 
       resizeSlider(root, 1200)
       slider['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider['modules'].has('navigation')).toBe(false)
+      expect(slider['modules'].has('pagination')).toBe(false)
+
+      slider.destroy()
+    })
+  })
+
+  describe('enable() не должен инициализировать неактивные модули', () => {
+    it('не должен создавать autoplay при enable() если autoplay не задан', () => {
+      const created = createSliderWithModuleContainers(3, 1000)
+      fixture = created.fixture
+      root = created.root
+
+      const slider = new Tvist(root, {
+        enabled: false,
+        // autoplay не задан — AutoplayModule.shouldBeActive() вернёт false
+        breakpointsBase: 'container',
+        breakpoints: {
+          768: { enabled: true }
+        }
+      })
+
+      // Слайдер отключён, autoplay не должен быть создан
+      expect(slider['modules'].has('autoplay')).toBe(false)
+
+      // Включаем через breakpoint
+      resizeSlider(root, 600)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+
+      expect(slider.isEnabled).toBe(true)
+      // autoplay по-прежнему не должен быть создан — shouldBeActive() = false
+      expect(slider['modules'].has('autoplay')).toBe(false)
+
+      slider.destroy()
+    })
+
+    it('не должен создавать pagination при enable() если pagination: false', () => {
+      const created = createSliderWithModuleContainers(3, 1000)
+      fixture = created.fixture
+      root = created.root
+
+      const slider = new Tvist(root, {
+        enabled: false,
+        pagination: false,
+        breakpointsBase: 'container',
+        breakpoints: {
+          768: { enabled: true }
+          // pagination остаётся false — не должен появиться
+        }
+      })
+
+      expect(slider['modules'].has('pagination')).toBe(false)
+
+      resizeSlider(root, 600)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+
+      expect(slider.isEnabled).toBe(true)
+      // pagination: false — модуль не должен быть создан через enable()
       expect(slider['modules'].has('pagination')).toBe(false)
 
       slider.destroy()

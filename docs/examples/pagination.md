@@ -444,6 +444,36 @@ pagination: {
 
 ---
 
+## Пагинация и брейкпоинты
+
+Пагинация полностью реагирует на смену брейкпоинта. Можно как включать/выключать её на разных разрешениях, так и менять параметры (`limit`, `type` и др.):
+
+```javascript
+// Пагинация только на мобиле
+new Tvist('.tvist', {
+  perPage: 3,
+  pagination: false,
+  breakpoints: {
+    768: {
+      perPage: 1,
+      pagination: true  // Появляется при ≤ 768px
+    }
+  }
+})
+```
+
+```javascript
+// Адаптивный limit точек
+new Tvist('.tvist', {
+  perPage: 3,
+  pagination: { limit: 7, clickable: true },
+  breakpoints: {
+    992: { pagination: { limit: 5, clickable: true } },
+    768: { pagination: { limit: 3, clickable: true } }
+  }
+})
+```
+
 ## Опции пагинации
 
 | Опция | Тип | Описание |

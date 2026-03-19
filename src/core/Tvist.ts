@@ -595,6 +595,7 @@ export class Tvist {
       
       try {
         const module = new ModuleClass(this, this.options)
+        if (module.shouldBeActive?.() === false) return
         this.modules.set(name, module)
         module.init()
       } catch (error) {
