@@ -1,6 +1,6 @@
 {
   "name": "tvist",
-  "version": "1.6.8",
+  "version": "1.7.0",
   "description": "Слайдер с широким API для современного веба",
   "type": "module",
   "main": "./dist/tvist.cjs.js",
