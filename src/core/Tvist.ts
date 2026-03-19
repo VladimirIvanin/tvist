@@ -275,6 +275,42 @@ export class Tvist {
   }
 
   /**
+   * Синхронизирует активные модули с текущими опциями:
+   * - инициализирует модули, которые стали активными (shouldBeActive() = true)
+   * - уничтожает модули, которые стали неактивными (shouldBeActive() = false)
+   * Вызывается при смене брейкпоинта и из updateOptions().
+   * @internal
+   */
+  syncModules(): void {
+    // Уничтожаем модули, которые больше не должны быть активными
+    this.modules.forEach((module, name) => {
+      if (name === 'breakpoints') return
+      try {
+        if (module.shouldBeActive?.() === false) {
+          module.destroy()
+          this.modules.delete(name)
+        }
+      } catch (error) {
+        console.error(`Tvist: Error destroying module "${name}":`, error)
+      }
+    })
+
+    // Инициализируем модули, которые стали активными
+    Tvist.MODULES.forEach((ModuleClass, name) => {
+      if (this.modules.has(name)) return
+      try {
+        const module = new ModuleClass(this, this.options)
+        if (module.shouldBeActive?.() !== false) {
+          this.modules.set(name, module)
+          module.init()
+        }
+      } catch (error) {
+        console.error(`Tvist: Failed to initialize module "${name}":`, error)
+      }
+    })
+  }
+
+  /**
    * Настройка обработчика resize
    */
   private setupResizeListener(): void {
@@ -480,23 +516,8 @@ export class Tvist {
       module.onOptionsUpdate?.(newOptions)
     })
 
-    // Переинициализируем модули, которые были выключены, а теперь включены
-    // Это нужно для модулей типа autoplay, marquee, visibility и т.д.
-    Tvist.MODULES.forEach((ModuleClass, name) => {
-      // Пропускаем модули, которые уже есть
-      if (this.modules.has(name)) return
-      
-      try {
-        const module = new ModuleClass(this, this.options)
-        // Проверяем, должен ли модуль быть активным
-        if (module.shouldBeActive?.() !== false) {
-          this.modules.set(name, module)
-          module.init()
-        }
-      } catch (error) {
-        console.error(`Tvist: Failed to initialize module "${name}":`, error)
-      }
-    })
+    // Синхронизируем модули с новыми опциями
+    this.syncModules()
 
     // Событие обновления опций
     this.emit('optionsUpdated', this, newOptions)
@@ -569,8 +590,8 @@ export class Tvist {
 
     // Переинициализируем модули (кроме breakpoints - он уже работает)
     Tvist.MODULES.forEach((ModuleClass, name) => {
-      if (name === 'breakpoints') return // Не переинициализируем breakpoints
-      if (this.modules.has(name)) return // Уже есть
+      if (name === 'breakpoints') return
+      if (this.modules.has(name)) return
       
       try {
         const module = new ModuleClass(this, this.options)

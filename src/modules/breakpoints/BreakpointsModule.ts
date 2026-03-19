@@ -192,6 +192,12 @@ export class BreakpointsModule extends Module {
     Object.assign(this.tvist.options, newOptions)
     this.tvist.options.breakpoints = breakpoints
 
+    // Синхронизируем модули с новыми опциями (инициализируем новые, уничтожаем деактивированные)
+    // Вызываем до enable/disable, чтобы модули были готовы при включении слайдера
+    if (shouldBeEnabled) {
+      this.tvist.syncModules()
+    }
+
     // Включаем или отключаем слайдер в зависимости от enabled
     // ВАЖНО: enable/disable вызывают update(), что может привести к повторному onResize
     // Но это не проблема, т.к. currentBreakpoint уже обновлён и повторного apply не будет
@@ -199,6 +205,11 @@ export class BreakpointsModule extends Module {
       this.tvist.enable()
     } else if (!shouldBeEnabled && this.tvist.isEnabled) {
       this.tvist.disable()
+    }
+
+    // При деактивации тоже синхронизируем (уничтожаем ставшие неактивными модули)
+    if (!shouldBeEnabled) {
+      this.tvist.syncModules()
     }
   }
 
