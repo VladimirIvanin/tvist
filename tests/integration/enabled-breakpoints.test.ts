@@ -239,6 +239,204 @@ describe('Tvist - enabled with breakpoints', () => {
     })
   })
 
+  describe('slide styles and classes cleanup on resize back and forth', () => {
+    it('should clear slide width and state classes after desktop→mobile→desktop resize cycle', () => {
+      // Десктоп: включён с perPage=2
+      const slider = new Tvist(fixture.root, {
+        enabled: true,
+        perPage: 2,
+        gap: 16,
+        breakpointsBase: 'container',
+        breakpoints: {
+          768: {
+            enabled: false
+          }
+        }
+      })
+
+      const SLIDE_ACTIVE = 'tvist-v1__slide--active'
+      const SLIDE_VISIBLE = 'tvist-v1__slide--visible'
+      const SLIDE_NEXT = 'tvist-v1__slide--next'
+      const SLIDE_PREV = 'tvist-v1__slide--prev'
+
+      // Десктоп — включён, стили и классы есть
+      expect(slider.isEnabled).toBe(true)
+      expect(slider.slides[0].style.width).not.toBe('')
+      expect(slider.slides[0].classList.contains(SLIDE_ACTIVE)).toBe(true)
+
+      // Мобильный — отключён
+      resizeSlider(fixture.root, 500)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(slider.isEnabled).toBe(false)
+
+      // Стили width должны быть очищены
+      slider.slides.forEach(slide => {
+        expect(slide.style.width).toBe('')
+        expect(slide.style.marginRight).toBe('')
+      })
+
+      // Классы состояний должны быть очищены
+      slider.slides.forEach(slide => {
+        expect(slide.classList.contains(SLIDE_ACTIVE)).toBe(false)
+        expect(slide.classList.contains(SLIDE_VISIBLE)).toBe(false)
+        expect(slide.classList.contains(SLIDE_NEXT)).toBe(false)
+        expect(slide.classList.contains(SLIDE_PREV)).toBe(false)
+      })
+
+      // Возвращаемся на десктоп — включён снова
+      resizeSlider(fixture.root, 1000)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(slider.isEnabled).toBe(true)
+
+      // Снова на мобильный — классы снова должны очищаться
+      resizeSlider(fixture.root, 500)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(slider.isEnabled).toBe(false)
+
+      slider.slides.forEach(slide => {
+        expect(slide.style.width).toBe('')
+        expect(slide.classList.contains(SLIDE_ACTIVE)).toBe(false)
+        expect(slide.classList.contains(SLIDE_VISIBLE)).toBe(false)
+      })
+    })
+
+    it('should clear transform on container when disabling via breakpoint', () => {
+      const slider = new Tvist(fixture.root, {
+        enabled: true,
+        perPage: 1,
+        breakpointsBase: 'container',
+        breakpoints: {
+          768: { enabled: false }
+        }
+      })
+
+      // Переходим на второй слайд — transform выставлен
+      slider.next()
+      expect(slider.container.style.transform).not.toBe('')
+
+      // Мобильный — transform должен сброситься
+      resizeSlider(fixture.root, 500)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(slider.isEnabled).toBe(false)
+      expect(slider.container.style.transform).toBe('')
+
+      // Снова десктоп → мобильный
+      resizeSlider(fixture.root, 1000)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      slider.next()
+
+      resizeSlider(fixture.root, 500)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(slider.isEnabled).toBe(false)
+      expect(slider.container.style.transform).toBe('')
+    })
+  })
+
+  describe('slide styles cleanup when disabling via breakpoint', () => {
+    it('should clear slide width styles when breakpoint sets enabled: false', () => {
+      // Слайдер включён на десктопе с peek и perPage
+      const slider = new Tvist(fixture.root, {
+        enabled: true,
+        perPage: 2,
+        gap: 16,
+        peek: { before: 0, after: 40 },
+        breakpointsBase: 'container',
+        breakpoints: {
+          768: {
+            enabled: false
+          }
+        }
+      })
+
+      // На десктопе слайдер включён — стили width должны быть применены
+      expect(slider.isEnabled).toBe(true)
+      expect(slider.slides[0].style.width).not.toBe('')
+
+      // Переходим на мобильный breakpoint с enabled: false
+      resizeSlider(fixture.root, 500)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+
+      // Слайдер должен быть отключён
+      expect(slider.isEnabled).toBe(false)
+
+      // Стили width на слайдах должны быть очищены (не аффектить вёрстку)
+      slider.slides.forEach(slide => {
+        expect(slide.style.width).toBe('')
+        expect(slide.style.height).toBe('')
+        expect(slide.style.marginRight).toBe('')
+        expect(slide.style.marginBottom).toBe('')
+      })
+    })
+
+    it('should clear slide width styles when breakpoint sets enabled: false with peek options', () => {
+      const mobile_right_padding = 20
+
+      const slider = new Tvist(fixture.root, {
+        enabled: true,
+        perPage: 3,
+        gap: 20,
+        breakpointsBase: 'container',
+        breakpoints: {
+          768: {
+            peek: {
+              before: 5,
+              after: mobile_right_padding
+            },
+            enabled: false
+          }
+        }
+      })
+
+      // На десктопе стили применены
+      expect(slider.isEnabled).toBe(true)
+      expect(slider.slides[0].style.width).not.toBe('')
+
+      // Переходим на мобильный
+      resizeSlider(fixture.root, 600)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+
+      expect(slider.isEnabled).toBe(false)
+
+      // Стили должны быть очищены
+      slider.slides.forEach(slide => {
+        expect(slide.style.width).toBe('')
+        expect(slide.style.marginRight).toBe('')
+      })
+    })
+
+    it('should restore slide styles when re-enabling via breakpoint after disable', () => {
+      const slider = new Tvist(fixture.root, {
+        enabled: true,
+        perPage: 2,
+        gap: 16,
+        breakpointsBase: 'container',
+        breakpoints: {
+          768: {
+            enabled: false
+          }
+        }
+      })
+
+      // Десктоп — включён, стили есть
+      expect(slider.isEnabled).toBe(true)
+      expect(slider.slides[0].style.width).not.toBe('')
+
+      // Мобильный — отключён, стили очищены
+      resizeSlider(fixture.root, 500)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(slider.isEnabled).toBe(false)
+      slider.slides.forEach(slide => {
+        expect(slide.style.width).toBe('')
+      })
+
+      // Возвращаемся на десктоп — включён, стили восстановлены
+      resizeSlider(fixture.root, 1000)
+      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(slider.isEnabled).toBe(true)
+      expect(slider.slides[0].style.width).not.toBe('')
+    })
+  })
+
   describe('edge cases', () => {
     it('should handle enabled: undefined in breakpoint (should not change state)', () => {
       const slider = new Tvist(fixture.root, {

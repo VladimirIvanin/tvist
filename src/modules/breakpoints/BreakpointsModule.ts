@@ -208,9 +208,10 @@ export class BreakpointsModule extends Module {
       this.tvist.disable()
     }
 
-    // При деактивации тоже синхронизируем (уничтожаем ставшие неактивными модули)
+    // При деактивации только уничтожаем ставшие неактивными модули —
+    // создавать новые нельзя, слайдер отключён
     if (!shouldBeEnabled) {
-      this.tvist.syncModules()
+      this.tvist.syncModules(true)
     }
   }
 

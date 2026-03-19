@@ -279,7 +279,7 @@ export class Tvist {
    * Вызывается при смене брейкпоинта и из updateOptions().
    * @internal
    */
-  syncModules(): void {
+  syncModules(destroyOnly = false): void {
     // Уничтожаем модули, которые больше не должны быть активными
     this.modules.forEach((module, name) => {
       if (name === 'breakpoints') return
@@ -294,6 +294,9 @@ export class Tvist {
     })
 
     // Инициализируем модули, которые стали активными
+    // При destroyOnly=true пропускаем — слайдер отключён, новые модули не нужны
+    if (destroyOnly) return
+
     Tvist.MODULES.forEach((ModuleClass, name) => {
       if (this.modules.has(name)) return
       try {
