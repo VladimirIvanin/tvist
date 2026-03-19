@@ -13,6 +13,7 @@ import { throttle } from '../../core/Animator'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 import { findMatchingBreakpoint, mergeBreakpointOptions } from '../../utils/breakpoints'
+import { cloneOptions } from '../../utils/dom'
 
 export class BreakpointsModule extends Module {
   readonly name = 'breakpoints'
@@ -171,8 +172,8 @@ export class BreakpointsModule extends Module {
   private applyBreakpoint(bp: number | null): void {
     const originalOptions = this.getOriginalOptions()
     
-    // Начинаем с оригинальных опций (deep clone)
-    const newOptions = JSON.parse(JSON.stringify(originalOptions)) as TvistOptions
+    // Начинаем с оригинальных опций (deep clone с сохранением DOM-элементов)
+    const newOptions = cloneOptions(originalOptions as Record<string, unknown>) as TvistOptions
 
     // Если есть breakpoint - мёрджим его опции
     if (bp !== null && originalOptions.breakpoints?.[bp]) {

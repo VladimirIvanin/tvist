@@ -6,7 +6,7 @@
 import pkg from '../../package.json' with { type: 'json' }
 import { Engine } from './Engine'
 import { EventEmitter } from './EventEmitter'
-import { getElement, children } from '../utils/dom'
+import { getElement, children, cloneOptions } from '../utils/dom'
 import { TVIST_CLASSES } from './constants'
 import type { TvistOptions, AutoplayModuleAPI, VideoModuleAPI } from './types'
 import type { Module, ModuleConstructor } from '../modules/Module'
@@ -165,9 +165,7 @@ export class Tvist {
     // Сохраняем оригинальные опции ДО применения breakpoints
     // Это нужно для BreakpointsModule чтобы восстанавливать базовые опции
     if (this.options.breakpoints && Object.keys(this.options.breakpoints).length > 0) {
-      // Deep clone оригинальных опций
-      const cloned = JSON.parse(JSON.stringify(this.options)) as TvistOptions
-      // Убеждаемся что breakpointsBase сохранен
+      const cloned = cloneOptions(this.options as Record<string, unknown>) as TvistOptions
       if (this.options.breakpointsBase) {
         cloned.breakpointsBase = this.options.breakpointsBase
       }
@@ -418,7 +416,7 @@ export class Tvist {
       // Если есть _originalOptions, восстанавливаем базовые опции
       if (this._originalOptions) {
         // Восстанавливаем базовые опции (без breakpoints)
-        const baseOptions = JSON.parse(JSON.stringify(this._originalOptions)) as TvistOptions
+        const baseOptions = cloneOptions(this._originalOptions as Record<string, unknown>) as TvistOptions
         delete baseOptions.breakpoints
         delete baseOptions.on
         
@@ -435,7 +433,7 @@ export class Tvist {
       Object.assign(this.options, newOptions)
       
       // Обновляем _originalOptions
-      const cloned = JSON.parse(JSON.stringify(this.options)) as TvistOptions
+      const cloned = cloneOptions(this.options as Record<string, unknown>) as TvistOptions
       if (this.options.breakpointsBase) {
         cloned.breakpointsBase = this.options.breakpointsBase
       }

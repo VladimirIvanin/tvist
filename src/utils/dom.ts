@@ -145,3 +145,53 @@ export function children(
   return Array.from(element.children) as HTMLElement[]
 }
 
+/**
+ * Проверяет, является ли значение DOM-элементом.
+ * Использует duck-typing вместо instanceof для совместимости с разными окружениями (happy-dom, jsdom).
+ */
+function isDomElement(value: unknown): value is Element {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    typeof (value as Record<string, unknown>).nodeType === 'number' &&
+    typeof (value as Record<string, unknown>).classList === 'object'
+  )
+}
+
+/**
+ * Восстанавливает DOM-элементы из вложенного объекта опций после JSON-клонирования.
+ */
+function restoreDomElements(
+  orig: Record<string, unknown>,
+  cloned: Record<string, unknown>
+): void {
+  for (const key of Object.keys(orig)) {
+    if (isDomElement(orig[key])) {
+      cloned[key] = orig[key]
+    }
+  }
+}
+
+/**
+ * Клонирует объект опций слайдера, сохраняя DOM-элементы.
+ * JSON.parse/stringify теряет DOM-элементы (arrows.prev/next, pagination.container,
+ * scrollbar.container и т.д.), поэтому после клонирования восстанавливаем их из оригинала.
+ */
+export function cloneOptions<T extends Record<string, unknown>>(options: T): T {
+  const cloned = JSON.parse(JSON.stringify(options)) as T
+
+  // Список вложенных объектов опций, которые могут содержать DOM-элементы
+  const nestedKeys = ['arrows', 'pagination', 'scrollbar'] as const
+
+  for (const key of nestedKeys) {
+    const orig = options[key]
+    if (orig && typeof orig === 'object' && !Array.isArray(orig)) {
+      const clonedNested = ((cloned[key] ?? {}) as Record<string, unknown>)
+      restoreDomElements(orig as Record<string, unknown>, clonedNested)
+      ;(cloned as Record<string, unknown>)[key] = clonedNested
+    }
+  }
+
+  return cloned
+}
+

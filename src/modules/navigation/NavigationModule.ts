@@ -72,14 +72,18 @@ export class NavigationModule extends Module {
     if (typeof arrows === 'object' && arrows !== null) {
       // Кастомные элементы из опций
       if (arrows.prev) {
-        this.prevButton = typeof arrows.prev === 'string' 
-          ? document.querySelector(arrows.prev)
-          : arrows.prev
+        if (typeof arrows.prev === 'string') {
+          this.prevButton = document.querySelector(arrows.prev)
+        } else if (arrows.prev instanceof Element || (arrows.prev as HTMLElement).classList !== undefined) {
+          this.prevButton = arrows.prev as HTMLElement
+        }
       }
       if (arrows.next) {
-        this.nextButton = typeof arrows.next === 'string'
-          ? document.querySelector(arrows.next)
-          : arrows.next
+        if (typeof arrows.next === 'string') {
+          this.nextButton = document.querySelector(arrows.next)
+        } else if (arrows.next instanceof Element || (arrows.next as HTMLElement).classList !== undefined) {
+          this.nextButton = arrows.next as HTMLElement
+        }
       }
     }
 
