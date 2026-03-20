@@ -239,6 +239,70 @@ describe('Tvist - enabled with breakpoints', () => {
     })
   })
 
+  describe('initial render on mobile with enabled: false breakpoint', () => {
+    it('should not apply width styles on initial render when breakpoint disables slider', () => {
+      // Мобильная фикстура — сразу попадаем в breakpoint с enabled: false
+      const mobileFixture = createSliderFixture({ slidesCount: 6, width: 500 })
+
+      const slider = new Tvist(mobileFixture.root, {
+        enabled: true,
+        perPage: 2,
+        gap: 16,
+        peek: { before: 5, after: 20 },
+        breakpointsBase: 'container',
+        breakpoints: {
+          768: {
+            enabled: false
+          }
+        }
+      })
+
+      // Слайдер должен быть отключён сразу
+      expect(slider.isEnabled).toBe(false)
+
+      // width на слайдах не должен быть выставлен
+      slider.slides.forEach(slide => {
+        expect(slide.style.width).toBe('')
+        expect(slide.style.marginRight).toBe('')
+      })
+
+      mobileFixture.cleanup()
+    })
+
+    it('should not apply state classes on initial render when breakpoint disables slider', () => {
+      const mobileFixture = createSliderFixture({ slidesCount: 6, width: 500 })
+
+      const slider = new Tvist(mobileFixture.root, {
+        enabled: true,
+        perPage: 2,
+        gap: 16,
+        breakpointsBase: 'container',
+        breakpoints: {
+          768: {
+            enabled: false
+          }
+        }
+      })
+
+      expect(slider.isEnabled).toBe(false)
+
+      const SLIDE_ACTIVE = 'tvist-v1__slide--active'
+      const SLIDE_VISIBLE = 'tvist-v1__slide--visible'
+      const SLIDE_NEXT = 'tvist-v1__slide--next'
+      const SLIDE_PREV = 'tvist-v1__slide--prev'
+
+      // Классы состояний не должны быть проставлены
+      slider.slides.forEach(slide => {
+        expect(slide.classList.contains(SLIDE_ACTIVE)).toBe(false)
+        expect(slide.classList.contains(SLIDE_VISIBLE)).toBe(false)
+        expect(slide.classList.contains(SLIDE_NEXT)).toBe(false)
+        expect(slide.classList.contains(SLIDE_PREV)).toBe(false)
+      })
+
+      mobileFixture.cleanup()
+    })
+  })
+
   describe('slide styles and classes cleanup on resize back and forth', () => {
     it('should clear slide width and state classes after desktop→mobile→desktop resize cycle', () => {
       // Десктоп: включён с perPage=2

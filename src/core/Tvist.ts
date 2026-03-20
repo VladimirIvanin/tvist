@@ -259,6 +259,11 @@ export class Tvist {
    */
   private initModules(): void {
     Tvist.MODULES.forEach((ModuleClass, name) => {
+      // Если слайдер был отключён в процессе инициализации (например breakpoints
+      // вызвал disable() при первом checkBreakpoints), не создаём новые модули.
+      // Breakpoints-модуль — исключение: он должен работать всегда.
+      if (!this._isEnabled && name !== 'breakpoints') return
+
       try {
         const module = new ModuleClass(this, this.options)
         // Проверяем, должен ли модуль быть активным
