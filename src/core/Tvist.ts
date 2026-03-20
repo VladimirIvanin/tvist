@@ -6,9 +6,15 @@
 import pkg from '../../package.json' with { type: 'json' }
 import { Engine } from './Engine'
 import { EventEmitter } from './EventEmitter'
-import { getElement, children, cloneOptions } from '../utils/dom'
+import { getElement, cloneOptions } from '../utils/dom'
+import { getSlidesInTvistRoot } from './tvistSlides'
 import { TVIST_CLASSES } from './constants'
-import type { TvistOptions, AutoplayModuleAPI, VideoModuleAPI } from './types'
+import type {
+  TvistOptions,
+  TvistDestroyOptions,
+  AutoplayModuleAPI,
+  VideoModuleAPI,
+} from './types'
 import type { Module, ModuleConstructor } from '../modules/Module'
 import { BreakpointsModule } from '../modules/breakpoints/BreakpointsModule'
 import { throttle } from './Animator'
@@ -133,7 +139,7 @@ export class Tvist {
     // Если на этом root уже есть инстанс — уничтожаем его
     const rootEl = this.root as TvistRootElement
     if (rootEl.tvistInstance && typeof rootEl.tvistInstance.destroy === 'function') {
-      rootEl.tvistInstance.destroy()
+      rootEl.tvistInstance.destroy({ destroyNested: true })
     }
     rootEl.tvistInstance = this
 
@@ -151,8 +157,8 @@ export class Tvist {
 
     this.container = containerElement
 
-    // Получаем слайды
-    this._slides = children(this.container, `.${TVIST_CLASSES.slide}`)
+    // Получаем слайды (без слайдов вложенных экземпляров Tvist)
+    this._slides = getSlidesInTvistRoot(this.container, this.root)
 
     if (this.slides.length === 0) {
       console.warn('Tvist: no slides found')
@@ -748,9 +754,44 @@ export class Tvist {
   }
 
   /**
-   * Уничтожить экземпляр и очистить ресурсы
+   * Все вложенные root с классом блока внутри этого слайдера, в порядке «сначала глубокие».
+   * `querySelectorAll` даёт обход в глубину сверху вниз; `.reverse()` — уничтожаем с листьев к корню поддерева.
    */
-  destroy(): this {
+  private nestedTvistRootsDeepestFirst(): TvistRootElement[] {
+    const roots = this.root.querySelectorAll<HTMLElement>(
+      `.${TVIST_CLASSES.block}`
+    )
+    return [...roots].reverse() as TvistRootElement[]
+  }
+
+  /**
+   * `destroy({ destroyNested: true })` для каждого вложенного root с `tvistInstance`.
+   */
+  private destroyNestedTvists(): void {
+    const cascade: TvistDestroyOptions = { destroyNested: true }
+    for (const el of this.nestedTvistRootsDeepestFirst()) {
+      const nested = el.tvistInstance
+      if (nested == null || nested === this) continue
+      try {
+        nested.destroy(cascade)
+      } catch (error) {
+        console.error('Tvist: Error destroying nested instance:', error)
+      }
+    }
+  }
+
+  /**
+   * Уничтожить экземпляр и очистить ресурсы.
+   * Вложенные Tvist по умолчанию **не** уничтожаются — задайте `{ destroyNested: true }`, если нужно снести всё поддерево.
+   * Повторный вызов безопасен (no-op).
+   */
+  destroy(options?: TvistDestroyOptions): this {
+    if (this._isDestroyed) return this
+
+    if (options?.destroyNested) {
+      this.destroyNestedTvists()
+    }
+
     this._isDestroyed = true
 
     this.emit('beforeDestroy', this)
@@ -820,7 +861,7 @@ export class Tvist {
    * Используется LoopModule после перемещения слайдов
    */
   updateSlidesList(): void {
-    this._slides = children(this.container, `.${TVIST_CLASSES.slide}`)
+    this._slides = getSlidesInTvistRoot(this.container, this.root)
   }
 
   /**

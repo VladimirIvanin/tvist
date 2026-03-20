@@ -16,6 +16,18 @@ declare module './Tvist' {
   }
 }
 
+/**
+ * Аргументы метода {@link Tvist.destroy}
+ */
+export interface TvistDestroyOptions {
+  /**
+   * Уничтожать вложенные экземпляры Tvist (потомки с классом блока).
+   * Рекурсивно: у каждого вложенного вызывается `destroy({ destroyNested: true })`.
+   * По умолчанию `false` — вложенные слайдеры (например галереи в карточках) остаются активными.
+   */
+  destroyNested?: boolean
+}
+
 /** API модуля loop для вызова fix из Tvist */
 export interface LoopModuleAPI {
   fix(params: { direction?: 'next' | 'prev' }): number

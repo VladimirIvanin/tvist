@@ -86,7 +86,8 @@ export default defineConfig({
           { text: 'LazyLoad', link: '/examples/lazyload' },
           { text: 'Modules', link: '/examples/modules' },
           { text: 'Thumbs', link: '/examples/thumbs' },
-          { text: 'Grid', link: '/examples/grid' }
+          { text: 'Grid', link: '/examples/grid' },
+          { text: 'Вложенные слайдеры', link: '/examples/nested-sliders' }
         ]
       }
     ],

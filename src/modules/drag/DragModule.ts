@@ -258,8 +258,12 @@ export class DragModule extends Module {
     // Игнорируем правую кнопку мыши
     if ('button' in e && e.button !== 0) return
 
-    // Проверяем focusable элементы
     const target = e.target as HTMLElement
+    // Вложенный Tvist: жест относится ближайшему root, родитель не должен ловить всплытие
+    const nearestBlock = target?.closest?.(`.${TVIST_CLASSES.block}`)
+    if (nearestBlock && nearestBlock !== this.tvist.root) return
+
+    // Проверяем focusable элементы
     if (this.isFocusableElement(target)) return
 
     const point = this.getPointerPosition(e)

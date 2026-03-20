@@ -203,10 +203,14 @@ slider.on('optionsUpdated', (tvist, newOptions) => {
 ### destroy()
 
 ```typescript
-destroy(): this
+destroy(options?: { destroyNested?: boolean }): this
 ```
 
 Уничтожение экземпляра слайдера. Удаляет все обработчики событий, останавливает анимации, очищает модули и освобождает ресурсы.
+
+**Параметры:**
+
+- `options.destroyNested` — если `true`, перед разборкой текущего экземпляра рекурсивно вызывается `destroy({ destroyNested: true })` у вложенных Tvist на потомках с классом блока. По умолчанию `false`: вложенные слайдеры (например в карточках товаров) не трогаются.
 
 **Возвращает:** экземпляр слайдера для цепочки вызовов
 
@@ -214,6 +218,9 @@ destroy(): this
 
 ```javascript
 slider.destroy()
+
+// Снести вместе со всеми вложенными Tvist внутри этого root:
+slider.destroy({ destroyNested: true })
 
 // С очисткой DOM
 slider.destroy()

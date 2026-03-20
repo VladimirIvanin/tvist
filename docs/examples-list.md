@@ -25,6 +25,7 @@ import ScrollControlExample from './.vitepress/theme/examples/ScrollControlExamp
 import ScrollbarExample from './.vitepress/theme/examples/ScrollbarExample.vue'
 import MarqueeExample from './.vitepress/theme/examples/MarqueeExample.vue'
 import AutoWidthExample from './.vitepress/theme/examples/AutoWidthExample.vue'
+import NestedSlidersExample from './.vitepress/theme/examples/NestedSlidersExample.vue'
 </script>
 
 <div class="examples-page">
@@ -122,6 +123,10 @@ import AutoWidthExample from './.vitepress/theme/examples/AutoWidthExample.vue'
 ## 23. Auto Width / Auto Height
 
 <AutoWidthExample detailsLink="./examples/auto-width" />
+
+## 24. Вложенные слайдеры
+
+<NestedSlidersExample detailsLink="./examples/nested-sliders" />
 
 </div>
 

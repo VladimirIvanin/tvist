@@ -32,7 +32,14 @@ import './modules/video'
 
 
 // Types
-export type { TvistOptions, AutoplayOptions, VideoOptions, VideoEvent, VideoProgressEvent } from './core/types'
+export type {
+  TvistOptions,
+  TvistDestroyOptions,
+  AutoplayOptions,
+  VideoOptions,
+  VideoEvent,
+  VideoProgressEvent,
+} from './core/types'
 export type { Module, ModuleConstructor } from './modules/Module'
 
 // Utils (опционально для расширенного использования)
