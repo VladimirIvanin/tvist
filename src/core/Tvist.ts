@@ -562,7 +562,8 @@ export class Tvist {
       TVIST_CLASSES.dragging,
       TVIST_CLASSES.singlePage,
       TVIST_CLASSES.nav,
-      TVIST_CLASSES.cube
+      TVIST_CLASSES.cube,
+      TVIST_CLASSES.locked
     )
 
     this.slides.forEach(slide => {

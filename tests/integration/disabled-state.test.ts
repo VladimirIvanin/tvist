@@ -3,6 +3,7 @@ import { Tvist } from '../../src/core/Tvist'
 import { createSliderFixture } from '../fixtures'
 import type { SliderFixture } from '../fixtures'
 import '../../src/modules/breakpoints'
+import { TVIST_CLASSES } from '../../src/core/constants'
 
 describe('Disabled State Integration', () => {
   let fixture: SliderFixture
@@ -73,5 +74,25 @@ describe('Disabled State Integration', () => {
     expect(slider.isEnabled).toBe(false)
     expect(fixture.slides[0].style.width).toBe('')
     expect(fixture.container.style.transform).toBe('')
+  })
+
+  it('должен удалять класс locked при выключении слайдера', () => {
+    // Делаем так, чтобы слайдер изначально был заблокирован (всего 1 слайд)
+    const lockedFixture = createSliderFixture({ slidesCount: 1, width: 1000 })
+    
+    const slider = new Tvist(lockedFixture.root, {
+      perPage: 2
+    })
+
+    // Убеждаемся, что класс locked был добавлен
+    expect(lockedFixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(true)
+
+    // Выключаем слайдер
+    slider.disable()
+
+    // Проверяем, что класс удалился
+    expect(lockedFixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(false)
+    
+    lockedFixture.cleanup()
   })
 })
