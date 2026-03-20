@@ -563,7 +563,8 @@ export class Tvist {
       TVIST_CLASSES.singlePage,
       TVIST_CLASSES.nav,
       TVIST_CLASSES.cube,
-      TVIST_CLASSES.locked
+      TVIST_CLASSES.locked,
+      TVIST_CLASSES.vertical
     )
 
     this.slides.forEach(slide => {
@@ -576,7 +577,8 @@ export class Tvist {
         TVIST_CLASSES.slideActive,
         TVIST_CLASSES.slidePrev,
         TVIST_CLASSES.slideNext,
-        TVIST_CLASSES.slideVisible
+        TVIST_CLASSES.slideVisible,
+        TVIST_CLASSES.slideNavActive
       )
     })
   }
