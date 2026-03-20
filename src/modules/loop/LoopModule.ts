@@ -376,7 +376,7 @@ export class LoopModule extends Module {
       this.tvist.engine.target.set(newTranslate)
       
       // Применяем transform
-      this.tvist.engine.applyTransformPublic()
+      this.tvist.engine.applyTransform()
 
     } else if (appendSlidesIndexes.length > 0) {
       // Вычисляем разницу в позиции слайда (используем сохранённые позиции)
@@ -402,7 +402,7 @@ export class LoopModule extends Module {
       this.tvist.engine.target.set(newTranslate)
       
       // Применяем transform
-      this.tvist.engine.applyTransformPublic()
+      this.tvist.engine.applyTransform()
     }
 
     // При инициализации или после перестановки нужно установить activeIndex на слайд с нужным realIndex
@@ -423,7 +423,7 @@ export class LoopModule extends Module {
           const targetPosition = this.tvist.engine.getScrollPositionForIndex(i)
           this.tvist.engine.location.set(targetPosition)
           this.tvist.engine.target.set(targetPosition)
-          this.tvist.engine.applyTransformPublic()
+          this.tvist.engine.applyTransform()
           break
         }
       }

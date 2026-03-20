@@ -39,6 +39,22 @@ const CATCH_UP_EVENTS = new Set<string>([
   'breakpoint',
 ])
 
+const DEFAULT_OPTIONS: Partial<TvistOptions> = {
+  perPage: 1,
+  slidesPerGroup: 1,
+  gap: 0,
+  speed: 300,
+  direction: 'horizontal',
+  drag: true,
+  start: 0,
+  loop: false,
+  enabled: true,
+  preventClicks: true,
+  preventClicksPropagation: true,
+  visibility: true,
+  browserFixes: { firefoxImageDecoding: true },
+}
+
 export class Tvist {
   static readonly VERSION = pkg.version ?? '0.0.0'
 
@@ -80,7 +96,7 @@ export class Tvist {
   readonly options: TvistOptions
   
   // Оригинальные опции (до применения breakpoints) - для BreakpointsModule
-  readonly _originalOptions?: TvistOptions
+  _originalOptions?: TvistOptions
 
   // Ядро
   readonly engine: Engine
@@ -130,98 +146,85 @@ export class Tvist {
     target: string | HTMLElement,
     options: TvistOptions = {}
   ) {
-    // Генерируем уникальный ID для инстанса
     this.id = Tvist.generateId()
-
-    // Парсинг DOM
-    this.root = getElement(target)
-
-    // Если на этом root уже есть инстанс — уничтожаем его
-    const rootEl = this.root as TvistRootElement
-    if (rootEl.tvistInstance && typeof rootEl.tvistInstance.destroy === 'function') {
-      rootEl.tvistInstance.destroy({ destroyNested: true })
-    }
-    rootEl.tvistInstance = this
-
-    // Находим контейнер
-    const containerSelector = `.${TVIST_CLASSES.container}`
-    const containerElement = this.root.querySelector<HTMLElement>(
-      containerSelector
-    )
-
-    if (!containerElement) {
-      throw new Error(
-        `Tvist: container "${containerSelector}" not found inside root element`
-      )
-    }
-
-    this.container = containerElement
-
-    // Получаем слайды (без слайдов вложенных экземпляров Tvist)
+    this.root = this.initRoot(target)
+    this.container = this.findContainer()
     this._slides = getSlidesInTvistRoot(this.container, this.root)
 
     if (this.slides.length === 0) {
       console.warn('Tvist: no slides found')
     }
 
-    // Мёрджим опции с дефолтными
-    const defaultBrowserFixes = {
-      firefoxImageDecoding: true,
+    this.options = this.mergeOptions(options)
+    // Сохраняем оригинальные опции ДО применения breakpoints — нужно для BreakpointsModule
+    this.saveOriginalOptions()
+    // Применяем breakpoints ДО создания Engine (если есть)
+    applyInitialBreakpoint(this.root, this.options)
+    // Индексы слайдов для стилизации и идентификации (в т.ч. для loop)
+    this.updateSlideIndices()
+    this._isEnabled = this.options.enabled !== false
+    this.events = new EventEmitter()
+    this.applyInitialClasses()
+    this.registerOptionHandlers()
+
+    this.engine = new Engine(this, this.options)
+    // Вычитываем модули, зарегистрированные до загрузки core-бандла
+    Tvist.flushModuleQueue()
+    this.initModules()
+    this.setupResizeListener()
+    this.performFirstRender()
+  }
+
+  private initRoot(target: string | HTMLElement): HTMLElement {
+    const root = getElement(target)
+    const rootEl = root as TvistRootElement
+    if (rootEl.tvistInstance && typeof rootEl.tvistInstance.destroy === 'function') {
+      rootEl.tvistInstance.destroy({ destroyNested: true })
     }
-    
-    this.options = {
-      perPage: 1,
-      slidesPerGroup: 1,
-      gap: 0,
-      speed: 300,
-      direction: 'horizontal',
-      drag: true,
-      start: 0,
-      loop: false,
-      enabled: true,
-      preventClicks: true,
-      preventClicksPropagation: true,
-      visibility: true,
+    rootEl.tvistInstance = this
+    return root
+  }
+
+  private findContainer(): HTMLElement {
+    const selector = `.${TVIST_CLASSES.container}`
+    const el = this.root.querySelector<HTMLElement>(selector)
+    if (!el) {
+      throw new Error(`Tvist: container "${selector}" not found inside root element`)
+    }
+    return el
+  }
+
+  private mergeOptions(options: TvistOptions): TvistOptions {
+    return {
+      ...DEFAULT_OPTIONS,
       ...options,
-      // Мерджим browserFixes отдельно для правильного объединения
       browserFixes: {
-        ...defaultBrowserFixes,
+        ...DEFAULT_OPTIONS.browserFixes,
         ...options.browserFixes,
       },
     }
+  }
 
-    // Сохраняем оригинальные опции ДО применения breakpoints
-    // Это нужно для BreakpointsModule чтобы восстанавливать базовые опции
+  /** Сохраняет копию опций до применения breakpoints — нужно для BreakpointsModule чтобы восстанавливать базовые опции */
+  private saveOriginalOptions(): void {
     if (this.options.breakpoints && Object.keys(this.options.breakpoints).length > 0) {
       const cloned = cloneOptions(this.options as Record<string, unknown>) as TvistOptions
       if (this.options.breakpointsBase) {
         cloned.breakpointsBase = this.options.breakpointsBase
       }
-      ;(this as { _originalOptions?: TvistOptions })._originalOptions = cloned
+      this._originalOptions = cloned
     }
+  }
 
-    // Применяем breakpoints ДО создания Engine (если есть)
-    applyInitialBreakpoint(this.root, this.options)
-
-    // Индексы слайдов для стилизации и идентификации (в т.ч. для loop)
-    this.updateSlideIndices()
-
-    // Проверяем начальное состояние enabled
-    this._isEnabled = this.options.enabled !== false
-
-    // Инициализация системы событий
-    this.events = new EventEmitter()
-
-    // Применяем классы состояния
-    if (this.options.direction === 'vertical') {
-      this.root.classList.add(TVIST_CLASSES.vertical)
-    }
-
+  private applyInitialClasses(): void {
+    this.updateDirectionClass()
     if (!this._isEnabled) {
       this.root.classList.add(TVIST_CLASSES.disabled)
     }
+  }
 
-    // Регистрируем обработчики из опций
+  /** Регистрирует обработчики событий из options.on */
+  private registerOptionHandlers(): void {
     if (this.options.on) {
       Object.entries(this.options.on).forEach(([event, handler]) => {
         if (handler) {
@@ -229,27 +232,18 @@ export class Tvist {
         }
       })
     }
+  }
 
-    // Создаём Engine
-    this.engine = new Engine(this, this.options)
-
-    // Вычитываем модули, зарегистрированные до загрузки core-бандла
-    Tvist.flushModuleQueue()
-
-    // Инициализируем модули (breakpoints должен работать всегда)
-    this.initModules()
-
-    // Слушаем resize
-    this.setupResizeListener()
-
-    // Первый рендер только если слайдер включен
+  /**
+   * Первый рендер: если слайдер включён — update(), если отключён — очищаем стили,
+   * которые мог установить Engine при конструировании.
+   */
+  private performFirstRender(): void {
     if (this._isEnabled) {
       this.update()
     } else {
-      // Если отключен, очищаем стили, которые мог установить Engine
       this.clearSliderStyles()
     }
-
     this.root.classList.add(TVIST_CLASSES.created)
     this.emit('created', this)
     this.setupSlideClick()
@@ -330,38 +324,41 @@ export class Tvist {
   }
 
   /**
+   * Создаёт модуль, проверяет shouldBeActive, добавляет в map и инициализирует.
+   * @returns true если модуль был создан и инициализирован
+   */
+  private tryInitModule(name: string, ModuleClass: ModuleConstructor): boolean {
+    try {
+      const module = new ModuleClass(this, this.options)
+      if (module.shouldBeActive?.() === false) return false
+      this.modules.set(name, module)
+      module.init()
+      return true
+    } catch (error) {
+      console.error(`Tvist: Failed to initialize module "${name}":`, error)
+      return false
+    }
+  }
+
+  /**
    * Инициализация всех зарегистрированных модулей
    */
   private initModules(): void {
     Tvist.MODULES.forEach((ModuleClass, name) => {
-      // Если слайдер был отключён в процессе инициализации (breakpoints вызвал
-      // disable() при первом checkBreakpoints), не создаём новые модули —
-      // они создадут DOM-элементы и классы которые некому будет убрать.
-      // Breakpoints — исключение: он должен работать всегда.
+      // Breakpoints должен работать всегда, остальные — только при включённом слайдере
       if (!this._isEnabled && name !== 'breakpoints') return
-
-      try {
-        const module = new ModuleClass(this, this.options)
-        // Проверяем, должен ли модуль быть активным
-        if (module.shouldBeActive?.() !== false) {
-          this.modules.set(name, module)
-          module.init()
-        }
-      } catch (error) {
-        console.error(`Tvist: Failed to initialize module "${name}":`, error)
-      }
+      this.tryInitModule(name, ModuleClass)
     })
   }
 
   /**
    * Синхронизирует активные модули с текущими опциями:
-   * - инициализирует модули, которые стали активными (shouldBeActive() = true)
    * - уничтожает модули, которые стали неактивными (shouldBeActive() = false)
+   * - инициализирует модули, которые стали активными (shouldBeActive() = true)
    * Вызывается при смене брейкпоинта и из updateOptions().
    * @internal
    */
   syncModules(destroyOnly = false): void {
-    // Уничтожаем модули, которые больше не должны быть активными
     this.modules.forEach((module, name) => {
       if (name === 'breakpoints') return
       try {
@@ -374,22 +371,17 @@ export class Tvist {
       }
     })
 
-    // Инициализируем модули, которые стали активными
-    // При destroyOnly=true пропускаем — слайдер отключён, новые модули не нужны
     if (destroyOnly) return
 
     Tvist.MODULES.forEach((ModuleClass, name) => {
       if (this.modules.has(name)) return
-      try {
-        const module = new ModuleClass(this, this.options)
-        if (module.shouldBeActive?.() !== false) {
-          this.modules.set(name, module)
-          module.init()
-        }
-      } catch (error) {
-        console.error(`Tvist: Failed to initialize module "${name}":`, error)
-      }
+      this.tryInitModule(name, ModuleClass)
     })
+  }
+
+  /** Обновляет CSS-класс направления (vertical/horizontal) на root */
+  private updateDirectionClass(): void {
+    this.root.classList.toggle(TVIST_CLASSES.vertical, this.options.direction === 'vertical')
   }
 
   /**
@@ -470,13 +462,7 @@ export class Tvist {
       module.onResize?.()
     })
 
-    // Обновляем класс направления
-    if (this.options.direction === 'vertical') {
-      this.root.classList.add(TVIST_CLASSES.vertical)
-    } else {
-      this.root.classList.remove(TVIST_CLASSES.vertical)
-    }
-
+    this.updateDirectionClass()
     this.engine.update()
 
     // Вызываем onUpdate на модулях
@@ -497,85 +483,25 @@ export class Tvist {
     
     // Обработка изменения breakpoints
     if (newOptions.breakpoints !== undefined || newOptions.breakpointsBase !== undefined) {
-      // Если есть _originalOptions, восстанавливаем базовые опции
-      if (this._originalOptions) {
-        // Восстанавливаем базовые опции (без breakpoints)
-        const baseOptions = cloneOptions(this._originalOptions as Record<string, unknown>) as TvistOptions
-        delete baseOptions.breakpoints
-        delete baseOptions.on
-        
-        // Применяем базовые опции
-        Object.keys(this.options).forEach(key => {
-          if (key !== 'breakpoints' && key !== 'on') {
-            delete (this.options as Record<string, unknown>)[key]
-          }
-        })
-        Object.assign(this.options, baseOptions)
-      }
-      
-      // Применяем новые опции
-      Object.assign(this.options, newOptions)
-      
-      // Обновляем _originalOptions
-      const cloned = cloneOptions(this.options as Record<string, unknown>) as TvistOptions
-      if (this.options.breakpointsBase) {
-        cloned.breakpointsBase = this.options.breakpointsBase
-      }
-      ;(this as { _originalOptions?: TvistOptions })._originalOptions = cloned
-
-      // Сбрасываем текущий breakpoint в BreakpointsModule чтобы он пересчитался
-      const breakpointsModule = this.modules.get('breakpoints')
-      if (breakpointsModule instanceof BreakpointsModule) {
-        breakpointsModule.resetCurrentBreakpoint()
-      }
+      this.applyBreakpointsOptionsUpdate(newOptions)
     } else {
-      // Обычный merge для остальных опций
-      // Специальная обработка для browserFixes - мерджим вложенный объект
-      if (newOptions.browserFixes) {
-        this.options.browserFixes = {
-          ...this.options.browserFixes,
-          ...newOptions.browserFixes,
-        }
-        // Удаляем из newOptions чтобы не перезаписать при Object.assign
-        const { browserFixes: _unused, ...restOptions } = newOptions
-        Object.assign(this.options, restOptions)
-      } else {
-        Object.assign(this.options, newOptions)
-      }
+      this.applySimpleOptionsUpdate(newOptions)
     }
 
     // Обработка изменения direction
     if (newOptions.direction !== undefined && newOptions.direction !== oldOptions.direction) {
-      if (this.options.direction === 'vertical') {
-        this.root.classList.add(TVIST_CLASSES.vertical)
-      } else {
-        this.root.classList.remove(TVIST_CLASSES.vertical)
-      }
+      this.updateDirectionClass()
     }
 
     // Обработка изменения on (обработчики событий)
     if (newOptions.on) {
-      // Удаляем старые обработчики если они были
-      if (oldOptions.on) {
-        Object.entries(oldOptions.on).forEach(([event, handler]) => {
-          if (handler) {
-            this.events.off(event, handler)
-          }
-        })
-      }
-      // Добавляем новые обработчики
-      Object.entries(newOptions.on).forEach(([event, handler]) => {
-        if (handler) {
-          this.events.on(event, handler)
-        }
-      })
+      this.updateEventHandlers(oldOptions.on, newOptions.on)
     }
 
     // Обработка изменения peek
     if (newOptions.peek !== undefined || newOptions.peekTrim !== undefined) {
-      // Применяем новые значения peek к контейнеру (только если слайдер включен)
       if (this._isEnabled) {
-        this.engine.applyPeekPublic()
+        this.engine.applyPeek()
       }
     }
 
@@ -594,14 +520,8 @@ export class Tvist {
     if (needsRecalculation && this._isEnabled) {
       this.update()
     } else if (needsRecalculation && !this._isEnabled) {
-      // Если слайдер выключен, но мы обновили опции, влияющие на размеры -
-      // мы должны очистить стили слайдов, так как они могли быть применены
-      // в предыдущих состояниях (например, width) или мы должны гарантировать, 
-      // что они не будут установлены
+      // Если слайдер выключен — очищаем стили и обновляем внутренний state Engine без DOM
       this.clearSliderStyles()
-      
-      // И также убедиться, что слайдер пересчитал размеры (это обновит внутренний state Engine),
-      // но не применял их в DOM
       this.engine.updateDisabled()
     }
 
@@ -611,13 +531,72 @@ export class Tvist {
     })
 
     // Синхронизируем модули с новыми опциями
-    // Если слайдер выключен, передаем destroyOnly = true, чтобы новые модули не инициализировались
+    // Если слайдер выключен, передаём destroyOnly=true, чтобы новые модули не инициализировались
     this.syncModules(!this._isEnabled)
-
-    // Событие обновления опций
     this.emit('optionsUpdated', this, newOptions)
 
     return this
+  }
+
+  /** Обновление опций с изменением breakpoints: восстанавливает базовые опции, применяет новые, обновляет _originalOptions */
+  private applyBreakpointsOptionsUpdate(newOptions: Partial<TvistOptions>): void {
+    // Если есть _originalOptions, восстанавливаем базовые опции (без breakpoints)
+    if (this._originalOptions) {
+      const baseOptions = cloneOptions(this._originalOptions as Record<string, unknown>) as TvistOptions
+      delete baseOptions.breakpoints
+      delete baseOptions.on
+      
+      Object.keys(this.options).forEach(key => {
+        if (key !== 'breakpoints' && key !== 'on') {
+          delete (this.options as Record<string, unknown>)[key]
+        }
+      })
+      Object.assign(this.options, baseOptions)
+    }
+    
+    Object.assign(this.options, newOptions)
+    
+    // Обновляем _originalOptions
+    const cloned = cloneOptions(this.options as Record<string, unknown>) as TvistOptions
+    if (this.options.breakpointsBase) {
+      cloned.breakpointsBase = this.options.breakpointsBase
+    }
+    this._originalOptions = cloned
+
+    // Сбрасываем текущий breakpoint в BreakpointsModule чтобы он пересчитался
+    const breakpointsModule = this.modules.get('breakpoints')
+    if (breakpointsModule instanceof BreakpointsModule) {
+      breakpointsModule.resetCurrentBreakpoint()
+    }
+  }
+
+  /** Обычный merge опций. Специальная обработка для browserFixes — мерджим вложенный объект отдельно */
+  private applySimpleOptionsUpdate(newOptions: Partial<TvistOptions>): void {
+    if (newOptions.browserFixes) {
+      this.options.browserFixes = {
+        ...this.options.browserFixes,
+        ...newOptions.browserFixes,
+      }
+      // Удаляем из newOptions чтобы не перезаписать при Object.assign
+      const { browserFixes: _unused, ...restOptions } = newOptions
+      Object.assign(this.options, restOptions)
+    } else {
+      Object.assign(this.options, newOptions)
+    }
+  }
+
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
+  private updateEventHandlers(oldOn?: Record<string, ((...args: any[]) => void) | undefined>, newOn?: Record<string, ((...args: any[]) => void) | undefined>): void {
+    if (oldOn) {
+      Object.entries(oldOn).forEach(([event, handler]) => {
+        if (handler) this.events.off(event, handler)
+      })
+    }
+    if (newOn) {
+      Object.entries(newOn).forEach(([event, handler]) => {
+        if (handler) this.events.on(event, handler)
+      })
+    }
   }
 
   /**
@@ -705,19 +684,9 @@ export class Tvist {
     this._isTogglingEnabled = true // Предотвращаем применение брейкпоинтов
     this.root.classList.remove(TVIST_CLASSES.disabled)
 
-    // Переинициализируем модули (кроме breakpoints - он уже работает)
     Tvist.MODULES.forEach((ModuleClass, name) => {
-      if (name === 'breakpoints') return
-      if (this.modules.has(name)) return
-      
-      try {
-        const module = new ModuleClass(this, this.options)
-        if (module.shouldBeActive?.() === false) return
-        this.modules.set(name, module)
-        module.init()
-      } catch (error) {
-        console.error(`Tvist: Failed to initialize module "${name}":`, error)
-      }
+      if (name === 'breakpoints' || this.modules.has(name)) return
+      this.tryInitModule(name, ModuleClass)
     })
 
     // Пересчитываем размеры и позиции

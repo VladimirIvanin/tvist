@@ -496,7 +496,7 @@ export class DragModule extends Module {
       newPosition,
       locationBefore: this.tvist.engine.location.get()
     })
-    this.tvist.engine.applyTransformPublic()
+    this.tvist.engine.applyTransform()
     dragLog('transform applied', {
       locationAfter: this.tvist.engine.location.get()
     })
@@ -560,7 +560,7 @@ export class DragModule extends Module {
         // Если позиция была скорректирована, устанавливаем её
         if (clampedPosition !== currentPosition) {
           this.tvist.engine.location.set(clampedPosition)
-          this.tvist.engine.applyTransformPublic()
+          this.tvist.engine.applyTransform()
         }
       }
 
@@ -964,7 +964,7 @@ export class DragModule extends Module {
       this.tvist.engine.location.set(newPosition)
       
       // Применяем transform напрямую (без пересчёта размеров)
-      this.tvist.engine.applyTransformPublic()
+      this.tvist.engine.applyTransform()
 
       // Сообщаем о скролле для LoopModule
       this.emit('scroll')

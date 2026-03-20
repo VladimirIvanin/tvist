@@ -373,7 +373,7 @@ export class GridModule extends Module {
 
     engine.target.set(correctPosition)
     engine.location.set(correctPosition)
-    engine.applyTransformPublic()
+    engine.applyTransform()
     
     // Проверяем блокировку после обновления позиций (возможно контент теперь влезает)
     engine.checkLock()

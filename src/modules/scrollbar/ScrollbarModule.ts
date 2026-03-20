@@ -294,7 +294,7 @@ export class ScrollbarModule extends Module {
     // Применяем позицию напрямую через engine (плавное следование)
     this.tvist.engine.location.set(clampedScroll)
     this.tvist.engine.target.set(clampedScroll)
-    this.tvist.engine.applyTransformPublic()
+    this.tvist.engine.applyTransform()
     
     // Обновляем визуальное положение ползунка
     this.updateScrollbar()
