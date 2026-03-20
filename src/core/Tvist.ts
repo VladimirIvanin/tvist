@@ -259,11 +259,6 @@ export class Tvist {
    */
   private initModules(): void {
     Tvist.MODULES.forEach((ModuleClass, name) => {
-      // Если слайдер был отключён в процессе инициализации (например breakpoints
-      // вызвал disable() при первом checkBreakpoints), не создаём новые модули.
-      // Breakpoints-модуль — исключение: он должен работать всегда.
-      if (!this._isEnabled && name !== 'breakpoints') return
-
       try {
         const module = new ModuleClass(this, this.options)
         // Проверяем, должен ли модуль быть активным
@@ -532,18 +527,33 @@ export class Tvist {
   }
 
   /**
-   * Очистить стили слайдера (transform и размеры слайдов)
+   * Очистить стили и классы состояний слайдера при отключении.
+   * Вызывается в disable() и при инициализации с enabled: false.
    */
   private clearSliderStyles(): void {
-    // Убираем transform с контейнера
     this.container.style.transform = ''
 
-    // Убираем инлайн-стили со слайдов
+    // Убираем все классы состояния с рута которые вешают модули
+    this.root.classList.remove(
+      TVIST_CLASSES.draggable,
+      TVIST_CLASSES.dragging,
+      TVIST_CLASSES.singlePage,
+      TVIST_CLASSES.nav,
+      TVIST_CLASSES.cube
+    )
+
     this.slides.forEach(slide => {
       slide.style.width = ''
       slide.style.height = ''
       slide.style.marginRight = ''
       slide.style.marginBottom = ''
+
+      slide.classList.remove(
+        TVIST_CLASSES.slideActive,
+        TVIST_CLASSES.slidePrev,
+        TVIST_CLASSES.slideNext,
+        TVIST_CLASSES.slideVisible
+      )
     })
   }
 
