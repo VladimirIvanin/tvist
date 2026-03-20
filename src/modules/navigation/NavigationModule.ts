@@ -74,15 +74,15 @@ export class NavigationModule extends Module {
       if (arrows.prev) {
         if (typeof arrows.prev === 'string') {
           this.prevButton = document.querySelector(arrows.prev)
-        } else if (arrows.prev instanceof Element || (arrows.prev as HTMLElement).classList !== undefined) {
-          this.prevButton = arrows.prev as HTMLElement
+        } else if (arrows.prev instanceof HTMLElement) {
+          this.prevButton = arrows.prev
         }
       }
       if (arrows.next) {
         if (typeof arrows.next === 'string') {
           this.nextButton = document.querySelector(arrows.next)
-        } else if (arrows.next instanceof Element || (arrows.next as HTMLElement).classList !== undefined) {
-          this.nextButton = arrows.next as HTMLElement
+        } else if (arrows.next instanceof HTMLElement) {
+          this.nextButton = arrows.next
         }
       }
     }

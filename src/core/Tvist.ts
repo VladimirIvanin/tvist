@@ -498,8 +498,10 @@ export class Tvist {
 
     // Обработка изменения peek
     if (newOptions.peek !== undefined || newOptions.peekTrim !== undefined) {
-      // Применяем новые значения peek к контейнеру
-      this.engine.applyPeekPublic()
+      // Применяем новые значения peek к контейнеру (только если слайдер включен)
+      if (this._isEnabled) {
+        this.engine.applyPeekPublic()
+      }
     }
 
     // Пересчитываем размеры и позиции при изменении ключевых опций
@@ -524,7 +526,8 @@ export class Tvist {
     })
 
     // Синхронизируем модули с новыми опциями
-    this.syncModules()
+    // Если слайдер выключен, передаем destroyOnly = true, чтобы новые модули не инициализировались
+    this.syncModules(!this._isEnabled)
 
     // Событие обновления опций
     this.emit('optionsUpdated', this, newOptions)
@@ -538,6 +541,10 @@ export class Tvist {
    */
   private clearSliderStyles(): void {
     this.container.style.transform = ''
+    this.container.style.paddingTop = ''
+    this.container.style.paddingBottom = ''
+    this.container.style.paddingLeft = ''
+    this.container.style.paddingRight = ''
 
     // Убираем все классы состояния с рута которые вешают модули
     this.root.classList.remove(

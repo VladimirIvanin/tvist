@@ -8,6 +8,9 @@ import { Tvist } from '@core/Tvist'
 import { createSliderFixture } from '../../fixtures'
 import type { SliderFixture } from '../../fixtures'
 import '../../../src/modules/autoplay' // Регистрация модуля autoplay
+import '../../../src/modules/drag'
+import '../../../src/modules/slide-states'
+
 
 describe('Tvist.updateOptions()', () => {
   let fixture: SliderFixture
@@ -220,5 +223,26 @@ describe('Tvist.updateOptions()', () => {
     expect(slider.activeIndex).toBe(1)
 
     slider.destroy()
+  })
+
+  it('не должен переинициализировать модули при updateOptions на выключенном слайдере', () => {
+    const slider = new Tvist(fixture.root, { enabled: false })
+
+    // Слайдер выключен, модули не должны добавлять классы и стили
+    expect(fixture.root.classList.contains(TVIST_CLASSES.draggable)).toBe(false)
+    expect(fixture.slides[0].classList.contains(TVIST_CLASSES.slideActive)).toBe(false)
+    expect(fixture.container.style.paddingLeft).toBe('')
+    expect(fixture.container.style.paddingRight).toBe('')
+
+    // Вызываем updateOptions (например, из-за resize или изменения другой опции)
+    slider.updateOptions({ gap: 15, peek: { before: 10, after: 10 } })
+
+    // Классы всё ещё не должны появиться
+    expect(fixture.root.classList.contains(TVIST_CLASSES.draggable)).toBe(false)
+    expect(fixture.slides[0].classList.contains(TVIST_CLASSES.slideActive)).toBe(false)
+    
+    // Стили контейнера тоже не должны применяться
+    expect(fixture.container.style.paddingLeft).toBe('')
+    expect(fixture.container.style.paddingRight).toBe('')
   })
 })
