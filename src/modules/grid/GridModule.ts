@@ -17,6 +17,8 @@ export class GridModule extends Module {
   private isActive = false
   private originalSlides: HTMLElement[] = []
   private wrapperSlides: HTMLElement[] = []
+  /** Сигнатура структуры сетки + отступов; при совпадении onUpdate не пересоздаёт DOM */
+  private gridStructureKey = ''
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
@@ -26,32 +28,82 @@ export class GridModule extends Module {
     if (this.shouldBeActive()) {
       this.isActive = true
       this.buildGrid()
+      this.gridStructureKey = this.computeGridStructureKey()
       this.fixEnginePositions()
     }
   }
 
   override destroy(): void {
+    this.gridStructureKey = ''
+    this.isActive = false
     this.removeGrid()
   }
 
   override onUpdate(): void {
     const wasActive = this.isActive
-    
-    if (this.shouldBeActive()) {
+
+    if (!this.shouldBeActive()) {
       if (wasActive) {
-        // Пересоздаем grid
+        this.isActive = false
+        this.gridStructureKey = ''
         this.removeGrid()
+        this.tvist.engine.update()
       }
-      
+      return
+    }
+
+    if (!wasActive) {
       this.isActive = true
       this.buildGrid()
+      this.gridStructureKey = this.computeGridStructureKey()
       this.fixEnginePositions()
-    } else if (wasActive) {
-      this.isActive = false
-      this.removeGrid()
-      // Форсим обновление Engine, чтобы он вернул свои стили
-      this.tvist.engine.update()
+      return
     }
+
+    const nextKey = this.computeGridStructureKey()
+    if (nextKey !== this.gridStructureKey) {
+      this.removeGrid()
+      this.buildGrid()
+      this.gridStructureKey = nextKey
+    }
+    this.fixEnginePositions()
+  }
+
+  /**
+   * Ключ для решения, нужно ли пересобирать DOM сетки (rows/cols/dimensions и gap).
+   */
+  private computeGridStructureKey(): string {
+    const { grid, gap: globalGap = 0 } = this.options
+    if (!grid) return ''
+
+    const gapFingerprint = this.gapFingerprintForStructureKey(grid.gap, globalGap)
+
+    const hasDimensions = grid.dimensions && grid.dimensions.length > 0
+    if (hasDimensions) {
+      return `d:${JSON.stringify(grid.dimensions)}:${gapFingerprint}`
+    }
+
+    return `f:${String(grid.rows ?? '')}:${String(grid.cols ?? '')}:${gapFingerprint}`
+  }
+
+  /**
+   * Стабильная строка по настройкам gap (совпадает с тем, как {@link getGapValue} их читает).
+   */
+  private gapFingerprintForStructureKey(
+    gridGap: NonNullable<TvistOptions['grid']>['gap'] | undefined,
+    globalGap: string | number
+  ): string {
+    if (gridGap === undefined) {
+      return `gg:${globalGap}`
+    }
+
+    if (typeof gridGap === 'object') {
+      const row = String(gridGap.row ?? '')
+      const col = String(gridGap.col ?? '')
+      return `gr:${row}:gc:${col}:gg:${globalGap}`
+    }
+
+    return `g:${String(gridGap)}:gg:${globalGap}`
   }
 
   public override shouldBeActive(): boolean {
@@ -110,43 +162,21 @@ export class GridModule extends Module {
     const { grid } = this.options
     if (!grid?.rows || !grid?.cols) return
 
-    const rows = grid.rows
-    const cols = grid.cols
-    const slidesPerPage = rows * cols
-    const pagesCount = Math.ceil(this.originalSlides.length / slidesPerPage)
-    
-    let slideIndex = 0
-    
-    const containerFragment = document.createDocumentFragment()
-    
-    for (let pageIndex = 0; pageIndex < pagesCount; pageIndex++) {
-      const outerSlide = this.createOuterSlide()
-      
-      for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
-        const rowEl = this.createRowElement(rowIndex, rows)
-        const rowFragment = document.createDocumentFragment()
-        
-        for (let colIndex = 0; colIndex < cols; colIndex++) {
-          if (slideIndex < this.originalSlides.length) {
-            const originalSlide = this.originalSlides[slideIndex]
-            if (originalSlide) {
-              const colWrapper = this.createColWrapper(colIndex, cols)
-              this.wrapSlide(originalSlide, colWrapper)
-              rowFragment.appendChild(colWrapper)
-            }
-            slideIndex++
-          }
-        }
-        
-        rowEl.appendChild(rowFragment)
-        outerSlide.appendChild(rowEl)
-      }
-      
-      this.wrapperSlides.push(outerSlide)
-      containerFragment.appendChild(outerSlide)
+    const { rows, cols } = grid
+    const cellsPerPage = rows * cols
+    const pageCount = Math.ceil(this.originalSlides.length / cellsPerPage)
+
+    const fragment = document.createDocumentFragment()
+    let nextSlideIndex = 0
+
+    for (let page = 0; page < pageCount; page++) {
+      const pageRoot = this.createOuterSlide()
+      nextSlideIndex = this.fillGridPage(pageRoot, rows, cols, nextSlideIndex)
+      this.wrapperSlides.push(pageRoot)
+      fragment.appendChild(pageRoot)
     }
-    
-    this.tvist.container.appendChild(containerFragment)
+
+    this.tvist.container.appendChild(fragment)
   }
 
   /**
@@ -156,46 +186,57 @@ export class GridModule extends Module {
    */
   private buildDimensionsGrid(): void {
     const { grid } = this.options
-    if (!grid?.dimensions) return
+    const specs = grid?.dimensions
+    if (!specs?.length) return
 
-    const dimensions = grid.dimensions
-    let slideIndex = 0
-    let dimensionIndex = 0
-    const containerFragment = document.createDocumentFragment()
-    
-    // Создаем страницы пока есть слайды
-    while (slideIndex < this.originalSlides.length) {
-      // Получаем размеры текущей страницы (циклически)
-      const [rows, cols] = dimensions[dimensionIndex % dimensions.length] ?? [1, 1]
+    const fragment = document.createDocumentFragment()
+    let nextSlideIndex = 0
+    let specRound = 0
 
-      const outerSlide = this.createOuterSlide()
-      
-      for (let rowIndex = 0; rowIndex < rows; rowIndex++) {
-        const rowEl = this.createRowElement(rowIndex, rows)
-        const rowFragment = document.createDocumentFragment()
-        
-        for (let colIndex = 0; colIndex < cols; colIndex++) {
-          if (slideIndex < this.originalSlides.length) {
-            const originalSlide = this.originalSlides[slideIndex]
-            if (originalSlide) {
-              const colWrapper = this.createColWrapper(colIndex, cols)
-              this.wrapSlide(originalSlide, colWrapper)
-              rowFragment.appendChild(colWrapper)
-            }
-            slideIndex++
-          }
-        }
-        
-        rowEl.appendChild(rowFragment)
-        outerSlide.appendChild(rowEl)
-      }
-      
-      this.wrapperSlides.push(outerSlide)
-      containerFragment.appendChild(outerSlide)
-      dimensionIndex++
+    while (nextSlideIndex < this.originalSlides.length) {
+      const [rows, cols] = specs[specRound % specs.length] ?? [1, 1]
+      const pageRoot = this.createOuterSlide()
+      nextSlideIndex = this.fillGridPage(pageRoot, rows, cols, nextSlideIndex)
+      this.wrapperSlides.push(pageRoot)
+      fragment.appendChild(pageRoot)
+      specRound++
     }
-    
-    this.tvist.container.appendChild(containerFragment)
+
+    this.tvist.container.appendChild(fragment)
+  }
+
+  /**
+   * Заполняет одну страницу сеткой rows×cols; возвращает индекс следующего оригинального слайда.
+   */
+  private fillGridPage(
+    pageRoot: HTMLElement,
+    rows: number,
+    cols: number,
+    startSlideIndex: number
+  ): number {
+    let index = startSlideIndex
+
+    for (let row = 0; row < rows; row++) {
+      const rowEl = this.createRowElement(row, rows)
+      const rowFragment = document.createDocumentFragment()
+
+      for (let col = 0; col < cols; col++) {
+        if (index >= this.originalSlides.length) break
+
+        const slide = this.originalSlides[index]
+        if (slide) {
+          const colWrapper = this.createColWrapper(col, cols)
+          this.wrapSlide(slide, colWrapper)
+          rowFragment.appendChild(colWrapper)
+        }
+        index++
+      }
+
+      rowEl.appendChild(rowFragment)
+      pageRoot.appendChild(rowEl)
+    }
+
+    return index
   }
 
   /**
@@ -240,8 +281,8 @@ export class GridModule extends Module {
    */
   private wrapSlide(originalSlide: HTMLElement, colWrapper: HTMLElement): void {
     // Убираем класс tvist-v1__slide, чтобы updateSlidesList не находил его
-originalSlide.classList.remove(TVIST_CLASSES.slide)
-        originalSlide.classList.add(TVIST_CLASSES.gridItem)
+    originalSlide.classList.remove(TVIST_CLASSES.slide)
+    originalSlide.classList.add(TVIST_CLASSES.gridItem)
     originalSlide.style.width = '100%'
     originalSlide.style.height = '100%'
     colWrapper.appendChild(originalSlide)
@@ -250,23 +291,29 @@ originalSlide.classList.remove(TVIST_CLASSES.slide)
   /**
    * Получает значение gap для строк или колонок
    */
-  private getGapValue(type: 'row' | 'col'): number {
+  private getGapValue(axis: 'row' | 'col'): number {
     const { grid, gap: globalGap = 0 } = this.options
     if (!grid) return 0
-    
-    const toNumber = (val: string | number): number => {
-      return typeof val === 'number' ? val : parseInt(val, 10) || 0
+
+    const { gap: gridGap } = grid
+
+    if (gridGap === undefined) {
+      return this.gapToPixels(globalGap)
     }
-    
-    if (grid.gap) {
-      if (typeof grid.gap === 'object') {
-        const value = grid.gap[type] ?? globalGap
-        return toNumber(value)
-      }
-      return toNumber(grid.gap)
+
+    if (typeof gridGap === 'object') {
+      const raw = gridGap[axis] ?? globalGap
+      return this.gapToPixels(raw)
     }
-    
-    return toNumber(globalGap)
+
+    return this.gapToPixels(gridGap)
+  }
+
+  /** Число пикселей для margin (число или строка вроде "12" / "12px"). */
+  private gapToPixels(value: string | number): number {
+    if (typeof value === 'number') return value
+    const n = parseInt(value, 10)
+    return Number.isFinite(n) ? n : 0
   }
 
   /**

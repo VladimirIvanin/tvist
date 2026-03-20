@@ -471,6 +471,61 @@ describe('GridModule', () => {
     })
   })
 
+  describe('Межстраничный gap (глобальный gap)', () => {
+    it('сохраняет margin между grid-страницами после update()', () => {
+      createSlides(8)
+      const pageGap = 24
+
+      slider = new Tvist(container, {
+        gap: pageGap,
+        grid: {
+          rows: 2,
+          cols: 2,
+          gap: 8,
+        },
+      })
+
+      const assertPageMargins = () => {
+        const pages = container.querySelectorAll(
+          `.${TVIST_CLASSES.slideGridPage}`,
+        ) as NodeListOf<HTMLElement>
+        expect(pages.length).toBeGreaterThanOrEqual(2)
+        // Межстраничный зазор задаёт Engine (applyFixedSize); геометрию margin в happy-dom не проверяем
+        expect(pages[0]?.style.marginRight).toBe(`${pageGap}px`)
+      }
+
+      assertPageMargins()
+      slider.update()
+      assertPageMargins()
+    })
+
+    it('в вертикальном режиме сохраняет margin-bottom между страницами после update()', () => {
+      createSlides(8)
+      const pageGap = 16
+
+      slider = new Tvist(container, {
+        direction: 'vertical',
+        gap: pageGap,
+        grid: {
+          rows: 2,
+          cols: 2,
+        },
+      })
+
+      const assertPageMargins = () => {
+        const pages = container.querySelectorAll(
+          `.${TVIST_CLASSES.slideGridPage}`,
+        ) as NodeListOf<HTMLElement>
+        expect(pages.length).toBeGreaterThanOrEqual(2)
+        expect(pages[0]?.style.marginBottom).toBe(`${pageGap}px`)
+      }
+
+      assertPageMargins()
+      slider.update()
+      assertPageMargins()
+    })
+  })
+
   describe('Engine integration', () => {
     it('должен обновлять позиции слайдов в Engine', () => {
       createSlides(8)
