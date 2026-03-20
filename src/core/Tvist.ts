@@ -19,6 +19,20 @@ export interface TvistRootElement extends HTMLElement {
   tvistInstance?: Tvist | null
 }
 
+/**
+ * События, эмит которых при инициализации происходит до того, как снаружи можно вызвать .on().
+ * Для поздней подписки воспроизводится последний emit (аргументы хранятся в replayLastArgs).
+ */
+const CATCH_UP_EVENTS = new Set<string>([
+  'created',
+  'refresh',
+  'setTranslate',
+  'progress',
+  'navigation:mounted',
+  'pagination:mounted',
+  'breakpoint',
+])
+
 export class Tvist {
   static readonly VERSION = pkg.version ?? '0.0.0'
 
@@ -92,6 +106,14 @@ export class Tvist {
 
   // Флаг для контроля кликов (устанавливается в false при драге)
   public allowClick = true
+
+  /** Последние аргументы для catch-up подписок (см. CATCH_UP_EVENTS) */
+  private replayLastArgs = new Map<string, unknown[]>()
+
+  /** Последний из эмитов lock/unlock — чтобы не отдать устаревший catch-up для lock после unlock */
+  private lastLockEdge: 'lock' | 'unlock' | null = null
+
+  private _isDestroyed = false
 
   /**
    * Создать экземпляр Tvist
@@ -252,6 +274,53 @@ export class Tvist {
     const index = this.slides.indexOf(slide as HTMLElement)
     if (index === -1) return
     this.emit('click', index, slide as HTMLElement, e)
+  }
+
+  /**
+   * Один раз вызывает handler с последним известным событием, если подписка позже первичного emit.
+   * Обработчики из options.on вешаются на EventEmitter напрямую и сюда не попадают — без двойного вызова.
+   */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  private invokeCatchUpForNewListener(event: string, handler: (...args: any[]) => void): void {
+    if (this._isDestroyed) return
+
+    if (event === 'lock') {
+      if (this.lastLockEdge === 'lock') {
+        try {
+          handler()
+        } catch (error) {
+          console.error(`Error in event handler (catch-up) for "lock":`, error)
+        }
+      }
+      return
+    }
+    if (event === 'unlock') {
+      if (this.lastLockEdge === 'unlock') {
+        try {
+          handler()
+        } catch (error) {
+          console.error(`Error in event handler (catch-up) for "unlock":`, error)
+        }
+      }
+      return
+    }
+
+    if (!CATCH_UP_EVENTS.has(event)) return
+    const args = this.replayLastArgs.get(event)
+    if (!args) return
+
+    try {
+      handler(...args)
+    } catch (error) {
+      console.error(`Error in event handler (catch-up) for "${event}":`, error)
+    }
+  }
+
+  private hasCatchUpPayload(event: string): boolean {
+    if (this._isDestroyed) return false
+    if (event === 'lock') return this.lastLockEdge === 'lock'
+    if (event === 'unlock') return this.lastLockEdge === 'unlock'
+    return CATCH_UP_EVENTS.has(event) && this.replayLastArgs.has(event)
   }
 
   /**
@@ -682,6 +751,8 @@ export class Tvist {
    * Уничтожить экземпляр и очистить ресурсы
    */
   destroy(): this {
+    this._isDestroyed = true
+
     this.emit('beforeDestroy', this)
     this.root.classList.add(TVIST_CLASSES.destroyed)
     this.container.removeEventListener('click', this.slideClickHandler)
@@ -706,6 +777,9 @@ export class Tvist {
     } else if (this.resizeHandler) {
       window.removeEventListener('resize', this.resizeHandler)
     }
+
+    this.replayLastArgs.clear()
+    this.lastLockEdge = null
 
     // Очищаем события
     this.events.clear()
@@ -808,6 +882,8 @@ export class Tvist {
    */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
   on(event: string, handler: (...args: any[]) => void): this {
+    if (this._isDestroyed) return this
+    this.invokeCatchUpForNewListener(event, handler)
     this.events.on(event, handler)
     return this
   }
@@ -826,6 +902,16 @@ export class Tvist {
    */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event args are untyped */
   emit(event: string, ...args: any[]): this {
+    if (event === 'lock') {
+      this.lastLockEdge = 'lock'
+    } else if (event === 'unlock') {
+      this.lastLockEdge = 'unlock'
+    }
+
+    if (CATCH_UP_EVENTS.has(event)) {
+      this.replayLastArgs.set(event, args)
+    }
+
     this.events.emit(event, ...args)
     return this
   }
@@ -835,6 +921,11 @@ export class Tvist {
    */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
   once(event: string, handler: (...args: any[]) => void): this {
+    if (this._isDestroyed) return this
+    if (this.hasCatchUpPayload(event)) {
+      this.invokeCatchUpForNewListener(event, handler)
+      return this
+    }
     this.events.once(event, handler)
     return this
   }

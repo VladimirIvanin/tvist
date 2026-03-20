@@ -1,8 +1,11 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { Tvist } from '@core/Tvist'
+import { TVIST_CLASSES } from '@core/constants'
 import pkg from '../../../package.json' with { type: 'json' }
 import { createSliderFixture, createInvalidSliderFixture, createEmptySliderFixture } from '../../fixtures'
 import type { SliderFixture } from '../../fixtures'
+import '../../../src/modules/navigation'
+import '../../../src/modules/pagination'
 
 describe('Tvist', () => {
   let fixture: SliderFixture
@@ -295,6 +298,164 @@ describe('Tvist', () => {
       slider.destroy()
 
       expect(handler).toHaveBeenCalledWith(slider)
+    })
+
+    /**
+     * Catch-up: события, эмитящиеся при инициализации до внешнего .on(), должны отработать
+     * при поздней подписке ровно один раз на регистрацию, без лишних вызовов при следующем update().
+     */
+    describe('catch-up subscriptions (no spurious doubles)', () => {
+      it('вызывает created при подписке после new', () => {
+        const late = vi.fn()
+        const slider = new Tvist(fixture.root)
+        slider.on('created', late)
+        expect(late).toHaveBeenCalledTimes(1)
+        expect(late).toHaveBeenCalledWith(slider)
+      })
+
+      it('once(created) после new — ровно один вызов', () => {
+        const late = vi.fn()
+        const slider = new Tvist(fixture.root)
+        slider.once('created', late)
+        expect(late).toHaveBeenCalledTimes(1)
+      })
+
+      it('обработчик из options.on(created) не дублируется', () => {
+        const fromOptions = vi.fn()
+        new Tvist(fixture.root, {
+          on: { created: fromOptions },
+        })
+        expect(fromOptions).toHaveBeenCalledTimes(1)
+      })
+
+      it('options.on(created) и поздний on(created) — по одному вызову на каждый канал', () => {
+        const fromOptions = vi.fn()
+        const late = vi.fn()
+        const slider = new Tvist(fixture.root, {
+          on: { created: fromOptions },
+        })
+        slider.on('created', late)
+        expect(fromOptions).toHaveBeenCalledTimes(1)
+        expect(late).toHaveBeenCalledTimes(1)
+      })
+
+      it('одна и та же функция в options.on(created) и поздний on(created) — два вызова (две подписки)', () => {
+        const h = vi.fn()
+        const slider = new Tvist(fixture.root, {
+          on: { created: h },
+        })
+        slider.on('created', h)
+        expect(h).toHaveBeenCalledTimes(2)
+      })
+
+      it('два отдельных on(created) с одной функцией — два catch-up (ожидаемое поведение двух подписок)', () => {
+        const h = vi.fn()
+        const slider = new Tvist(fixture.root)
+        slider.on('created', h)
+        slider.on('created', h)
+        expect(h).toHaveBeenCalledTimes(2)
+      })
+
+      it('поздний on(created): повторный update() не вызывает обработчик снова', () => {
+        const late = vi.fn()
+        const slider = new Tvist(fixture.root)
+        slider.on('created', late)
+        expect(late).toHaveBeenCalledTimes(1)
+        slider.update()
+        expect(late).toHaveBeenCalledTimes(1)
+      })
+
+      it('после destroy поздняя подписка на created не срабатывает', () => {
+        const late = vi.fn()
+        const slider = new Tvist(fixture.root)
+        slider.destroy()
+        slider.on('created', late)
+        expect(late).not.toHaveBeenCalled()
+      })
+
+      it('on(refresh) после new: один catch-up, второй вызов только после следующего update()', () => {
+        const h = vi.fn()
+        const slider = new Tvist(fixture.root)
+        slider.on('refresh', h)
+        expect(h).toHaveBeenCalledTimes(1)
+        slider.update()
+        expect(h).toHaveBeenCalledTimes(2)
+      })
+
+      it('on: { refresh } — по одному вызову на каждый refresh при инициализации', () => {
+        const h = vi.fn()
+        new Tvist(fixture.root, {
+          on: { refresh: h },
+        })
+        expect(h).toHaveBeenCalledTimes(1)
+      })
+
+      it('on(setTranslate) после new: catch-up + ещё один вызов после update()', () => {
+        const h = vi.fn()
+        const slider = new Tvist(fixture.root)
+        slider.on('setTranslate', h)
+        expect(h).toHaveBeenCalledTimes(1)
+        slider.update()
+        expect(h).toHaveBeenCalledTimes(2)
+        expect(h.mock.calls[0][0]).toBe(slider)
+        expect(typeof h.mock.calls[0][1]).toBe('number')
+      })
+
+      it('on(progress): catch-up по последнему emit без дубля при следующем emit', () => {
+        const h = vi.fn()
+        const slider = new Tvist(fixture.root, { loop: false })
+        // При инициализации progress может не эмититься (range <= 0) — задаём последнее значение вручную
+        slider.emit('progress', 0.42)
+        slider.on('progress', h)
+        expect(h).toHaveBeenCalledTimes(1)
+        expect(h).toHaveBeenLastCalledWith(0.42)
+        slider.emit('progress', 0.9)
+        expect(h).toHaveBeenCalledTimes(2)
+        expect(h).toHaveBeenLastCalledWith(0.9)
+      })
+
+      it('on(unlock) после new без эмита unlock — без ложного catch-up', () => {
+        const h = vi.fn()
+        const slider = new Tvist(fixture.root)
+        slider.on('unlock', h)
+        expect(h).not.toHaveBeenCalled()
+      })
+
+      it('on(lock) после new при одном слайде — один catch-up', () => {
+        const oneSlide = createSliderFixture({ slidesCount: 1, width: 1000 })
+        const h = vi.fn()
+        const slider = new Tvist(oneSlide.root)
+        slider.on('lock', h)
+        expect(h).toHaveBeenCalledTimes(1)
+        oneSlide.cleanup()
+      })
+
+      it('navigation:mounted при поздней подписке', () => {
+        const prevBtn = document.createElement('button')
+        prevBtn.type = 'button'
+        prevBtn.className = TVIST_CLASSES.arrowPrev
+        const nextBtn = document.createElement('button')
+        nextBtn.type = 'button'
+        nextBtn.className = TVIST_CLASSES.arrowNext
+        fixture.root.appendChild(prevBtn)
+        fixture.root.appendChild(nextBtn)
+
+        const h = vi.fn()
+        const slider = new Tvist(fixture.root, { arrows: true })
+        slider.on('navigation:mounted', h)
+        expect(h).toHaveBeenCalledTimes(1)
+      })
+
+      it('pagination:mounted при поздней подписке', () => {
+        const paginationEl = document.createElement('div')
+        paginationEl.className = TVIST_CLASSES.pagination
+        fixture.root.appendChild(paginationEl)
+
+        const h = vi.fn()
+        const slider = new Tvist(fixture.root, { pagination: true })
+        slider.on('pagination:mounted', h)
+        expect(h).toHaveBeenCalledTimes(1)
+      })
     })
   })
 
