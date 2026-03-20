@@ -906,12 +906,18 @@ export class Engine {
   }
 
   private setLocked(isLocked: boolean, isDisabled = false): void {
+    // Если слайдер выключен, мы не должны менять его стейт блокировки, 
+    // чтобы при включении (enable) метод checkLock мог корректно обновить состояние и применить классы.
+    // Если мы обновим _isLocked здесь, то при enable() checkLock() вызовет setLocked() с тем же значением isLocked, 
+    // условие this._isLocked !== isLocked не выполнится, и классы не обновятся.
+    if (isDisabled) {
+      return
+    }
+
     if (this._isLocked !== isLocked) {
       this._isLocked = isLocked
       
-      if (!isDisabled) {
-        this.tvist.root.classList.toggle(TVIST_CLASSES.locked, isLocked)
-      }
+      this.tvist.root.classList.toggle(TVIST_CLASSES.locked, isLocked)
       
       if (isLocked) {
         // При блокировке сбрасываем позицию на начало (индекс 0)
@@ -920,11 +926,9 @@ export class Engine {
         this.location.set(initialPos)
         this.target.set(initialPos)
         
-        if (!isDisabled) {
-          this.applyTransform()
-          this.tvist.emit('lock')
-        }
-      } else if (!isDisabled) {
+        this.applyTransform()
+        this.tvist.emit('lock')
+      } else {
         this.tvist.emit('unlock')
       }
     }
