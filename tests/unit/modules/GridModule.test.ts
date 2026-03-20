@@ -257,6 +257,31 @@ describe('GridModule', () => {
       const page2FirstCol = page2Cols?.[0] as HTMLElement
       expect(page2FirstCol?.style.marginRight).toBe('15px')
     })
+
+    it('должен задавать отступ между страницами при grid.gap без top-level gap', () => {
+      createSlides(8)
+
+      slider = new Tvist(container, {
+        grid: {
+          gap: 10,
+          dimensions: [
+            [2, 2],
+            [1, 2],
+          ],
+        },
+      })
+
+      const pages = container.querySelectorAll(
+        `.${TVIST_CLASSES.slideGridPage}`
+      )
+      expect(pages.length).toBeGreaterThanOrEqual(2)
+
+      const firstPage = pages[0] as HTMLElement
+      expect(firstPage.style.marginRight).toBe('10px')
+
+      const lastPage = pages[pages.length - 1] as HTMLElement
+      expect(lastPage.style.marginRight).toBe('')
+    })
   })
 
   describe('Сохранение и восстановление слайдов', () => {

@@ -23,6 +23,25 @@ describe('LoopModule', () => {
     Tvist.unregisterModule('loop')
   })
 
+  it('при gap: 0 не задаёт margin между слайдами и шаг позиций равен slideSize', () => {
+    slider = new Tvist(fixture.root, {
+      loop: true,
+      perPage: 1,
+      gap: 0,
+    })
+
+    slider.slides.forEach((slide) => {
+      expect(slide.style.marginRight).toBe('')
+      expect(slide.style.marginBottom).toBe('')
+    })
+
+    const positions = slider.engine.getSlidePositions()
+    const slideSize = slider.engine.slideSizeValue
+    for (let i = 1; i < positions.length; i++) {
+      expect(positions[i]! - positions[i - 1]!).toBeCloseTo(slideSize, 5)
+    }
+  })
+
   it('должен проставлять data-tvist-slide-index при инициализации', () => {
     slider = new Tvist(fixture.root, {
       loop: true,

@@ -16,6 +16,7 @@ import { Module } from '../Module'
 import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
+import { resolveTrackGapFromOptions } from '../../utils/gridGap'
 
 const DRAG_DEBUG = false
 const dragLog = (..._args: unknown[]) => {
@@ -1040,7 +1041,7 @@ export class DragModule extends Module {
     const startIndex = engine.activeIndex
     
     const slideSize = engine.slideSizeValue
-    const gap = this.options.gap ?? 0
+    const gap = resolveTrackGapFromOptions(this.options)
     const slideWithGap = slideSize + gap
     
     if (slideWithGap === 0) {

@@ -285,6 +285,8 @@ export class Engine {
   }
 
   private calculateFixedSlideSize(): void {
+    // Только верхнеуровневый gap: межстраничные отступы grid задаёт GridModule в DOM,
+    // позиции для grid перезаписываются в fixEnginePositions по offsetLeft.
     const gap = this.options.gap ?? 0
     
     if (this.options.slideMinSize && this.options.slideMinSize > 0) {

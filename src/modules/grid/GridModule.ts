@@ -2,6 +2,7 @@ import { Module } from '../Module'
 import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
+import { resolveGridGapForAxis, resolveTrackGapFromOptions } from '../../utils/gridGap'
 
 /**
  * Grid Module
@@ -153,6 +154,9 @@ export class GridModule extends Module {
     
     // Обновляем список слайдов в Tvist
     this.tvist.updateSlidesList()
+    // До первого engine.update() движок ещё не выставил margin между страницами —
+    // задаём их здесь, чтобы fixEnginePositions() сразу видел верную геометрию.
+    this.applyInterPageGaps()
   }
 
   /**
@@ -294,26 +298,30 @@ export class GridModule extends Module {
   private getGapValue(axis: 'row' | 'col'): number {
     const { grid, gap: globalGap = 0 } = this.options
     if (!grid) return 0
-
-    const { gap: gridGap } = grid
-
-    if (gridGap === undefined) {
-      return this.gapToPixels(globalGap)
-    }
-
-    if (typeof gridGap === 'object') {
-      const raw = gridGap[axis] ?? globalGap
-      return this.gapToPixels(raw)
-    }
-
-    return this.gapToPixels(gridGap)
+    return resolveGridGapForAxis(grid, globalGap, axis)
   }
 
-  /** Число пикселей для margin (число или строка вроде "12" / "12px"). */
-  private gapToPixels(value: string | number): number {
-    if (typeof value === 'number') return value
-    const n = parseInt(value, 10)
-    return Number.isFinite(n) ? n : 0
+  /**
+   * Margin между wrapper-слайдами (страницами). Внутри страницы отступы задают ряды/колонки.
+   * Значение совпадает с {@link resolveTrackGapFromOptions} (для drag и визуальной согласованности).
+   */
+  private applyInterPageGaps(): void {
+    const trackGap = resolveTrackGapFromOptions(this.options)
+    const isVertical = this.options.direction === 'vertical'
+    const slides = this.tvist.slides
+
+    slides.forEach((slide, i) => {
+      const isLast = i === slides.length - 1
+      if (isVertical) {
+        slide.style.marginRight = ''
+        slide.style.marginBottom =
+          trackGap > 0 && !isLast ? `${trackGap}px` : ''
+      } else {
+        slide.style.marginBottom = ''
+        slide.style.marginRight =
+          trackGap > 0 && !isLast ? `${trackGap}px` : ''
+      }
+    })
   }
 
   /**
@@ -351,6 +359,8 @@ export class GridModule extends Module {
   private fixEnginePositions(): void {
     const engine = this.tvist.engine
     const slides = this.tvist.slides
+
+    this.applyInterPageGaps()
 
     // Для grid с wrapper-слайдами позиции простые: каждая страница - это один слайд
     // offsetLeft уже правильный для каждой страницы
