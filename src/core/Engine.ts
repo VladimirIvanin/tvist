@@ -238,77 +238,94 @@ export class Engine {
 
   /**
    * Рассчитывает размеры контейнера и слайдов
+   * @param isDisabled - если true, то не применяем стили к DOM-элементам
    */
-  private calculateSizes(): void {
-    const slides = this.tvist.slides
-    const isVertical = this.options.direction === 'vertical'
-
-    if (slides.length === 0) {
-      this.containerSize = 0
-      this.slideSize = 0
-      this.peekStart = 0
-      this.peekEnd = 0
+  private calculateSizes(isDisabled = false): void {
+    if (this.tvist.slides.length === 0) {
+      this.resetSizes()
       return
     }
 
-    // Получаем значения peek из опций (для числовых значений)
-    if (isVertical) {
-      this.peekStart = getPeekValueFromOptions(this.options, 'top')
-      this.peekEnd = getPeekValueFromOptions(this.options, 'bottom')
+    this.updatePeekValues(isDisabled)
+    
+    this.containerSize = this.getRootSize() - this.peekStart - this.peekEnd
 
-      if (this.peekStart === 0 && this.options.peek) {
-        this.peekStart = getPeekValue(this.tvist.container, 'top')
-      }
-      if (this.peekEnd === 0 && this.options.peek) {
-        this.peekEnd = getPeekValue(this.tvist.container, 'bottom')
-      }
-    } else {
-      this.peekStart = getPeekValueFromOptions(this.options, 'left')
-      this.peekEnd = getPeekValueFromOptions(this.options, 'right')
-
-      if (this.peekStart === 0 && this.options.peek) {
-        this.peekStart = getPeekValue(this.tvist.container, 'left')
-      }
-      if (this.peekEnd === 0 && this.options.peek) {
-        this.peekEnd = getPeekValue(this.tvist.container, 'right')
-      }
-    }
-
-    const rootSize = this.getRootSize()
-
-    this.containerSize = rootSize - this.peekStart - this.peekEnd
-
-    const gap = this.options.gap ?? 0
-    const autoWidth = !isVertical && this.options.autoWidth === true
-    const autoHeight = isVertical && this.options.autoHeight === true
-    const isAutoSize = autoWidth || autoHeight
+    const isAutoSize = this.isAutoSize()
 
     if (!isAutoSize) {
-      if (this.options.slideMinSize && this.options.slideMinSize > 0) {
-        const minSize = this.options.slideMinSize
-        const calculatedPerPage = Math.floor(
-          (this.containerSize + gap) / (minSize + gap)
-        )
-        this.options.perPage = Math.max(1, calculatedPerPage)
-      }
-      const perPage = this.options.perPage ?? 1
-      this.slideSize = (this.containerSize - gap * (perPage - 1)) / perPage
-      if (this.slideSize < 0 || !isFinite(this.slideSize)) {
-        this.slideSize = 0
-      }
-      this.slideSizes = []
+      this.calculateFixedSlideSize()
     } else {
       this.slideSize = 0
     }
 
     if (isAutoSize) {
-      // В режиме autoWidth/autoHeight только добавляем gap, НЕ трогаем размеры
-      slides.forEach((slide, i) => {
-        // Сбрасываем только margin (gap может измениться)
+      this.applyAndMeasureAutoSize(isDisabled)
+    } else {
+      this.applyFixedSize(isDisabled)
+    }
+  }
+
+  private resetSizes(): void {
+    this.containerSize = 0
+    this.slideSize = 0
+    this.peekStart = 0
+    this.peekEnd = 0
+  }
+
+  private isAutoSize(): boolean {
+    const isVertical = this.options.direction === 'vertical'
+    return isVertical ? this.options.autoHeight === true : this.options.autoWidth === true
+  }
+
+  private updatePeekValues(isDisabled: boolean): void {
+    const isVertical = this.options.direction === 'vertical'
+    const startSide = isVertical ? 'top' : 'left'
+    const endSide = isVertical ? 'bottom' : 'right'
+
+    this.peekStart = getPeekValueFromOptions(this.options, startSide)
+    this.peekEnd = getPeekValueFromOptions(this.options, endSide)
+
+    if (this.options.peek && !isDisabled) {
+      if (this.peekStart === 0) {
+        this.peekStart = getPeekValue(this.tvist.container, startSide)
+      }
+      if (this.peekEnd === 0) {
+        this.peekEnd = getPeekValue(this.tvist.container, endSide)
+      }
+    }
+  }
+
+  private calculateFixedSlideSize(): void {
+    const gap = this.options.gap ?? 0
+    
+    if (this.options.slideMinSize && this.options.slideMinSize > 0) {
+      const minSize = this.options.slideMinSize
+      const calculatedPerPage = Math.floor(
+        (this.containerSize + gap) / (minSize + gap)
+      )
+      this.options.perPage = Math.max(1, calculatedPerPage)
+    }
+
+    const perPage = this.options.perPage ?? 1
+    this.slideSize = (this.containerSize - gap * (perPage - 1)) / perPage
+    
+    if (this.slideSize < 0 || !isFinite(this.slideSize)) {
+      this.slideSize = 0
+    }
+    
+    this.slideSizes = []
+  }
+
+  private applyAndMeasureAutoSize(isDisabled: boolean): void {
+    const gap = this.options.gap ?? 0
+    const isVertical = this.options.direction === 'vertical'
+
+    if (!isDisabled) {
+      this.tvist.slides.forEach((slide, i) => {
         slide.style.marginRight = ''
         slide.style.marginBottom = ''
         
-        if (gap > 0 && i !== slides.length - 1) {
+        if (gap > 0 && i !== this.tvist.slides.length - 1) {
           if (isVertical) {
             slide.style.marginBottom = `${gap}px`
           } else {
@@ -316,17 +333,30 @@ export class Engine {
           }
         }
       })
-      
-      // Измеряем реальные размеры из DOM только если кеш невалиден
-      if (!this.slideSizesCacheValid) {
-        this.slideSizes = slides.map((slide) =>
+    }
+    
+    if (!this.slideSizesCacheValid) {
+      if (isDisabled) {
+        // Если слайдер выключен, мы не можем получить правильные размеры из DOM
+        // так как мы не применили стили. Оставляем предыдущие размеры или нули
+        if (this.slideSizes.length === 0) {
+          this.slideSizes = this.tvist.slides.map(() => 0)
+        }
+      } else {
+        this.slideSizes = this.tvist.slides.map((slide) =>
           isVertical ? getOuterHeight(slide) : getOuterWidth(slide)
         )
-        this.slideSizesCacheValid = true
       }
-    } else {
-      // В обычном режиме устанавливаем размеры принудительно
-      slides.forEach((slide, i) => {
+      this.slideSizesCacheValid = true
+    }
+  }
+
+  private applyFixedSize(isDisabled: boolean): void {
+    const gap = this.options.gap ?? 0
+    const isVertical = this.options.direction === 'vertical'
+
+    if (!isDisabled) {
+      this.tvist.slides.forEach((slide, i) => {
         slide.style.width = ''
         slide.style.height = ''
         slide.style.marginRight = ''
@@ -341,7 +371,7 @@ export class Engine {
           }
         }
         
-        if (gap > 0 && i !== slides.length - 1) {
+        if (gap > 0 && i !== this.tvist.slides.length - 1) {
           if (isVertical) {
             slide.style.marginBottom = `${gap}px`
           } else {
@@ -349,11 +379,10 @@ export class Engine {
           }
         }
       })
-      
-      // Очищаем массив размеров (используем общий slideSize)
-      this.slideSizes = []
-      this.slideSizesCacheValid = false
     }
+    
+    this.slideSizes = []
+    this.slideSizesCacheValid = false
   }
 
   /**
@@ -742,6 +771,41 @@ export class Engine {
   }
 
   /**
+   * Обновление без применения стилей в DOM (используется когда слайдер disabled)
+   */
+  updateDisabled(): void {
+    // Инвалидируем кеши перед обновлением
+    this.invalidateRootSizeCache()
+    this.slideSizesCacheValid = false
+    
+    // Получаем новые значения из опций, но не вызываем DOM-методы типа applyPeek
+    this.calculateSizes(true)
+    this.calculatePositions()
+    
+    // Обновляем Counter.endIndex после изменения perPage
+    const slideCount = this.tvist.slides.length
+    const perPage = this.options.perPage ?? 1
+    const isLoop = this.options.loop === true
+    const counterEndIndex = (isLoop || this.options.isNavigation || this.options.center)
+      ? slideCount - 1 
+      : Math.max(0, slideCount - perPage)
+    
+    this.index.endIndex = counterEndIndex
+    this.index.max = slideCount
+    
+    // Проверяем блокировку после обновления (важно для resize)
+    this.checkLock(true) // Передаем true чтобы не применять классы
+
+    const currentIndex = this.index.get()
+    const targetPosition = this.getScrollPositionForIndex(currentIndex)
+
+    this.target.set(targetPosition)
+    this.location.set(targetPosition)
+    // НЕ применяем трансформации!
+    // this.applyTransform()
+  }
+
+  /**
    * Обновление размеров (вызывается при resize)
    */
   update(): void {
@@ -780,7 +844,7 @@ export class Engine {
    * Проверка на необходимость блокировки слайдера.
    * Блокировка включается, если весь контент помещается в контейнер и некуда листать.
    */
-  public checkLock(): void {
+  public   checkLock(isDisabled = false): void {
     const slideCount = this.tvist.slides.length
     const perPage = this.options.perPage ?? 1
     const hasSizes = this.slideSize > 0 || this.slideSizes.length === slideCount
@@ -788,9 +852,9 @@ export class Engine {
     if (this.options.loop) {
       if (hasSizes) {
         const contentFits = this.getContentSize() <= this.containerSize + 1
-        this.setLocked(contentFits)
+        this.setLocked(contentFits, isDisabled)
       } else {
-        this.setLocked(slideCount <= perPage)
+        this.setLocked(slideCount <= perPage, isDisabled)
       }
       return
     }
@@ -800,12 +864,12 @@ export class Engine {
       : false
 
     if (slideCount > perPage) {
-      this.setLocked(hasSizes && cannotScroll)
+      this.setLocked(hasSizes && cannotScroll, isDisabled)
       return
     }
 
     const contentFits = this.getContentSize() <= this.containerSize + 1
-    this.setLocked(hasSizes ? contentFits && cannotScroll : slideCount <= perPage)
+    this.setLocked(hasSizes ? contentFits && cannotScroll : slideCount <= perPage, isDisabled)
   }
 
   /**
@@ -840,11 +904,13 @@ export class Engine {
     return maxPos - minPos
   }
 
-  private setLocked(isLocked: boolean): void {
+  private setLocked(isLocked: boolean, isDisabled = false): void {
     if (this._isLocked !== isLocked) {
       this._isLocked = isLocked
       
-      this.tvist.root.classList.toggle(TVIST_CLASSES.locked, isLocked)
+      if (!isDisabled) {
+        this.tvist.root.classList.toggle(TVIST_CLASSES.locked, isLocked)
+      }
       
       if (isLocked) {
         // При блокировке сбрасываем позицию на начало (индекс 0)
@@ -852,10 +918,12 @@ export class Engine {
         const initialPos = this.getScrollPositionForIndex(0)
         this.location.set(initialPos)
         this.target.set(initialPos)
-        this.applyTransform()
         
-        this.tvist.emit('lock')
-      } else {
+        if (!isDisabled) {
+          this.applyTransform()
+          this.tvist.emit('lock')
+        }
+      } else if (!isDisabled) {
         this.tvist.emit('unlock')
       }
     }

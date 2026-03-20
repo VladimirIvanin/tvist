@@ -105,18 +105,16 @@ export class BreakpointsModule extends Module {
    * Использует throttle для оптимизации производительности при частых изменениях окна.
    */
   private handleMediaChange = (): void => {
-    // Сначала синхронно применяем breakpoint (может disable/enable слайдер),
-    // только потом update — иначе update выставит width до того как disable его очистит
+    // Сначала синхронно применяем breakpoint (может disable/enable слайдер)
     this.checkBreakpoints()
     
+    // Если слайдер включен, пересчитываем размеры
     if (this.tvist.isEnabled) {
       this.tvist.update()
     }
   }
 
-  /**
-   * Проверка текущего breakpoint
-   */
+    // Проверка текущего breakpoint
   private checkBreakpoints(): void {
     // Не применяем брейкпоинты во время enable/disable
     if (this.tvist.isTogglingEnabled) {
@@ -199,6 +197,9 @@ export class BreakpointsModule extends Module {
       this.tvist.enable()
     } else if (!shouldBeEnabled && this.tvist.isEnabled) {
       this.tvist.disable()
+    } else if (shouldBeEnabled && this.tvist.isEnabled) {
+      // Только если слайдер остается включенным, обновляем его
+      this.tvist.update()
     }
 
     // При деактивации только уничтожаем ставшие неактивными модули —
@@ -224,4 +225,3 @@ export class BreakpointsModule extends Module {
     this.checkBreakpoints()
   }
 }
-

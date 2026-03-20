@@ -516,8 +516,18 @@ export class Tvist {
       newOptions.breakpoints !== undefined ||
       newOptions.breakpointsBase !== undefined
 
-    if (needsRecalculation) {
+    if (needsRecalculation && this._isEnabled) {
       this.update()
+    } else if (needsRecalculation && !this._isEnabled) {
+      // Если слайдер выключен, но мы обновили опции, влияющие на размеры -
+      // мы должны очистить стили слайдов, так как они могли быть применены
+      // в предыдущих состояниях (например, width) или мы должны гарантировать, 
+      // что они не будут установлены
+      this.clearSliderStyles()
+      
+      // И также убедиться, что слайдер пересчитал размеры (это обновит внутренний state Engine),
+      // но не применял их в DOM
+      this.engine.updateDisabled()
     }
 
     // Уведомляем модули об изменении опций
