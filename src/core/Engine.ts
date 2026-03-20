@@ -844,32 +844,33 @@ export class Engine {
    * Проверка на необходимость блокировки слайдера.
    * Блокировка включается, если весь контент помещается в контейнер и некуда листать.
    */
-  public   checkLock(isDisabled = false): void {
+  public checkLock(isDisabled = false): void {
     const slideCount = this.tvist.slides.length
     const perPage = this.options.perPage ?? 1
     const hasSizes = this.slideSize > 0 || this.slideSizes.length === slideCount
 
-    if (this.options.loop) {
-      if (hasSizes) {
-        const contentFits = this.getContentSize() <= this.containerSize + 1
-        this.setLocked(contentFits, isDisabled)
-      } else {
-        this.setLocked(slideCount <= perPage, isDisabled)
-      }
+    // Если размеры ещё не рассчитаны, блокируем просто по количеству слайдов
+    if (!hasSizes) {
+      this.setLocked(slideCount <= perPage, isDisabled)
       return
     }
 
-    const cannotScroll = hasSizes
-      ? this.getMaxScrollPosition() >= this.getMinScrollPosition() - 1
-      : false
+    // Размеры доступны: проверяем, помещается ли контент полностью
+    const contentFits = this.getContentSize() <= this.containerSize + 1
+
+    if (this.options.loop) {
+      this.setLocked(contentFits, isDisabled)
+      return
+    }
+
+    // Для обычного режима дополнительно проверяем возможность скролла
+    const cannotScroll = this.getMaxScrollPosition() >= this.getMinScrollPosition() - 1
 
     if (slideCount > perPage) {
-      this.setLocked(hasSizes && cannotScroll, isDisabled)
-      return
+      this.setLocked(cannotScroll, isDisabled)
+    } else {
+      this.setLocked(contentFits && cannotScroll, isDisabled)
     }
-
-    const contentFits = this.getContentSize() <= this.containerSize + 1
-    this.setLocked(hasSizes ? contentFits && cannotScroll : slideCount <= perPage, isDisabled)
   }
 
   /**
