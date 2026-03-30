@@ -16,25 +16,24 @@
       </div>
 
       <div class="stories-shell">
-        <div class="stories-progress">
-          <div
-            v-for="(item, index) in groups[activeGroupIndex]?.stories ?? []"
-            :key="item.id"
-            class="stories-progress__segment"
-          >
-            <div
-              class="stories-progress__fill"
-              :class="{ 'stories-progress__fill--animated': shouldAnimateSegment(index) }"
-              :style="{ width: getSegmentWidth(index) }"
-              :key="`${item.id}-${progressRenderKey}`"
-            ></div>
-          </div>
-        </div>
-
         <div ref="groupRootEl" class="tvist-v1 stories-groups">
           <div class="tvist-v1__container">
             <div v-for="(group, groupIndex) in groups" :key="group.id" class="tvist-v1__slide stories-group-slide">
               <div class="stories-inner-wrap">
+                <div class="stories-progress">
+                  <div
+                    v-for="(item, storyIndex) in group.stories"
+                    :key="item.id"
+                    class="stories-progress__segment"
+                  >
+                    <div
+                      class="stories-progress__fill"
+                      :class="{ 'stories-progress__fill--animated': shouldAnimateSegment(groupIndex, storyIndex) }"
+                      :style="{ width: getSegmentWidth(groupIndex, storyIndex) }"
+                      :key="`${item.id}-${progressRenderKey}`"
+                    ></div>
+                  </div>
+                </div>
                 <div :ref="(el) => setInnerRootRef(el, groupIndex)" class="tvist-v1 stories-inner">
                   <div class="tvist-v1__container">
                     <div
@@ -433,11 +432,12 @@ const shouldAcceptProgress = (index, progress) => {
   return true
 }
 
-const shouldAnimateSegment = (segmentIndex) => {
-  return animateActiveSegment.value && segmentIndex === activeStoryIndex.value
+const shouldAnimateSegment = (groupIndex, segmentIndex) => {
+  return groupIndex === activeGroupIndex.value && animateActiveSegment.value && segmentIndex === activeStoryIndex.value
 }
 
-const getSegmentWidth = (segmentIndex) => {
+const getSegmentWidth = (groupIndex, segmentIndex) => {
+  if (groupIndex !== activeGroupIndex.value) return '0%'
   if (segmentIndex < activeStoryIndex.value) return '100%'
   if (segmentIndex > activeStoryIndex.value) return '0%'
   return `${Math.max(0, Math.min(activeStoryProgress.value * 100, 100))}%`
@@ -637,9 +637,10 @@ onUnmounted(() => {
   top: 10px;
   left: 10px;
   right: 10px;
-  z-index: 5;
+  z-index: 3;
   display: flex;
   gap: 6px;
+  pointer-events: none;
 }
 
 .stories-progress__segment {
@@ -679,6 +680,7 @@ onUnmounted(() => {
 }
 
 .stories-group-slide {
+  position: relative;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
