@@ -11,6 +11,7 @@ import {
   forceEagerLoadingForLazyImages,
   resolveNativeLazyAdjacentConfig,
 } from '../../utils/nativeLazyImages'
+import { findSlideByRealIndex } from '../../utils/slideRealIndex'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -60,7 +61,7 @@ export class SlideStatesModule extends Module {
           this.options.nativeLazyAdjacent
         )
         if (!cfg?.onTransitionStart) return
-        const slide = this.findSlideByRealIndex(targetRealIndex)
+        const slide = findSlideByRealIndex(this.tvist.slides, targetRealIndex)
         if (slide) {
           forceEagerLoadingForLazyImages(slide)
         }
@@ -123,23 +124,6 @@ export class SlideStatesModule extends Module {
         }
       })
     })
-  }
-
-  /**
-   * Слайд по логическому индексу (data-tvist-slide-index) или DOM-индексу без loop.
-   */
-  private findSlideByRealIndex(realIndex: number): HTMLElement | null {
-    const slides = this.tvist.slides
-    for (const slide of slides) {
-      const attr = slide.getAttribute('data-tvist-slide-index')
-      if (attr !== null && parseInt(attr, 10) === realIndex) {
-        return slide
-      }
-    }
-    if (realIndex >= 0 && realIndex < slides.length) {
-      return slides[realIndex] ?? null
-    }
-    return null
   }
 
   /**
