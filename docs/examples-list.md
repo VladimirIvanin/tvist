@@ -26,6 +26,7 @@ import ScrollbarExample from './.vitepress/theme/examples/ScrollbarExample.vue'
 import MarqueeExample from './.vitepress/theme/examples/MarqueeExample.vue'
 import AutoWidthExample from './.vitepress/theme/examples/AutoWidthExample.vue'
 import NestedSlidersExample from './.vitepress/theme/examples/NestedSlidersExample.vue'
+import StoriesDocExample from './.vitepress/theme/examples/StoriesDocExample.vue'
 </script>
 
 <div class="examples-page">
@@ -100,7 +101,7 @@ import NestedSlidersExample from './.vitepress/theme/examples/NestedSlidersExamp
 
 Готовый паттерн для полноэкранных карточек: сегментный прогресс, hold-to-pause, видео + `waitForVideo`.
 
-[Открыть пример →](./examples/stories)
+<StoriesDocExample />
 
 ## 17. Thumbs Sync
 
