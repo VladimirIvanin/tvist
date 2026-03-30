@@ -212,6 +212,8 @@ Tvist.registerModule('slide-states', SlideStatesModule)
 - `.tvist-v1__slide--next` - следующий слайд
 - `.tvist-v1__slide--visible` - видимый слайд
 
+С опцией **`nativeLazyAdjacent`** модуль дополнительно переводит `img[loading="lazy"]` в режим eager для целевого слайда при старте перехода и (если задано) для соседних слайдов после init — см. [опции: nativeLazyAdjacent](/api/options#native-lazy-adjacent).
+
 ### Автоматизация
 
 #### AutoplayModule

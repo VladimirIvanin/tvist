@@ -7,6 +7,10 @@ import { Module } from '../Module'
 import { getCubeSlidesInRange } from '../effects/cubeSlideInRange'
 import { TVIST_CLASSES } from '../../core/constants'
 import { isFirefox } from '../../utils/browser'
+import {
+  forceEagerLoadingForLazyImages,
+  resolveNativeLazyAdjacentConfig,
+} from '../../utils/nativeLazyImages'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -29,6 +33,9 @@ export class SlideStatesModule extends Module {
   // Флаги полностью предзагруженных слайдов (WeakMap для автоматической очистки памяти)
   private preloadedSlides = new WeakMap<HTMLElement, boolean>()
 
+  private nativeLazyBeforeSlideChange: ((targetRealIndex: number) => void) | null =
+    null
+
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
   }
@@ -40,6 +47,26 @@ export class SlideStatesModule extends Module {
     // Обновляем классы при создании
     this.updateActiveClasses()
     this.updateVisibleClasses()
+
+    const nativeLazyCfg = resolveNativeLazyAdjacentConfig(
+      this.options.nativeLazyAdjacent
+    )
+    if (nativeLazyCfg?.onInit) {
+      this.applyNativeLazyAdjacentOnInit()
+    }
+    if (nativeLazyCfg?.onTransitionStart) {
+      this.nativeLazyBeforeSlideChange = (targetRealIndex: number) => {
+        const cfg = resolveNativeLazyAdjacentConfig(
+          this.options.nativeLazyAdjacent
+        )
+        if (!cfg?.onTransitionStart) return
+        const slide = this.findSlideByRealIndex(targetRealIndex)
+        if (slide) {
+          forceEagerLoadingForLazyImages(slide)
+        }
+      }
+      this.tvist.on('beforeSlideChange', this.nativeLazyBeforeSlideChange)
+    }
 
     // slideChangeStart: обновляем active/prev/next + visible (синхронно)
     this.tvist.on('slideChangeStart', () => {
@@ -95,6 +122,75 @@ export class SlideStatesModule extends Module {
           img.setAttribute('decoding', 'sync')
         }
       })
+    })
+  }
+
+  /**
+   * Слайд по логическому индексу (data-tvist-slide-index) или DOM-индексу без loop.
+   */
+  private findSlideByRealIndex(realIndex: number): HTMLElement | null {
+    const slides = this.tvist.slides
+    for (const slide of slides) {
+      const attr = slide.getAttribute('data-tvist-slide-index')
+      if (attr !== null && parseInt(attr, 10) === realIndex) {
+        return slide
+      }
+    }
+    if (realIndex >= 0 && realIndex < slides.length) {
+      return slides[realIndex] ?? null
+    }
+    return null
+  }
+
+  /**
+   * Принудительный eager для img[loading=lazy] у соседних слайдов после init.
+   */
+  private applyNativeLazyAdjacentOnInit(): void {
+    const slides = this.tvist.slides
+    const activeIndex = this.tvist.activeIndex
+    const activeSlide = slides[activeIndex]
+
+    if (!activeSlide) return
+
+    const activeAttr = activeSlide.getAttribute('data-tvist-slide-index')
+    const isLoop = activeAttr !== null || this.options.loop === true
+
+    let activeLogicalIndex = activeIndex
+    const originalCount = slides.length
+
+    if (activeAttr !== null) {
+      activeLogicalIndex = parseInt(activeAttr, 10)
+    }
+
+    let prevTargetIndex = activeLogicalIndex - 1
+    let nextTargetIndex = activeLogicalIndex + 1
+
+    if (isLoop) {
+      prevTargetIndex =
+        (activeLogicalIndex - 1 + originalCount) % originalCount
+      nextTargetIndex = (activeLogicalIndex + 1) % originalCount
+    }
+
+    slides.forEach((slide, index) => {
+      let currentLogicalIndex = index
+
+      if (isLoop) {
+        const attr = slide.getAttribute('data-tvist-slide-index')
+        if (attr !== null) {
+          currentLogicalIndex = parseInt(attr, 10)
+        }
+      }
+
+      const isPrev = isLoop
+        ? currentLogicalIndex === prevTargetIndex
+        : index === activeIndex - 1
+      const isNext = isLoop
+        ? currentLogicalIndex === nextTargetIndex
+        : index === activeIndex + 1
+
+      if (isPrev || isNext) {
+        forceEagerLoadingForLazyImages(slide)
+      }
     })
   }
 
@@ -282,6 +378,11 @@ export class SlideStatesModule extends Module {
     if (this.visibilityRafId !== null) {
       cancelAnimationFrame(this.visibilityRafId)
       this.visibilityRafId = null
+    }
+
+    if (this.nativeLazyBeforeSlideChange) {
+      this.tvist.off('beforeSlideChange', this.nativeLazyBeforeSlideChange)
+      this.nativeLazyBeforeSlideChange = null
     }
 
     this.tvist.slides.forEach((slide) => {

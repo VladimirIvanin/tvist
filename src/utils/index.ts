@@ -5,4 +5,5 @@
 export * from './math'
 export * from './dom'
 export * from './browser'
+export * from './nativeLazyImages'
 

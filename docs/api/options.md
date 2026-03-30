@@ -67,11 +67,41 @@
 
 - `enabled` — включение/отключение слайдера (при `false` — статичный контент)
 - `lazy` — ленивая загрузка изображений (true или объект с `preloadPrevNext`)
+- `nativeLazyAdjacent` — нативный `loading="lazy"` на `<img>`: принудительная подгрузка при переходе и опционально соседей при init (подробнее ниже)
 - `thumbs` — связь с слайдером-миниатюрами (`{ slider: Tvist }`)
 - `isNavigation` — режим навигации (клики по слайдам переключают слайд)
 - `breakpoints` — адаптивные настройки (ключ — ширина в px, в т.ч. `enabled` внутри брейкпоинта)
 - `breakpointsBase` — база для расчёта breakpoints (`'window'` | `'container'`)
 - `on` — объект с обработчиками событий (см. [События](/api/events))
+
+### `nativeLazyAdjacent` и нативный `loading="lazy"` {#native-lazy-adjacent}
+
+Отдельно от модуля [LazyLoad](/examples/lazyload) (поля `data-src` / `data-srcset`) в разметке часто используют обычные `<img src="..." loading="lazy">`. Браузер откладывает такую загрузку, пока картинка не окажется «рядом» с viewport. При эффекте **cube** соседняя грань может кратко попасть в кадр до того, как lazy сработает — визуально это пустая грань.
+
+Опция **`nativeLazyAdjacent`** (модуль slide-states) для выбранных слайдов выставляет у подходящих изображений `loading = 'eager'`, чтобы загрузка началась заранее.
+
+| Значение | Поведение |
+|----------|-----------|
+| `false` / не задавать | Выкл. |
+| `true` или `{}` | Только при **начале перехода** к другому слайду ([`beforeSlideChange`](/api/events)): целевой слайд. **`onInit` по умолчанию выключен** (без лишнего трафика при открытии страницы). |
+| `{ onInit: true }` | Дополнительно после init: **prev** и **next** относительно активного (с учётом `loop`). |
+| `{ onTransitionStart: false }` | Отключить подгрузку на переходе (остаётся только явный `onInit`, если задан). |
+
+Тип объекта: **`NativeLazyAdjacentOptions`** (экспорт из пакета, см. [TypeScript](/api/typescript)). Утилита **`forceEagerLoadingForLazyImages`** экспортируется из пакета (`import { forceEagerLoadingForLazyImages } from 'tvist'`).
+
+```javascript
+// Частый случай: cube + обычные img с loading="lazy"
+const slider = new Tvist(root, {
+  effect: 'cube',
+  nativeLazyAdjacent: true,
+})
+
+// Прогреть соседей сразу после монтирования слайдера (больше трафика при загрузке)
+const slider2 = new Tvist(root, {
+  effect: 'cube',
+  nativeLazyAdjacent: { onInit: true, onTransitionStart: true },
+})
+```
 
 ## Примеры использования
 

@@ -63,3 +63,20 @@ const slider = new Tvist('.tvist', {
 .tvist-v1__slide[data-tvist-slide-index="2"] { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
 .tvist-v1__slide[data-tvist-slide-index="3"] { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 ```
+
+## Картинки с `loading="lazy"`
+
+Если в слайдах стоят обычные `<img src="..." loading="lazy">`, браузер может не начать загрузку до появления изображения у края viewport. На вращающейся грани куба это иногда даёт пустой кадр на долю секунды.
+
+Включите опцию **`nativeLazyAdjacent`** (по умолчанию срабатывает **в начале перехода** к целевому слайду; соседей при первой отрисовке страницы можно добавить через `onInit: true`):
+
+```javascript
+const slider = new Tvist('.tvist', {
+  effect: 'cube',
+  speed: 600,
+  loop: true,
+  nativeLazyAdjacent: true,
+})
+```
+
+Подробности и все варианты — в [справочнике опций: nativeLazyAdjacent](/api/options#native-lazy-adjacent).
