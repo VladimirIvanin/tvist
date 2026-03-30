@@ -73,7 +73,7 @@
       </p>
 
       <div class="stories-code">
-        <div class="stories-code__title">Полный код для пользователя (nested + cube breakpoints)</div>
+        <div class="stories-code__title">Пример</div>
         <pre><code>{{ userFacingCode }}</code></pre>
       </div>
     </div>
@@ -154,6 +154,11 @@ const userFacingCode = `<div class="tvist-v1 stories-groups">
   <div class="tvist-v1__container">
     <div class="tvist-v1__slide stories-group-slide">
       <div class="stories-inner-wrap">
+        <div class="stories-progress">
+          <div class="stories-progress__segment"><div class="stories-progress__fill" data-progress-segment="0"></div></div>
+          <div class="stories-progress__segment"><div class="stories-progress__fill" data-progress-segment="1"></div></div>
+          <div class="stories-progress__segment"><div class="stories-progress__fill" data-progress-segment="2"></div></div>
+        </div>
         <div class="tvist-v1 stories-inner">
           <div class="tvist-v1__container">
             <div class="tvist-v1__slide stories-inner-slide">Story 1</div>
@@ -166,6 +171,10 @@ const userFacingCode = `<div class="tvist-v1 stories-groups">
 
     <div class="tvist-v1__slide stories-group-slide">
       <div class="stories-inner-wrap">
+        <div class="stories-progress">
+          <div class="stories-progress__segment"><div class="stories-progress__fill" data-progress-segment="0"></div></div>
+          <div class="stories-progress__segment"><div class="stories-progress__fill" data-progress-segment="1"></div></div>
+        </div>
         <div class="tvist-v1 stories-inner">
           <div class="tvist-v1__container">
             <div class="tvist-v1__slide stories-inner-slide">Story A</div>
@@ -183,6 +192,7 @@ const userFacingCode = `<div class="tvist-v1 stories-groups">
   const MOBILE_BREAKPOINT = 767
   const groupRoot = document.querySelector('.stories-groups')
   const innerRoots = groupRoot.querySelectorAll('.stories-inner')
+  const progressRoots = groupRoot.querySelectorAll('.stories-progress')
 
   // Внешний слайдер групп:
   // desktop = slide (speed 0), mobile = cube (speed 540)
@@ -220,9 +230,28 @@ const userFacingCode = `<div class="tvist-v1 stories-groups">
         delay: 2800,
         pauseOnHover: false,
         waitForVideo: false
+      },
+      on: {
+        autoplayProgress: ({ progress, index }) => {
+          const fillEls = root.parentElement.querySelectorAll('[data-progress-segment]')
+          fillEls.forEach((el, segmentIndex) => {
+            if (segmentIndex < index) el.style.width = '100%'
+            else if (segmentIndex > index) el.style.width = '0%'
+            else el.style.width = \`\${Math.max(0, Math.min(progress * 100, 100))}%\`
+          })
+        },
+        slideChangeStart: (index) => {
+          const fillEls = root.parentElement.querySelectorAll('[data-progress-segment]')
+          fillEls.forEach((el, segmentIndex) => {
+            el.style.width = segmentIndex < index ? '100%' : '0%'
+          })
+        }
       }
     })
-  )image.png
+  )
+
+  // Важно для cube: прогресс находится внутри каждой грани.
+  // Поэтому при вращении куба индикатор "приклеен" к текущему слайду.
 <\/script>`
 
 const syncAutoplayForActiveGroup = () => {
