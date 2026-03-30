@@ -9,11 +9,11 @@
 .#{$tvist-block}--cube {
   overflow: visible;
   
-  .#{$tvist-block}__container {
+  > .#{$tvist-block}__container {
     transform-style: preserve-3d;
   }
   
-  .#{$tvist-block}__slide {
+  > .#{$tvist-block}__container > .#{$tvist-block}__slide {
     position: absolute !important;
     left: 0;
     top: 0;
@@ -36,10 +36,24 @@
       visibility: visible;
     }
   }
+
+  // Защита для вложенных слайдеров внутри грани куба:
+  // в некоторых браузерах комбинация preserve-3d + backface hidden + identity transform
+  // может скрывать контент вложенного слайдера (даже текст/фон).
+  > .#{$tvist-block}__container > .#{$tvist-block}__slide .#{$tvist-block}__container {
+    transform-style: flat;
+    -webkit-transform-style: flat;
+  }
+
+  > .#{$tvist-block}__container > .#{$tvist-block}__slide .#{$tvist-block}__slide {
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+    transform: none;
+  }
 }
 
 // RTL поддержка
-[dir='rtl'] .#{$tvist-block}--cube .#{$tvist-block}__slide {
+[dir='rtl'] .#{$tvist-block}--cube > .#{$tvist-block}__container > .#{$tvist-block}__slide {
   transform-origin: 100% 0;
 }
 

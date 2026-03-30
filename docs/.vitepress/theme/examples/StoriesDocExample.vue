@@ -121,10 +121,19 @@ const activeStoryProgress = ref(0)
 const animateActiveSegment = ref(false)
 const storiesEnded = ref(false)
 const progressRenderKey = ref(0)
+const groupTransitioning = ref(false)
+const groupTransitionTarget = ref(null)
+const groupTransitionTimer = ref(null)
+const lastAcceptedProgress = ref(0)
+const lastAcceptedIndex = ref(0)
+const progressResetAt = ref(0)
+const lastAcceptedAt = ref(0)
+const groupCompletionHandled = ref({})
 
 const tapPointerId = ref(null)
 const tapStartedAt = ref(0)
 const TAP_MAX_DURATION = 220
+const DEBUG_STORIES = false
 
 const STORY_AUTOPLAY = {
   delay: 2800,
@@ -136,33 +145,7 @@ const setInnerRootRef = (el, index) => {
   innerRootEls.value[index] = el ?? null
 }
 
-const isMobile = () => window.matchMedia('(max-width: 767px)').matches
-
-const getGroupSliderOptions = () => {
-  if (isMobile()) {
-    return {
-      effect: 'cube',
-      speed: 540,
-      cubeEffect: {
-        slideShadows: true,
-        shadow: true,
-        shadowOffset: 12,
-        shadowScale: 0.94,
-      },
-    }
-  }
-
-  return {
-    effect: 'slide',
-    speed: 0,
-    cubeEffect: undefined,
-  }
-}
-
-const applyGroupMode = () => {
-  if (!groupSlider.value) return
-  groupSlider.value.updateOptions(getGroupSliderOptions())
-}
+const MOBILE_BREAKPOINT = 767
 
 const syncAutoplayForActiveGroup = () => {
   innerSliders.value.forEach((slider, index) => {
@@ -184,32 +167,65 @@ const activateGroup = (index) => {
   activeGroupIndex.value = index
   const slider = innerSliders.value[index]
   if (!slider) return
+  groupCompletionHandled.value[index] = false
 
   activeStoryIndex.value = slider.realIndex ?? slider.activeIndex ?? 0
   activeStoryProgress.value = 0
   progressRenderKey.value += 1
+  lastAcceptedIndex.value = activeStoryIndex.value
+  lastAcceptedProgress.value = 0
+  const now = performance.now()
+  progressResetAt.value = now
+  lastAcceptedAt.value = now
+  refreshInnerSliderLayout(index)
   syncAutoplayForActiveGroup()
+}
+
+const debugLog = (...args) => {
+  if (!DEBUG_STORIES) return
+  console.log('[StoriesDocExample]', ...args)
+}
+
+const refreshInnerSliderLayout = (groupIndex) => {
+  const slider = innerSliders.value[groupIndex]
+  if (!slider) return
+  // Слайдеры неактивных групп инициализируются в скрытом состоянии:
+  // при активации группы форсируем пересчёт метрик/границ.
+  slider.update()
+  requestAnimationFrame(() => {
+    slider.update()
+  })
 }
 
 const moveToGroup = (index) => {
   if (!groupSlider.value) return
   const safeIndex = Math.max(0, Math.min(index, groups.length - 1))
-  if (safeIndex === activeGroupIndex.value) return
-  activateGroup(safeIndex)
-  groupSlider.value.scrollTo(safeIndex, !isMobile())
+  const currentGroup = groupSlider.value.realIndex ?? groupSlider.value.activeIndex ?? 0
+  if (safeIndex === currentGroup) return
+  groupTransitioning.value = true
+  groupTransitionTarget.value = safeIndex
+  if (groupTransitionTimer.value) {
+    window.clearTimeout(groupTransitionTimer.value)
+    groupTransitionTimer.value = null
+  }
+  debugLog('moveToGroup', { from: currentGroup, to: safeIndex })
+  const instant = !window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT}px)`).matches
+  groupSlider.value.scrollTo(safeIndex, instant)
 
-  // Защита от рассинхрона: если внешний слайдер не сменил группу,
-  // принудительно доводим его до целевого индекса.
-  queueMicrotask(() => {
+  // Fallback: если slideChanged не пришёл, форсируем целевую группу.
+  groupTransitionTimer.value = window.setTimeout(() => {
     if (!groupSlider.value) return
-    const currentGroup = groupSlider.value.realIndex ?? groupSlider.value.activeIndex ?? 0
-    if (currentGroup !== safeIndex) {
+    const actualGroup = groupSlider.value.realIndex ?? groupSlider.value.activeIndex ?? 0
+    if (actualGroup !== safeIndex) {
+      debugLog('fallback force group sync', { actualGroup, target: safeIndex })
       groupSlider.value.scrollTo(safeIndex, true)
     }
-  })
+  }, 600)
 }
 
 const handleInnerReachEnd = (groupIndex) => {
+  if (groupCompletionHandled.value[groupIndex]) return
+  groupCompletionHandled.value[groupIndex] = true
   if (!groupSlider.value) return
   if (groupIndex >= groups.length - 1) {
     storiesEnded.value = true
@@ -230,9 +246,8 @@ const handlePrev = () => {
   if (!slider) return
   const currentIndex = slider.realIndex ?? slider.activeIndex ?? 0
   if (currentIndex > 0) {
-    activeStoryIndex.value = currentIndex - 1
-    activeStoryProgress.value = 0
-    progressRenderKey.value += 1
+    groupCompletionHandled.value[activeGroupIndex.value] = false
+    resetActiveProgress(currentIndex - 1)
     slider.prev()
     return
   }
@@ -250,9 +265,8 @@ const handleNext = () => {
   if (!slider) return
   const currentIndex = slider.realIndex ?? slider.activeIndex ?? 0
   if (activeGroup && currentIndex < activeGroup.stories.length - 1) {
-    activeStoryIndex.value = currentIndex + 1
-    activeStoryProgress.value = 0
-    progressRenderKey.value += 1
+    groupCompletionHandled.value[activeGroupIndex.value] = false
+    resetActiveProgress(currentIndex + 1)
     slider.next()
     return
   }
@@ -294,6 +308,52 @@ const onTapPointerCancel = () => {
   tapStartedAt.value = 0
 }
 
+const resetActiveProgress = (index) => {
+  animateActiveSegment.value = false
+  activeStoryIndex.value = index
+  activeStoryProgress.value = 0
+  lastAcceptedIndex.value = index
+  lastAcceptedProgress.value = 0
+  const now = performance.now()
+  progressResetAt.value = now
+  lastAcceptedAt.value = now
+  progressRenderKey.value += 1
+}
+
+const shouldAcceptProgress = (index, progress) => {
+  const now = performance.now()
+  const clamped = Math.max(0, Math.min(progress, 1))
+  const storiesInActiveGroup = groups[activeGroupIndex.value]?.stories?.length ?? 1
+
+  // После резкого reset отбрасываем "хвост" предыдущего кадра (обычно 10-40%).
+  if (index === activeStoryIndex.value && now - progressResetAt.value < 140 && clamped > 0.12) {
+    return false
+  }
+
+  // Прогресс внутри сегмента должен быть монотонным.
+  if (index === lastAcceptedIndex.value && clamped + 0.001 < lastAcceptedProgress.value) {
+    const isSameIndexWrap = lastAcceptedProgress.value > 0.95 && clamped < 0.05
+
+    // Для групп с 2+ сторис wrap в том же index невозможен — это stale тик.
+    if (storiesInActiveGroup > 1 && isSameIndexWrap) return false
+
+    // Любой другой регресс внутри index тоже stale.
+    if (!isSameIndexWrap) return false
+  }
+
+  // Анти-скачок: если за очень короткое время прогресс вырос слишком сильно,
+  // считаем это устаревшим тиком из предыдущего цикла/индекса.
+  if (index === lastAcceptedIndex.value && lastAcceptedAt.value > 0) {
+    const deltaMs = Math.max(1, now - lastAcceptedAt.value)
+    const deltaProgress = clamped - lastAcceptedProgress.value
+    const maxExpectedPerMs = 1 / 1200 // быстрее этого темпа для delay=2800 быть не должно
+    const maxAllowedJump = deltaMs * maxExpectedPerMs + 0.02
+    if (deltaProgress > maxAllowedJump) return false
+  }
+
+  return true
+}
+
 const shouldAnimateSegment = (segmentIndex) => {
   return animateActiveSegment.value && segmentIndex === activeStoryIndex.value
 }
@@ -305,7 +365,8 @@ const getSegmentWidth = (segmentIndex) => {
 }
 
 const handleResize = () => {
-  applyGroupMode()
+  // При смене размеров пересчитываем вложенные слайдеры для корректной геометрии.
+  innerSliders.value.forEach((slider) => slider?.update())
 }
 
 onMounted(() => {
@@ -317,12 +378,42 @@ onMounted(() => {
     drag: true,
     loop: false,
     autoplay: false,
-    ...getGroupSliderOptions(),
+    debug: DEBUG_STORIES,
+    effect: 'slide',
+    speed: 0,
+    breakpointsBase: 'window',
+    breakpoints: {
+      [MOBILE_BREAKPOINT]: {
+        effect: 'cube',
+        speed: 540,
+        cubeEffect: {
+          slideShadows: false,
+          shadow: false,
+          shadowOffset: 0,
+          shadowScale: 1,
+        },
+      },
+    },
     on: {
-      slideChanged: (index) => {
-        if (index !== activeGroupIndex.value) {
-          activateGroup(index)
+      slideChangeStart: (index) => {
+        debugLog('group slideChangeStart', {
+          from: groupSlider.value?.realIndex ?? groupSlider.value?.activeIndex,
+          to: index,
+          target: groupTransitionTarget.value,
+        })
+      },
+      slideChangeEnd: (index) => {
+        debugLog('group slideChanged', {
+          index,
+          previousActive: activeGroupIndex.value,
+        })
+        groupTransitioning.value = false
+        groupTransitionTarget.value = null
+        if (groupTransitionTimer.value) {
+          window.clearTimeout(groupTransitionTimer.value)
+          groupTransitionTimer.value = null
         }
+        activateGroup(index)
       },
     },
   })
@@ -334,36 +425,51 @@ onMounted(() => {
     return new Tvist(root, {
       perPage: 1,
       gap: 0,
+      speed: 0,
       drag: true,
       loop: false,
       holdToPause: true,
+      debug: DEBUG_STORIES,
       autoplay: groupIndex === 0 ? STORY_AUTOPLAY : false,
       on: {
         autoplayProgress: ({ progress, index }) => {
           if (groupIndex !== activeGroupIndex.value) return
+          if (groupTransitioning.value) return
           const slider = innerSliders.value[groupIndex]
           const currentIndex = slider ? (slider.realIndex ?? slider.activeIndex ?? 0) : index
           if (index !== currentIndex) return
+          if (!shouldAcceptProgress(index, progress)) return
+          if (progress >= 0.99 || progress <= 0.01) {
+            debugLog('autoplayProgress edge', {
+              groupIndex,
+              index,
+              progress: Number(progress.toFixed(3)),
+              currentIndex,
+            })
+          }
           animateActiveSegment.value = true
           activeStoryIndex.value = index
-          activeStoryProgress.value = progress
+          const clamped = Math.max(0, Math.min(progress, 1))
+          activeStoryProgress.value = clamped
+          lastAcceptedIndex.value = index
+          lastAcceptedProgress.value = clamped
+          lastAcceptedAt.value = performance.now()
+
+          const storiesCount = groups[groupIndex]?.stories.length ?? 0
+          const isLastStory = storiesCount > 0 && index === storiesCount - 1
+          if (isLastStory && clamped >= 0.999) {
+            handleInnerReachEnd(groupIndex)
+          }
         },
         slideChangeStart: (index) => {
           if (groupIndex !== activeGroupIndex.value) return
-          animateActiveSegment.value = false
-          activeStoryIndex.value = index
-          activeStoryProgress.value = 0
-          progressRenderKey.value += 1
+          groupCompletionHandled.value[groupIndex] = false
+          resetActiveProgress(index)
         },
-        slideChanged: (index) => {
+        slideChangeEnd: (index) => {
           if (groupIndex !== activeGroupIndex.value) return
-          animateActiveSegment.value = false
-          activeStoryIndex.value = index
-          activeStoryProgress.value = 0
-          progressRenderKey.value += 1
-        },
-        reachEnd: () => {
-          handleInnerReachEnd(groupIndex)
+          groupCompletionHandled.value[groupIndex] = false
+          resetActiveProgress(index)
         },
       },
     })
@@ -375,6 +481,10 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
+  if (groupTransitionTimer.value) {
+    window.clearTimeout(groupTransitionTimer.value)
+    groupTransitionTimer.value = null
+  }
   innerSliders.value.forEach((slider) => slider?.destroy())
   groupSlider.value?.destroy()
 })
@@ -484,6 +594,14 @@ onUnmounted(() => {
 
 .stories-inner-slide {
   position: relative;
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+  transform: none;
+}
+
+.stories-group-slide {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .stories-meta {

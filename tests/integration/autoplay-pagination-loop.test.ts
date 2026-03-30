@@ -406,6 +406,61 @@ describe('Autoplay + Pagination + Loop integration', () => {
 
     slider.destroy()
   })
+
+  it('should not emit reachEnd before last slide delay in non-loop with animated transitions', async () => {
+    container.innerHTML = `
+      <div class="${TVIST_CLASSES.block}">
+        <div class="${TVIST_CLASSES.container}">
+          <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.slide}">2</div>
+          <div class="${TVIST_CLASSES.slide}">3</div>
+        </div>
+      </div>
+    `
+
+    let lastSlideReachedAt: number | null = null
+    let reachEndAt: number | null = null
+    const reachEndSpy = vi.fn()
+
+    const slider = new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+      autoplay: 100,
+      loop: false,
+      speed: 300,
+      on: {
+        slideChangeEnd: (index: number) => {
+          if (index === 2) {
+            lastSlideReachedAt = Date.now()
+          }
+        },
+        reachEnd: () => {
+          reachEndAt = Date.now()
+          reachEndSpy()
+        },
+      },
+    })
+
+    // 0 -> 1 (delay + transition)
+    await vi.advanceTimersByTimeAsync(450)
+    expect(slider.activeIndex).toBe(1)
+    expect(reachEndSpy).toHaveBeenCalledTimes(0)
+
+    // 1 -> 2 (delay + transition)
+    await vi.advanceTimersByTimeAsync(450)
+    expect(slider.activeIndex).toBe(2)
+    expect(lastSlideReachedAt).not.toBeNull()
+
+    // Пока не прошла полная задержка последнего слайда, reachEnd быть не должен.
+    await vi.advanceTimersByTimeAsync(90)
+    expect(reachEndSpy).toHaveBeenCalledTimes(0)
+
+    // После delay + проверки границы (speed+20) reachEnd должен прийти.
+    await vi.advanceTimersByTimeAsync(350)
+    expect(reachEndSpy).toHaveBeenCalledTimes(1)
+    expect(reachEndAt).not.toBeNull()
+    expect((reachEndAt as number) - (lastSlideReachedAt as number)).toBeGreaterThanOrEqual(100)
+
+    slider.destroy()
+  })
 })
 
 describe('Autoplay + Pagination + Drag (no loop, rewind)', () => {
