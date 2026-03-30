@@ -191,6 +191,24 @@ const activateGroup = (index) => {
   syncAutoplayForActiveGroup()
 }
 
+const moveToGroup = (index) => {
+  if (!groupSlider.value) return
+  const safeIndex = Math.max(0, Math.min(index, groups.length - 1))
+  if (safeIndex === activeGroupIndex.value) return
+  activateGroup(safeIndex)
+  groupSlider.value.scrollTo(safeIndex, !isMobile())
+
+  // Защита от рассинхрона: если внешний слайдер не сменил группу,
+  // принудительно доводим его до целевого индекса.
+  queueMicrotask(() => {
+    if (!groupSlider.value) return
+    const currentGroup = groupSlider.value.realIndex ?? groupSlider.value.activeIndex ?? 0
+    if (currentGroup !== safeIndex) {
+      groupSlider.value.scrollTo(safeIndex, true)
+    }
+  })
+}
+
 const handleInnerReachEnd = (groupIndex) => {
   if (!groupSlider.value) return
   if (groupIndex >= groups.length - 1) {
@@ -202,7 +220,7 @@ const handleInnerReachEnd = (groupIndex) => {
     return
   }
 
-  groupSlider.value.scrollTo(groupIndex + 1, true)
+  moveToGroup(groupIndex + 1)
 }
 
 const handlePrev = () => {
@@ -220,7 +238,7 @@ const handlePrev = () => {
   }
 
   if (activeGroupIndex.value > 0) {
-    groupSlider.value?.scrollTo(activeGroupIndex.value - 1, true)
+    moveToGroup(activeGroupIndex.value - 1)
   }
 }
 
@@ -240,16 +258,12 @@ const handleNext = () => {
   }
 
   if (activeGroupIndex.value < groups.length - 1) {
-    groupSlider.value?.scrollTo(activeGroupIndex.value + 1, true)
+    moveToGroup(activeGroupIndex.value + 1)
   }
 }
 
 const goToGroup = (index) => {
-  if (!groupSlider.value) return
-  if (index === activeGroupIndex.value) return
-  animateActiveSegment.value = false
-  storiesEnded.value = false
-  groupSlider.value.scrollTo(index, true)
+  moveToGroup(index)
 }
 
 const onTapPointerDown = (_, event) => {
@@ -306,7 +320,9 @@ onMounted(() => {
     ...getGroupSliderOptions(),
     on: {
       slideChanged: (index) => {
-        activateGroup(index)
+        if (index !== activeGroupIndex.value) {
+          activateGroup(index)
+        }
       },
     },
   })
@@ -433,12 +449,12 @@ onUnmounted(() => {
   left: 10px;
   right: 10px;
   z-index: 5;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 6px;
 }
 
 .stories-progress__segment {
+  flex: 1 1 0;
   height: 3px;
   background: rgba(255, 255, 255, 0.28);
   border-radius: 999px;
