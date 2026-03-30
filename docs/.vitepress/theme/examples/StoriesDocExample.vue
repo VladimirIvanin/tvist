@@ -96,8 +96,7 @@ const groups = [
     author: 'Саша',
     stories: [
       { id: '2-1', title: 'Скейт-парк', background: 'linear-gradient(135deg, #3f3f46 0%, #52525b 45%, #27272a 100%)' },
-      { id: '2-2', title: 'Город вечером', background: 'linear-gradient(150deg, #0f172a 0%, #7c3aed 55%, #a855f7 100%)' },
-      { id: '2-3', title: 'Ночной ритм', background: 'linear-gradient(150deg, #111827 0%, #0f766e 60%, #2dd4bf 100%)' },
+      { id: '2-2', title: 'Город вечером', background: 'linear-gradient(150deg, #0f172a 0%, #7c3aed 55%, #a855f7 100%)' }
     ],
   },
   {
