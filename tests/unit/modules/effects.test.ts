@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import Tvist from '@core/Tvist'
 import { EffectModule } from '@modules/effects/EffectModule'
+import '@modules/breakpoints'
 
 // Manually register for test isolation or import the index
 Tvist.registerModule('effect', EffectModule)
@@ -23,6 +24,11 @@ describe('EffectModule', () => {
     
     // Mock offsetWidth to allow calculation of slideWidth
     Object.defineProperty(container, 'offsetWidth', {
+      configurable: true,
+      value: 1000
+    })
+
+    Object.defineProperty(container, 'clientWidth', {
       configurable: true,
       value: 1000
     })
@@ -72,5 +78,26 @@ describe('EffectModule', () => {
     })
     
     expect(slider.container.style.transformStyle).toBe('preserve-3d')
+  })
+
+  it('должен очищать cube transform при выходе из breakpoint', () => {
+    window.innerWidth = 500
+
+    const slider = new Tvist(container, {
+      effect: 'slide',
+      breakpoints: {
+        767: { effect: 'cube' }
+      }
+    })
+
+    expect(slider.root.classList.contains(TVIST_CLASSES.cube)).toBe(true)
+    expect(slider.slides[0].style.transform).toContain('rotateY(')
+
+    window.innerWidth = 1200
+    slider.update()
+
+    expect(slider.options.effect).toBe('slide')
+    expect(slider.root.classList.contains(TVIST_CLASSES.cube)).toBe(false)
+    expect(slider.slides[0].style.transform).toBe('')
   })
 })
