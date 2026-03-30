@@ -10,7 +10,11 @@
  */
 
 import { Module } from '../Module'
-import { TVIST_CLASSES, NAVIGATION_ARROW_SVG } from '../../core/constants'
+import {
+  TVIST_CLASSES,
+  NAVIGATION_ARROW_NEXT_SVG,
+  NAVIGATION_ARROW_PREV_SVG,
+} from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -130,7 +134,7 @@ export class NavigationModule extends Module {
 
     // Вставляем SVG
     const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = NAVIGATION_ARROW_SVG
+    tempDiv.innerHTML = direction === 'prev' ? NAVIGATION_ARROW_PREV_SVG : NAVIGATION_ARROW_NEXT_SVG
     const svgElement = tempDiv.querySelector('svg')
     
     if (svgElement) {

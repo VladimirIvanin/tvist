@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { TVIST_CLASSES, NAVIGATION_ARROW_SVG } from '@core/constants'
+import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '@core/Tvist'
 // Импортируем модуль через index для автоматической регистрации
 import '../../../src/modules/navigation'
