@@ -26,6 +26,7 @@ const VIDEO_DEFAULTS: Required<VideoOptions> = {
   playsinline: true,
   pauseOnLeave: true,
   resetOnLeave: false,
+  pauseOnHold: false,
 }
 
 /** Запись о видео на слайде */
@@ -60,7 +61,14 @@ function normalizeVideoOptions(raw: TvistOptions['video']): Required<VideoOption
     playsinline: raw.playsinline ?? VIDEO_DEFAULTS.playsinline,
     pauseOnLeave: raw.pauseOnLeave ?? VIDEO_DEFAULTS.pauseOnLeave,
     resetOnLeave: raw.resetOnLeave ?? VIDEO_DEFAULTS.resetOnLeave,
+    pauseOnHold: raw.pauseOnHold ?? VIDEO_DEFAULTS.pauseOnHold,
   }
+}
+
+function isHoldToPauseEnabled(raw: TvistOptions['holdToPause']): boolean {
+  if (!raw) return false
+  if (raw === true) return true
+  return raw.enabled !== false
 }
 
 // ==================== Утилиты iframe ====================
@@ -161,11 +169,20 @@ export class VideoModule extends Module {
 
   /** Видео поставлено на паузу из-за невидимости */
   private pausedByVisibility = false
+  /** Видео поставлено на паузу из-за long press */
+  private pausedByHold = false
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
     this.config = normalizeVideoOptions(this.options.video)
     if (this.config) {
+      if (
+        isHoldToPauseEnabled(this.options.holdToPause) &&
+        (this.options.video === true ||
+          (typeof this.options.video === 'object' && this.options.video.pauseOnHold === undefined))
+      ) {
+        this.config.pauseOnHold = true
+      }
       this.muted = this.config.muted
     }
   }
@@ -681,6 +698,7 @@ export class VideoModule extends Module {
   private resumeFromVisibility(): void {
     if (!this.pausedByVisibility) return
     this.pausedByVisibility = false
+    this.pausedByHold = false
 
     if (!this.config?.autoplay) return
 
@@ -746,6 +764,35 @@ export class VideoModule extends Module {
    */
   isMutedState(): boolean {
     return this.muted
+  }
+
+  /**
+   * Поставить активное видео на паузу из-за long press.
+   * Работает только для HTML video на активном слайде.
+   */
+  pauseActiveForHold(): void {
+    if (!this.config?.pauseOnHold) return
+    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
+    const entry = this.videos.get(realIndex)
+    if (!entry) return
+    if (!entry.video.paused) {
+      this.pausedByHold = true
+      entry.video.pause()
+    }
+  }
+
+  /**
+   * Возобновить активное видео после long press.
+   */
+  resumeActiveAfterHold(): void {
+    if (!this.config?.pauseOnHold || !this.pausedByHold) return
+    this.pausedByHold = false
+    if (!this.config.autoplay) return
+    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
+    const entry = this.videos.get(realIndex)
+    if (entry?.video.paused) {
+      this.safePlay(entry.video)
+    }
   }
 
   /**

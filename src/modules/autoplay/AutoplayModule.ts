@@ -25,7 +25,7 @@
 
 import { Module } from '../Module'
 import type { Tvist } from '../../core/Tvist'
-import type { TvistOptions, AutoplayOptions } from '../../core/types'
+import type { AutoplayProgressEvent, TvistOptions, AutoplayOptions } from '../../core/types'
 
 /** Дефолтные значения для AutoplayOptions */
 const AUTOPLAY_DEFAULTS: Required<AutoplayOptions> = {
@@ -96,6 +96,7 @@ export class AutoplayModule extends Module {
   private waitingForVideo = false
   private videoEndedWhilePaused = false  // видео закончилось пока autoplay на паузе (hover)
   private videoEndedHandler?: () => void
+  private videoProgressHandler?: (data: { progress: number; index: number }) => void
 
   /** Переход был инициирован autoplay (next() из таймера или videoEnded). Не сбрасываем таймер на slideChangeEnd. */
   private transitionByAutoplay = false
@@ -123,6 +124,7 @@ export class AutoplayModule extends Module {
     this.detachHoverEvents()
     this.detachVisibilityEvents()
     this.detachVideoEndedListener()
+    this.detachVideoProgressListener()
   }
 
   public override shouldBeActive(): boolean {
@@ -156,6 +158,7 @@ export class AutoplayModule extends Module {
         this.detachHoverEvents()
         this.detachVisibilityEvents()
         this.detachVideoEndedListener()
+        this.detachVideoProgressListener()
         this.stopped = true
       }
       // Если autoplay был включен и остается включен (но изменились настройки)
@@ -171,6 +174,11 @@ export class AutoplayModule extends Module {
           this.waitingForVideo = false
           this.videoEndedWhilePaused = false
           this.detachVideoEndedListener()
+        }
+        if (this.config.waitForVideo) {
+          this.attachVideoProgressBridge()
+        } else {
+          this.detachVideoProgressListener()
         }
         
         this.start() // Перезапускаем с новой задержкой
@@ -249,6 +257,8 @@ export class AutoplayModule extends Module {
     if (this.config.pauseOnHover) {
       this.attachHoverEvents()
     }
+
+    this.attachVideoProgressBridge()
 
     // Всегда ставим на паузу при драге (не только при pauseOnInteraction),
     // иначе таймер может вызвать next() во время/сразу после драга (rewind к 0)
@@ -330,6 +340,23 @@ export class AutoplayModule extends Module {
     })
   }
 
+  private attachVideoProgressBridge(): void {
+    if (!this.config?.waitForVideo) return
+
+    this.detachVideoProgressListener()
+    this.videoProgressHandler = (data: { progress: number; index: number }) => {
+      if (!this.waitingForVideo || this.stopped) return
+      this.emitAutoplayProgress(data.index, Math.min(Math.max(data.progress, 0), 1))
+    }
+    this.on('videoProgress', this.videoProgressHandler)
+  }
+
+  private detachVideoProgressListener(): void {
+    if (!this.videoProgressHandler) return
+    this.off('videoProgress', this.videoProgressHandler)
+    this.videoProgressHandler = undefined
+  }
+
   /**
    * Обработка смены слайда для режима waitForVideo.
    * index из slideChangeEnd — это normalizedIndex (= realIndex), НЕ DOM-позиция.
@@ -373,6 +400,7 @@ export class AutoplayModule extends Module {
     this.waitingForVideo = true
     this.cancelTimer()
     this.stopProgressTracking()
+    this.emitAutoplayProgress(index, 0)
 
     this.videoEndedHandler = () => {
       if (this.stopped || !this.waitingForVideo) {
@@ -384,6 +412,7 @@ export class AutoplayModule extends Module {
         this.videoEndedWhilePaused = true
         return
       }
+      this.emitAutoplayProgress(this.tvist.realIndex ?? this.tvist.activeIndex, 1)
       this.waitingForVideo = false
       
       // Запоминаем индекс до навигации
@@ -549,7 +578,7 @@ export class AutoplayModule extends Module {
     this.stopProgressTracking()
 
     if (timeLeft <= 0) {
-      this.emit('autoplayProgress', { progress: 1, index: this.tvist.activeIndex })
+      this.emitAutoplayProgress(this.tvist.activeIndex, 1)
       return
     }
 
@@ -567,10 +596,7 @@ export class AutoplayModule extends Module {
       let progress = startOffset + (chunkProgress * (timeLeft / totalDuration))
       progress = Math.min(progress, 1)
 
-      this.emit('autoplayProgress', {
-        progress,
-        index: this.tvist.activeIndex,
-      })
+      this.emitAutoplayProgress(this.tvist.activeIndex, progress)
 
       if (progress < 1 && !this.paused && !this.stopped) {
         this.progressRAF = requestAnimationFrame(tick)
@@ -578,6 +604,17 @@ export class AutoplayModule extends Module {
     }
 
     this.progressRAF = requestAnimationFrame(tick)
+  }
+
+  private emitAutoplayProgress(index: number, progress: number): void {
+    const payload: AutoplayProgressEvent = {
+      progress,
+      index,
+      segmentIndex: index,
+      segmentProgress: progress,
+      totalSegments: this.tvist.slides.length,
+    }
+    this.emit('autoplayProgress', payload)
   }
 
   /**

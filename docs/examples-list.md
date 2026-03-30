@@ -96,6 +96,12 @@ import NestedSlidersExample from './.vitepress/theme/examples/NestedSlidersExamp
 
 <AutoplayExample detailsLink="./examples/modules" />
 
+## 16.1 Сценарий «Истории»
+
+Готовый паттерн для полноэкранных карточек: сегментный прогресс, hold-to-pause, видео + `waitForVideo`.
+
+[Открыть пример →](./examples/stories)
+
 ## 17. Thumbs Sync
 
 <ThumbsExample detailsLink="./examples/thumbs" />

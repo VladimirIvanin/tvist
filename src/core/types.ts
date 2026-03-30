@@ -145,6 +145,57 @@ export interface VideoOptions {
    * @default false
    */
   resetOnLeave?: boolean
+
+  /**
+   * Ставить активное видео на паузу во время long press и продолжать после отпускания
+   * @default true (если включен holdToPause), иначе false
+   */
+  pauseOnHold?: boolean
+}
+
+/**
+ * Опции удержания для сценариев историй (long press)
+ */
+export interface HoldToPauseOptions {
+  /**
+   * Включить long press удержание
+   * @default true
+   */
+  enabled?: boolean
+
+  /**
+   * Порог удержания в миллисекундах
+   * @default 300
+   */
+  threshold?: number
+
+  /**
+   * Область, в которой отслеживается удержание:
+   * - 'slider' — root слайдера
+   * - 'container' — внутренний контейнер со слайдами
+   * - HTMLElement — кастомный элемент
+   * @default 'slider'
+   */
+  root?: 'slider' | 'container' | HTMLElement
+
+  /**
+   * CSS-селектор элементов, которые нужно исключить из удержания
+   * @default undefined
+   */
+  exclude?: string
+
+  /**
+   * Отменять удержание при старте drag
+   * @default true
+   */
+  cancelOnDrag?: boolean
+
+  /**
+   * Порог движения до отмены удержания (px).
+   * Если не задан, используется внутренний порог drag.
+   * @default undefined
+   */
+  moveThreshold?: number
 }
 
 /**
@@ -198,6 +249,20 @@ export interface VideoProgressEvent {
   currentTime: number
   /** Полная длительность видео в секундах */
   duration: number
+}
+
+/** Payload события autoplayProgress */
+export interface AutoplayProgressEvent {
+  /** Прогресс активного сегмента (0..1) */
+  progress: number
+  /** Индекс активного слайда */
+  index: number
+  /** Индекс активного сегмента (равен index) */
+  segmentIndex: number
+  /** Прогресс активного сегмента (0..1), алиас progress */
+  segmentProgress: number
+  /** Общее количество сегментов (слайдов) */
+  totalSegments: number
 }
 
 /** Payload событий video (play, pause, ended, ready) */
@@ -460,6 +525,15 @@ export interface TvistOptions {
    * @default false
    */
   video?: boolean | VideoOptions
+
+  /**
+   * Удержание для сценариев историй:
+   * - `false` / `undefined` — выключено (по умолчанию)
+   * - `true` — включено с дефолтными настройками
+   * - `HoldToPauseOptions` — полный контроль
+   * @default undefined
+   */
+  holdToPause?: boolean | HoldToPauseOptions
   
   // Visibility
   
@@ -750,8 +824,12 @@ export interface TvistOptions {
     videoEnded?: (data: VideoEvent) => void
     /** Прогресс воспроизведения видео (0..1) */
     videoProgress?: (data: VideoProgressEvent) => void
-    /** Прогресс автопрокрутки (0..1), работает и для таймера, и для видео */
-    autoplayProgress?: (data: { progress: number; index: number }) => void
+    /** Прогресс активного сегмента (текущий слайд, 0..1) */
+    autoplayProgress?: (data: AutoplayProgressEvent) => void
+    /** Начало long press удержания */
+    longPressStart?: (data: { index: number; pointerType: string }) => void
+    /** Конец long press удержания */
+    longPressEnd?: (data: { index: number; pointerType: string }) => void
     /** Слайдер стал видимым */
     sliderVisible?: () => void
     /** Слайдер скрыт */

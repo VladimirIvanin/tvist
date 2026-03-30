@@ -30,6 +30,8 @@
 - [`dragStart`](#dragstart) — начало перетаскивания
 - [`drag`](#drag) — во время перетаскивания
 - [`dragEnd`](#dragend) — конец перетаскивания
+- [`longPressStart`](#longpressstart) — начало удержания (hold)
+- [`longPressEnd`](#longpressend) — конец удержания (hold)
 
 ### Состояние и обновления
 - [`resized`](#resized) — завершилось изменение размера контейнера
@@ -378,6 +380,22 @@ slider.on('dragEnd', () => {
 })
 ```
 
+### longPressStart
+
+```typescript
+longPressStart: (data: { index: number; pointerType: string }) => void
+```
+
+Вызывается после удержания указателя дольше `holdToPause.threshold`.
+
+### longPressEnd
+
+```typescript
+longPressEnd: (data: { index: number; pointerType: string }) => void
+```
+
+Вызывается при отпускании (или cancel) после активного удержания.
+
 ## События обновления
 
 События, связанные с изменением состояния слайдера.
@@ -631,10 +649,21 @@ autoplayResume: () => void
 ### autoplayProgress
 
 ```typescript
-autoplayProgress: (data: { progress: number; index: number }) => void
+autoplayProgress: (data: {
+  progress: number
+  index: number
+  segmentIndex: number
+  segmentProgress: number
+  totalSegments: number
+}) => void
 ```
 
 Прогресс до следующего перехода: `progress` от 0 до 1, `index` — текущий активный слайд. Вызывается во время ожидания перед сменой слайда (и при ожидании окончания видео, если `waitForVideo: true`).
+
+Контракт для сценариев «историй»:
+- `progress` — прогресс **активного сегмента** (текущего слайда) в диапазоне `0..1`
+- при `waitForVideo: true` для HTML `<video>` источник прогресса — `videoProgress` (текущее время видео)
+- при `pause` (включая hold) значение замирает, после `resume` продолжается
 
 **Примеры:**
 

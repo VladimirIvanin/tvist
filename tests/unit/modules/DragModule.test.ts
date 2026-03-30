@@ -858,5 +858,76 @@ describe('DragModule', () => {
       )
     })
   })
+
+  describe('Long press (holdToPause)', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('должен эмитить longPressStart и longPressEnd после удержания', () => {
+      vi.useFakeTimers()
+      slider.updateOptions({
+        holdToPause: true,
+      })
+
+      const longPressStartSpy = vi.fn()
+      const longPressEndSpy = vi.fn()
+      slider.on('longPressStart', longPressStartSpy)
+      slider.on('longPressEnd', longPressEndSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      vi.advanceTimersByTime(301)
+
+      expect(longPressStartSpy).toHaveBeenCalledOnce()
+
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 200, clientY: 100 })
+      )
+      expect(longPressEndSpy).toHaveBeenCalledOnce()
+    })
+
+    it('не должен запускать long press при отпускании до threshold', () => {
+      vi.useFakeTimers()
+      slider.updateOptions({
+        holdToPause: true,
+      })
+
+      const longPressStartSpy = vi.fn()
+      slider.on('longPressStart', longPressStartSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      vi.advanceTimersByTime(150)
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 200, clientY: 100 })
+      )
+      vi.advanceTimersByTime(300)
+
+      expect(longPressStartSpy).not.toHaveBeenCalled()
+    })
+
+    it('должен отменять long press при начале drag', () => {
+      vi.useFakeTimers()
+      slider.updateOptions({
+        holdToPause: true,
+      })
+
+      const longPressStartSpy = vi.fn()
+      slider.on('longPressStart', longPressStartSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 140, clientY: 100 })
+      )
+      vi.advanceTimersByTime(400)
+
+      expect(longPressStartSpy).not.toHaveBeenCalled()
+    })
+  })
 })
 
