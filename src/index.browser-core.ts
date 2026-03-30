@@ -8,7 +8,12 @@ import './styles/tvist.scss'
 
 // Core
 export { Tvist, Tvist as TvistV1, type TvistRootElement } from './core/Tvist'
-export { TVIST_CSS_PREFIX, TVIST_CLASSES } from './core/constants'
+export {
+  TVIST_CSS_PREFIX,
+  TVIST_CLASSES,
+  TVIST_DOM_EVENTS,
+  HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS,
+} from './core/constants'
 export { Engine } from './core/Engine'
 export { Vector1D } from './core/Vector1D'
 export { Counter } from './core/Counter'
@@ -22,7 +27,14 @@ import './modules/autoplay'
 import './modules/breakpoints'
 
 // Types
-export type { TvistOptions, AutoplayOptions, VideoOptions, VideoEvent, VideoProgressEvent } from './core/types'
+export type {
+  TvistOptions,
+  TvistLongPressDomEventDetail,
+  AutoplayOptions,
+  VideoOptions,
+  VideoEvent,
+  VideoProgressEvent,
+} from './core/types'
 export type { Module, ModuleConstructor } from './modules/Module'
 
 // Дефолтный экспорт

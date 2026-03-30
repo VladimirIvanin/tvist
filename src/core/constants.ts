@@ -75,6 +75,21 @@ export const TVIST_CLASSES = {
 } as const
 
 /**
+ * DOM CustomEvent при holdToPause на слайде: `bubbles: false`, `composed: false`.
+ * Поле `detail` — тип `TvistLongPressDomEventDetail` в `core/types`.
+ */
+export const TVIST_DOM_EVENTS = {
+  longPressStart: 'tvist-long-press-start',
+  longPressEnd: 'tvist-long-press-end',
+} as const
+
+/**
+ * Дефолтный порог удержания `holdToPause` в миллисекундах (если в опциях не задан `threshold`).
+ * Используется модулем `DragModule`.
+ */
+export const HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS = 100
+
+/**
  * SVG иконки для кнопок навигации.
  * Используют currentColor для автоматического наследования цвета от родителя.
  */

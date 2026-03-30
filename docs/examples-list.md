@@ -26,6 +26,7 @@ import ScrollbarExample from './.vitepress/theme/examples/ScrollbarExample.vue'
 import MarqueeExample from './.vitepress/theme/examples/MarqueeExample.vue'
 import AutoWidthExample from './.vitepress/theme/examples/AutoWidthExample.vue'
 import NestedSlidersExample from './.vitepress/theme/examples/NestedSlidersExample.vue'
+import StoriesDocExample from './.vitepress/theme/examples/StoriesDocExample.vue'
 </script>
 
 <div class="examples-page">
@@ -95,6 +96,12 @@ import NestedSlidersExample from './.vitepress/theme/examples/NestedSlidersExamp
 ## 16. Autoplay + Pagination
 
 <AutoplayExample detailsLink="./examples/modules" />
+
+## 16.1 Сценарий «Истории»
+
+Готовый паттерн для полноэкранных карточек: сегментный прогресс, hold-to-pause, видео + `waitForVideo`.
+
+<StoriesDocExample />
 
 ## 17. Thumbs Sync
 

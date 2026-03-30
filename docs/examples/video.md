@@ -44,6 +44,7 @@ const slider = new Tvist('.tvist-v1', {
     playsinline: true,    // playsinline для iOS (default: true)
     pauseOnLeave: true,   // пауза при уходе со слайда (default: true)
     resetOnLeave: false,  // сбрасывать на начало (default: false)
+    pauseOnHold: true,    // пауза во время long press (default: true при holdToPause)
   }
 })
 ```
@@ -99,7 +100,7 @@ document.querySelector('.sound-btn').addEventListener('click', () => {
 
 ## Прогресс-бар
 
-Используйте события `videoProgress` и `autoplayProgress` для отображения прогресса:
+Используйте единый контракт: `autoplayProgress` всегда про активный сегмент (текущий слайд). Для HTML `<video>` при `waitForVideo: true` этот прогресс синхронизирован с реальным временем видео.
 
 ```js
 const slider = new Tvist('.tvist-v1', {
@@ -109,12 +110,7 @@ const slider = new Tvist('.tvist-v1', {
 
 const progressBar = document.querySelector('.progress-fill')
 
-// Прогресс видео (0..1)
-slider.on('videoProgress', ({ progress }) => {
-  progressBar.style.width = progress * 100 + '%'
-})
-
-// Прогресс таймера autoplay для фото-слайдов (0..1)
+// Прогресс сегмента (0..1): и для фото, и для video+waitForVideo
 slider.on('autoplayProgress', ({ progress }) => {
   progressBar.style.width = progress * 100 + '%'
 })
@@ -122,6 +118,20 @@ slider.on('autoplayProgress', ({ progress }) => {
 // Сброс при смене слайда
 slider.on('slideChangeStart', () => {
   progressBar.style.width = '0%'
+})
+```
+
+## Пауза видео на удержании
+
+```js
+const slider = new Tvist('.tvist-v1', {
+  holdToPause: true,
+  video: {
+    pauseOnHold: true,
+  },
+  autoplay: {
+    waitForVideo: true,
+  },
 })
 ```
 

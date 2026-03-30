@@ -73,6 +73,48 @@ autoplay.isPaused()  // на паузе ли
 autoplay.isStopped() // остановлен ли
 ```
 
+## Hold-to-pause для сценариев историй
+
+Long press удержание можно включить отдельной опцией. Во время удержания autoplay ставится на паузу, после отпускания продолжает с того же места.
+
+```js
+const slider = new Tvist('.tvist-v1', {
+  holdToPause: {
+    enabled: true,
+    threshold: 100, // по умолчанию 100 мс; можно увеличить для менее чувствительного hold
+    root: 'slider', // 'slider' | 'container' | HTMLElement
+    exclude: '[data-tvist-no-hold]',
+    cancelOnDrag: true,
+  },
+  autoplay: {
+    delay: 3000,
+    waitForVideo: true,
+  },
+})
+```
+
+События удержания:
+
+```js
+slider.on('longPressStart', ({ index, pointerType }) => {
+  console.log('hold start', index, pointerType)
+})
+
+slider.on('longPressEnd', ({ index, pointerType }) => {
+  console.log('hold end', index, pointerType)
+})
+```
+
+Подписка на **узле слайда** (событие не всплывает к родителю):
+
+```js
+import { TVIST_DOM_EVENTS, type TvistLongPressDomEventDetail } from 'tvist'
+
+slider.slides[0].addEventListener(TVIST_DOM_EVENTS.longPressStart, (e) => {
+  const { index, pointerType } = (e as CustomEvent<TvistLongPressDomEventDetail>).detail
+})
+```
+
 ## Опции
 
 ### `autoplay`

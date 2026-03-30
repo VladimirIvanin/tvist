@@ -86,11 +86,24 @@ export class SlideStatesModule extends Module {
     this.tvist.slides.forEach((slide) => {
       const images = slide.querySelectorAll<HTMLImageElement>('img')
       images.forEach((img) => {
+        if (!this.hasImageSource(img)) {
+          return
+        }
+
         if (!img.hasAttribute('decoding')) {
           img.setAttribute('decoding', 'sync')
         }
       })
     })
+  }
+
+  /**
+   * Проверяет, что у изображения задан непустой src или srcset.
+   */
+  private hasImageSource(img: HTMLImageElement): boolean {
+    const src = img.getAttribute('src')?.trim() ?? ''
+    const srcset = img.getAttribute('srcset')?.trim() ?? ''
+    return src.length > 0 || srcset.length > 0
   }
 
   /**
@@ -108,6 +121,10 @@ export class SlideStatesModule extends Module {
     const decodePromises: Promise<void>[] = []
   
     images.forEach((img) => {
+      if (!this.hasImageSource(img)) {
+        return
+      }
+
       // Декодируем только загруженные и ещё не декодированные изображения
       if (img.complete && img.naturalWidth > 0 && !this.decodedImages.has(img)) {
         if ('decode' in img) {

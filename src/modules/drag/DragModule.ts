@@ -13,9 +13,13 @@
  */
 
 import { Module } from '../Module'
-import { TVIST_CLASSES } from '../../core/constants'
+import {
+  HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS,
+  TVIST_CLASSES,
+  TVIST_DOM_EVENTS,
+} from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
-import type { TvistOptions } from '../../core/types'
+import type { TvistOptions, TvistLongPressDomEventDetail } from '../../core/types'
 import { resolveTrackGapFromOptions } from '../../utils/gridGap'
 
 const DRAG_DEBUG = false
@@ -29,6 +33,14 @@ interface DragPoint {
   x: number
   y: number
   time: number
+}
+
+interface HoldToPauseConfig {
+  threshold: number
+  root: 'slider' | 'container' | HTMLElement
+  exclude?: string
+  cancelOnDrag: boolean
+  moveThreshold?: number
 }
 
 export class DragModule extends Module {
@@ -67,6 +79,18 @@ export class DragModule extends Module {
   
   private readonly MIN_DRAG_DISTANCE = 5
   private isPotentialDrag = false
+
+  // Hold-to-pause
+  private holdConfig: HoldToPauseConfig | null = null
+  private holdRoot: HTMLElement | null = null
+  private holdTimer: number | null = null
+  private holdPending = false
+  private holdActive = false
+  private holdPointerType = 'mouse'
+  private holdStartX = 0
+  private holdStartY = 0
+  private holdPointerId: number | null = null
+  private holdCaptureTarget: HTMLElement | null = null
   
   // Флаги для loop
   private isFirstMove = true // Флаг первого движения
@@ -93,6 +117,7 @@ export class DragModule extends Module {
     if (!this.shouldBeActive()) return
 
     this.attachEvents()
+    this.setupHoldToPause()
     this.updateCachedRefs()
     this.updateBounds()
 
@@ -129,6 +154,8 @@ export class DragModule extends Module {
   }
 
   override destroy(): void {
+    this.cancelHoldTracking()
+    this.detachHoldEvents()
     this.detachEvents()
     this.stopMomentum()
     this.off('positionShifted', this.onPositionShifted)
@@ -221,6 +248,65 @@ export class DragModule extends Module {
     root.classList.add(TVIST_CLASSES.draggable)
   }
 
+  private normalizeHoldToPause(raw: TvistOptions['holdToPause']): HoldToPauseConfig | null {
+    if (!raw) return null
+    if (raw === true) {
+      return {
+        threshold: HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS,
+        root: 'slider',
+        cancelOnDrag: true,
+      }
+    }
+
+    if (raw.enabled === false) return null
+
+    return {
+      threshold: raw.threshold ?? HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS,
+      root: raw.root ?? 'slider',
+      exclude: raw.exclude,
+      cancelOnDrag: raw.cancelOnDrag ?? true,
+      moveThreshold: raw.moveThreshold,
+    }
+  }
+
+  private resolveHoldRoot(config: HoldToPauseConfig): HTMLElement {
+    if (config.root === 'container') return this.tvist.container
+    if (config.root === 'slider') return this.tvist.root
+    return config.root
+  }
+
+  private setupHoldToPause(): void {
+    this.holdConfig = this.normalizeHoldToPause(this.options.holdToPause)
+    if (!this.holdConfig) return
+    this.holdRoot = this.resolveHoldRoot(this.holdConfig)
+    this.attachHoldEvents()
+  }
+
+  private attachHoldEvents(): void {
+    if (!this.holdRoot) return
+
+    if ('PointerEvent' in window) {
+      this.holdRoot.addEventListener('pointerdown', this.onHoldPointerDown)
+      this.holdRoot.addEventListener('lostpointercapture', this.onLostPointerCapture)
+    } else {
+      this.holdRoot.addEventListener('touchstart', this.onHoldPointerDown, { passive: true })
+      this.holdRoot.addEventListener('mousedown', this.onHoldPointerDown)
+    }
+  }
+
+  private detachHoldEvents(): void {
+    if (!this.holdRoot) return
+
+    if ('PointerEvent' in window) {
+      this.holdRoot.removeEventListener('pointerdown', this.onHoldPointerDown)
+      this.holdRoot.removeEventListener('lostpointercapture', this.onLostPointerCapture)
+    } else {
+      this.holdRoot.removeEventListener('touchstart', this.onHoldPointerDown)
+      this.holdRoot.removeEventListener('mousedown', this.onHoldPointerDown)
+    }
+    this.holdRoot = null
+  }
+
   /**
    * Предотвращение нативного drag-and-drop
    */
@@ -244,6 +330,201 @@ export class DragModule extends Module {
     root.removeEventListener('dragstart', this.onDragStart)
     root.classList.remove(TVIST_CLASSES.draggable)
     this.removeDocumentEvents()
+  }
+
+  private onHoldPointerDown = (e: TouchEvent | MouseEvent | PointerEvent): void => {
+    if (!this.holdConfig || !this.holdRoot) return
+    if ('button' in e && e.button !== 0) return
+
+    const target = e.target as HTMLElement | null
+    if (!target) return
+
+    const nearestBlock = target.closest?.(`.${TVIST_CLASSES.block}`)
+    if (nearestBlock && nearestBlock !== this.tvist.root) return
+    if (this.isFocusableElement(target)) return
+    if (this.holdConfig.exclude && target.closest(this.holdConfig.exclude)) return
+
+    const point = this.getPointerPosition(e)
+    if (!point) return
+
+    // Не отдаём удержание родительскому Tvist (вложенные слайдеры, stories)
+    e.stopPropagation()
+
+    this.cancelHoldTracking()
+    this.holdPending = true
+    this.holdActive = false
+    this.holdStartX = point.x
+    this.holdStartY = point.y
+    this.holdPointerType = this.getPointerType(e)
+    this.holdPointerId = 'pointerId' in e ? e.pointerId : null
+    this.holdCaptureTarget = e.currentTarget instanceof HTMLElement ? e.currentTarget : this.holdRoot
+
+    if (
+      this.holdPointerId !== null &&
+      this.holdCaptureTarget &&
+      'setPointerCapture' in this.holdCaptureTarget
+    ) {
+      try {
+        this.holdCaptureTarget.setPointerCapture(this.holdPointerId)
+      } catch {
+        // noop
+      }
+    }
+
+    this.holdTimer = window.setTimeout(() => {
+      if (!this.holdPending || this.holdActive) return
+      this.holdPending = false
+      this.holdActive = true
+      const pressIndex = this.tvist.realIndex ?? this.tvist.activeIndex
+      this.emit('longPressStart', {
+        index: pressIndex,
+        pointerType: this.holdPointerType,
+      })
+      this.dispatchLongPressSlideDomEvent(
+        TVIST_DOM_EVENTS.longPressStart,
+        pressIndex,
+        this.holdPointerType,
+      )
+      const autoplay = this.tvist.getModule('autoplay') as { pause?: () => void } | undefined
+      autoplay?.pause?.()
+      const video = this.tvist.getModule('video') as { pauseActiveForHold?: () => void } | undefined
+      video?.pauseActiveForHold?.()
+    }, this.holdConfig.threshold)
+
+    this.addHoldDocumentEvents()
+  }
+
+  private addHoldDocumentEvents(): void {
+    if ('PointerEvent' in window) {
+      document.addEventListener('pointermove', this.onHoldPointerMove)
+      document.addEventListener('pointerup', this.onHoldPointerUp)
+      document.addEventListener('pointercancel', this.onHoldPointerUp)
+    } else {
+      document.addEventListener('touchmove', this.onHoldPointerMove, { passive: true })
+      document.addEventListener('touchend', this.onHoldPointerUp)
+      document.addEventListener('touchcancel', this.onHoldPointerUp)
+      document.addEventListener('mousemove', this.onHoldPointerMove)
+      document.addEventListener('mouseup', this.onHoldPointerUp)
+    }
+  }
+
+  private removeHoldDocumentEvents(): void {
+    if ('PointerEvent' in window) {
+      document.removeEventListener('pointermove', this.onHoldPointerMove)
+      document.removeEventListener('pointerup', this.onHoldPointerUp)
+      document.removeEventListener('pointercancel', this.onHoldPointerUp)
+    } else {
+      document.removeEventListener('touchmove', this.onHoldPointerMove)
+      document.removeEventListener('touchend', this.onHoldPointerUp)
+      document.removeEventListener('touchcancel', this.onHoldPointerUp)
+      document.removeEventListener('mousemove', this.onHoldPointerMove)
+      document.removeEventListener('mouseup', this.onHoldPointerUp)
+    }
+  }
+
+  private onLostPointerCapture = (e: Event): void => {
+    if (!this.holdActive && !this.holdPending) return
+    if (!(e instanceof PointerEvent)) return
+    if (this.holdPointerId !== null && e.pointerId !== this.holdPointerId) return
+    this.finishHold()
+  }
+
+  private onHoldPointerMove = (e: TouchEvent | MouseEvent | PointerEvent): void => {
+    if (!this.holdPending || !this.holdConfig) return
+    const point = this.getPointerPosition(e)
+    if (!point) return
+    const dx = point.x - this.holdStartX
+    const dy = point.y - this.holdStartY
+    const distance = Math.hypot(dx, dy)
+    const threshold = this.holdConfig.moveThreshold ?? this.MIN_DRAG_DISTANCE
+    if (distance > threshold) {
+      this.cancelHoldTracking()
+    }
+  }
+
+  private onHoldPointerUp = (e: TouchEvent | MouseEvent | PointerEvent): void => {
+    if (!this.holdPending && !this.holdActive) return
+    if ('pointerId' in e && this.holdPointerId !== null && e.pointerId !== this.holdPointerId) return
+    this.finishHold()
+  }
+
+  private getPointerType(e: TouchEvent | MouseEvent | PointerEvent): string {
+    if ('pointerType' in e) return e.pointerType || 'mouse'
+    if ('touches' in e) return 'touch'
+    return 'mouse'
+  }
+
+  private cancelHoldTracking(): void {
+    if (this.holdTimer !== null) {
+      window.clearTimeout(this.holdTimer)
+      this.holdTimer = null
+    }
+    this.holdPending = false
+    this.removeHoldDocumentEvents()
+    this.releaseHoldPointerCapture()
+    this.holdPointerId = null
+  }
+
+  private finishHold(): void {
+    const wasActive = this.holdActive
+    this.cancelHoldTracking()
+    this.holdActive = false
+    if (!wasActive) return
+
+    const autoplay = this.tvist.getModule('autoplay') as { resume?: () => void } | undefined
+    autoplay?.resume?.()
+    const video = this.tvist.getModule('video') as { resumeActiveAfterHold?: () => void } | undefined
+    video?.resumeActiveAfterHold?.()
+    const endIndex = this.tvist.realIndex ?? this.tvist.activeIndex
+    this.emit('longPressEnd', {
+      index: endIndex,
+      pointerType: this.holdPointerType,
+    })
+    this.dispatchLongPressSlideDomEvent(
+      TVIST_DOM_EVENTS.longPressEnd,
+      endIndex,
+      this.holdPointerType,
+    )
+  }
+
+  private resolveHoldSlideEl(index: number): HTMLElement | null {
+    const byAttr = this.tvist.root.querySelector<HTMLElement>(
+      `[data-tvist-slide-index="${index}"]`,
+    )
+    if (byAttr) return byAttr
+    return this.tvist.slides[index] ?? null
+  }
+
+  private dispatchLongPressSlideDomEvent(
+    eventName: (typeof TVIST_DOM_EVENTS)[keyof typeof TVIST_DOM_EVENTS],
+    index: number,
+    pointerType: string,
+  ): void {
+    const el = this.resolveHoldSlideEl(index)
+    if (!el) return
+    el.dispatchEvent(
+      new CustomEvent<TvistLongPressDomEventDetail>(eventName, {
+        bubbles: false,
+        composed: false,
+        detail: { index, pointerType },
+      }),
+    )
+  }
+
+  private releaseHoldPointerCapture(): void {
+    if (
+      this.holdPointerId !== null &&
+      this.holdCaptureTarget &&
+      'hasPointerCapture' in this.holdCaptureTarget &&
+      this.holdCaptureTarget.hasPointerCapture(this.holdPointerId)
+    ) {
+      try {
+        this.holdCaptureTarget.releasePointerCapture(this.holdPointerId)
+      } catch {
+        // noop
+      }
+    }
+    this.holdCaptureTarget = null
   }
 
   /**
@@ -357,6 +638,9 @@ export class DragModule extends Module {
     // Если еще не начали драг, проверяем threshold
     if (!this.isDragging) {
       if (absDelta > this.MIN_DRAG_DISTANCE) {
+        if (this.holdConfig?.cancelOnDrag !== false) {
+          this.finishHold()
+        }
         this.isDragging = true
         
         // Запрещаем клики при начале реального драга
@@ -1115,6 +1399,10 @@ export class DragModule extends Module {
    * Хук при динамическом обновлении опций (updateOptions)
    */
   override onOptionsUpdate(): void {
+    // Как при обычном окончании hold: иначе autoplay/video остаются на паузе, holdActive — true
+    this.finishHold()
+    this.detachHoldEvents()
+    this.setupHoldToPause()
     this.updateCachedRefs()
     this.updateBounds()
   }

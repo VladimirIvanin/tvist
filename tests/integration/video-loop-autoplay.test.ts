@@ -3,12 +3,13 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { TVIST_CLASSES } from '@core/constants'
+import { HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS, TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '@core/Tvist'
 // Импортируем модули для автоматической регистрации
 import '../../src/modules/video'
 import '../../src/modules/autoplay'
 import '../../src/modules/loop'
+import '../../src/modules/drag'
 
 /**
  * Создать mock <video> элемент с базовыми свойствами.
@@ -325,6 +326,113 @@ describe('VideoModule + LoopModule + AutoplayModule Integration', () => {
       // slideChangeStart вызван (DOM-индекс может отличаться от realIndex)
       expect(slideChangeSpy).toHaveBeenCalled()
 
+      slider.destroy()
+    })
+  })
+
+  describe('Stories hold + unified progress', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('should bridge videoProgress to autoplayProgress while waitForVideo is active', async () => {
+      container.innerHTML = createSliderHTML([
+        '<video src="video1.mp4"></video>',
+        '<div>Image</div>',
+      ])
+
+      const root = container.querySelector(`.${TVIST_CLASSES.block}`)!
+      mockVideos(root as HTMLElement)
+      const autoplayProgressSpy = vi.fn()
+
+      const slider = new Tvist(root, {
+        perPage: 1,
+        loop: false,
+        video: {
+          autoplay: true,
+          muted: true,
+        },
+        autoplay: {
+          delay: 1000,
+          waitForVideo: true,
+        },
+        on: {
+          autoplayProgress: autoplayProgressSpy,
+        },
+      })
+
+      await new Promise(resolve => setTimeout(resolve, 10))
+      slider.emit('videoProgress', { progress: 0.5, index: 0 })
+
+      expect(autoplayProgressSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ progress: 0, index: 0 })
+      )
+      expect(autoplayProgressSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ progress: 0.5, index: 0 })
+      )
+
+      slider.destroy()
+    })
+
+    it('should pause and resume active video on long press', async () => {
+      vi.useFakeTimers()
+      container.innerHTML = createSliderHTML([
+        '<video src="video1.mp4"></video>',
+        '<div>Image</div>',
+      ])
+
+      const root = container.querySelector(`.${TVIST_CLASSES.block}`)!
+      mockVideos(root as HTMLElement)
+
+      const slider = new Tvist(root, {
+        perPage: 1,
+        loop: false,
+        holdToPause: true,
+        video: {
+          autoplay: true,
+          muted: true,
+        },
+        autoplay: {
+          delay: 1000,
+          waitForVideo: true,
+        },
+      })
+
+      const video = slider.slides[0].querySelector('video')!
+      const pauseSpy = vi.spyOn(video, 'pause').mockImplementation(() => {
+        Object.defineProperty(video, 'paused', { value: true, writable: true, configurable: true })
+      })
+      const playSpy = vi.spyOn(video, 'play').mockResolvedValue(undefined)
+      Object.defineProperty(video, 'paused', { value: false, writable: true, configurable: true })
+
+      root.dispatchEvent(
+        new PointerEvent('pointerdown', {
+          clientX: 120,
+          clientY: 80,
+          pointerId: 1,
+          bubbles: true,
+          cancelable: true,
+          pointerType: 'touch',
+          isPrimary: true,
+        })
+      )
+      vi.advanceTimersByTime(HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS + 1)
+
+      expect(pauseSpy).toHaveBeenCalled()
+
+      document.dispatchEvent(
+        new PointerEvent('pointerup', {
+          clientX: 120,
+          clientY: 80,
+          pointerId: 1,
+          bubbles: true,
+          cancelable: true,
+          pointerType: 'touch',
+          isPrimary: true,
+        })
+      )
+
+      expect(playSpy).toHaveBeenCalled()
       slider.destroy()
     })
   })

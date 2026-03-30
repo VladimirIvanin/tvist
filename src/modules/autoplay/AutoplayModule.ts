@@ -25,7 +25,7 @@
 
 import { Module } from '../Module'
 import type { Tvist } from '../../core/Tvist'
-import type { TvistOptions, AutoplayOptions } from '../../core/types'
+import type { AutoplayProgressEvent, TvistOptions, AutoplayOptions } from '../../core/types'
 
 /** Дефолтные значения для AutoplayOptions */
 const AUTOPLAY_DEFAULTS: Required<AutoplayOptions> = {
@@ -96,15 +96,35 @@ export class AutoplayModule extends Module {
   private waitingForVideo = false
   private videoEndedWhilePaused = false  // видео закончилось пока autoplay на паузе (hover)
   private videoEndedHandler?: () => void
+  private videoProgressHandler?: (data: { progress: number; index: number }) => void
 
   /** Переход был инициирован autoplay (next() из таймера или videoEnded). Не сбрасываем таймер на slideChangeEnd. */
   private transitionByAutoplay = false
   /** Таймаут для сброса transitionByAutoplay, если next() не привёл к переходу (например, слайдер на границе). */
   private clearTransitionByAutoplayTimeout: number | null = null
+  /** Проверка, что autoplay next() реально привёл к смене слайда. */
+  private boundaryCheckTimeout: number | null = null
+  /** Момент последнего slideChangeEnd (нужен для корректного boundary тайминга). */
+  private lastSlideChangeEndAt: number | null = null
+  /** Момент последнего autoplay next(). */
+  private lastAutoplayNextAt: number | null = null
+  /** Диагностика последовательности autoplayProgress */
+  private lastProgressIndex: number | null = null
+  private lastProgressValue: number | null = null
+  private lastProgressAt: number | null = null
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
     this.config = normalizeAutoplay(this.options.autoplay)
+  }
+
+  private isDebugEnabled(): boolean {
+    return this.options.debug === true
+  }
+
+  private debugLog(message: string, data: Record<string, unknown> = {}): void {
+    if (!this.isDebugEnabled()) return
+    console.warn('[AutoplayModule]', message, data)
   }
 
   override init(): void {
@@ -119,10 +139,12 @@ export class AutoplayModule extends Module {
     this.stop()
     this.clearDragEndTimeout()
     this.clearTransitionByAutoplayFallback()
+    this.clearBoundaryCheckTimeout()
     this.stopProgressTracking()
     this.detachHoverEvents()
     this.detachVisibilityEvents()
     this.detachVideoEndedListener()
+    this.detachVideoProgressListener()
   }
 
   public override shouldBeActive(): boolean {
@@ -156,6 +178,7 @@ export class AutoplayModule extends Module {
         this.detachHoverEvents()
         this.detachVisibilityEvents()
         this.detachVideoEndedListener()
+        this.detachVideoProgressListener()
         this.stopped = true
       }
       // Если autoplay был включен и остается включен (но изменились настройки)
@@ -172,6 +195,11 @@ export class AutoplayModule extends Module {
           this.videoEndedWhilePaused = false
           this.detachVideoEndedListener()
         }
+        if (this.config.waitForVideo) {
+          this.attachVideoProgressBridge()
+        } else {
+          this.detachVideoProgressListener()
+        }
         
         this.start() // Перезапускаем с новой задержкой
       }
@@ -186,6 +214,13 @@ export class AutoplayModule extends Module {
     if (this.clearTransitionByAutoplayTimeout !== null) {
       window.clearTimeout(this.clearTransitionByAutoplayTimeout)
       this.clearTransitionByAutoplayTimeout = null
+    }
+  }
+
+  private clearBoundaryCheckTimeout(): void {
+    if (this.boundaryCheckTimeout !== null) {
+      window.clearTimeout(this.boundaryCheckTimeout)
+      this.boundaryCheckTimeout = null
     }
   }
 
@@ -250,6 +285,8 @@ export class AutoplayModule extends Module {
       this.attachHoverEvents()
     }
 
+    this.attachVideoProgressBridge()
+
     // Всегда ставим на паузу при драге (не только при pauseOnInteraction),
     // иначе таймер может вызвать next() во время/сразу после драга (rewind к 0)
     // и перебить snap к нужному слайду — пагинация тогда расходится с кадром
@@ -304,30 +341,62 @@ export class AutoplayModule extends Module {
     // При смене слайда: при ручной навигации (стрелки, пагинация и т.д.) сбрасываем таймер,
     // чтобы новый слайд показывался полное время delay, а не остаток от предыдущего счётчика
     this.on('slideChangeEnd', (index: number) => {
-      // Сохраняем значение флага ДО его сброса
       const byAutoplay = this.transitionByAutoplay
+      const now = performance.now()
+      if (byAutoplay && this.lastAutoplayNextAt !== null) {
+        const speed = this.options.speed ?? 300
+        this.lastSlideChangeEndAt = Math.max(now, this.lastAutoplayNextAt + speed)
+      } else {
+        this.lastSlideChangeEndAt = now
+      }
       
       // Сбрасываем флаг и отменяем fallback
       if (this.transitionByAutoplay) {
         this.transitionByAutoplay = false
         this.clearTransitionByAutoplayFallback()
+        this.clearBoundaryCheckTimeout()
       }
       
-      // Если переход был НЕ от autoplay (ручная навигация), сбрасываем таймер
-      if (!byAutoplay && !this.paused && !this.stopped) {
+      // Для ручной навигации новый цикл стартует здесь.
+      // Для autoplay-переходов цикл продолжается рекурсивно в run(),
+      // чтобы delay не зависел от длительности анимации.
+      if (!this.paused && !this.stopped) {
         this.cancelTimer()
         this.timeLeft = null
         this.progressStartOffset = 0
         this.stopProgressTracking()
         if (this.config?.waitForVideo) {
           this.handleSlideChangedForVideo(index)
-        } else {
+        } else if (!byAutoplay) {
           this.run()
+        } else if (this.config && !this.options.loop && this.config.delay < (this.options.speed ?? 300)) {
+          // При очень коротком delay и включённой анимации ждём slideChangeEnd,
+          // чтобы следующий autoplay-тик не успел выполниться до окончания текущего перехода.
+          this.run()
+        } else {
+          // autoplay режим без waitForVideo: следующий цикл запланирован в run()
         }
-      } else if (this.config?.waitForVideo) {
+      } else if (!byAutoplay && this.config?.waitForVideo) {
         this.handleSlideChangedForVideo(index)
       }
     })
+  }
+
+  private attachVideoProgressBridge(): void {
+    if (!this.config?.waitForVideo) return
+
+    this.detachVideoProgressListener()
+    this.videoProgressHandler = (data: { progress: number; index: number }) => {
+      if (!this.waitingForVideo || this.stopped) return
+      this.emitAutoplayProgress(data.index, Math.min(Math.max(data.progress, 0), 1))
+    }
+    this.on('videoProgress', this.videoProgressHandler)
+  }
+
+  private detachVideoProgressListener(): void {
+    if (!this.videoProgressHandler) return
+    this.off('videoProgress', this.videoProgressHandler)
+    this.videoProgressHandler = undefined
   }
 
   /**
@@ -373,6 +442,7 @@ export class AutoplayModule extends Module {
     this.waitingForVideo = true
     this.cancelTimer()
     this.stopProgressTracking()
+    this.emitAutoplayProgress(index, 0)
 
     this.videoEndedHandler = () => {
       if (this.stopped || !this.waitingForVideo) {
@@ -384,6 +454,7 @@ export class AutoplayModule extends Module {
         this.videoEndedWhilePaused = true
         return
       }
+      this.emitAutoplayProgress(this.tvist.realIndex ?? this.tvist.activeIndex, 1)
       this.waitingForVideo = false
       
       // Запоминаем индекс до навигации
@@ -527,20 +598,77 @@ export class AutoplayModule extends Module {
         
         // Запоминаем индекс до навигации
         const indexBefore = this.tvist.activeIndex
+        const slidesPerPage = this.options.perPage ?? 1
+        const endIndex = Math.max(0, this.tvist.slides.length - slidesPerPage)
+        const boundaryAttempt = !this.options.loop && !this.options.rewind && indexBefore >= endIndex
         
         this.transitionByAutoplay = true
+        this.lastAutoplayNextAt = performance.now()
         this.tvist.next()
         
-        // Проверяем, изменился ли индекс (произошла ли навигация)
-        // Если индекс не изменился (граница без loop), сбрасываем флаг немедленно
-        if (this.tvist.activeIndex === indexBefore) {
+        // На заведомой границе (без loop/rewind) next() не изменит индекс.
+        // Флаг нужно сбросить сразу, иначе ручная навигация попадёт в false-positive "autoplay".
+        if (boundaryAttempt) {
           this.transitionByAutoplay = false
-          // Не планируем fallback, т.к. переход не произошёл
+          this.clearTransitionByAutoplayFallback()
         } else {
           this.scheduleTransitionByAutoplayFallback()
         }
-        
-        this.run() // Рекурсивный вызов после переключения
+        // Продолжаем autoplay цикл рекурсивно сразу после попытки перехода.
+        // В не-loop режиме при delay < speed продолжаем цикл из slideChangeEnd.
+        const speed = this.options.speed ?? 300
+        if (!this.config?.waitForVideo) {
+          if (this.config && !this.options.loop && this.config.delay < speed) {
+            // no-op: continue from slideChangeEnd
+          } else {
+            this.run()
+          }
+        }
+
+        this.clearBoundaryCheckTimeout()
+        const boundaryDelay = speed === 0 ? 0 : speed + 20
+        this.boundaryCheckTimeout = window.setTimeout(() => {
+          this.boundaryCheckTimeout = null
+          if (this.paused || this.stopped) return
+
+          // Если после ожидаемой длительности перехода индекс всё ещё тот же,
+          // считаем, что next() уткнулся в границу без loop.
+          if (this.tvist.activeIndex !== indexBefore) return
+
+          // reachEnd должен приходить только после полного показа последнего слайда:
+          // delay + время проверки границы от момента slideChangeEnd.
+          if (this.lastSlideChangeEndAt !== null && this.config) {
+            const minElapsed = this.config.delay + boundaryDelay
+            const elapsed = performance.now() - this.lastSlideChangeEndAt
+            if (elapsed < minElapsed) {
+              this.boundaryCheckTimeout = window.setTimeout(() => {
+                this.boundaryCheckTimeout = null
+                if (this.paused || this.stopped) return
+                if (this.tvist.activeIndex !== indexBefore) return
+                this.transitionByAutoplay = false
+                this.clearTransitionByAutoplayFallback()
+                this.emitAutoplayProgress(this.tvist.realIndex ?? this.tvist.activeIndex, 1)
+                if (!this.options.loop) {
+                  this.tvist.emit('reachEnd')
+                }
+                this.stop()
+              }, Math.max(0, Math.ceil(minElapsed - elapsed)))
+              return
+            }
+          }
+
+          this.transitionByAutoplay = false
+          this.clearTransitionByAutoplayFallback()
+          this.emitAutoplayProgress(this.tvist.realIndex ?? this.tvist.activeIndex, 1)
+          if (!this.options.loop) {
+            this.tvist.emit('reachEnd')
+          }
+          this.stop()
+          this.debugLog('autoplay boundary reached (no index change)', {
+            indexBefore,
+            loop: this.options.loop === true,
+          })
+        }, boundaryDelay)
       }
     }, delay)
   }
@@ -549,7 +677,7 @@ export class AutoplayModule extends Module {
     this.stopProgressTracking()
 
     if (timeLeft <= 0) {
-      this.emit('autoplayProgress', { progress: 1, index: this.tvist.activeIndex })
+      this.emitAutoplayProgress(this.tvist.activeIndex, 1)
       return
     }
 
@@ -567,10 +695,7 @@ export class AutoplayModule extends Module {
       let progress = startOffset + (chunkProgress * (timeLeft / totalDuration))
       progress = Math.min(progress, 1)
 
-      this.emit('autoplayProgress', {
-        progress,
-        index: this.tvist.activeIndex,
-      })
+      this.emitAutoplayProgress(this.tvist.activeIndex, progress)
 
       if (progress < 1 && !this.paused && !this.stopped) {
         this.progressRAF = requestAnimationFrame(tick)
@@ -578,6 +703,45 @@ export class AutoplayModule extends Module {
     }
 
     this.progressRAF = requestAnimationFrame(tick)
+  }
+
+  private emitAutoplayProgress(index: number, progress: number): void {
+    const now = performance.now()
+    const previousIndex = this.lastProgressIndex
+    const previousValue = this.lastProgressValue
+    const previousAt = this.lastProgressAt
+
+    if (previousIndex !== null && previousValue !== null && previousAt !== null) {
+      const deltaMs = now - previousAt
+      const decreasedInSameIndex = previousIndex === index && progress + 0.001 < previousValue
+      const sameIndexWrap = previousIndex === index && previousValue > 0.95 && progress < 0.05
+
+      if (decreasedInSameIndex) {
+        this.debugLog('progress decreased in same index', {
+          index,
+          prev: Number(previousValue.toFixed(4)),
+          next: Number(progress.toFixed(4)),
+          deltaMs: Number(deltaMs.toFixed(2)),
+          waitingForVideo: this.waitingForVideo,
+          paused: this.paused,
+          stopped: this.stopped,
+          sameIndexWrap,
+        })
+      }
+    }
+
+    this.lastProgressIndex = index
+    this.lastProgressValue = progress
+    this.lastProgressAt = now
+
+    const payload: AutoplayProgressEvent = {
+      progress,
+      index,
+      segmentIndex: index,
+      segmentProgress: progress,
+      totalSegments: this.tvist.slides.length,
+    }
+    this.emit('autoplayProgress', payload)
   }
 
   /**
@@ -628,6 +792,7 @@ export class AutoplayModule extends Module {
   stop(): void {
     this.cancelTimer()
     this.clearTransitionByAutoplayFallback()
+    this.clearBoundaryCheckTimeout()
     this.stopProgressTracking()
     this.emit('autoplayStop')
   }

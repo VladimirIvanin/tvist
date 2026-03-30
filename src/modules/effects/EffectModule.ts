@@ -8,15 +8,23 @@ import { setCubeEffect } from './cube'
 export class EffectModule extends Module {
   name = 'effect'
   private slideProgress = new WeakMap<HTMLElement, number>()
+  private currentEffect: TvistOptions['effect'] = 'slide'
+  private readonly setTranslateHandler = this.onSetTranslate.bind(this)
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
   }
 
+  override shouldBeActive(): boolean {
+    return this.options.effect === 'fade' || this.options.effect === 'cube'
+  }
+
   init(): void {
-    if (!this.options.effect || this.options.effect === 'slide') {
+    if (!this.shouldBeActive()) {
       return
     }
+
+    this.currentEffect = this.options.effect
 
     // Effects require perPage: 1
     if (this.options.perPage !== 1) {
@@ -31,39 +39,31 @@ export class EffectModule extends Module {
     
     // Set container styles for 3D
     if (this.options.effect === 'cube') {
-        this.tvist.container.style.transformStyle = 'preserve-3d'
-        this.tvist.root.classList.add(TVIST_CLASSES.cube)
-        // root keeps overflow: hidden from _base.scss — clips 3D faces to viewport
-        const padding = this.options.cubeEffect?.viewportPadding ?? 10
-        this.tvist.root.style.padding = `${padding}px`
-        this.tvist.root.style.boxSizing = 'border-box'
+      this.applyCubeRootStyles()
     }
 
-    this.tvist.on('setTranslate', this.onSetTranslate.bind(this))
+    this.tvist.on('setTranslate', this.setTranslateHandler)
   }
 
   destroy(): void {
-    this.tvist.off('setTranslate', this.onSetTranslate.bind(this))
-    
-    // Reset styles
-    this.tvist.slides.forEach(slide => {
-        slide.style.opacity = ''
-        slide.style.transform = ''
-        slide.style.zIndex = ''
-        slide.style.backfaceVisibility = ''
-        slide.style.contentVisibility = ''
-        slide.style.visibility = ''
-    })
-    this.tvist.container.style.transformStyle = ''
-    this.tvist.container.style.width = ''
-    this.tvist.container.style.height = ''
-    this.tvist.root.style.removeProperty('perspective')
-    this.tvist.root.style.removeProperty('-webkit-perspective')
-    this.tvist.root.style.removeProperty('perspective-origin')
-    this.tvist.root.style.removeProperty('overflow')
-    this.tvist.root.style.removeProperty('padding')
-    this.tvist.root.style.removeProperty('box-sizing')
-    this.tvist.root.classList.remove(TVIST_CLASSES.cube)
+    this.tvist.off('setTranslate', this.setTranslateHandler)
+    this.cleanupEffectStyles(this.currentEffect)
+    this.currentEffect = 'slide'
+  }
+
+  override onOptionsUpdate(): void {
+    const nextEffect = this.options.effect ?? 'slide'
+
+    if (nextEffect === this.currentEffect) {
+      return
+    }
+
+    this.cleanupEffectStyles(this.currentEffect)
+    this.currentEffect = nextEffect
+
+    if (nextEffect === 'cube') {
+      this.applyCubeRootStyles()
+    }
   }
 
   private onSetTranslate(_tvist: Tvist, translate: number): void {
@@ -84,6 +84,42 @@ export class EffectModule extends Module {
     
     if (this.options.effect === 'cube') {
         setCubeEffect(this.tvist, translate, this.options)
+    }
+  }
+
+  private applyCubeRootStyles(): void {
+    this.tvist.container.style.transformStyle = 'preserve-3d'
+    this.tvist.root.classList.add(TVIST_CLASSES.cube)
+    const padding = this.options.cubeEffect?.viewportPadding ?? 10
+    this.tvist.root.style.padding = `${padding}px`
+    this.tvist.root.style.boxSizing = 'border-box'
+  }
+
+  private cleanupEffectStyles(effect: TvistOptions['effect']): void {
+    this.tvist.slides.forEach((slide) => {
+      slide.style.opacity = ''
+      slide.style.transform = ''
+      slide.style.zIndex = ''
+      slide.style.backfaceVisibility = ''
+      slide.style.contentVisibility = ''
+      slide.style.visibility = ''
+      slide.querySelectorAll(`.${TVIST_CLASSES.block}-slide-shadow-cube`).forEach((shadow) => {
+        shadow.remove()
+      })
+    })
+
+    if (effect === 'cube') {
+      this.tvist.container.style.transformStyle = ''
+      this.tvist.container.style.width = ''
+      this.tvist.container.style.height = ''
+      this.tvist.container.style.transformOrigin = ''
+      this.tvist.root.style.removeProperty('perspective')
+      this.tvist.root.style.removeProperty('-webkit-perspective')
+      this.tvist.root.style.removeProperty('perspective-origin')
+      this.tvist.root.style.removeProperty('overflow')
+      this.tvist.root.style.removeProperty('padding')
+      this.tvist.root.style.removeProperty('box-sizing')
+      this.tvist.root.classList.remove(TVIST_CLASSES.cube)
     }
   }
 }

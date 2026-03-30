@@ -237,7 +237,11 @@ describe('VideoModule', () => {
 
       // Устанавливаем duration и currentTime
       Object.defineProperty(video, 'duration', { value: 10, configurable: true })
-      Object.defineProperty(video, 'currentTime', { value: 5, configurable: true })
+      Object.defineProperty(video, 'currentTime', {
+        value: 5,
+        writable: true,
+        configurable: true,
+      })
 
       video.dispatchEvent(new Event('timeupdate'))
 

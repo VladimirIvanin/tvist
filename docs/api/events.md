@@ -30,6 +30,8 @@
 - [`dragStart`](#dragstart) — начало перетаскивания
 - [`drag`](#drag) — во время перетаскивания
 - [`dragEnd`](#dragend) — конец перетаскивания
+- [`longPressStart`](#longpressstart) — начало удержания (hold)
+- [`longPressEnd`](#longpressend) — конец удержания (hold)
 
 ### Состояние и обновления
 - [`resized`](#resized) — завершилось изменение размера контейнера
@@ -378,6 +380,36 @@ slider.on('dragEnd', () => {
 })
 ```
 
+### longPressStart
+
+```typescript
+longPressStart: (data: { index: number; pointerType: string }) => void
+```
+
+Вызывается после удержания указателя дольше `holdToPause.threshold` (по умолчанию **100 ms** при `holdToPause: true` или объекте без поля `threshold`). Требуется опция `holdToPause` (см. [опции слайдера](/api/options)).
+
+При старте отслеживания удержания всплытие `pointerdown` **останавливается** (`stopPropagation`), чтобы вложенный слайдер не будил родительский жест (например внешний слайдер групп).
+
+**DOM (опционально):** на соответствующем узле слайда диспатчится `CustomEvent` с именем из `TVIST_DOM_EVENTS.longPressStart` (`tvist-long-press-start`), `bubbles: false`, `composed: false`, `detail`: `{ index, pointerType }` — тип `TvistLongPressDomEventDetail`. Удобно подписаться в разметке на конкретном слайде без перехвата на родителе.
+
+```ts
+import { TVIST_DOM_EVENTS, type TvistLongPressDomEventDetail } from 'tvist'
+
+slideEl.addEventListener(TVIST_DOM_EVENTS.longPressStart, (e) => {
+  const { index, pointerType } = (e as CustomEvent<TvistLongPressDomEventDetail>).detail
+})
+```
+
+### longPressEnd
+
+```typescript
+longPressEnd: (data: { index: number; pointerType: string }) => void
+```
+
+Вызывается при отпускании (или `pointercancel` / потере захвата) после активного удержания. Autoplay и видео при необходимости возобновляются здесь же.
+
+**DOM:** аналогично, `TVIST_DOM_EVENTS.longPressEnd` (`tvist-long-press-end`), те же правила всплытия и `detail`.
+
 ## События обновления
 
 События, связанные с изменением состояния слайдера.
@@ -631,10 +663,21 @@ autoplayResume: () => void
 ### autoplayProgress
 
 ```typescript
-autoplayProgress: (data: { progress: number; index: number }) => void
+autoplayProgress: (data: {
+  progress: number
+  index: number
+  segmentIndex: number
+  segmentProgress: number
+  totalSegments: number
+}) => void
 ```
 
 Прогресс до следующего перехода: `progress` от 0 до 1, `index` — текущий активный слайд. Вызывается во время ожидания перед сменой слайда (и при ожидании окончания видео, если `waitForVideo: true`).
+
+Контракт для сценариев «историй»:
+- `progress` — прогресс **активного сегмента** (текущего слайда) в диапазоне `0..1`
+- при `waitForVideo: true` для HTML `<video>` источник прогресса — `videoProgress` (текущее время видео)
+- при `pause` (включая hold) значение замирает, после `resume` продолжается
 
 **Примеры:**
 

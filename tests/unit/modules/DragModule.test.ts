@@ -12,7 +12,13 @@
 
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest'
 import { Tvist } from '@core/Tvist'
+import {
+  HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS,
+  TVIST_CLASSES,
+  TVIST_DOM_EVENTS,
+} from '@core/constants'
 import { DragModule } from '@modules/drag/DragModule'
+import '../../../src/modules/autoplay'
 import {
   createSliderFixture,
   simulateDrag,
@@ -857,6 +863,228 @@ describe('DragModule', () => {
         createMouseEvent('mouseup', { clientX: 280, clientY: 200 })
       )
     })
+  })
+
+  describe('Long press (holdToPause)', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('должен эмитить longPressStart и longPressEnd после удержания', () => {
+      vi.useFakeTimers()
+      slider.updateOptions({
+        holdToPause: true,
+      })
+
+      const longPressStartSpy = vi.fn()
+      const longPressEndSpy = vi.fn()
+      slider.on('longPressStart', longPressStartSpy)
+      slider.on('longPressEnd', longPressEndSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      vi.advanceTimersByTime(HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS + 1)
+
+      expect(longPressStartSpy).toHaveBeenCalledOnce()
+
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 200, clientY: 100 })
+      )
+      expect(longPressEndSpy).toHaveBeenCalledOnce()
+    })
+
+    it('должен использовать дефолтный threshold из HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS при holdToPause: true', () => {
+      vi.useFakeTimers()
+      slider.updateOptions({ holdToPause: true })
+      const longPressStartSpy = vi.fn()
+      slider.on('longPressStart', longPressStartSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      vi.advanceTimersByTime(HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS - 1)
+      expect(longPressStartSpy).not.toHaveBeenCalled()
+      vi.advanceTimersByTime(1)
+      expect(longPressStartSpy).toHaveBeenCalledOnce()
+    })
+
+    it('не должен запускать long press при отпускании до threshold', () => {
+      vi.useFakeTimers()
+      slider.updateOptions({
+        holdToPause: true,
+      })
+
+      const longPressStartSpy = vi.fn()
+      slider.on('longPressStart', longPressStartSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      vi.advanceTimersByTime(HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS - 1)
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 200, clientY: 100 })
+      )
+      vi.advanceTimersByTime(300)
+
+      expect(longPressStartSpy).not.toHaveBeenCalled()
+    })
+
+    it('должен отменять long press при начале drag', () => {
+      vi.useFakeTimers()
+      slider.updateOptions({
+        holdToPause: true,
+      })
+
+      const longPressStartSpy = vi.fn()
+      slider.on('longPressStart', longPressStartSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 140, clientY: 100 })
+      )
+      vi.advanceTimersByTime(400)
+
+      expect(longPressStartSpy).not.toHaveBeenCalled()
+    })
+
+    it('должен снимать паузу autoplay и эмитить longPressEnd при updateOptions во время активного hold', () => {
+      vi.useFakeTimers()
+      slider.destroy()
+      slider = new Tvist(fixture.root, {
+        drag: true,
+        speed: 300,
+        autoplay: true,
+        holdToPause: true,
+      })
+
+      const longPressEndSpy = vi.fn()
+      slider.on('longPressEnd', longPressEndSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      vi.advanceTimersByTime(HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS + 1)
+
+      expect(slider.autoplay?.isPaused()).toBe(true)
+
+      slider.updateOptions({ perPage: 1 })
+
+      expect(slider.autoplay?.isPaused()).toBe(false)
+      expect(longPressEndSpy).toHaveBeenCalledOnce()
+    })
+
+    it('должен диспатчить tvist-long-press-start на слайд без всплытия к root', () => {
+      vi.useFakeTimers()
+      slider.updateOptions({ holdToPause: true })
+
+      const slide = fixture.slides[0]
+      const rootSpy = vi.fn()
+      const slideDetail = vi.fn()
+
+      fixture.root.addEventListener(TVIST_DOM_EVENTS.longPressStart, rootSpy)
+      slide.addEventListener(TVIST_DOM_EVENTS.longPressStart, (ev) => {
+        slideDetail({
+          bubbles: ev.bubbles,
+          composed: ev.composed,
+          detail: (ev as CustomEvent).detail,
+        })
+      })
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      vi.advanceTimersByTime(HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS + 1)
+
+      expect(slideDetail).toHaveBeenCalledOnce()
+      expect(slideDetail.mock.calls[0][0]).toMatchObject({
+        bubbles: false,
+        composed: false,
+        detail: { index: 0, pointerType: 'mouse' },
+      })
+      expect(rootSpy).not.toHaveBeenCalled()
+    })
+
+    it('должен диспатчить tvist-long-press-end на слайде при отпускании после hold', () => {
+      vi.useFakeTimers()
+      slider.updateOptions({ holdToPause: true })
+
+      const slide = fixture.slides[0]
+      const endSpy = vi.fn()
+
+      slide.addEventListener(TVIST_DOM_EVENTS.longPressEnd, endSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      vi.advanceTimersByTime(HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS + 1)
+
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 200, clientY: 100 })
+      )
+
+      expect(endSpy).toHaveBeenCalledOnce()
+      const ev = endSpy.mock.calls[0][0] as CustomEvent
+      expect(ev.bubbles).toBe(false)
+      expect(ev.detail).toEqual({ index: 0, pointerType: 'mouse' })
+    })
+  })
+})
+
+describe('DragModule — holdToPause: pointerdown не всплывает к родительскому слайдеру', () => {
+  beforeEach(() => {
+    Tvist.registerModule('drag', DragModule)
+  })
+
+  afterEach(() => {
+    Tvist.unregisterModule('drag')
+  })
+
+  it('родительский root не получает pointerdown при hold на вложенном слайдере', () => {
+    vi.useFakeTimers()
+    const outer = createSliderFixture({ slidesCount: 1, width: 600, height: 400 })
+
+    const innerRoot = document.createElement('div')
+    innerRoot.className = TVIST_CLASSES.block
+    innerRoot.style.width = '500px'
+    innerRoot.style.height = '300px'
+    const innerContainer = document.createElement('div')
+    innerContainer.className = TVIST_CLASSES.container
+    const innerSlide = document.createElement('div')
+    innerSlide.className = TVIST_CLASSES.slide
+    innerSlide.textContent = 'inner'
+    innerSlide.style.width = '500px'
+    innerSlide.style.height = '300px'
+    innerContainer.appendChild(innerSlide)
+    innerRoot.appendChild(innerContainer)
+    outer.slides[0].appendChild(innerRoot)
+
+    Object.defineProperty(innerRoot, 'offsetWidth', { configurable: true, value: 500 })
+    Object.defineProperty(innerRoot, 'offsetHeight', { configurable: true, value: 300 })
+    Object.defineProperty(innerContainer, 'offsetWidth', { configurable: true, value: 500 })
+    Object.defineProperty(innerContainer, 'clientWidth', { configurable: true, value: 500 })
+    Object.defineProperty(innerSlide, 'offsetWidth', { configurable: true, value: 500 })
+    Object.defineProperty(innerSlide, 'offsetHeight', { configurable: true, value: 300 })
+
+    const outerSlider = new Tvist(outer.root, { drag: true, speed: 0 })
+    const innerSlider = new Tvist(innerRoot, { drag: true, holdToPause: true, speed: 0 })
+
+    const outerPointerDown = vi.fn()
+    outer.root.addEventListener('pointerdown', outerPointerDown)
+
+    innerSlide.dispatchEvent(
+      createMouseEvent('mousedown', { clientX: 120, clientY: 80, bubbles: true })
+    )
+    vi.advanceTimersByTime(HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS + 1)
+
+    expect(outerPointerDown).not.toHaveBeenCalled()
+
+    innerSlider.destroy()
+    outerSlider.destroy()
+    outer.cleanup()
+    vi.useRealTimers()
   })
 })
 
