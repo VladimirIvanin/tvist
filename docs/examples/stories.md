@@ -20,7 +20,7 @@ import StoriesDocExample from '../.vitepress/theme/examples/StoriesDocExample.vu
 const slider = new Tvist('.tvist-v1', {
   holdToPause: {
     enabled: true,
-    threshold: 300,
+    threshold: 100,
     root: 'slider',
     exclude: '[data-tvist-no-hold]',
     cancelOnDrag: true,
@@ -87,4 +87,6 @@ document.querySelector('[data-story-next]')?.addEventListener('click', () => {
 - внешний слайдер групп: `autoplay: false`
 - внутренний слайдер медиа: `autoplay + holdToPause + waitForVideo`
 
-Это упрощает синхронизацию и исключает конфликт таймеров между уровнями.
+Это упрощает синхронизацию и исключает конфликт таймеров между уровнями. Для hold на внутреннем слайдере `pointerdown` не всплывает к родителю; дополнительно на слайде можно слушать DOM `CustomEvent` из `TVIST_DOM_EVENTS` ([события API](/api/events#longpressstart)).
+
+Если поверх карточки лежат свои зоны «назад / вперёд», они перехватывают касания — удержание для паузы сработает только там, где событие доходит до root внутреннего слайдера (например центральная полоса, если боковые заняты оверлеями).

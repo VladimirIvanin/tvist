@@ -19,6 +19,12 @@ declare module './Tvist' {
 /**
  * Аргументы метода {@link Tvist.destroy}
  */
+/** `detail` для DOM CustomEvent long press на слайде (имена в `TVIST_DOM_EVENTS`) */
+export interface TvistLongPressDomEventDetail {
+  index: number
+  pointerType: string
+}
+
 export interface TvistDestroyOptions {
   /**
    * Уничтожать вложенные экземпляры Tvist (потомки с классом блока).
@@ -164,8 +170,8 @@ export interface HoldToPauseOptions {
   enabled?: boolean
 
   /**
-   * Порог удержания в миллисекундах
-   * @default 300
+   * Порог удержания в миллисекундах.
+   * Дефолт при отсутствии поля — `HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS` из `core/constants`.
    */
   threshold?: number
 

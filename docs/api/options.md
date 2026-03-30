@@ -35,6 +35,7 @@
 - `focusableElements` — CSS-селектор элементов, сохраняющих фокус при перетаскивании
 - `preventClicks` — блокировать клики по слайдам во время перетаскивания
 - `preventClicksPropagation` — не всплывать клику во время анимации
+- `holdToPause` — пауза autoplay (и при необходимости видео) по долгому нажатию: `true` или объект `HoldToPauseOptions` с полями `threshold` (по умолчанию **100 ms**), `root`, `exclude`, `cancelOnDrag`. События экземпляра: [`longPressStart` / `longPressEnd`](/api/events#longpressstart); на узле слайда дополнительно диспатчатся DOM `CustomEvent` без всплытия — константы `TVIST_DOM_EVENTS`, тип `TvistLongPressDomEventDetail` (см. [TypeScript](/api/typescript#tvistoptions), [события](/api/events#longpressstart))
 
 ### Навигация
 
@@ -265,6 +266,7 @@ slider
 - `drag` - включение/отключение перетаскивания
 - `dragSpeed` - скорость перетаскивания
 - `rubberband` - эффект резинки
+- `holdToPause` - пауза по долгому нажатию (см. [опции](/api/options) и [события](/api/events#longpressstart))
 
 #### Autoplay
 - `autoplay` - автопрокрутка (число, `true`, `false` или объект с `delay`, `pauseOnHover`, `pauseOnInteraction`, `disableOnInteraction`, `waitForVideo`)

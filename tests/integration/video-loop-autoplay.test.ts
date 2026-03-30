@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { TVIST_CLASSES } from '@core/constants'
+import { HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS, TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '@core/Tvist'
 // Импортируем модули для автоматической регистрации
 import '../../src/modules/video'
@@ -416,7 +416,7 @@ describe('VideoModule + LoopModule + AutoplayModule Integration', () => {
           isPrimary: true,
         })
       )
-      vi.advanceTimersByTime(301)
+      vi.advanceTimersByTime(HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS + 1)
 
       expect(pauseSpy).toHaveBeenCalled()
 

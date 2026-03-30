@@ -15,7 +15,7 @@
         </button>
       </div>
 
-      <div class="stories-shell">
+      <div class="stories-shell" :class="{ 'stories-shell--hold-paused': storyHoldPaused }">
         <div ref="groupRootEl" class="tvist-v1 stories-groups">
           <div class="tvist-v1__container">
             <div v-for="(group, groupIndex) in groups" :key="group.id" class="tvist-v1__slide stories-group-slide">
@@ -136,7 +136,16 @@ const groupCompletionHandled = ref({})
 
 const tapPointerId = ref(null)
 const tapStartedAt = ref(0)
-const TAP_MAX_DURATION = 220
+/** Визуал «на паузе по удержанию»; сама пауза autoplay — в движке через holdToPause */
+const storyHoldPaused = ref(false)
+/** Короткий тап для prev/next; должен быть < дефолтного holdToPause.threshold (100ms) */
+const TAP_MAX_DURATION = 90
+
+/*
+ * Пауза autoplay при удержании делает holdToPause (движок). Для своей разметки можно:
+ * — slider.on('longPressStart' | 'longPressEnd', …) через опцию on (ниже);
+ * — или slide.addEventListener(TVIST_DOM_EVENTS.longPressStart, …) из «tvist» (без всплытия к родителю).
+ */
 const DEBUG_STORIES = false
 
 const STORY_AUTOPLAY = {
@@ -271,6 +280,7 @@ const syncAutoplayForActiveGroup = () => {
 const activateGroup = (index) => {
   storiesEnded.value = false
   animateActiveSegment.value = false
+  storyHoldPaused.value = false
   activeGroupIndex.value = index
   const slider = innerSliders.value[index]
   if (!slider) return
@@ -579,6 +589,14 @@ onMounted(() => {
           groupCompletionHandled.value[groupIndex] = false
           resetActiveProgress(index)
         },
+        longPressStart: () => {
+          if (groupIndex !== activeGroupIndex.value) return
+          storyHoldPaused.value = true
+        },
+        longPressEnd: () => {
+          if (groupIndex !== activeGroupIndex.value) return
+          storyHoldPaused.value = false
+        },
       },
     })
   })
@@ -659,6 +677,11 @@ onUnmounted(() => {
   max-width: 460px;
   margin: 0 auto;
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 160ms ease, outline-color 160ms ease;
+}
+
+.stories-shell--hold-paused {
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35), 0 0 0 2px rgba(255, 255, 255, 0.35) inset;
 }
 
 .stories-progress {

@@ -13,9 +13,13 @@
  */
 
 import { Module } from '../Module'
-import { TVIST_CLASSES } from '../../core/constants'
+import {
+  HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS,
+  TVIST_CLASSES,
+  TVIST_DOM_EVENTS,
+} from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
-import type { TvistOptions } from '../../core/types'
+import type { TvistOptions, TvistLongPressDomEventDetail } from '../../core/types'
 import { resolveTrackGapFromOptions } from '../../utils/gridGap'
 
 const DRAG_DEBUG = false
@@ -248,7 +252,7 @@ export class DragModule extends Module {
     if (!raw) return null
     if (raw === true) {
       return {
-        threshold: 300,
+        threshold: HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS,
         root: 'slider',
         cancelOnDrag: true,
       }
@@ -257,7 +261,7 @@ export class DragModule extends Module {
     if (raw.enabled === false) return null
 
     return {
-      threshold: raw.threshold ?? 300,
+      threshold: raw.threshold ?? HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS,
       root: raw.root ?? 'slider',
       exclude: raw.exclude,
       cancelOnDrag: raw.cancelOnDrag ?? true,
@@ -343,6 +347,9 @@ export class DragModule extends Module {
     const point = this.getPointerPosition(e)
     if (!point) return
 
+    // Не отдаём удержание родительскому Tvist (вложенные слайдеры, stories)
+    e.stopPropagation()
+
     this.cancelHoldTracking()
     this.holdPending = true
     this.holdActive = false
@@ -368,10 +375,16 @@ export class DragModule extends Module {
       if (!this.holdPending || this.holdActive) return
       this.holdPending = false
       this.holdActive = true
+      const pressIndex = this.tvist.realIndex ?? this.tvist.activeIndex
       this.emit('longPressStart', {
-        index: this.tvist.realIndex ?? this.tvist.activeIndex,
+        index: pressIndex,
         pointerType: this.holdPointerType,
       })
+      this.dispatchLongPressSlideDomEvent(
+        TVIST_DOM_EVENTS.longPressStart,
+        pressIndex,
+        this.holdPointerType,
+      )
       const autoplay = this.tvist.getModule('autoplay') as { pause?: () => void } | undefined
       autoplay?.pause?.()
       const video = this.tvist.getModule('video') as { pauseActiveForHold?: () => void } | undefined
@@ -462,10 +475,40 @@ export class DragModule extends Module {
     autoplay?.resume?.()
     const video = this.tvist.getModule('video') as { resumeActiveAfterHold?: () => void } | undefined
     video?.resumeActiveAfterHold?.()
+    const endIndex = this.tvist.realIndex ?? this.tvist.activeIndex
     this.emit('longPressEnd', {
-      index: this.tvist.realIndex ?? this.tvist.activeIndex,
+      index: endIndex,
       pointerType: this.holdPointerType,
     })
+    this.dispatchLongPressSlideDomEvent(
+      TVIST_DOM_EVENTS.longPressEnd,
+      endIndex,
+      this.holdPointerType,
+    )
+  }
+
+  private resolveHoldSlideEl(index: number): HTMLElement | null {
+    const byAttr = this.tvist.root.querySelector<HTMLElement>(
+      `[data-tvist-slide-index="${index}"]`,
+    )
+    if (byAttr) return byAttr
+    return this.tvist.slides[index] ?? null
+  }
+
+  private dispatchLongPressSlideDomEvent(
+    eventName: (typeof TVIST_DOM_EVENTS)[keyof typeof TVIST_DOM_EVENTS],
+    index: number,
+    pointerType: string,
+  ): void {
+    const el = this.resolveHoldSlideEl(index)
+    if (!el) return
+    el.dispatchEvent(
+      new CustomEvent<TvistLongPressDomEventDetail>(eventName, {
+        bubbles: false,
+        composed: false,
+        detail: { index, pointerType },
+      }),
+    )
   }
 
   private releaseHoldPointerCapture(): void {

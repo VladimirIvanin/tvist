@@ -6,6 +6,7 @@ Tvist полностью типизирован с включенным strict m
 
 ### Основные типы
 - [`TvistOptions`](#tvistoptions) - Интерфейс опций слайдера
+- [`TvistLongPressDomEventDetail`](#tvistlongpressdomeventdetail) — `detail` DOM long press при `holdToPause`
 - [`Partial<TvistOptions>`](#частичные-опции-partial) - Частичные опции
 - [`Module` и `ModuleConstructor`](#module-и-moduleconstructor) - Типы модулей
 
@@ -52,6 +53,22 @@ const options: TvistOptions = {
 
 const slider = new Tvist('.slider', options)
 ```
+
+### TvistLongPressDomEventDetail
+
+При включённом `holdToPause` на соответствующем **элементе слайда** диспатчатся нативные `CustomEvent` без всплытия. Имена заданы константой `TVIST_DOM_EVENTS` (`longPressStart` → `tvist-long-press-start`, `longPressEnd` → `tvist-long-press-end`). Поле `detail` имеет тип `TvistLongPressDomEventDetail` (`index`, `pointerType`).
+
+```typescript
+import Tvist, { TVIST_DOM_EVENTS, type TvistLongPressDomEventDetail } from 'tvist'
+
+const slider = new Tvist('.tvist-v1', { holdToPause: true })
+
+slider.slides[0].addEventListener(TVIST_DOM_EVENTS.longPressStart, (e) => {
+  const d = (e as CustomEvent<TvistLongPressDomEventDetail>).detail
+})
+```
+
+События экземпляра `slider.on('longPressStart', …)` остаются основным API; DOM-события удобны для делегирования на конкретный слайд в шаблонах.
 
 ### Частичные опции (Partial)
 

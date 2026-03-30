@@ -386,7 +386,19 @@ slider.on('dragEnd', () => {
 longPressStart: (data: { index: number; pointerType: string }) => void
 ```
 
-Вызывается после удержания указателя дольше `holdToPause.threshold`.
+Вызывается после удержания указателя дольше `holdToPause.threshold` (по умолчанию **100 ms** при `holdToPause: true` или объекте без поля `threshold`). Требуется опция `holdToPause` (см. [опции слайдера](/api/options)).
+
+При старте отслеживания удержания всплытие `pointerdown` **останавливается** (`stopPropagation`), чтобы вложенный слайдер не будил родительский жест (например внешний слайдер групп).
+
+**DOM (опционально):** на соответствующем узле слайда диспатчится `CustomEvent` с именем из `TVIST_DOM_EVENTS.longPressStart` (`tvist-long-press-start`), `bubbles: false`, `composed: false`, `detail`: `{ index, pointerType }` — тип `TvistLongPressDomEventDetail`. Удобно подписаться в разметке на конкретном слайде без перехвата на родителе.
+
+```ts
+import { TVIST_DOM_EVENTS, type TvistLongPressDomEventDetail } from 'tvist'
+
+slideEl.addEventListener(TVIST_DOM_EVENTS.longPressStart, (e) => {
+  const { index, pointerType } = (e as CustomEvent<TvistLongPressDomEventDetail>).detail
+})
+```
 
 ### longPressEnd
 
@@ -394,7 +406,9 @@ longPressStart: (data: { index: number; pointerType: string }) => void
 longPressEnd: (data: { index: number; pointerType: string }) => void
 ```
 
-Вызывается при отпускании (или cancel) после активного удержания.
+Вызывается при отпускании (или `pointercancel` / потере захвата) после активного удержания. Autoplay и видео при необходимости возобновляются здесь же.
+
+**DOM:** аналогично, `TVIST_DOM_EVENTS.longPressEnd` (`tvist-long-press-end`), те же правила всплытия и `detail`.
 
 ## События обновления
 
