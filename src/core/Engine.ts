@@ -20,6 +20,7 @@ const engineLog = (_label: string, _data?: Record<string, unknown>) => {
 
 /** Контекст для передачи между подметодами scrollTo */
 interface ScrollContext {
+  requestedIndex: number
   clampedIndex: number
   normalizedIndex: number
   eventIndex: number
@@ -604,6 +605,7 @@ export class Engine {
     // В loop-режиме normalizedIndex = DOM-позиция, eventIndex = realIndex из data-tvist-slide-index.
     // В обычном режиме они совпадают.
     return {
+      requestedIndex: index,
       clampedIndex,
       normalizedIndex,
       eventIndex: this.getEventIndex(normalizedIndex),
@@ -665,7 +667,7 @@ export class Engine {
 
     if (ctx.indexChanged) {
       this.tvist.emit('slideChangeEnd', ctx.eventIndex)
-      this.emitReachEdge(ctx.eventIndex, endIndex)
+      this.emitReachEdge(ctx, endIndex)
     }
   }
 
@@ -715,7 +717,7 @@ export class Engine {
 
           if (ctx.indexChanged) {
             this.tvist.emit('slideChangeEnd', ctx.eventIndex)
-            this.emitReachEdge(ctx.eventIndex, endIndex)
+            this.emitReachEdge(ctx, endIndex)
           }
         }
       )
@@ -742,11 +744,17 @@ export class Engine {
   }
 
   /** События достижения начала/конца (reachBeginning / reachEnd) */
-  private emitReachEdge(index: number, endIndex: number): void {
-    if (index <= 0) {
+  private emitReachEdge(ctx: ScrollContext, endIndex: number): void {
+    const index = ctx.eventIndex
+    // reach-edge события эмитим только когда навигация действительно уткнулась в границу:
+    // requestedIndex вышел за пределы доступного диапазона.
+    const triedBeforeStart = !this.options.loop && ctx.requestedIndex < 0
+    const triedAfterEnd = !this.options.loop && !this.options.rewind && ctx.requestedIndex > endIndex
+
+    if (index <= 0 && triedBeforeStart) {
       this.tvist.emit('reachBeginning')
     }
-    if (index >= endIndex) {
+    if (index >= endIndex && triedAfterEnd) {
       this.tvist.emit('reachEnd')
     }
   }

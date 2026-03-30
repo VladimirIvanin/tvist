@@ -626,7 +626,7 @@ export class AutoplayModule extends Module {
         }
 
         this.clearBoundaryCheckTimeout()
-        const boundaryDelay = speed === 0 ? 0 : speed + 120
+        const boundaryDelay = speed === 0 ? 0 : speed + 20
         this.boundaryCheckTimeout = window.setTimeout(() => {
           this.boundaryCheckTimeout = null
           if (this.paused || this.stopped) return
