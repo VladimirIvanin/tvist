@@ -1356,7 +1356,8 @@ export class DragModule extends Module {
    * Хук при динамическом обновлении опций (updateOptions)
    */
   override onOptionsUpdate(): void {
-    this.cancelHoldTracking()
+    // Как при обычном окончании hold: иначе autoplay/video остаются на паузе, holdActive — true
+    this.finishHold()
     this.detachHoldEvents()
     this.setupHoldToPause()
     this.updateCachedRefs()

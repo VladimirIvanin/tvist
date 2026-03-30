@@ -13,6 +13,7 @@
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest'
 import { Tvist } from '@core/Tvist'
 import { DragModule } from '@modules/drag/DragModule'
+import '../../../src/modules/autoplay'
 import {
   createSliderFixture,
   simulateDrag,
@@ -927,6 +928,32 @@ describe('DragModule', () => {
       vi.advanceTimersByTime(400)
 
       expect(longPressStartSpy).not.toHaveBeenCalled()
+    })
+
+    it('должен снимать паузу autoplay и эмитить longPressEnd при updateOptions во время активного hold', () => {
+      vi.useFakeTimers()
+      slider.destroy()
+      slider = new Tvist(fixture.root, {
+        drag: true,
+        speed: 300,
+        autoplay: true,
+        holdToPause: true,
+      })
+
+      const longPressEndSpy = vi.fn()
+      slider.on('longPressEnd', longPressEndSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      vi.advanceTimersByTime(301)
+
+      expect(slider.autoplay?.isPaused()).toBe(true)
+
+      slider.updateOptions({ perPage: 1 })
+
+      expect(slider.autoplay?.isPaused()).toBe(false)
+      expect(longPressEndSpy).toHaveBeenCalledOnce()
     })
   })
 })
