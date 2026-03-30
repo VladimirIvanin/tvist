@@ -290,10 +290,22 @@
       "description": "Управление видео внутри слайдов (HTML `<video>` и iframe YouTube/Vimeo). - `false` — выключено (по умолчанию) - `true` — включено с дефолтными настройками - `VideoOptions` — полный контроль"
     },
     {
+      "name": "holdToPause",
+      "type": "boolean | HoldToPauseOptions",
+      "default": "undefined",
+      "description": "Удержание для сценариев историй: - `false` / `undefined` — выключено (по умолчанию) - `true` — включено с дефолтными настройками - `HoldToPauseOptions` — полный контроль"
+    },
+    {
       "name": "visibility",
       "type": "boolean | VisibilityOptions",
       "default": "true",
       "description": "Отслеживание видимости слайдера для приостановки autoplay/marquee. - `false` — выключено - `true` — включено с дефолтными настройками (по умолчанию) - `VisibilityOptions` — полный контроль"
+    },
+    {
+      "name": "browserFixes",
+      "type": "BrowserFixesOptions",
+      "default": "{ firefoxImageDecoding: true }",
+      "description": "Специфичные фиксы для браузеров"
     },
     {
       "name": "loop",
@@ -324,6 +336,12 @@
           "description": ""
         }
       ]
+    },
+    {
+      "name": "nativeLazyAdjacent",
+      "type": "boolean | NativeLazyAdjacentOptions",
+      "default": "false (выключено)",
+      "description": "Предзагрузка изображений с нативным `loading=\"lazy\"` у соседних слайдов и/или целевого при переходе. Полезно для `effect: 'cube'`, когда соседняя грань видна до подгрузки браузером. `true` — по умолчанию только при начале перехода; соседи при init — `onInit: true`."
     },
     {
       "name": "effect",
@@ -706,7 +724,7 @@
         {
           "name": "visible",
           "type": "(slide: HTMLElement, index: number) => void",
-          "description": ""
+          "description": "Слайд вошёл в видимую область (по расчёту движка: пересечение с viewport; для effect cube — та же геометрия граней, что и у эффекта куба). За одну анимацию или кадр событие может прийти для нескольких слайдов (например perPage>1 или при кубе — до двух граней, пока идёт переход). Для логики «текущий слайд» используйте slideChangeEnd / activeIndex, а не этот колбэк. В обработчике опирайтесь на аргумент index, а не на activeIndex в момент вызова."
         },
         {
           "name": "hidden",
@@ -795,7 +813,17 @@
         },
         {
           "name": "autoplayProgress",
-          "type": "(data: { progress: number",
+          "type": "(data: AutoplayProgressEvent) => void",
+          "description": ""
+        },
+        {
+          "name": "longPressStart",
+          "type": "(data: { index: number",
+          "description": ""
+        },
+        {
+          "name": "longPressEnd",
+          "type": "(data: { index: number",
           "description": ""
         },
         {

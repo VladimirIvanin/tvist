@@ -45,6 +45,7 @@ export type {
   VideoOptions,
   VideoEvent,
   VideoProgressEvent,
+  NativeLazyAdjacentOptions,
 } from './core/types'
 export type { Module, ModuleConstructor } from './modules/Module'
 

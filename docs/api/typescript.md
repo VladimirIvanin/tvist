@@ -7,6 +7,7 @@ Tvist полностью типизирован с включенным strict m
 ### Основные типы
 - [`TvistOptions`](#tvistoptions) - Интерфейс опций слайдера
 - [`TvistLongPressDomEventDetail`](#tvistlongpressdomeventdetail) — `detail` DOM long press при `holdToPause`
+- [`NativeLazyAdjacentOptions`](#nativelazyadjacentoptions) — опция `nativeLazyAdjacent` (нативный `loading="lazy"`)
 - [`Partial<TvistOptions>`](#частичные-опции-partial) - Частичные опции
 - [`Module` и `ModuleConstructor`](#module-и-moduleconstructor) - Типы модулей
 
@@ -69,6 +70,21 @@ slider.slides[0].addEventListener(TVIST_DOM_EVENTS.longPressStart, (e) => {
 ```
 
 События экземпляра `slider.on('longPressStart', …)` остаются основным API; DOM-события удобны для делегирования на конкретный слайд в шаблонах.
+
+### NativeLazyAdjacentOptions
+
+Тип поля `nativeLazyAdjacent` в `TvistOptions`. Семантика полей `onInit` и `onTransitionStart` — в [справочнике опций](/api/options#native-lazy-adjacent).
+
+```typescript
+import type { NativeLazyAdjacentOptions } from 'tvist'
+
+const adj: NativeLazyAdjacentOptions = {
+  onInit: false,
+  onTransitionStart: true,
+}
+```
+
+Для ручного вызова в разметке экспортируется **`forceEagerLoadingForLazyImages(root: HTMLElement)`**.
 
 ### Частичные опции (Partial)
 

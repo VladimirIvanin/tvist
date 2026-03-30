@@ -282,6 +282,24 @@ export interface VideoEvent {
 }
 
 /**
+ * Принудительная подгрузка img с нативным loading="lazy" для соседних и целевого слайда.
+ */
+export interface NativeLazyAdjacentOptions {
+  /**
+   * После инициализации слайдера — для слайдов prev/next относительно активного.
+   * Дополнительный трафик при загрузке страницы; по умолчанию выключено.
+   * @default false (включите явно `onInit: true`)
+   */
+  onInit?: boolean
+
+  /**
+   * В начале перехода к другому слайду (событие beforeSlideChange), до анимации; то же при speed: 0.
+   * @default true при включённой опции (`true` или объект без `onTransitionStart: false`)
+   */
+  onTransitionStart?: boolean
+}
+
+/**
  * Основные опции слайдера
  */
 export interface TvistOptions {
@@ -583,6 +601,14 @@ export interface TvistOptions {
     /** Количество соседних слайдов для предзагрузки с каждой стороны */
     preloadPrevNext?: number
   }
+
+  /**
+   * Предзагрузка изображений с нативным `loading="lazy"` у соседних слайдов и/или целевого при переходе.
+   * Полезно для `effect: 'cube'`, когда соседняя грань видна до подгрузки браузером.
+   * `true` — по умолчанию только при начале перехода; соседи при init — `onInit: true`.
+   * @default false (выключено)
+   */
+  nativeLazyAdjacent?: boolean | NativeLazyAdjacentOptions
   
   // Effects
   

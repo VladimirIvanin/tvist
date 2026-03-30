@@ -24,6 +24,7 @@
  */
 
 import { Module } from '../Module'
+import { findSlideByRealIndex } from '../../utils/slideRealIndex'
 import type { Tvist } from '../../core/Tvist'
 import type { AutoplayProgressEvent, TvistOptions, AutoplayOptions } from '../../core/types'
 
@@ -411,7 +412,7 @@ export class AutoplayModule extends Module {
     this.videoEndedWhilePaused = false
 
     // index = realIndex. Ищем слайд по data-tvist-slide-index (loop) или по DOM-позиции (обычный)
-    const slide = this.findSlideByRealIndex(index)
+    const slide = findSlideByRealIndex(this.tvist.slides, index)
 
     // Если слайд не найден (некорректный индекс или проблема с DOM), запускаем обычный таймер
     // чтобы autoplay продолжил работу, а не остановился навсегда
@@ -474,25 +475,6 @@ export class AutoplayModule extends Module {
     }
 
     this.on('videoEnded', this.videoEndedHandler)
-  }
-
-  /**
-   * Найти DOM-элемент слайда по realIndex (data-tvist-slide-index).
-   * В loop-режиме DOM-позиция может не совпадать с realIndex.
-   */
-  private findSlideByRealIndex(realIndex: number): HTMLElement | undefined {
-    const slides = this.tvist.slides
-    
-    // Сначала пробуем по data-tvist-slide-index (loop mode)
-    for (const slide of slides) {
-      const dataAttr = slide.getAttribute('data-tvist-slide-index')
-      if (dataAttr !== null && parseInt(dataAttr, 10) === realIndex) {
-        return slide
-      }
-    }
-    
-    // Fallback: по DOM-позиции (обычный режим, без loop)
-    return slides[realIndex]
   }
 
   /**

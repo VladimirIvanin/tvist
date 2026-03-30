@@ -10,6 +10,10 @@ import type { Tvist } from './Tvist'
 import type { TvistOptions } from './types'
 import { getOuterWidth, getOuterHeight } from '../utils/dom'
 import { applyPeek, getPeekValue, getPeekValueFromOptions } from '../utils/peek'
+import {
+  findDomIndexByRealIndex,
+  TVIST_SLIDE_INDEX_ATTR,
+} from '../utils/slideRealIndex'
 
 const ENGINE_DEBUG = false
 const engineLog = (_label: string, _data?: Record<string, unknown>) => {
@@ -129,26 +133,11 @@ export class Engine {
   private getEventIndex(domIndex: number): number {
     const slide = this.tvist.slides[domIndex]
     if (!slide) return domIndex
-    const dataAttr = slide.getAttribute('data-tvist-slide-index')
+    const dataAttr = slide.getAttribute(TVIST_SLIDE_INDEX_ATTR)
     if (dataAttr !== null) {
       return parseInt(dataAttr, 10)
     }
     return domIndex
-  }
-
-  /**
-   * Найти DOM-позицию слайда по его realIndex (data-tvist-slide-index).
-   * Возвращает -1, если слайд не найден.
-   */
-  private findDomIndexByRealIndex(realIndex: number): number {
-    const slides = this.tvist.slides
-    for (let i = 0; i < slides.length; i++) {
-      const dataAttr = slides[i]?.getAttribute('data-tvist-slide-index')
-      if (dataAttr != null && parseInt(dataAttr, 10) === realIndex) {
-        return i
-      }
-    }
-    return -1
   }
 
   /**
@@ -631,7 +620,7 @@ export class Engine {
     // Находим DOM-позицию целевого слайда по его eventIndex (= realIndex).
     if (counterBeforeEmit !== counterAfterEmit && this.options.loop) {
       // Ищем DOM-позицию слайда с data-tvist-slide-index === eventIndex
-      const targetDomIndex = this.findDomIndexByRealIndex(ctx.eventIndex)
+      const targetDomIndex = findDomIndexByRealIndex(this.tvist.slides, ctx.eventIndex)
 
       if (targetDomIndex !== -1) {
         ctx.clampedIndex = targetDomIndex
