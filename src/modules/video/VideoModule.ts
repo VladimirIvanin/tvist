@@ -479,7 +479,7 @@ export class VideoModule extends Module {
         videoEntry.video.pause()
       }
       if (this.config.resetOnLeave) {
-        videoEntry.video.currentTime = 0
+        this.safeResetVideoTime(videoEntry.video)
       }
     }
 
@@ -498,12 +498,24 @@ export class VideoModule extends Module {
   private deactivateAll(): void {
     this.videos.forEach(entry => {
       entry.video.pause()
-      entry.video.currentTime = 0
+      this.safeResetVideoTime(entry.video)
     })
     this.iframes.forEach(entry => {
       this.deactivateIframe(entry)
     })
     this.stopProgressTracking()
+  }
+
+  /**
+   * Безопасно сбросить позицию видео.
+   * В тестовой среде currentTime может быть read-only через defineProperty.
+   */
+  private safeResetVideoTime(video: HTMLVideoElement): void {
+    try {
+      video.currentTime = 0
+    } catch {
+      // ignore read-only currentTime in mocks/test environment
+    }
   }
 
   // ==================== Безопасный play ====================
