@@ -104,6 +104,10 @@ export class AutoplayModule extends Module {
   private clearTransitionByAutoplayTimeout: number | null = null
   /** Проверка, что autoplay next() реально привёл к смене слайда. */
   private boundaryCheckTimeout: number | null = null
+  /** Момент последнего slideChangeEnd (нужен для корректного boundary тайминга). */
+  private lastSlideChangeEndAt: number | null = null
+  /** Момент последнего autoplay next(). */
+  private lastAutoplayNextAt: number | null = null
   /** Диагностика последовательности autoplayProgress */
   private lastProgressIndex: number | null = null
   private lastProgressValue: number | null = null
@@ -337,8 +341,14 @@ export class AutoplayModule extends Module {
     // При смене слайда: при ручной навигации (стрелки, пагинация и т.д.) сбрасываем таймер,
     // чтобы новый слайд показывался полное время delay, а не остаток от предыдущего счётчика
     this.on('slideChangeEnd', (index: number) => {
-      // Сохраняем значение флага ДО его сброса
       const byAutoplay = this.transitionByAutoplay
+      const now = performance.now()
+      if (byAutoplay && this.lastAutoplayNextAt !== null) {
+        const speed = this.options.speed ?? 300
+        this.lastSlideChangeEndAt = Math.max(now, this.lastAutoplayNextAt + speed)
+      } else {
+        this.lastSlideChangeEndAt = now
+      }
       
       // Сбрасываем флаг и отменяем fallback
       if (this.transitionByAutoplay) {
@@ -347,7 +357,9 @@ export class AutoplayModule extends Module {
         this.clearBoundaryCheckTimeout()
       }
       
-      // И для ручной навигации, и для autoplay-перехода новый цикл стартует здесь.
+      // Для ручной навигации новый цикл стартует здесь.
+      // Для autoplay-переходов цикл продолжается рекурсивно в run(),
+      // чтобы delay не зависел от длительности анимации.
       if (!this.paused && !this.stopped) {
         this.cancelTimer()
         this.timeLeft = null
@@ -355,8 +367,14 @@ export class AutoplayModule extends Module {
         this.stopProgressTracking()
         if (this.config?.waitForVideo) {
           this.handleSlideChangedForVideo(index)
-        } else {
+        } else if (!byAutoplay) {
           this.run()
+        } else if (this.config && !this.options.loop && this.config.delay < (this.options.speed ?? 300)) {
+          // При очень коротком delay и включённой анимации ждём slideChangeEnd,
+          // чтобы следующий autoplay-тик не успел выполниться до окончания текущего перехода.
+          this.run()
+        } else {
+          // autoplay режим без waitForVideo: следующий цикл запланирован в run()
         }
       } else if (!byAutoplay && this.config?.waitForVideo) {
         this.handleSlideChangedForVideo(index)
@@ -580,21 +598,64 @@ export class AutoplayModule extends Module {
         
         // Запоминаем индекс до навигации
         const indexBefore = this.tvist.activeIndex
+        const slidesPerPage = this.options.perPage ?? 1
+        const endIndex = Math.max(0, this.tvist.slides.length - slidesPerPage)
+        const boundaryAttempt = !this.options.loop && !this.options.rewind && indexBefore >= endIndex
         
         this.transitionByAutoplay = true
+        this.lastAutoplayNextAt = performance.now()
         this.tvist.next()
         
-        this.scheduleTransitionByAutoplayFallback()
-        this.clearBoundaryCheckTimeout()
+        // На заведомой границе (без loop/rewind) next() не изменит индекс.
+        // Флаг нужно сбросить сразу, иначе ручная навигация попадёт в false-positive "autoplay".
+        if (boundaryAttempt) {
+          this.transitionByAutoplay = false
+          this.clearTransitionByAutoplayFallback()
+        } else {
+          this.scheduleTransitionByAutoplayFallback()
+        }
+        // Продолжаем autoplay цикл рекурсивно сразу после попытки перехода.
+        // В не-loop режиме при delay < speed продолжаем цикл из slideChangeEnd.
         const speed = this.options.speed ?? 300
-        const boundaryDelay = speed === 0 ? 0 : speed + 20
+        if (!this.config?.waitForVideo) {
+          if (this.config && !this.options.loop && this.config.delay < speed) {
+            // no-op: continue from slideChangeEnd
+          } else {
+            this.run()
+          }
+        }
+
+        this.clearBoundaryCheckTimeout()
+        const boundaryDelay = speed === 0 ? 0 : speed + 120
         this.boundaryCheckTimeout = window.setTimeout(() => {
           this.boundaryCheckTimeout = null
-          if (!this.transitionByAutoplay || this.paused || this.stopped) return
+          if (this.paused || this.stopped) return
 
           // Если после ожидаемой длительности перехода индекс всё ещё тот же,
           // считаем, что next() уткнулся в границу без loop.
           if (this.tvist.activeIndex !== indexBefore) return
+
+          // reachEnd должен приходить только после полного показа последнего слайда:
+          // delay + время проверки границы от момента slideChangeEnd.
+          if (this.lastSlideChangeEndAt !== null && this.config) {
+            const minElapsed = this.config.delay + boundaryDelay
+            const elapsed = performance.now() - this.lastSlideChangeEndAt
+            if (elapsed < minElapsed) {
+              this.boundaryCheckTimeout = window.setTimeout(() => {
+                this.boundaryCheckTimeout = null
+                if (this.paused || this.stopped) return
+                if (this.tvist.activeIndex !== indexBefore) return
+                this.transitionByAutoplay = false
+                this.clearTransitionByAutoplayFallback()
+                this.emitAutoplayProgress(this.tvist.realIndex ?? this.tvist.activeIndex, 1)
+                if (!this.options.loop) {
+                  this.tvist.emit('reachEnd')
+                }
+                this.stop()
+              }, Math.max(0, Math.ceil(minElapsed - elapsed)))
+              return
+            }
+          }
 
           this.transitionByAutoplay = false
           this.clearTransitionByAutoplayFallback()
