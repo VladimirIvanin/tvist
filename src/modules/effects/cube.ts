@@ -1,6 +1,7 @@
 import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
+import { getCubeSlidesInRange } from './cubeSlideInRange'
 
 // Кэш для теней и списка слайдов
 interface SlideShadows {
@@ -72,7 +73,8 @@ export function setCubeEffect(
     
     const slidesList = getCachedSlides(tvist)
     const numSlides = slidesList.length
-    
+    const slidesInRange = getCubeSlidesInRange(translate, slideSize, numSlides)
+
     // Calculate wrapper rotation
     // translate corresponds to linear movement.
     // Width = 90 degrees.
@@ -117,19 +119,9 @@ export function setCubeEffect(
         // Cosine = how "front" the face is. 0°→1, 180°→-1. Keep z-index for stacking fallback.
         const zIndex = Math.round(Math.cos(netAngle * Math.PI / 180) * 100)
         slide.style.zIndex = `${100 + zIndex}`
-        
-        // Calculate progress (distance from current position)
-        // Fix for loop mode: normalize diff to be within half of the slide count range.
-        let slideProgress = i - progressTotal
-        if (Math.abs(slideProgress) > numSlides / 2) {
-             slideProgress -= numSlides * Math.round(slideProgress / numSlides)
-        }
-        
-        // Fix: Hide slides that are out of bounds (preventing them from flying around screen)
-        // Show only active slide and immediate neighbors (enough for a cube corner)
-        // Range 1 is enough because we only see at most 2 faces at once (or one full face).
-        const isInRange = Math.abs(slideProgress) <= 1
-        
+
+        const isInRange = slidesInRange[i] ?? false
+
         // Chrome bug workaround: Sometimes Chrome fails to render content with hidden backface.
         // However, for a proper cube effect, we MUST hide backfaces to avoid seeing inside the cube.
         // We rely on z-index to handle sorting, but backface-visibility: hidden gives the cleanest look.

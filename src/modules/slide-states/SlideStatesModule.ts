@@ -4,6 +4,7 @@
  */
 
 import { Module } from '../Module'
+import { getCubeSlidesInRange } from '../effects/cubeSlideInRange'
 import { TVIST_CLASSES } from '../../core/constants'
 import { isFirefox } from '../../utils/browser'
 import type { Tvist } from '../../core/Tvist'
@@ -233,10 +234,20 @@ export class SlideStatesModule extends Module {
    * Обновление классов видимости слайдов.
    * Использует математический расчёт через Engine.getVisibleSlides() вместо
    * getBoundingClientRect(), что исключает forced reflow во время анимации.
+   *
+   * Несколько слайдов могут стать «видимыми» одновременно (пересечение с viewport; для cube —
+   * маска из getCubeSlidesInRange, как в setCubeEffect). emit('visible') — для каждого слайда отдельно.
    */
   private updateVisibleClasses(): void {
     const slides = this.tvist.slides
-    const visibleFlags = this.tvist.engine.getVisibleSlides()
+    const visibleFlags =
+      this.options.effect === 'cube'
+        ? getCubeSlidesInRange(
+            this.tvist.engine.location.get(),
+            this.tvist.engine.slideSizeValue,
+            slides.length
+          )
+        : this.tvist.engine.getVisibleSlides()
 
     slides.forEach((slide, index) => {
       const isVisible = visibleFlags[index] ?? false

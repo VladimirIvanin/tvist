@@ -952,6 +952,8 @@ export class Engine {
   /**
    * Вычисляет видимость каждого слайда математически (без DOM-запросов).
    * Использует закэшированные slidePositions, slideSizes и текущий location.
+   * Для эффекта cube маска граней задаётся в SlideStatesModule через `getCubeSlidesInRange`.
+   *
    * @returns массив булевых значений видимости для каждого слайда
    */
   public getVisibleSlides(): boolean[] {

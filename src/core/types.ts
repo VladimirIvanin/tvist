@@ -794,9 +794,16 @@ export interface TvistOptions {
     transitionStart?: (index: number) => void
     /** Конец анимации перехода */
     transitionEnd?: (index: number) => void
-    /** Слайд вошёл в видимую область */
+    /**
+     * Слайд вошёл в видимую область (по расчёту движка: пересечение с viewport; для effect cube —
+     * та же геометрия граней, что и у эффекта куба).
+     * За одну анимацию или кадр событие может прийти для нескольких слайдов (например perPage>1
+     * или при кубе — до двух граней, пока идёт переход).
+     * Для логики «текущий слайд» используйте slideChangeEnd / activeIndex, а не этот колбэк.
+     * В обработчике опирайтесь на аргумент index, а не на activeIndex в момент вызова.
+     */
     visible?: (slide: HTMLElement, index: number) => void
-    /** Слайд вышел из видимой области */
+    /** Слайд вышел из видимой области (см. замечания к visible) */
     hidden?: (slide: HTMLElement, index: number) => void
     /** Во время прокрутки (тики анимации / драг) */
     scroll?: () => void

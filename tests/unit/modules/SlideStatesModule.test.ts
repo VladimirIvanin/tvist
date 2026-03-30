@@ -154,6 +154,52 @@ describe('SlideStatesModule', () => {
       const hasVisible = slides.some(s => s.classList.contains(`${TVIST_CSS_PREFIX}__slide--visible`))
       expect(hasVisible).toBe(true)
     })
+
+    it('за одно обновление событие visible может прийти для нескольких индексов (perPage > 1)', () => {
+      const visibleIndices: number[] = []
+
+      tvist = new Tvist(root, {
+        perPage: 2,
+        start: 0,
+        speed: 0,
+        on: {
+          visible: (_slide, index) => {
+            visibleIndices.push(index)
+          },
+        },
+      })
+
+      // В viewport попадают два слайда — оба впервые получают класс в одном updateVisibleClasses()
+      expect(visibleIndices.length).toBeGreaterThanOrEqual(2)
+      expect(new Set(visibleIndices).size).toBeGreaterThanOrEqual(2)
+    })
+
+    it('при промежуточной позиции прокрутки несколько слайдов помечены visible (как при кубе между гранями)', async () => {
+      tvist = new Tvist(root, {
+        perPage: 1,
+        start: 0,
+        speed: 0,
+      })
+
+      const slideSize = tvist.engine.slideSizeValue
+      // Между соседними слайдами в 1D-модели пересекаются две «полосы» viewport
+      tvist.engine.location.set(-slideSize / 2)
+      tvist.engine.target.set(-slideSize / 2)
+      tvist.emit('scroll')
+
+      await new Promise<void>(resolve => {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => resolve())
+        })
+      })
+
+      const visibleCount = tvist.slides.filter(s =>
+        s.classList.contains(`${TVIST_CSS_PREFIX}__slide--visible`)
+      ).length
+
+      expect(visibleCount).toBeGreaterThanOrEqual(2)
+      expect(tvist.engine.getVisibleSlides().filter(Boolean).length).toBeGreaterThanOrEqual(2)
+    })
   })
 
   describe('PerPage = 1 mode', () => {
