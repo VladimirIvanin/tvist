@@ -72,6 +72,11 @@
       <p class="stories-caption">
         Desktop: группы переключаются без анимации. Mobile: группы через cube-эффект.
       </p>
+
+      <div class="stories-code">
+        <div class="stories-code__title">Полный код для пользователя (nested + cube breakpoints)</div>
+        <pre><code>{{ userFacingCode }}</code></pre>
+      </div>
     </div>
   </ExampleCard>
 </template>
@@ -146,6 +151,80 @@ const setInnerRootRef = (el, index) => {
 }
 
 const MOBILE_BREAKPOINT = 767
+const userFacingCode = `<div class="tvist-v1 stories-groups">
+  <div class="tvist-v1__container">
+    <div class="tvist-v1__slide stories-group-slide">
+      <div class="stories-inner-wrap">
+        <div class="tvist-v1 stories-inner">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide stories-inner-slide">Story 1</div>
+            <div class="tvist-v1__slide stories-inner-slide">Story 2</div>
+            <div class="tvist-v1__slide stories-inner-slide">Story 3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tvist-v1__slide stories-group-slide">
+      <div class="stories-inner-wrap">
+        <div class="tvist-v1 stories-inner">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide stories-inner-slide">Story A</div>
+            <div class="tvist-v1__slide stories-inner-slide">Story B</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { Tvist } from 'tvist'
+
+  const MOBILE_BREAKPOINT = 767
+  const groupRoot = document.querySelector('.stories-groups')
+  const innerRoots = groupRoot.querySelectorAll('.stories-inner')
+
+  // Внешний слайдер групп:
+  // desktop = slide (speed 0), mobile = cube (speed 540)
+  const groupSlider = new Tvist(groupRoot, {
+    perPage: 1,
+    gap: 0,
+    loop: false,
+    drag: true,
+    effect: 'slide',
+    speed: 0,
+    breakpointsBase: 'window',
+    breakpoints: {
+      [MOBILE_BREAKPOINT]: {
+        effect: 'cube',
+        speed: 540,
+        cubeEffect: {
+          slideShadows: false,
+          shadow: false,
+          shadowOffset: 0,
+          shadowScale: 1
+        }
+      }
+    }
+  })
+
+  // Вложенные слайдеры историй внутри каждой группы
+  const innerSliders = Array.from(innerRoots).map((root) =>
+    new Tvist(root, {
+      perPage: 1,
+      gap: 0,
+      loop: false,
+      drag: true,
+      holdToPause: true,
+      autoplay: {
+        delay: 2800,
+        pauseOnHover: false,
+        waitForVideo: false
+      }
+    })
+  )image.png
+<\/script>`
 
 const syncAutoplayForActiveGroup = () => {
   innerSliders.value.forEach((slider, index) => {
@@ -650,6 +729,46 @@ onUnmounted(() => {
   text-align: center;
 }
 
+.stories-code {
+  width: 100%;
+  max-width: none;
+  margin: 12px auto 0;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.stories-code__title {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.stories-code pre {
+  margin: 0;
+  padding: 12px 14px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #111827;
+  text-align: left;
+  overflow: auto;
+  max-height: 360px;
+  background: #fff;
+}
+
+.stories-code code {
+  display: block;
+  min-width: max-content;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
 @media (max-width: 767px) {
   .stories-shell {
     border-radius: 12px;
@@ -661,6 +780,23 @@ onUnmounted(() => {
   .stories-inner,
   .stories-inner-slide {
     height: 460px;
+  }
+
+  .stories-code {
+    margin-top: 10px;
+    border-radius: 8px;
+  }
+
+  .stories-code__title {
+    padding: 9px 10px;
+    font-size: 12px;
+  }
+
+  .stories-code pre {
+    padding: 10px;
+    font-size: 11px;
+    line-height: 1.4;
+    max-height: 280px;
   }
 }
 </style>
