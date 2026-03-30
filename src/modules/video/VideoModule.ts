@@ -171,6 +171,8 @@ export class VideoModule extends Module {
   private pausedByVisibility = false
   /** Видео поставлено на паузу из-за long press */
   private pausedByHold = false
+  /** HTML-video на паузе из-за autoplay pauseOnHover (root mouseenter) */
+  private pausedByAutoplayHover = false
 
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
@@ -198,6 +200,9 @@ export class VideoModule extends Module {
       this.onSlideChange(index)
     })
 
+    this.on('autoplayHoverPause', this.onAutoplayHoverPause)
+    this.on('autoplayHoverResume', this.onAutoplayHoverResume)
+
     // Запускаем видео на начальном слайде (используем realIndex)
     const startRealIndex = this.tvist.realIndex ?? this.tvist.activeIndex
     this.previousIndex = startRealIndex
@@ -205,6 +210,8 @@ export class VideoModule extends Module {
   }
 
   override destroy(): void {
+    this.off('autoplayHoverPause', this.onAutoplayHoverPause)
+    this.off('autoplayHoverResume', this.onAutoplayHoverResume)
     this.stopProgressTracking()
     this.deactivateAll()
     this.cleanupVideoListeners()
@@ -225,7 +232,9 @@ export class VideoModule extends Module {
    */
   override onSlideChange(index: number): void {
     if (!this.config) return
-    
+
+    this.pausedByAutoplayHover = false
+
     // index = realIndex (оригинальный индекс слайда)
     const realIndex = index
     const prev = this.previousIndex
@@ -687,6 +696,32 @@ export class VideoModule extends Module {
     if (this.visibilityHandler) {
       document.removeEventListener('visibilitychange', this.visibilityHandler)
       this.visibilityHandler = undefined
+    }
+  }
+
+  /**
+   * Синхронизация с autoplay pauseOnHover: только HTML-video на активном слайде.
+   * События эмитит AutoplayModule только при mouseenter/mouseleave по root (не drag/вкладка).
+   */
+  private onAutoplayHoverPause = (): void => {
+    if (!this.config) return
+    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
+    const entry = this.videos.get(realIndex)
+    if (!entry) return
+    if (!entry.video.paused) {
+      this.pausedByAutoplayHover = true
+      entry.video.pause()
+    }
+  }
+
+  private onAutoplayHoverResume = (): void => {
+    if (!this.pausedByAutoplayHover) return
+    this.pausedByAutoplayHover = false
+    if (!this.config?.autoplay) return
+    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
+    const entry = this.videos.get(realIndex)
+    if (entry?.video.paused) {
+      this.safePlay(entry.video)
     }
   }
 

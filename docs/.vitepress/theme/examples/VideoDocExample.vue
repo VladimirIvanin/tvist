@@ -42,6 +42,8 @@
       <div class="info">
         <p>Видео-слайды воспроизводятся автоматически. Фото-слайды показываются 5 секунд.</p>
         <p>waitForVideo: переход после окончания видео</p>
+        <p>pauseOnHover: наведение на слайдер — пауза таймера и HTML-видео</p>
+        <p>holdToPause: долгое нажатие на слайдер — пауза видео и автоплея</p>
       </div>
     </div>
   </ExampleCard>
@@ -81,6 +83,8 @@ onMounted(() => {
       perPage: 1,
       gap: 0,
       loop: true,
+      // Без этого DragModule не вешает long press — видео не ставится на паузу при удержании
+      holdToPause: true,
       video: {
         autoplay: true,
         muted: true,

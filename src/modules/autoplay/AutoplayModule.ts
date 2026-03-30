@@ -511,9 +511,12 @@ export class AutoplayModule extends Module {
   private attachHoverEvents(): void {
     this.mouseEnterHandler = () => {
       this.pause()
+      // Только hover: VideoModule синхронизирует HTML-video (не путать с pause() от drag/вкладки)
+      this.emit('autoplayHoverPause')
     }
     this.mouseLeaveHandler = () => {
       this.resume()
+      this.emit('autoplayHoverResume')
     }
 
     this.tvist.root.addEventListener('mouseenter', this.mouseEnterHandler)
