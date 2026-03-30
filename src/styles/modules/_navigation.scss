@@ -51,11 +51,6 @@
   // Позиционирование
   &--prev {
     left: var(--#{$tvist-block}-arrow-offset, 10px);
-
-    // Поворот иконки для стрелки влево
-    .#{$tvist-block}__arrow-icon {
-      transform: rotate(180deg);
-    }
   }
 
   &--next {
