@@ -72,7 +72,6 @@ describe('Autoplay basic example (docs AutoplayBasicExample)', () => {
         type: 'bullets',
         clickable: true,
       },
-      debug: true,
     })
 
     expect(slider.activeIndex).toBe(0)

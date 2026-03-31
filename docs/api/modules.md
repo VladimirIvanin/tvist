@@ -228,6 +228,7 @@ Tvist.registerModule('autoplay', AutoplayModule)
 - `autoplay` - задержка (число или `true`), либо объект с настройками:
   - `delay` - задержка между переходами (мс)
   - `pauseOnHover` - пауза при наведении курсора (по умолчанию `true`)
+  - `pauseOnInteraction` - пауза при взаимодействии (по умолчанию `true`)
   - `disableOnInteraction` - отключить после взаимодействия (по умолчанию `false`)
   - `waitForVideo` - ждать окончания видео вместо таймера (по умолчанию `false`)
 
@@ -240,7 +241,7 @@ Tvist.registerModule('autoplay', AutoplayModule)
 
 ```javascript
 const slider = new Tvist('.slider', {
-  autoplay: { delay: 3000, pauseOnHover: true }
+  autoplay: { delay: 3000, pauseOnHover: true, pauseOnInteraction: true }
 })
 
 // Управление через модуль

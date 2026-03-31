@@ -32,6 +32,7 @@ import type { AutoplayProgressEvent, TvistOptions, AutoplayOptions } from '../..
 const AUTOPLAY_DEFAULTS: Required<AutoplayOptions> = {
   delay: 3000,
   pauseOnHover: true,
+  pauseOnInteraction: true,
   disableOnInteraction: false,
   waitForVideo: false,
 }
@@ -55,6 +56,7 @@ function normalizeAutoplay(raw: TvistOptions['autoplay']): Required<AutoplayOpti
   return {
     delay: raw.delay ?? AUTOPLAY_DEFAULTS.delay,
     pauseOnHover: raw.pauseOnHover ?? AUTOPLAY_DEFAULTS.pauseOnHover,
+    pauseOnInteraction: raw.pauseOnInteraction ?? AUTOPLAY_DEFAULTS.pauseOnInteraction,
     disableOnInteraction: raw.disableOnInteraction ?? AUTOPLAY_DEFAULTS.disableOnInteraction,
     waitForVideo: raw.waitForVideo ?? AUTOPLAY_DEFAULTS.waitForVideo,
   }
@@ -556,13 +558,6 @@ export class AutoplayModule extends Module {
   private run(): void {
     if (this.paused || this.stopped || !this.config) return
 
-    this.debugLog('run() called', {
-      activeIndex: this.tvist.activeIndex,
-      paused: this.paused,
-      stopped: this.stopped,
-      timeLeft: this.timeLeft,
-    })
-
     // Если ждём видео — не запускаем таймер
     if (this.waitingForVideo) return
 
@@ -582,18 +577,7 @@ export class AutoplayModule extends Module {
     // Запуск отслеживания прогресса
     this.startProgressTracking(delay, this.currentDuration, this.progressStartOffset)
 
-    this.debugLog('scheduling autoplay timeout', {
-      delay,
-      currentDuration: this.currentDuration,
-      progressStartOffset: this.progressStartOffset,
-    })
-
     this.timer = window.setTimeout(() => {
-      this.debugLog('autoplay timeout fired', {
-        activeIndexBefore: this.tvist.activeIndex,
-        paused: this.paused,
-        stopped: this.stopped,
-      })
       if (!this.paused && !this.stopped) {
         this.timeLeft = null // Сбрасываем timeLeft для следующего шага
         this.progressStartOffset = 0

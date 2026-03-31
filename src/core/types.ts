@@ -93,6 +93,12 @@ export interface AutoplayOptions {
   pauseOnHover?: boolean
 
   /**
+   * Ставить автопрокрутку на паузу при любом взаимодействии (drag, click)
+   * @default true
+   */
+  pauseOnInteraction?: boolean
+
+  /**
    * Отключить автопрокрутку после первого взаимодействия пользователя
    * @default false
    */
