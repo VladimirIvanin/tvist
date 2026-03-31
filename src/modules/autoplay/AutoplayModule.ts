@@ -363,6 +363,8 @@ export class AutoplayModule extends Module {
       // Для ручной навигации новый цикл стартует здесь.
       // Для autoplay-переходов цикл продолжается рекурсивно в run(),
       // чтобы delay не зависел от длительности анимации, и мы не сбрасывали таймер зря.
+      // Исключение: non-loop с очень коротким delay (< speed) — там следующий шаг
+      // намеренно запускается из slideChangeEnd, чтобы тик не сработал до окончания перехода.
       if (!this.paused && !this.stopped) {
         if (!byAutoplay) {
           // Ручная навигация: сбрасываем текущий цикл и запускаем новый от текущего слайда.
@@ -375,6 +377,10 @@ export class AutoplayModule extends Module {
           } else {
             this.run()
           }
+        } else if (byAutoplay && this.config && !this.options.loop && this.config.delay < (this.options.speed ?? 300)) {
+          // Non-loop + очень короткий delay: следующий autoplay-тик запускаем
+          // после завершения перехода.
+          this.run()
         } else if (this.config?.waitForVideo) {
           // Автоплей в режиме ожидания видео: обновляем слушатель для нового слайда.
           this.handleSlideChangedForVideo(index)
