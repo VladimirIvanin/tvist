@@ -633,11 +633,11 @@ export class DragModule extends Module {
     const isHorizontal = this.options.direction !== 'vertical'
     let deltaX = point.x - this.startX
     let deltaY = point.y - this.startY
-    const absDelta = isHorizontal ? Math.abs(deltaX) : Math.abs(deltaY)
+    const moveDistance = Math.hypot(deltaX, deltaY)
 
     // Если еще не начали драг, проверяем threshold
     if (!this.isDragging) {
-      if (absDelta > this.MIN_DRAG_DISTANCE) {
+      if (moveDistance > this.MIN_DRAG_DISTANCE) {
         if (this.holdConfig?.cancelOnDrag !== false) {
           this.finishHold()
         }
