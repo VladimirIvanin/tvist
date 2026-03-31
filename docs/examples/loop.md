@@ -4,6 +4,7 @@
 
 <script setup>
 import LoopExample from '../.vitepress/theme/examples/LoopExample.vue'
+import LoopPeekGapExample from '../.vitepress/theme/examples/LoopPeekGapExample.vue'
 </script>
 
 <LoopExample />
@@ -13,6 +14,14 @@ import LoopExample from '../.vitepress/theme/examples/LoopExample.vue'
 Бесконечная прокрутка по одному слайду с картинками, без зазора между слайдами:
 
 <LoopImagesExample />
+
+## Loop + perPage: 3, peek 120, 4 слайда
+
+Кейс с `perPage: 3`, `gap: 32`, `peek: 120` и всего 4 слайдами.  
+Слайдер в loop-режиме **не должен давать «дыру» справа** — даже если
+слайдов меньше, чем рекомендуется для бесконечной прокрутки.
+
+<LoopPeekGapExample />
 
 ```js
 new Tvist('.tvist', {
@@ -42,10 +51,11 @@ new Tvist('.tvist', {
 **JavaScript:**
 ```javascript
 const slider = new Tvist('.tvist', {
-  perPage: 2,
-  gap: 20,
+  perPage: 3,
+  gap: 32,
   loop: true,
   drag: true,
+  peek: 120,
   speed: 300
 });
 ```
