@@ -146,11 +146,23 @@ export class Engine {
   public getScrollPositionForIndex(index: number): number {
     const basePosition = -this.getSlidePosition(index)
     const centerOffset = this.getCenterOffset(index)
-    
+
     if (this.options.loop) {
-      return basePosition + centerOffset
+      // В loop-режиме с center продолжаем просто добавлять смещение
+      if (this.options.center) {
+        return basePosition + centerOffset
+      }
+
+      // Для обычного loop без центрирования ограничиваем позицию так,
+      // чтобы viewport не выходил за пределы контента (особенно важно при
+      // небольшом количестве слайдов и активном peek), иначе появляются "дыры".
+      if (!this.scrollCacheValid) this.updateScrollCache()
+      const minScroll = this.cachedMinScroll
+      const maxScroll = this.cachedMaxScroll
+
+      return Math.max(maxScroll, Math.min(minScroll, basePosition))
     }
-    
+
     const endIndex = this.getEndIndex()
     const peekTrim = this.options.peekTrim !== false
     
@@ -398,13 +410,6 @@ export class Engine {
   private updateScrollCache(): void {
     // ВАЖНО: cachedRootSize нужен для getCenterOffset даже при loop
     this.cachedRootSize = this.getRootSize()
-
-    if (this.options.loop) {
-      this.cachedMinScroll = -Infinity
-      this.cachedMaxScroll = -Infinity
-      this.scrollCacheValid = true
-      return
-    }
 
     // minScroll: используем peekStart (уже вычислен в calculateSizes)
     this.cachedMinScroll = -this.peekStart
