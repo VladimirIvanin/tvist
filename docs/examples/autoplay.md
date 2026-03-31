@@ -14,7 +14,7 @@ import AutoplayLoopExample from '../.vitepress/theme/examples/AutoplayLoopExampl
 
 ```js
 const slider = new Tvist('.tvist-v1', {
-  autoplay: { delay: 3000, pauseOnHover: true, pauseOnInteraction: false },
+  autoplay: { delay: 3000, pauseOnHover: true },
   pagination: {
     type: 'bullets',
     clickable: true
@@ -123,11 +123,10 @@ slider.slides[0].addEventListener(TVIST_DOM_EVENTS.longPressStart, (e) => {
 - **Описание:** Включает автопрокрутку. Поддерживает сокращённую запись и объект настроек:
   - `autoplay: true` — дефолтная задержка 3000мс, все настройки по умолчанию
   - `autoplay: 5000` — число задаёт задержку в мс, остальное по умолчанию
-  - `autoplay: { delay: 3000, pauseOnHover: true, pauseOnInteraction: false }` — полный контроль
+  - `autoplay: { delay: 3000, pauseOnHover: true }` — полный контроль
 - **Свойства объекта:**
   - `delay` — задержка между переходами (мс)
   - `pauseOnHover` — пауза при наведении курсора (по умолчанию `true`)
-  - `pauseOnInteraction` — пауза при любом взаимодействии: drag, click (по умолчанию `false`)
   - `disableOnInteraction` — полностью отключить после первого взаимодействия (по умолчанию `false`)
   - `waitForVideo` — для видео-слайдов: ждать окончания видео вместо таймера (по умолчанию `false`)
 

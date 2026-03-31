@@ -32,7 +32,6 @@ import type { AutoplayProgressEvent, TvistOptions, AutoplayOptions } from '../..
 const AUTOPLAY_DEFAULTS: Required<AutoplayOptions> = {
   delay: 3000,
   pauseOnHover: true,
-  pauseOnInteraction: false,
   disableOnInteraction: false,
   waitForVideo: false,
 }
@@ -56,7 +55,6 @@ function normalizeAutoplay(raw: TvistOptions['autoplay']): Required<AutoplayOpti
   return {
     delay: raw.delay ?? AUTOPLAY_DEFAULTS.delay,
     pauseOnHover: raw.pauseOnHover ?? AUTOPLAY_DEFAULTS.pauseOnHover,
-    pauseOnInteraction: raw.pauseOnInteraction ?? AUTOPLAY_DEFAULTS.pauseOnInteraction,
     disableOnInteraction: raw.disableOnInteraction ?? AUTOPLAY_DEFAULTS.disableOnInteraction,
     waitForVideo: raw.waitForVideo ?? AUTOPLAY_DEFAULTS.waitForVideo,
   }
@@ -339,8 +337,10 @@ export class AutoplayModule extends Module {
       }
     })
 
-    // При смене слайда: при ручной навигации (стрелки, пагинация и т.д.) сбрасываем таймер,
-    // чтобы новый слайд показывался полное время delay, а не остаток от предыдущего счётчика
+    // При смене слайда:
+    // - при ручной навигации (стрелки, пагинация и т.д.) сбрасываем таймер,
+    //   чтобы новый слайд показывался полное время delay, а не остаток от предыдущего счётчика
+    // - при autoplay-переходах не трогаем таймер, чтобы не ломать рекурсивный цикл run()
     this.on('slideChangeEnd', (index: number) => {
       const byAutoplay = this.transitionByAutoplay
       const now = performance.now()
@@ -360,22 +360,22 @@ export class AutoplayModule extends Module {
       
       // Для ручной навигации новый цикл стартует здесь.
       // Для autoplay-переходов цикл продолжается рекурсивно в run(),
-      // чтобы delay не зависел от длительности анимации.
+      // чтобы delay не зависел от длительности анимации, и мы не сбрасывали таймер зря.
       if (!this.paused && !this.stopped) {
-        this.cancelTimer()
-        this.timeLeft = null
-        this.progressStartOffset = 0
-        this.stopProgressTracking()
-        if (this.config?.waitForVideo) {
+        if (!byAutoplay) {
+          // Ручная навигация: сбрасываем текущий цикл и запускаем новый от текущего слайда.
+          this.cancelTimer()
+          this.timeLeft = null
+          this.progressStartOffset = 0
+          this.stopProgressTracking()
+          if (this.config?.waitForVideo) {
+            this.handleSlideChangedForVideo(index)
+          } else {
+            this.run()
+          }
+        } else if (this.config?.waitForVideo) {
+          // Автоплей в режиме ожидания видео: обновляем слушатель для нового слайда.
           this.handleSlideChangedForVideo(index)
-        } else if (!byAutoplay) {
-          this.run()
-        } else if (this.config && !this.options.loop && this.config.delay < (this.options.speed ?? 300)) {
-          // При очень коротком delay и включённой анимации ждём slideChangeEnd,
-          // чтобы следующий autoplay-тик не успел выполниться до окончания текущего перехода.
-          this.run()
-        } else {
-          // autoplay режим без waitForVideo: следующий цикл запланирован в run()
         }
       } else if (!byAutoplay && this.config?.waitForVideo) {
         this.handleSlideChangedForVideo(index)
