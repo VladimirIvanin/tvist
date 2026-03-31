@@ -150,7 +150,8 @@ export class Engine {
     if (this.options.loop) {
       // В loop-режиме с center продолжаем просто добавлять смещение
       if (this.options.center) {
-        return basePosition + centerOffset
+        const pos = basePosition + centerOffset
+        return pos === 0 ? 0 : pos
       }
 
       // Для обычного loop без центрирования ограничиваем позицию так,
@@ -160,7 +161,8 @@ export class Engine {
       const minScroll = this.cachedMinScroll
       const maxScroll = this.cachedMaxScroll
 
-      return Math.max(maxScroll, Math.min(minScroll, basePosition))
+      const clamped = Math.max(maxScroll, Math.min(minScroll, basePosition))
+      return clamped === 0 ? 0 : clamped
     }
 
     const endIndex = this.getEndIndex()
@@ -168,12 +170,16 @@ export class Engine {
     
     // При центрировании применяем offset
     if (this.options.center) {
-      return basePosition + centerOffset
+      const pos = basePosition + centerOffset
+      return pos === 0 ? 0 : pos
     }
     
     // Без центрирования применяем старую логику с peekTrim
     if (index === 0) return peekTrim ? this.getMinScrollPosition() : 0
-    if (index === endIndex) return peekTrim ? this.getMaxScrollPosition() : basePosition
+    if (index === endIndex) {
+      const pos = peekTrim ? this.getMaxScrollPosition() : basePosition
+      return pos === 0 ? 0 : pos
+    }
     
     // В режиме autoWidth/autoHeight проверяем, не создаст ли basePosition дыру справа/снизу
     const isAutoSize = (!this.options.direction || this.options.direction === 'horizontal') 
@@ -190,7 +196,8 @@ export class Engine {
       }
     }
     
-    return basePosition
+    const pos = basePosition
+    return pos === 0 ? 0 : pos
   }
 
   /**
