@@ -803,8 +803,11 @@ export class DragModule extends Module {
     // Emit события
     this.emit('drag', e)
 
-    // Prevent default для touchmove (избегаем скролла)
-    if (e.type === 'touchmove') {
+    // Prevent default для touch-жестов, чтобы браузер не перехватывал скролл.
+    // В окружениях с PointerEvent реальные тач-события приходят как pointermove
+    // c pointerType: 'touch', а не как touchmove, поэтому проверяем pointerType.
+    const pointerType = this.getPointerType(e)
+    if (pointerType === 'touch') {
       e.preventDefault()
     }
   }

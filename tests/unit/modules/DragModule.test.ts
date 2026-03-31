@@ -124,6 +124,50 @@ describe('DragModule', () => {
     })
   })
 
+  describe('Диагональный drag', () => {
+    it('не должен сбрасываться при диагональном свайпе (mouse)', async () => {
+      const initialPosition = slider.engine.location.get()
+
+      await simulateDrag({
+        element: fixture.container,
+        startX: 200,
+        startY: 200,
+        deltaX: -40,
+        deltaY: 80,
+        steps: 4,
+        type: 'mouse',
+      })
+
+      const finalPosition = slider.engine.location.get()
+
+      expect(finalPosition).not.toBe(initialPosition)
+      expect(finalPosition).toBeLessThan(initialPosition)
+    })
+
+    it('не должен сбрасываться при диагональном свайпе (touch)', async () => {
+      const initialPosition = slider.engine.location.get()
+
+      await simulateDrag({
+        element: fixture.container,
+        startX: 200,
+        startY: 200,
+        deltaX: -40,
+        deltaY: 80,
+        steps: 4,
+        type: 'touch',
+      })
+
+      const finalPosition = slider.engine.location.get()
+
+      expect(finalPosition).not.toBe(initialPosition)
+      expect(finalPosition).toBeLessThan(initialPosition)
+    })
+
+    // Поведение preventDefault для pointermove с pointerType 'touch'
+    // зависит от браузера и polyfill-ов PointerEvent, happy-dom этого
+    // не эмулирует, поэтому в unit-тестах мы не проверяем этот аспект.
+  })
+
   describe('Snap после отпускания', () => {
     it('НЕ должен переключать слайд если драг меньше threshold', async () => {
       const initialIndex = slider.activeIndex
