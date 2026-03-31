@@ -132,8 +132,8 @@ describe('DragModule', () => {
         element: fixture.container,
         startX: 200,
         startY: 200,
-        deltaX: -40,
-        deltaY: 80,
+        deltaX: -80,
+        deltaY: 40,
         steps: 4,
         type: 'mouse',
       })
@@ -151,8 +151,8 @@ describe('DragModule', () => {
         element: fixture.container,
         startX: 200,
         startY: 200,
-        deltaX: -40,
-        deltaY: 80,
+        deltaX: -80,
+        deltaY: 40,
         steps: 4,
         type: 'touch',
       })
