@@ -231,7 +231,18 @@ export class Engine {
    * Применяет peek к контейнеру слайдов
    */
   applyPeek(): void {
-    applyPeek(this.tvist.container, this.options)
+    // Ограничиваем peek так, чтобы он не превышал 50% базовой ширины/высоты слайда.
+    // Базовый размер считаем по root без учёта peek:
+    // slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
+    const isVertical = this.options.direction === 'vertical'
+    const rootSize = isVertical ? this.cachedRootHeight || getOuterHeight(this.tvist.root)
+      : this.cachedRootWidth || getOuterWidth(this.tvist.root)
+    const gap = this.options.gap ?? 0
+    const perPage = this.options.perPage ?? 1
+    const slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
+    const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : undefined
+
+    applyPeek(this.tvist.container, this.options, maxPeek)
   }
 
   /**
@@ -290,6 +301,20 @@ export class Engine {
       if (this.peekEnd === 0) {
         this.peekEnd = getPeekValue(this.tvist.container, endSide)
       }
+    }
+
+    // Дополнительно ограничиваем числовые peek значением не более 50% базового
+    // размера слайда (как и в applyPeek), чтобы математическая модель
+    // соответствовала DOM.
+    const rootSize = this.getRootSize()
+    const gap = this.options.gap ?? 0
+    const perPage = this.options.perPage ?? 1
+    const slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
+    const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : 0
+
+    if (maxPeek > 0) {
+      if (this.peekStart > maxPeek) this.peekStart = maxPeek
+      if (this.peekEnd > maxPeek) this.peekEnd = maxPeek
     }
   }
 
@@ -857,8 +882,12 @@ export class Engine {
     // Размеры доступны: проверяем, помещается ли контент полностью
     const contentFits = this.getContentSize() <= this.containerSize + 1
 
+    // Дополнительная эвристика для loop: если уникальных слайдов мало и они
+    // все одновременно попадают в viewport (contentFits), то листать
+    // "по кругу" визуально некуда — считаем такой слайдер заблокированным.
     if (this.options.loop) {
-      this.setLocked(contentFits, isDisabled)
+      const smallLoopCarousel = slideCount <= perPage + 1
+      this.setLocked(contentFits || smallLoopCarousel, isDisabled)
       return
     }
 

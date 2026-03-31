@@ -688,7 +688,10 @@ export class DragModule extends Module {
         this.stopMomentum();
         this.tvist.engine.animator.stop();
 
-        // КРИТИЧНО: вызываем loopFix ДО первого применения transform
+        // КРИТИЧНО: вызываем loopFix ДО первого применения transform.
+        // Но для "маленьких" loop-каруселей (slidesCount <= perPage + 1)
+        // первый loopFix при drag только создаёт визуальные дыры, поэтому
+        // в таком случае мы его пропускаем.
         if (this.options.loop && this.isFirstMove) {
           if (this.isMarqueeActive) {
             // В режиме marquee НЕ вызываем loopFix при драге.
@@ -696,7 +699,13 @@ export class DragModule extends Module {
             // Слайды уже расставлены MarqueeModule для непрерывной прокрутки.
             this.isFirstMove = false;
           } else {
-            if (this.loopModuleRef?.fix) {
+            const slidesCount = this.tvist.slides.length
+            const perPage = this.options.perPage ?? 1
+
+            // Маленькая карусель: полностью отключаем первый loopFix для drag.
+            if (slidesCount <= perPage + 1) {
+              this.isFirstMove = false
+            } else if (this.loopModuleRef?.fix) {
               // Определяем направление движения:
               // Движение вправо (delta > 0) = движение к началу = 'prev'
               // Движение влево (delta < 0) = движение к концу = 'next'
@@ -1016,8 +1025,21 @@ export class DragModule extends Module {
     if (!loopModule?.fix) return;
     const loopFix = loopModule.fix.bind(loopModule);
 
-    // Используем закешированный размер viewport (обновляется в updateBounds)
-    const viewportSize = this.cachedViewportSize;
+    const viewportSize = this.tvist.engine.containerSizeValue;
+
+    // Для "маленьких" loop-каруселей (мало слайдов относительно perPage)
+    // не имеет смысла coverageFix: контент и так почти всегда полностью
+    // покрывает viewport, а перестановки дают только визуальные прыжки.
+    // Для marquee-режима coverageFix всегда должен работать (даже на маленьких
+    // каруселях) — именно он подставляет слайды и устраняет дыры.
+    // Ограничение по "маленьким" каруселям применяем только для обычного loop.
+    if (!this.isMarqueeActive) {
+      const slidesCount = this.tvist.slides.length;
+      const perPage = this.options.perPage ?? 1;
+      if (slidesCount <= perPage + 1) {
+        return;
+      }
+    }
 
     // Координаты viewport в пространстве контента
     const vpStart = -currentPosition;
@@ -1090,7 +1112,7 @@ export class DragModule extends Module {
       this.startIndex = this.tvist.engine.index.get();
 
       // Cooldown: пропускаем следующие N pointermove для стабилизации
-      this.coverageFixCooldown = 5;
+              this.coverageFixCooldown = 5;
     }
   }
 

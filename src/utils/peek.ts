@@ -31,11 +31,15 @@ function isPeekObject(
  * Получает CSS значение padding для указанной стороны (peek реализуется через padding контейнера)
  * @param options - опции слайдера
  * @param side - сторона ('left', 'right', 'top', 'bottom')
+ * @param maxNumericPx - максимальное числовое значение peek в пикселях
+ *   (если передано, все числовые значения будут ограничены этим порогом,
+ *   строковые peek вроде '10%' остаются как есть)
  * @returns CSS строка
  */
 export function getCssPeek(
   options: TvistOptions,
-  side: 'left' | 'right' | 'top' | 'bottom'
+  side: 'left' | 'right' | 'top' | 'bottom',
+  maxNumericPx?: number
 ): string {
   const { peek } = options
 
@@ -44,8 +48,17 @@ export function getCssPeek(
   }
 
   if (isPeekObject(peek)) {
-    const value = (peek as Record<string, number | string | undefined>)[side]
-    return unit(value)
+    const raw = (peek as Record<string, number | string | undefined>)[side]
+    if (typeof raw === 'number' && typeof maxNumericPx === 'number' && maxNumericPx > 0) {
+      const limited = Math.min(raw, maxNumericPx)
+      return unit(limited)
+    }
+    return unit(raw)
+  }
+
+  if (typeof peek === 'number' && typeof maxNumericPx === 'number' && maxNumericPx > 0) {
+    const limited = Math.min(peek, maxNumericPx)
+    return unit(limited)
   }
 
   return unit(peek)
@@ -98,15 +111,20 @@ export function getPeekValue(
  * Применяет peek к элементу (через CSS padding контейнера)
  * @param element - DOM элемент
  * @param options - опции слайдера
+ * @param maxNumericPx - максимальное числовое значение peek (в пикселях)
  */
-export function applyPeek(element: HTMLElement, options: TvistOptions): void {
+export function applyPeek(
+  element: HTMLElement,
+  options: TvistOptions,
+  maxNumericPx?: number
+): void {
   const isVertical = options.direction === 'vertical'
 
   if (isVertical) {
-    element.style.paddingTop = getCssPeek(options, 'top')
-    element.style.paddingBottom = getCssPeek(options, 'bottom')
+    element.style.paddingTop = getCssPeek(options, 'top', maxNumericPx)
+    element.style.paddingBottom = getCssPeek(options, 'bottom', maxNumericPx)
   } else {
-    element.style.paddingLeft = getCssPeek(options, 'left')
-    element.style.paddingRight = getCssPeek(options, 'right')
+    element.style.paddingLeft = getCssPeek(options, 'left', maxNumericPx)
+    element.style.paddingRight = getCssPeek(options, 'right', maxNumericPx)
   }
 }

@@ -173,6 +173,75 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
   })
 
   // ===========================================================================
+  // Bug 4: Loop + perPage: 3 + peek 120 + 4 слайда
+  //
+  // Суть: при конфигурации, где все слайды уже помещаются во viewport
+  // (loop + perPage: 3 + gap + peek, всего 4 слайда), coverage-проверка
+  // в DragModule ошибочно считает, что справа есть "дыра" из-за того, что
+  // использует размер root (offsetWidth) вместо фактического viewport
+  // слайдов (engine.containerSizeValue). В результате при первом drag
+  // вызывается loopFix и слайды перестраиваются, создавая большую левую
+  // пустоту несмотря на то, что до drag всё было корректно.
+  //
+  // Ожидание: если до drag viewport полностью покрыт слайдами (нет дыр),
+  // то во время drag coverageFix НЕ должен вызывать loopFix и создавать
+  // левую "дыру" — leftGap остаётся ~0.
+  // ===========================================================================
+
+  describe('Bug 4: Loop + perPage: 3 + peek 120 + 4 slides', () => {
+    it('drag start не должен создавать левую дыру, когда все слайды уже помещаются', async () => {
+      // Воспроизводим конфигурацию из док-примера и реального кейса:
+      // ширина root ~1103, 4 слайда, perPage: 3, gap: 32, peek: 120, loop: true.
+      const WIDTH = 1103
+
+      fixture = createSliderFixture({
+        slidesCount: 4,
+        width: WIDTH,
+      })
+
+      slider = new Tvist(fixture.root, {
+        loop: true,
+        drag: true,
+        perPage: 3,
+        gap: GAP,
+        peek: 120,
+        speed: 0,
+      })
+
+      // ВАЖНО: coverage нужно считать по фактическому viewport слайдов,
+      // а не по ширине root.
+      const viewport = slider.engine.containerSizeValue
+
+      // До drag viewport полностью покрыт контентом — дыр нет
+      const coverageBefore = checkViewportCoverage(slider, viewport)
+
+      expect(coverageBefore.hasGaps).toBe(false)
+      expect(coverageBefore.leftGap).toBeLessThan(5)
+      expect(coverageBefore.rightGap).toBeLessThan(5)
+
+      // Стартуем drag вправо на небольшое расстояние (достаточно, чтобы
+      // превысить MIN_DRAG_DISTANCE и запустить drag + coverageFix),
+      // но НЕ отпускаем сразу — проверяем состояние во время drag.
+      const endDrag = await startContinuousDrag(fixture.root, 400, 80, 10)
+
+      const coverageDuring = checkViewportCoverage(slider, viewport)
+
+      console.log('[Bug 4] Loop + perPage:3 + peek 120 + 4 slides, during drag:', {
+        location: coverageDuring.location,
+        leftGap: coverageDuring.leftGap,
+        rightGap: coverageDuring.rightGap,
+        hasGaps: coverageDuring.hasGaps,
+      })
+
+      // Ожидаемое поведение: coverageFix НЕ должен создавать дыр слева
+      // (контент не должен отлипать от начала карусели).
+      expect(coverageDuring.leftGap).toBeLessThan(5)
+
+      await endDrag()
+    })
+  })
+
+  // ===========================================================================
   // Bug 1: Loop + Drag — пустоты при длинном непрерывном drag
   //
   // Суть: DragModule вызывает loopFix один раз при начале drag и выставляет
