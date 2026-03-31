@@ -65,9 +65,6 @@ export class DragModule extends Module {
   private minPosition = 0;
   private maxPosition = 0;
 
-  // Кеш размера viewport (избегаем layout thrashing при drag)
-  private cachedViewportSize = 0;
-
   // Кеш ссылок на модули и вычислений (избегаем повторных lookup на каждом pointermove)
   private loopModuleRef: {
     fix?: (params: {
@@ -195,12 +192,6 @@ export class DragModule extends Module {
   private updateBounds(): void {
     const { engine, slides } = this.tvist;
     const perPage = this.options.perPage ?? 1;
-
-    // Кешируем размер viewport (читаем offsetWidth/offsetHeight один раз при resize, не на каждом pointermove)
-    const isHorizontal = this.options.direction !== 'vertical';
-    this.cachedViewportSize = isHorizontal
-      ? this.tvist.root.offsetWidth
-      : this.tvist.root.offsetHeight;
 
     if (this.options.loop || this.isMarqueeActive) {
       // При loop или marquee границ нет (бесконечная прокрутка)
