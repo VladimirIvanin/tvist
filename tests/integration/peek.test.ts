@@ -121,7 +121,7 @@ describe('Peek integration', () => {
       const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
       expect(track.style.paddingLeft).toBe('50px')
-      expect(track.style.paddingRight).toBe('0px')
+      expect(track.style.paddingRight).toBe('')
     })
   })
 
@@ -198,7 +198,7 @@ describe('Peek integration', () => {
   })
 
   describe('Peek without value', () => {
-    it('should not apply peek when not specified', () => {
+    it('should not set padding when peek is not specified', () => {
       const options: TvistOptions = {
         direction: 'horizontal'
       }
@@ -206,8 +206,8 @@ describe('Peek integration', () => {
       tvist = new Tvist(root, options)
       const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(track.style.paddingLeft).toBe('0px')
-      expect(track.style.paddingRight).toBe('0px')
+      expect(track.style.paddingLeft).toBe('')
+      expect(track.style.paddingRight).toBe('')
     })
   })
 
@@ -253,7 +253,7 @@ describe('Peek integration', () => {
   })
 
   describe('Peek edge cases', () => {
-    it('should handle zero peek', () => {
+    it('should not set padding when peek is zero', () => {
       const options: TvistOptions = {
         peek: 0,
         direction: 'horizontal'
@@ -262,11 +262,11 @@ describe('Peek integration', () => {
       tvist = new Tvist(root, options)
       const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(track.style.paddingLeft).toBe('0px')
-      expect(track.style.paddingRight).toBe('0px')
+      expect(track.style.paddingLeft).toBe('')
+      expect(track.style.paddingRight).toBe('')
     })
 
-    it('should handle empty object peek', () => {
+    it('should not set padding when peek is empty object', () => {
       const options: TvistOptions = {
         peek: {},
         direction: 'horizontal'
@@ -275,8 +275,8 @@ describe('Peek integration', () => {
       tvist = new Tvist(root, options)
       const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(track.style.paddingLeft).toBe('0px')
-      expect(track.style.paddingRight).toBe('0px')
+      expect(track.style.paddingLeft).toBe('')
+      expect(track.style.paddingRight).toBe('')
     })
   })
 })

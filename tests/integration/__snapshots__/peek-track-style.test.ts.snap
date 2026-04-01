@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Track padding style snapshot > with peek > track style should contain both paddings for full asymmetric object peek 1`] = `"padding-left: 20px; padding-right: 60px;"`;
+
+exports[`Track padding style snapshot > with peek > track style should contain only paddingLeft for asymmetric object peek 1`] = `"padding-left: 30px;"`;
+
+exports[`Track padding style snapshot > with peek > track style should contain paddingLeft and paddingRight for numeric peek 1`] = `"padding-left: 40px; padding-right: 40px;"`;
+
+exports[`Track padding style snapshot > with peek > track style should contain paddingLeft and paddingRight for string peek 1`] = `"padding-left: 2rem; padding-right: 2rem;"`;
+
+exports[`Track padding style snapshot > with peek > track style should contain paddingTop and paddingBottom for vertical peek 1`] = `"padding-top: 50px; padding-bottom: 50px;"`;
+
+exports[`Track padding style snapshot > without peek > track style attribute should not contain padding for vertical slider without peek 1`] = `null`;
+
+exports[`Track padding style snapshot > without peek > track style attribute should not contain padding when peek is empty object 1`] = `null`;
+
+exports[`Track padding style snapshot > without peek > track style attribute should not contain padding when peek is not set 1`] = `null`;
+
+exports[`Track padding style snapshot > without peek > track style attribute should not contain padding when peek is zero 1`] = `null`;

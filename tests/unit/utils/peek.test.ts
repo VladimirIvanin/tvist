@@ -164,5 +164,40 @@ describe('peek utils', () => {
       expect(element.style.paddingLeft).toBe('10px')
       expect(element.style.paddingRight).toBe('10px')
     })
+
+    it('should not set any padding when peek is not specified', () => {
+      const options: TvistOptions = {
+        direction: 'horizontal'
+      }
+
+      applyPeek(element, options)
+
+      expect(element.style.paddingLeft).toBe('')
+      expect(element.style.paddingRight).toBe('')
+    })
+
+    it('should not set padding when peek is zero', () => {
+      const options: TvistOptions = {
+        direction: 'horizontal',
+        peek: 0
+      }
+
+      applyPeek(element, options)
+
+      expect(element.style.paddingLeft).toBe('')
+      expect(element.style.paddingRight).toBe('')
+    })
+
+    it('should not set padding for missing side in object peek', () => {
+      const options: TvistOptions = {
+        direction: 'horizontal',
+        peek: { left: 20 }
+      }
+
+      applyPeek(element, options)
+
+      expect(element.style.paddingLeft).toBe('20px')
+      expect(element.style.paddingRight).toBe('')
+    })
   })
 })

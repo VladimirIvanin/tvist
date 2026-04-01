@@ -108,6 +108,16 @@ export function getPeekValue(
 }
 
 /**
+ * Устанавливает или удаляет CSS padding на элементе.
+ * Если значение равно '0px', свойство удаляется (присваивается ''),
+ * чтобы не загрязнять inline-стили нулевыми значениями.
+ */
+function setPaddingOrRemove(element: HTMLElement, prop: keyof CSSStyleDeclaration, value: string): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ;(element.style as any)[prop] = value === '0px' ? '' : value
+}
+
+/**
  * Применяет peek к элементу (через CSS padding контейнера)
  * @param element - DOM элемент
  * @param options - опции слайдера
@@ -121,10 +131,10 @@ export function applyPeek(
   const isVertical = options.direction === 'vertical'
 
   if (isVertical) {
-    element.style.paddingTop = getCssPeek(options, 'top', maxNumericPx)
-    element.style.paddingBottom = getCssPeek(options, 'bottom', maxNumericPx)
+    setPaddingOrRemove(element, 'paddingTop', getCssPeek(options, 'top', maxNumericPx))
+    setPaddingOrRemove(element, 'paddingBottom', getCssPeek(options, 'bottom', maxNumericPx))
   } else {
-    element.style.paddingLeft = getCssPeek(options, 'left', maxNumericPx)
-    element.style.paddingRight = getCssPeek(options, 'right', maxNumericPx)
+    setPaddingOrRemove(element, 'paddingLeft', getCssPeek(options, 'left', maxNumericPx))
+    setPaddingOrRemove(element, 'paddingRight', getCssPeek(options, 'right', maxNumericPx))
   }
 }
