@@ -17,34 +17,42 @@
 
       <div class="stories-shell" :class="{ 'stories-shell--hold-paused': storyHoldPaused }">
         <div ref="groupRootEl" class="tvist-v1 stories-groups">
-          <div class="tvist-v1__container">
-            <div v-for="(group, groupIndex) in groups" :key="group.id" class="tvist-v1__slide stories-group-slide">
-              <div class="stories-inner-wrap">
-                <div class="stories-progress">
-                  <div
-                    v-for="(item, storyIndex) in group.stories"
-                    :key="item.id"
-                    class="stories-progress__segment"
-                  >
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div
+                v-for="(group, groupIndex) in groups"
+                :key="group.id"
+                class="tvist-v1__slide stories-group-slide"
+              >
+                <div class="stories-inner-wrap">
+                  <div class="stories-progress">
                     <div
-                      class="stories-progress__fill"
-                      :class="{ 'stories-progress__fill--animated': shouldAnimateSegment(groupIndex, storyIndex) }"
-                      :style="{ width: getSegmentWidth(groupIndex, storyIndex) }"
-                      :key="`${item.id}-${progressRenderKey}`"
-                    ></div>
-                  </div>
-                </div>
-                <div :ref="(el) => setInnerRootRef(el, groupIndex)" class="tvist-v1 stories-inner">
-                  <div class="tvist-v1__container">
-                    <div
-                      v-for="story in group.stories"
-                      :key="story.id"
-                      class="tvist-v1__slide stories-inner-slide"
-                      :style="{ background: story.background }"
+                      v-for="(item, storyIndex) in group.stories"
+                      :key="item.id"
+                      class="stories-progress__segment"
                     >
-                      <div class="stories-meta">
-                        <div class="stories-author">{{ group.author }}</div>
-                        <div class="stories-title">{{ story.title }}</div>
+                      <div
+                        class="stories-progress__fill"
+                        :class="{ 'stories-progress__fill--animated': shouldAnimateSegment(groupIndex, storyIndex) }"
+                        :style="{ width: getSegmentWidth(groupIndex, storyIndex) }"
+                        :key="`${item.id}-${progressRenderKey}`"
+                      ></div>
+                    </div>
+                  </div>
+                  <div :ref="(el) => setInnerRootRef(el, groupIndex)" class="tvist-v1 stories-inner">
+                    <div class="tvist-v1__track">
+                      <div class="tvist-v1__container">
+                        <div
+                          v-for="story in group.stories"
+                          :key="story.id"
+                          class="tvist-v1__slide stories-inner-slide"
+                          :style="{ background: story.background }"
+                        >
+                          <div class="stories-meta">
+                            <div class="stories-author">{{ group.author }}</div>
+                            <div class="stories-title">{{ story.title }}</div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

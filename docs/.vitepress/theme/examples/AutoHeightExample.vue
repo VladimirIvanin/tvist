@@ -6,15 +6,17 @@
   >
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1 tvist-v1--vertical">
-        <div class="tvist-v1__container">
-          <div
-            v-for="(item, i) in slides"
-            :key="i"
-            class="tvist-v1__slide"
-            :style="{ minHeight: item.height }"
-          >
-            <span class="slide-label">{{ item.label }}</span>
-            <span class="slide-size">{{ item.height }}</span>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div
+              v-for="(item, i) in slides"
+              :key="i"
+              class="tvist-v1__slide"
+              :style="{ minHeight: item.height }"
+            >
+              <span class="slide-label">{{ item.label }}</span>
+              <span class="slide-size">{{ item.height }}</span>
+            </div>
           </div>
         </div>
       </div>

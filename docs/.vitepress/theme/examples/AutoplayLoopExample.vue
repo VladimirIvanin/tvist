@@ -2,29 +2,31 @@
   <ExampleCard title="Autoplay с Loop" description="Бесконечная прокрутка: после последнего слайда плавно переходим к первому">
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">1</div>
-              <div class="slide-text">Первый</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">1</div>
+                <div class="slide-text">Первый</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">2</div>
-              <div class="slide-text">Второй</div>
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">2</div>
+                <div class="slide-text">Второй</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">3</div>
-              <div class="slide-text">Третий</div>
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">3</div>
+                <div class="slide-text">Третий</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">4</div>
-              <div class="slide-text">Последний → снова первый</div>
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">4</div>
+                <div class="slide-text">Последний → снова первый</div>
+              </div>
             </div>
           </div>
         </div>

@@ -2,11 +2,13 @@
   <div class="marquee-example">
     <h3>Базовый пример</h3>
     <div ref="basicSlider" class="tvist-v1 marquee-basic">
-      <div class="tvist-v1__container">
-        <div v-for="i in 8" :key="i" class="tvist-v1__slide">
-          <div class="marquee-card">
-            <div class="marquee-icon">🎨</div>
-            <div class="marquee-text">Слайд {{ i }}</div>
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div v-for="i in 8" :key="i" class="tvist-v1__slide">
+            <div class="marquee-card">
+              <div class="marquee-icon">🎨</div>
+              <div class="marquee-text">Слайд {{ i }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -32,10 +34,12 @@
 
     <h3>Логотипы партнёров</h3>
     <div ref="logosSlider" class="tvist-v1 marquee-logos">
-      <div class="tvist-v1__container">
-        <div v-for="i in 6" :key="i" class="tvist-v1__slide">
-          <div class="logo-card">
-            <div class="logo-placeholder">Logo {{ i }}</div>
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div v-for="i in 6" :key="i" class="tvist-v1__slide">
+            <div class="logo-card">
+              <div class="logo-placeholder">Logo {{ i }}</div>
+            </div>
           </div>
         </div>
       </div>
@@ -43,11 +47,13 @@
 
     <h3>Вертикальная бегущая строка</h3>
     <div ref="verticalSlider" class="tvist-v1 marquee-vertical">
-      <div class="tvist-v1__container">
-        <div v-for="i in 5" :key="i" class="tvist-v1__slide">
-          <div class="news-item">
-            <span class="news-icon">📢</span>
-            <span class="news-text">Новость {{ i }}: Важное объявление</span>
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div v-for="i in 5" :key="i" class="tvist-v1__slide">
+            <div class="news-item">
+              <span class="news-icon">📢</span>
+              <span class="news-text">Новость {{ i }}: Важное объявление</span>
+            </div>
           </div>
         </div>
       </div>

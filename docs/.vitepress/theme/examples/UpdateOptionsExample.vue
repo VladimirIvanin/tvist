@@ -164,15 +164,17 @@
 
     <div class="slider-wrapper">
       <div ref="sliderEl" class="tvist-v1" :class="{ 'tvist-v1--vertical': options.direction === 'vertical' }">
-        <div class="tvist-v1__container">
-          <div 
-            v-for="i in 8" 
-            :key="i" 
-            class="tvist-v1__slide"
-          >
-            <div class="slide-content">
-              <span class="slide-number">{{ i }}</span>
-              <p class="slide-text">Слайд {{ i }}</p>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div 
+              v-for="i in 8" 
+              :key="i" 
+              class="tvist-v1__slide"
+            >
+              <div class="slide-content">
+                <span class="slide-number">{{ i }}</span>
+                <p class="slide-text">Слайд {{ i }}</p>
+              </div>
             </div>
           </div>
         </div>

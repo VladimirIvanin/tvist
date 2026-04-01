@@ -6,19 +6,23 @@
   >
     <div class="demo-wrapper">
       <div ref="parentEl" class="tvist-v1 parent-slider">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide parent-slide--nested">
-            <span class="parent-slide__label">Внешний слайд 1</span>
-            <div ref="nestedEl" class="tvist-v1 nested-slider">
-              <div class="tvist-v1__container">
-                <div class="tvist-v1__slide">Внутр. A</div>
-                <div class="tvist-v1__slide">Внутр. B</div>
-                <div class="tvist-v1__slide">Внутр. C</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide parent-slide--nested">
+              <span class="parent-slide__label">Внешний слайд 1</span>
+              <div ref="nestedEl" class="tvist-v1 nested-slider">
+                <div class="tvist-v1__track">
+                  <div class="tvist-v1__container">
+                    <div class="tvist-v1__slide">Внутр. A</div>
+                    <div class="tvist-v1__slide">Внутр. B</div>
+                    <div class="tvist-v1__slide">Внутр. C</div>
+                  </div>
+                </div>
               </div>
             </div>
+            <div class="tvist-v1__slide">Внешний 2</div>
+            <div class="tvist-v1__slide">Внешний 3</div>
           </div>
-          <div class="tvist-v1__slide">Внешний 2</div>
-          <div class="tvist-v1__slide">Внешний 3</div>
         </div>
       </div>
 

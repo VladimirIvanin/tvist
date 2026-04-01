@@ -3,23 +3,27 @@
     <div class="demo-wrapper">
       <div class="gallery-wrapper">
         <div ref="thumbsVerticalEl" class="tvist-v1 tvist-thumbs">
-          <div class="tvist-v1__container">
-            <div class="tvist-v1__slide">1</div>
-            <div class="tvist-v1__slide">2</div>
-            <div class="tvist-v1__slide">3</div>
-            <div class="tvist-v1__slide">4</div>
-            <div class="tvist-v1__slide">5</div>
-            <div class="tvist-v1__slide">6</div>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div class="tvist-v1__slide">1</div>
+              <div class="tvist-v1__slide">2</div>
+              <div class="tvist-v1__slide">3</div>
+              <div class="tvist-v1__slide">4</div>
+              <div class="tvist-v1__slide">5</div>
+              <div class="tvist-v1__slide">6</div>
+            </div>
           </div>
         </div>
         <div ref="mainHorizontalEl" class="tvist-v1 tvist-main">
-          <div class="tvist-v1__container">
-            <div class="tvist-v1__slide">Slide 1</div>
-            <div class="tvist-v1__slide">Slide 2</div>
-            <div class="tvist-v1__slide">Slide 3</div>
-            <div class="tvist-v1__slide">Slide 4</div>
-            <div class="tvist-v1__slide">Slide 5</div>
-            <div class="tvist-v1__slide">Slide 6</div>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div class="tvist-v1__slide">Slide 1</div>
+              <div class="tvist-v1__slide">Slide 2</div>
+              <div class="tvist-v1__slide">Slide 3</div>
+              <div class="tvist-v1__slide">Slide 4</div>
+              <div class="tvist-v1__slide">Slide 5</div>
+              <div class="tvist-v1__slide">Slide 6</div>
+            </div>
           </div>
         </div>
       </div>
@@ -34,25 +38,29 @@
 <div class="gallery-wrapper">
   <!-- Vertical Thumbnails (left) -->
   <div class="tvist-v1 tvist-thumbs">
-    <div class="tvist-v1__container">
-      <div class="tvist-v1__slide">1</div>
-      <div class="tvist-v1__slide">2</div>
-      <div class="tvist-v1__slide">3</div>
-      <div class="tvist-v1__slide">4</div>
-      <div class="tvist-v1__slide">5</div>
-      <div class="tvist-v1__slide">6</div>
+    <div class="tvist-v1__track">
+      <div class="tvist-v1__container">
+        <div class="tvist-v1__slide">1</div>
+        <div class="tvist-v1__slide">2</div>
+        <div class="tvist-v1__slide">3</div>
+        <div class="tvist-v1__slide">4</div>
+        <div class="tvist-v1__slide">5</div>
+        <div class="tvist-v1__slide">6</div>
+      </div>
     </div>
   </div>
   
   <!-- Main Horizontal Slider (right) -->
   <div class="tvist-v1 tvist-main">
-    <div class="tvist-v1__container">
-      <div class="tvist-v1__slide">Slide 1</div>
-      <div class="tvist-v1__slide">Slide 2</div>
-      <div class="tvist-v1__slide">Slide 3</div>
-      <div class="tvist-v1__slide">Slide 4</div>
-      <div class="tvist-v1__slide">Slide 5</div>
-      <div class="tvist-v1__slide">Slide 6</div>
+    <div class="tvist-v1__track">
+      <div class="tvist-v1__container">
+        <div class="tvist-v1__slide">Slide 1</div>
+        <div class="tvist-v1__slide">Slide 2</div>
+        <div class="tvist-v1__slide">Slide 3</div>
+        <div class="tvist-v1__slide">Slide 4</div>
+        <div class="tvist-v1__slide">Slide 5</div>
+        <div class="tvist-v1__slide">Slide 6</div>
+      </div>
     </div>
   </div>
 </div>

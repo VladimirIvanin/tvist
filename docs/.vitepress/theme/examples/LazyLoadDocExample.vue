@@ -6,14 +6,16 @@
   >
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div v-for="i in 10" :key="i" class="tvist-v1__slide">
-            <img 
-              :data-src="`https://picsum.photos/800/600?random=${i}`"
-              :alt="`Slide ${i}`"
-              class="lazy-image"
-            >
-            <div class="slide-label">Slide {{ i }}</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div v-for="i in 10" :key="i" class="tvist-v1__slide">
+              <img 
+                :data-src="`https://picsum.photos/800/600?random=${i}`"
+                :alt="`Slide ${i}`"
+                class="lazy-image"
+              >
+              <div class="slide-label">Slide {{ i }}</div>
+            </div>
           </div>
         </div>
       </div>

@@ -1,39 +1,41 @@
 <template>
-  <ExampleCard 
-    title="Scrollbar Module" 
+  <ExampleCard
+    title="Scrollbar Module"
     description="Кастомный скроллбар для навигации по слайдеру с поддержкой drag & drop"
     :detailsLink="detailsLink"
   >
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1" style="position: relative;">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide slide-1">
-            <div class="slide-content">
-              <div class="slide-title">Слайд 1</div>
-              <div class="slide-hint">
-                🖱️ Используйте скроллбар внизу<br>
-                Кликайте или перетаскивайте
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide slide-1">
+              <div class="slide-content">
+                <div class="slide-title">Слайд 1</div>
+                <div class="slide-hint">
+                  🖱️ Используйте скроллбар внизу<br />
+                  Кликайте или перетаскивайте
+                </div>
               </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide slide-2">
-            <div class="slide-content">
-              <div class="slide-title">Слайд 2</div>
+            <div class="tvist-v1__slide slide-2">
+              <div class="slide-content">
+                <div class="slide-title">Слайд 2</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide slide-3">
-            <div class="slide-content">
-              <div class="slide-title">Слайд 3</div>
+            <div class="tvist-v1__slide slide-3">
+              <div class="slide-content">
+                <div class="slide-title">Слайд 3</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide slide-4">
-            <div class="slide-content">
-              <div class="slide-title">Слайд 4</div>
+            <div class="tvist-v1__slide slide-4">
+              <div class="slide-content">
+                <div class="slide-title">Слайд 4</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide slide-5">
-            <div class="slide-content">
-              <div class="slide-title">Слайд 5</div>
+            <div class="tvist-v1__slide slide-5">
+              <div class="slide-content">
+                <div class="slide-title">Слайд 5</div>
+              </div>
             </div>
           </div>
         </div>

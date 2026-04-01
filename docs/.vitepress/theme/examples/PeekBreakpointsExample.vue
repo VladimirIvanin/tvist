@@ -1,10 +1,12 @@
 <template>
   <div class="example">
     <div ref="sliderRef" class="tvist-v1 peek-breakpoints">
-      <div class="tvist-v1__container">
-        <div v-for="i in 9" :key="i" class="tvist-v1__slide">
-          <div class="slide-content">
-            {{ i }}
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div v-for="i in 9" :key="i" class="tvist-v1__slide">
+            <div class="slide-content">
+              {{ i }}
+            </div>
           </div>
         </div>
       </div>

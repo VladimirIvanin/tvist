@@ -2,28 +2,30 @@
   <ExampleCard title="Video" description="Управление видео в слайдах с автовоспроизведением и прогрессом">
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide">
-            <video
-              src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
-              muted
-              playsinline
-              height="300"
-            ></video>
-          </div>
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">2</div>
-              <div class="slide-text">Фото-слайд (2 сек)</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">
+              <video
+                src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+                muted
+                playsinline
+                height="300"
+              ></video>
             </div>
-          </div>
-          <div class="tvist-v1__slide">
-            <video
-              src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
-              muted
-              playsinline
-              height="300"
-            ></video>
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">2</div>
+                <div class="slide-text">Фото-слайд (2 сек)</div>
+              </div>
+            </div>
+            <div class="tvist-v1__slide">
+              <video
+                src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm"
+                muted
+                playsinline
+                height="300"
+              ></video>
+            </div>
           </div>
         </div>
         <div class="tvist-v1__pagination"></div>

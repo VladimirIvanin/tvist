@@ -1,38 +1,40 @@
 <template>
-  <ExampleCard 
-    title="Scroll Control" 
+  <ExampleCard
+    title="Scroll Control"
     description="Управление слайдером через скролл колесика мыши"
     :detailsLink="detailsLink"
   >
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide slide-1">
-            <div class="slide-content">
-              <div class="slide-title">Слайд 1</div>
-              <div class="slide-hint">
-                🖱️ Используйте колесико мыши
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide slide-1">
+              <div class="slide-content">
+                <div class="slide-title">Слайд 1</div>
+                <div class="slide-hint">
+                  🖱️ Используйте колесико мыши
+                </div>
               </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide slide-2">
-            <div class="slide-content">
-              <div class="slide-title">Слайд 2</div>
+            <div class="tvist-v1__slide slide-2">
+              <div class="slide-content">
+                <div class="slide-title">Слайд 2</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide slide-3">
-            <div class="slide-content">
-              <div class="slide-title">Слайд 3</div>
+            <div class="tvist-v1__slide slide-3">
+              <div class="slide-content">
+                <div class="slide-title">Слайд 3</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide slide-4">
-            <div class="slide-content">
-              <div class="slide-title">Слайд 4</div>
+            <div class="tvist-v1__slide slide-4">
+              <div class="slide-content">
+                <div class="slide-title">Слайд 4</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide slide-5">
-            <div class="slide-content">
-              <div class="slide-title">Слайд 5</div>
+            <div class="tvist-v1__slide slide-5">
+              <div class="slide-content">
+                <div class="slide-title">Слайд 5</div>
+              </div>
             </div>
           </div>
         </div>
@@ -43,13 +45,20 @@
           Текущий слайд: <strong>{{ state.current }}</strong> / <strong>5</strong>
         </div>
         <div class="info-item">
-          Направление: <strong>{{ state.direction === 'horizontal' ? '←→ Горизонтальное' : '↑↓ Вертикальное' }}</strong>
+          Направление:
+          <strong>
+            {{ state.direction === 'horizontal' ? '←→ Горизонтальное' : '↑↓ Вертикальное' }}
+          </strong>
         </div>
       </div>
 
       <div class="controls">
         <button @click="toggleDirection">
-          {{ state.direction === 'horizontal' ? '↕️ Переключить на вертикальное' : '↔️ Переключить на горизонтальное' }}
+          {{
+            state.direction === 'horizontal'
+              ? '↕️ Переключить на вертикальное'
+              : '↔️ Переключить на горизонтальное'
+          }}
         </button>
         <button @click="toggleReleaseOnEdges">
           {{ state.releaseOnEdges ? '🔓 ReleaseOnEdges: ON' : '🔒 ReleaseOnEdges: OFF' }}

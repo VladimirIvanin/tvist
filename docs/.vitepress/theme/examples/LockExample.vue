@@ -8,9 +8,11 @@
         <h3>Заблокирован (perPage: 2, 2 слайда, без loop)</h3>
         <p class="hint">Весь контент виден, листать некуда → слайдер заблокирован.</p>
         <div ref="lockedEl" class="tvist-v1 lock-demo">
-          <div class="tvist-v1__container">
-            <div class="tvist-v1__slide"><span>1</span></div>
-            <div class="tvist-v1__slide"><span>2</span></div>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div class="tvist-v1__slide"><span>1</span></div>
+              <div class="tvist-v1__slide"><span>2</span></div>
+            </div>
           </div>
         </div>
         <div class="controls">
@@ -26,8 +28,10 @@
         <h3>Разблокирован (perPage: 2, 6 слайдов, без loop)</h3>
         <p class="hint">Контент не помещается → слайдер активен, стрелки и drag работают.</p>
         <div ref="unlockedEl" class="tvist-v1 lock-demo">
-          <div class="tvist-v1__container">
-            <div v-for="i in 6" :key="i" class="tvist-v1__slide"><span>{{ i }}</span></div>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div v-for="i in 6" :key="i" class="tvist-v1__slide"><span>{{ i }}</span></div>
+            </div>
           </div>
         </div>
         <div class="controls">

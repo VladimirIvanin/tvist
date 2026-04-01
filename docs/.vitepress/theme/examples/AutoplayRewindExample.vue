@@ -2,29 +2,31 @@
   <ExampleCard title="Autoplay с Rewind" description="Автоматический возврат к первому слайду после последнего">
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">1</div>
-              <div class="slide-text">Первый</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">1</div>
+                <div class="slide-text">Первый</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">2</div>
-              <div class="slide-text">Второй</div>
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">2</div>
+                <div class="slide-text">Второй</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">3</div>
-              <div class="slide-text">Третий</div>
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">3</div>
+                <div class="slide-text">Третий</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">4</div>
-              <div class="slide-text">Последний</div>
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">4</div>
+                <div class="slide-text">Последний</div>
+              </div>
             </div>
           </div>
         </div>

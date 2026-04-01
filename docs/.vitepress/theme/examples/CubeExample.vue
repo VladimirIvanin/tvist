@@ -3,11 +3,13 @@
     <div class="demo-wrapper">
       <div class="cube-wrapper">
         <div ref="sliderEl" class="tvist-v1">
-          <div class="tvist-v1__container">
-            <div class="tvist-v1__slide">Slide 1</div>
-            <div class="tvist-v1__slide">Slide 2</div>
-            <div class="tvist-v1__slide">Slide 3</div>
-            <div class="tvist-v1__slide">Slide 4</div>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div class="tvist-v1__slide">Slide 1</div>
+              <div class="tvist-v1__slide">Slide 2</div>
+              <div class="tvist-v1__slide">Slide 3</div>
+              <div class="tvist-v1__slide">Slide 4</div>
+            </div>
           </div>
         </div>
       </div>
@@ -64,13 +66,20 @@ onUnmounted(() => {
   margin: 0 auto 20px;
 }
 
-.tvist-v1 {
+:deep(.tvist-v1) {
   width: 100%;
   height: 100%;
-  background: #f5f5f5;
 }
 
-.tvist-v1__slide {
+:deep(.tvist-v1__track) {
+  height: 100%;
+}
+
+:deep(.tvist-v1__container) {
+  height: 100%;
+}
+
+:deep(.tvist-v1__slide) {
   height: 100%;
   display: flex;
   align-items: center;
@@ -80,10 +89,10 @@ onUnmounted(() => {
   color: white;
 }
 
-.tvist-v1 :deep(.tvist-v1__slide[data-tvist-slide-index="0"]) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-.tvist-v1 :deep(.tvist-v1__slide[data-tvist-slide-index="1"]) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-.tvist-v1 :deep(.tvist-v1__slide[data-tvist-slide-index="2"]) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-.tvist-v1 :deep(.tvist-v1__slide[data-tvist-slide-index="3"]) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+:deep(.tvist-v1__slide[data-tvist-slide-index="0"]) { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+:deep(.tvist-v1__slide[data-tvist-slide-index="1"]) { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+:deep(.tvist-v1__slide[data-tvist-slide-index="2"]) { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+:deep(.tvist-v1__slide[data-tvist-slide-index="3"]) { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
 
 .controls {
   display: flex;

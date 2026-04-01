@@ -8,9 +8,11 @@
       <div class="demo-section">
         <h3>perPage: 1 (по умолчанию)</h3>
         <div ref="slider1El" class="tvist-v1">
-          <div class="tvist-v1__container">
-            <div v-for="i in 8" :key="i" class="tvist-v1__slide">
-              <span>{{ i }}</span>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div v-for="i in 8" :key="i" class="tvist-v1__slide">
+                <span>{{ i }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -20,9 +22,11 @@
       <div class="demo-section">
         <h3>perPage: 2</h3>
         <div ref="slider2El" class="tvist-v1">
-          <div class="tvist-v1__container">
-            <div v-for="i in 8" :key="i" class="tvist-v1__slide">
-              <span>{{ i }}</span>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div v-for="i in 8" :key="i" class="tvist-v1__slide">
+                <span>{{ i }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -37,9 +41,11 @@
       <div class="demo-section">
         <h3>perPage: 3 с зазором</h3>
         <div ref="slider3El" class="tvist-v1">
-          <div class="tvist-v1__container">
-            <div v-for="i in 8" :key="i" class="tvist-v1__slide">
-              <span>{{ i }}</span>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div v-for="i in 8" :key="i" class="tvist-v1__slide">
+                <span>{{ i }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -54,9 +60,11 @@
       <div class="demo-section">
         <h3>perPage: 4 (grid-style)</h3>
         <div ref="slider4El" class="tvist-v1">
-          <div class="tvist-v1__container">
-            <div v-for="i in 12" :key="i" class="tvist-v1__slide">
-              <span>{{ i }}</span>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div v-for="i in 12" :key="i" class="tvist-v1__slide">
+                <span>{{ i }}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -71,8 +79,10 @@
       <div class="demo-section">
         <h3>perPage: 2, loop: true, 1 слайд</h3>
         <div ref="slider5El" class="tvist-v1">
-          <div class="tvist-v1__container">
-            <div class="tvist-v1__slide"><span>1</span></div>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div class="tvist-v1__slide"><span>1</span></div>
+            </div>
           </div>
         </div>
         <div class="controls">

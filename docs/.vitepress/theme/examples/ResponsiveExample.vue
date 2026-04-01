@@ -38,11 +38,13 @@
           </button>
         </div>
         <div ref="slider1El" class="tvist-v1">
-          <div class="tvist-v1__container">
-            <div v-for="i in 12" :key="i" class="tvist-v1__slide">
-              <div class="slide-content">
-                <span class="slide-number">{{ i }}</span>
-                <span class="slide-label">Slide {{ i }}</span>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div v-for="i in 12" :key="i" class="tvist-v1__slide">
+                <div class="slide-content">
+                  <span class="slide-number">{{ i }}</span>
+                  <span class="slide-label">Slide {{ i }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -72,11 +74,13 @@
           При изменении размера контейнера (окно, сайдбар, grid) слайдер обновляется автоматически.
         </p>
         <div ref="slider2El" class="tvist-v1 slider-minsize">
-          <div class="tvist-v1__container">
-            <div v-for="i in 12" :key="i" class="tvist-v1__slide">
-              <div class="slide-content">
-                <span class="slide-number">{{ i }}</span>
-                <span class="slide-label">Slide {{ i }}</span>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div v-for="i in 12" :key="i" class="tvist-v1__slide">
+                <div class="slide-content">
+                  <span class="slide-number">{{ i }}</span>
+                  <span class="slide-label">Slide {{ i }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -104,11 +108,13 @@
           Количество слайдов одно и то же; меняется только сколько точек показывается.
         </p>
         <div ref="sliderLimitEl" class="tvist-v1">
-          <div class="tvist-v1__container">
-            <div v-for="i in 12" :key="i" class="tvist-v1__slide">
-              <div class="slide-content">
-                <span class="slide-number">{{ i }}</span>
-                <span class="slide-label">Slide {{ i }}</span>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div v-for="i in 12" :key="i" class="tvist-v1__slide">
+                <div class="slide-content">
+                  <span class="slide-number">{{ i }}</span>
+                  <span class="slide-label">Slide {{ i }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -135,11 +141,13 @@
           Мобила (≤768): <strong>perPage 1</strong>, 2 слайда — две страницы, появляются стрелки и пагинация.
         </p>
         <div ref="sliderLockEl" class="tvist-v1">
-          <div class="tvist-v1__container">
-            <div v-for="i in 2" :key="i" class="tvist-v1__slide">
-              <div class="slide-content">
-                <span class="slide-number">{{ i }}</span>
-                <span class="slide-label">Slide {{ i }}</span>
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div v-for="i in 2" :key="i" class="tvist-v1__slide">
+                <div class="slide-content">
+                  <span class="slide-number">{{ i }}</span>
+                  <span class="slide-label">Slide {{ i }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -173,10 +181,12 @@
         </p>
         <div class="narrow-container">
           <div ref="slider3El" class="tvist-v1">
-            <div class="tvist-v1__container">
-              <div v-for="i in 8" :key="i" class="tvist-v1__slide">
-                <div class="slide-content">
-                  <span class="slide-number">{{ i }}</span>
+            <div class="tvist-v1__track">
+              <div class="tvist-v1__container">
+                <div v-for="i in 8" :key="i" class="tvist-v1__slide">
+                  <div class="slide-content">
+                    <span class="slide-number">{{ i }}</span>
+                  </div>
                 </div>
               </div>
             </div>

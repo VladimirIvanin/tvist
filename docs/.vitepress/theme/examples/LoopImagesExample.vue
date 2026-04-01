@@ -1,13 +1,15 @@
 <template>
   <div class="example">
     <div ref="sliderRef" class="tvist-v1 loop-images">
-      <div class="tvist-v1__container">
-        <div v-for="i in 5" :key="i" class="tvist-v1__slide">
-          <img
-            :src="`https://picsum.photos/800/450?random=${i}`"
-            :alt="`Слайд ${i}`"
-            class="slide-image"
-          >
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div v-for="i in 5" :key="i" class="tvist-v1__slide">
+            <img
+              :src="`https://picsum.photos/800/450?random=${i}`"
+              :alt="`Слайд ${i}`"
+              class="slide-image"
+            >
+          </div>
         </div>
       </div>
     </div>

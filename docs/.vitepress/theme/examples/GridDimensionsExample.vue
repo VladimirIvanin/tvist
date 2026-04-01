@@ -2,17 +2,19 @@
   <ExampleCard title="Grid Dimensions" description="Разные размеры страниц в сетке" :detailsLink="detailsLink">
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide">1</div>
-          <div class="tvist-v1__slide">2</div>
-          <div class="tvist-v1__slide">3</div>
-          <div class="tvist-v1__slide">4</div>
-          <div class="tvist-v1__slide">5</div>
-          <div class="tvist-v1__slide">6</div>
-          <div class="tvist-v1__slide">7</div>
-          <div class="tvist-v1__slide">8</div>
-          <div class="tvist-v1__slide">9</div>
-          <div class="tvist-v1__slide">10</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">1</div>
+            <div class="tvist-v1__slide">2</div>
+            <div class="tvist-v1__slide">3</div>
+            <div class="tvist-v1__slide">4</div>
+            <div class="tvist-v1__slide">5</div>
+            <div class="tvist-v1__slide">6</div>
+            <div class="tvist-v1__slide">7</div>
+            <div class="tvist-v1__slide">8</div>
+            <div class="tvist-v1__slide">9</div>
+            <div class="tvist-v1__slide">10</div>
+          </div>
         </div>
       </div>
       
