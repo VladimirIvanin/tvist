@@ -41,6 +41,17 @@ export class SlideStatesModule extends Module {
     super(tvist, options)
   }
 
+  /** У клонов одинаковый data-tvist-slide-index — active/prev/next только по DOM. */
+  private isLoopWithClonesEnabled(): boolean {
+    const l = this.options.loop
+    return (
+      typeof l === 'object' &&
+      l !== null &&
+      l.withClones === true &&
+      l.enabled !== false
+    )
+  }
+
   override init(): void {
     // Применяем Firefox фикс ко всем изображениям при инициализации
     this.applyFirefoxImageFix()
@@ -135,6 +146,20 @@ export class SlideStatesModule extends Module {
     const activeSlide = slides[activeIndex]
 
     if (!activeSlide) return
+
+    const len = slides.length
+    if (len === 0) return
+
+    if (this.isLoopWithClonesEnabled()) {
+      const prevDom = (activeIndex - 1 + len) % len
+      const nextDom = (activeIndex + 1) % len
+      slides.forEach((slide, index) => {
+        if (index === prevDom || index === nextDom) {
+          forceEagerLoadingForLazyImages(slide)
+        }
+      })
+      return
+    }
 
     const activeAttr = activeSlide.getAttribute('data-tvist-slide-index')
     const isLoop = activeAttr !== null || this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
@@ -241,6 +266,25 @@ export class SlideStatesModule extends Module {
     // Массив для сбора промисов декодирования
     const preloadPromises: Promise<void>[] = []
 
+    const len = slides.length
+
+    if (this.isLoopWithClonesEnabled() && len > 0) {
+      const prevDom = (activeIndex - 1 + len) % len
+      const nextDom = (activeIndex + 1) % len
+      slides.forEach((slide, index) => {
+        this.toggleClass(slide, this.CLASS_ACTIVE, index === activeIndex)
+        this.toggleClass(slide, this.CLASS_PREV, index === prevDom)
+        this.toggleClass(slide, this.CLASS_NEXT, index === nextDom)
+        if (index === prevDom || index === nextDom) {
+          preloadPromises.push(this.preloadSlideImages(slide))
+        }
+      })
+      if (preloadPromises.length > 0) {
+        Promise.all(preloadPromises).catch(() => undefined)
+      }
+      return
+    }
+
     // Режим Loop: по атрибуту на слайде (после инита Loop) или по опции (до проставления атрибутов)
     const activeAttr = activeSlide.getAttribute('data-tvist-slide-index')
     const isLoop = activeAttr !== null || this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
@@ -250,9 +294,6 @@ export class SlideStatesModule extends Module {
 
     if (activeAttr !== null) {
       activeLogicalIndex = parseInt(activeAttr, 10)
-      
-      // В loop режиме все слайды являются оригинальными (клоны не создаются)
-      // originalCount = slides.length уже установлен выше
     }
 
     // Вычисляем целевые логические индексы для prev/next
@@ -282,7 +323,7 @@ export class SlideStatesModule extends Module {
       let isNext = false
 
       if (isLoop) {
-        // В loop режиме сравниваем логические индексы (включая клоны)
+        // В loop без клонов у каждого DOM-узла свой realIndex — логика корректна
         isPrev = currentLogicalIndex === prevTargetIndex
         isNext = currentLogicalIndex === nextTargetIndex
       } else {

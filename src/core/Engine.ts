@@ -12,6 +12,7 @@ import { getOuterWidth, getOuterHeight } from '../utils/dom'
 import { applyPeek, getPeekValue, getPeekValueFromOptions } from '../utils/peek'
 import {
   findDomIndexByRealIndex,
+  findDomIndexByRealIndexForTransition,
   TVIST_SLIDE_INDEX_ATTR,
 } from '../utils/slideRealIndex'
 
@@ -141,6 +142,19 @@ export class Engine {
   }
 
   /**
+   * loop: { withClones: true } — отдельная ветка в getScrollPositionForIndex.
+   */
+  private isLoopWithClonesEnabled(): boolean {
+    const l = this.options.loop
+    return (
+      typeof l === 'object' &&
+      l !== null &&
+      l.withClones === true &&
+      l.enabled !== false
+    )
+  }
+
+  /**
    * Позиция скролла для индекса. При loop peekTrim не применяется.
    */
   public getScrollPositionForIndex(index: number): number {
@@ -150,6 +164,13 @@ export class Engine {
     if (this.options.loop && (this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
       // В loop-режиме с center продолжаем просто добавлять смещение
       if (this.options.center) {
+        const pos = basePosition + centerOffset
+        return pos === 0 ? 0 : pos
+      }
+
+      // withClones: длинная лента; clamp к [maxScroll, minScroll] сжимает несколько
+      // DOM-индексов у правого края в одну translate — activeIndex меняется, картинка нет («смешение»).
+      if (this.isLoopWithClonesEnabled()) {
         const pos = basePosition + centerOffset
         return pos === 0 ? 0 : pos
       }
@@ -657,8 +678,17 @@ export class Engine {
     // После перестановки DOM-позиция целевого слайда могла измениться.
     // Находим DOM-позицию целевого слайда по его eventIndex (= realIndex).
     if (counterBeforeEmit !== counterAfterEmit && (this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
+      const loopOpt = this.options.loop
+      const withClones = typeof loopOpt === 'object' && loopOpt !== null && loopOpt.withClones === true
       // Ищем DOM-позицию слайда с data-tvist-slide-index === eventIndex
-      const targetDomIndex = findDomIndexByRealIndex(this.tvist.slides, ctx.eventIndex)
+      const targetDomIndex = withClones
+        ? findDomIndexByRealIndexForTransition(
+            this.tvist.slides,
+            ctx.eventIndex,
+            counterAfterEmit,
+            direction
+          )
+        : findDomIndexByRealIndex(this.tvist.slides, ctx.eventIndex)
 
       if (targetDomIndex !== -1) {
         ctx.clampedIndex = targetDomIndex

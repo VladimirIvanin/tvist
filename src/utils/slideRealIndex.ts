@@ -2,6 +2,8 @@
  * Поиск слайда по логическому индексу (realIndex): data-tvist-slide-index и fallback по DOM.
  */
 
+import { TVIST_CLASSES } from '../core/constants'
+
 /** Атрибут логического индекса слайда (loop, события slideChange*). */
 export const TVIST_SLIDE_INDEX_ATTR = 'data-tvist-slide-index' as const
 
@@ -9,12 +11,26 @@ export const TVIST_SLIDE_INDEX_ATTR = 'data-tvist-slide-index' as const
  * DOM-позиция слайда с указанным realIndex по атрибуту.
  * Без fallback по числовому индексу (как в нелoop режиме).
  *
+ * `preferNonClone`: при loop.withClones несколько узлов делят один realIndex;
+ * для старта и навигации нужен оригинал в «основной» полосе, а не первый клон слева.
+ *
  * @returns индекс в массиве slides или -1
  */
 export function findDomIndexByRealIndex(
   slides: readonly HTMLElement[],
-  realIndex: number
+  realIndex: number,
+  options?: { preferNonClone?: boolean }
 ): number {
+  if (options?.preferNonClone) {
+    for (let i = 0; i < slides.length; i++) {
+      const el = slides[i]
+      if (!el || el.classList.contains(TVIST_CLASSES.slideClone)) continue
+      const dataAttr = el.getAttribute(TVIST_SLIDE_INDEX_ATTR)
+      if (dataAttr != null && parseInt(dataAttr, 10) === realIndex) {
+        return i
+      }
+    }
+  }
   for (let i = 0; i < slides.length; i++) {
     const dataAttr = slides[i]?.getAttribute(TVIST_SLIDE_INDEX_ATTR)
     if (dataAttr != null && parseInt(dataAttr, 10) === realIndex) {
@@ -25,13 +41,47 @@ export function findDomIndexByRealIndex(
 }
 
 /**
+ * DOM-индекс для realIndex при нескольких клонах: выбираем узел в сторону `direction` от `referenceDomIndex`
+ * (после loopFix — обычно текущий активный DOM-индекс).
+ */
+export function findDomIndexByRealIndexForTransition(
+  slides: readonly HTMLElement[],
+  realIndex: number,
+  referenceDomIndex: number,
+  direction: 'next' | 'prev'
+): number {
+  const matches: number[] = []
+  for (let i = 0; i < slides.length; i++) {
+    const dataAttr = slides[i]?.getAttribute(TVIST_SLIDE_INDEX_ATTR)
+    if (dataAttr != null && parseInt(dataAttr, 10) === realIndex) {
+      matches.push(i)
+    }
+  }
+  if (matches.length === 0) return -1
+  if (matches.length === 1) return matches[0]!
+
+  if (direction === 'prev') {
+    for (let j = matches.length - 1; j >= 0; j--) {
+      const idx = matches[j]!
+      if (idx < referenceDomIndex) return idx
+    }
+    return matches[matches.length - 1]!
+  }
+  for (const idx of matches) {
+    if (idx > referenceDomIndex) return idx
+  }
+  return matches[0]!
+}
+
+/**
  * Элемент слайда по realIndex: сначала по {@link TVIST_SLIDE_INDEX_ATTR}, иначе по DOM-индексу в пределах [0, length).
  */
 export function findSlideByRealIndex(
   slides: readonly HTMLElement[],
-  realIndex: number
+  realIndex: number,
+  options?: { preferNonClone?: boolean }
 ): HTMLElement | null {
-  const domIndex = findDomIndexByRealIndex(slides, realIndex)
+  const domIndex = findDomIndexByRealIndex(slides, realIndex, options)
   if (domIndex !== -1) {
     return slides[domIndex] ?? null
   }

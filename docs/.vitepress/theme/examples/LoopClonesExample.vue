@@ -49,8 +49,8 @@ onMounted(() => {
     loop: {
       enabled: true,
       withClones: true,
-      fill: true,
     },
+    // peek: 20,
     arrows: true,
     pagination: true,
     drag: true,

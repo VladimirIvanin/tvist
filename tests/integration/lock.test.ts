@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '../../src/core/Tvist'
-import { createSliderFixture } from '../fixtures/dom'
+import { createSliderFixture, waitForAnimation } from '../fixtures'
 import '../../src/modules/drag'
 import '../../src/modules/grid'
 import '../../src/modules/loop'
@@ -349,6 +349,65 @@ describe('Lock functionality', () => {
     // блокируется. Важно лишь, чтобы cube/fade/withClones
     // работали корректно — отдельные тесты это покрывают.
     expect(slider.engine.isLocked).toBeTypeOf('boolean')
+  })
+
+  // loop.withClones: prev с первого слайда не должен прыгать на «дальний» клон
+  // (огромный сдвиг translate) — см. findDomIndexByRealIndex / loopFix.
+  it('should not overscroll on prev() when loop.withClones is enabled', () => {
+    fixture = createSliderFixture({
+      slidesCount: 4,
+      width: 800,
+    })
+
+    const slider = new Tvist(fixture.root, {
+      perPage: 1,
+      gap: 0,
+      speed: 0,
+      loop: {
+        enabled: true,
+        withClones: true,
+      },
+    })
+
+    const slideSize = slider.engine.getSlideSize(0)
+    const locationBefore = slider.engine.location.get()
+
+    slider.prev()
+
+    const locationAfter = slider.engine.location.get()
+
+    expect(slider.realIndex).toBe(3)
+    expect(Math.abs(locationAfter - locationBefore)).toBeLessThanOrEqual(slideSize + 1)
+  })
+
+  it('should not overscroll on prev() when loop.withClones is enabled (with animation)', async () => {
+    fixture = createSliderFixture({
+      slidesCount: 4,
+      width: 800,
+    })
+
+    const speed = 120
+    const slider = new Tvist(fixture.root, {
+      perPage: 1,
+      gap: 0,
+      speed,
+      loop: {
+        enabled: true,
+        withClones: true,
+      },
+    })
+
+    const slideSize = slider.engine.getSlideSize(0)
+    const locationBefore = slider.engine.location.get()
+
+    slider.prev()
+
+    await waitForAnimation(speed)
+
+    const locationAfter = slider.engine.location.get()
+
+    expect(slider.realIndex).toBe(3)
+    expect(Math.abs(locationAfter - locationBefore)).toBeLessThanOrEqual(slideSize + 1)
   })
 
   it('should lock when loop is true but slides count <= perPage (e.g. perPage 2, 1 slide)', () => {
