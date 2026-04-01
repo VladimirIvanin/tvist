@@ -153,7 +153,20 @@ describe('Lock functionality', () => {
     
     // Мокаем resize
     fixture.root.style.width = '400px'
+    const track = fixture.track
     Object.defineProperty(fixture.root, 'offsetWidth', {
+      configurable: true,
+      value: 400
+    })
+    Object.defineProperty(fixture.root, 'clientWidth', {
+      configurable: true,
+      value: 400
+    })
+    Object.defineProperty(track, 'offsetWidth', {
+      configurable: true,
+      value: 400
+    })
+    Object.defineProperty(track, 'clientWidth', {
       configurable: true,
       value: 400
     })
