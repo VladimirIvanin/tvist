@@ -22,6 +22,7 @@ const P = TVIST_CSS_PREFIX
  */
 export const TVIST_CLASSES = {
   block: P,
+  track: `${P}__track`,
   container: `${P}__container`,
   slide: `${P}__slide`,
   vertical: `${P}--vertical`,

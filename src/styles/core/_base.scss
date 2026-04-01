@@ -6,7 +6,6 @@
 
 .#{$tvist-block} {
   position: relative;
-  overflow: hidden;
   width: 100%;
   visibility: hidden;
   
@@ -16,6 +15,12 @@
   
   &--created {
     visibility: visible;
+  }
+  
+  &__track {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
   }
   
   &__container {
@@ -29,7 +34,7 @@
     // GPU acceleration
     transform: translate3d(0, 0, 0);
     
-    // Performance: изолируем layout и paint для track
+    // Performance: изолируем layout и paint для container
     // Анимация transform не затрагивает layout родителя
     contain: layout style;
   }
@@ -92,14 +97,14 @@
   
   // Вертикальная ориентация
   &--vertical {
-    > .#{$tvist-block}__container {
+    > .#{$tvist-block}__track > .#{$tvist-block}__container {
       flex-direction: column;
     }
   }
   
   // Drag включён: предотвращаем выделение текста и нативный drag
   &--draggable {
-    > .#{$tvist-block}__container {
+    > .#{$tvist-block}__track > .#{$tvist-block}__container {
       user-select: none;
       -webkit-user-select: none;
       cursor: grab;
@@ -110,7 +115,7 @@
 
   // Заблокированный слайдер — не показываем grab (листать некуда)
   &--locked.#{$tvist-block}--draggable {
-    > .#{$tvist-block}__container {
+    > .#{$tvist-block}__track > .#{$tvist-block}__container {
       cursor: default;
     }
   }
@@ -123,19 +128,19 @@
 
   // Вертикальный + draggable: разрешаем горизонтальный скролл
   &--vertical#{&}--draggable {
-    > .#{$tvist-block}__container {
+    > .#{$tvist-block}__track > .#{$tvist-block}__container {
       touch-action: pan-x;
     }
   }
 
   // Состояние dragging (активный drag)
   &--dragging {
-    > .#{$tvist-block}__container {
+    > .#{$tvist-block}__track > .#{$tvist-block}__container {
       transition: none !important;
       cursor: grabbing;
     }
     
-    > .#{$tvist-block}__container > .#{$tvist-block}__slide {
+    > .#{$tvist-block}__track > .#{$tvist-block}__container > .#{$tvist-block}__slide {
       pointer-events: none;
     }
   }

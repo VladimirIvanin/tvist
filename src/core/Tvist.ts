@@ -89,6 +89,7 @@ export class Tvist {
 
   // DOM элементы
   readonly root: HTMLElement
+  readonly track: HTMLElement
   readonly container: HTMLElement
   private _slides: HTMLElement[]
 
@@ -148,6 +149,7 @@ export class Tvist {
   ) {
     this.id = Tvist.generateId()
     this.root = this.initRoot(target)
+    this.track = this.findTrack()
     this.container = this.findContainer()
     this._slides = getSlidesInTvistRoot(this.container, this.root)
 
@@ -185,11 +187,20 @@ export class Tvist {
     return root
   }
 
-  private findContainer(): HTMLElement {
-    const selector = `.${TVIST_CLASSES.container}`
+  private findTrack(): HTMLElement {
+    const selector = `.${TVIST_CLASSES.track}`
     const el = this.root.querySelector<HTMLElement>(selector)
     if (!el) {
-      throw new Error(`Tvist: container "${selector}" not found inside root element`)
+      throw new Error(`Tvist: track "${selector}" not found inside root element`)
+    }
+    return el
+  }
+
+  private findContainer(): HTMLElement {
+    const selector = `.${TVIST_CLASSES.container}`
+    const el = this.track.querySelector<HTMLElement>(selector)
+    if (!el) {
+      throw new Error(`Tvist: container "${selector}" not found inside track element`)
     }
     return el
   }
@@ -605,10 +616,10 @@ export class Tvist {
    */
   private clearSliderStyles(): void {
     this.container.style.transform = ''
-    this.container.style.paddingTop = ''
-    this.container.style.paddingBottom = ''
-    this.container.style.paddingLeft = ''
-    this.container.style.paddingRight = ''
+    this.track.style.paddingTop = ''
+    this.track.style.paddingBottom = ''
+    this.track.style.paddingLeft = ''
+    this.track.style.paddingRight = ''
 
     // Убираем все классы состояния с рута которые вешают модули
     this.root.classList.remove(

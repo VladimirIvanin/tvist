@@ -176,11 +176,11 @@ export class Engine {
   }
 
   /**
-   * Обновляет кеш размера root элемента
+   * Обновляет кеш размера track элемента (viewport слайдера)
    */
   private updateRootSizeCache(): void {
-    this.cachedRootWidth = getOuterWidth(this.tvist.root)
-    this.cachedRootHeight = getOuterHeight(this.tvist.root)
+    this.cachedRootWidth = getOuterWidth(this.tvist.track)
+    this.cachedRootHeight = getOuterHeight(this.tvist.track)
     this.rootSizeCacheValid = true
   }
 
@@ -217,7 +217,7 @@ export class Engine {
     const slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
     const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : undefined
 
-    applyPeek(this.tvist.container, this.options, maxPeek)
+    applyPeek(this.tvist.track, this.options, maxPeek)
   }
 
   private calculateSizes(isDisabled = false): void {

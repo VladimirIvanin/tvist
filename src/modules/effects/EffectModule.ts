@@ -91,8 +91,8 @@ export class EffectModule extends Module {
     this.tvist.container.style.transformStyle = 'preserve-3d'
     this.tvist.root.classList.add(TVIST_CLASSES.cube)
     const padding = this.options.cubeEffect?.viewportPadding ?? 10
-    this.tvist.root.style.padding = `${padding}px`
-    this.tvist.root.style.boxSizing = 'border-box'
+    this.tvist.track.style.padding = `${padding}px`
+    this.tvist.track.style.boxSizing = 'border-box'
   }
 
   private cleanupEffectStyles(effect: TvistOptions['effect']): void {
@@ -113,12 +113,12 @@ export class EffectModule extends Module {
       this.tvist.container.style.width = ''
       this.tvist.container.style.height = ''
       this.tvist.container.style.transformOrigin = ''
-      this.tvist.root.style.removeProperty('perspective')
-      this.tvist.root.style.removeProperty('-webkit-perspective')
-      this.tvist.root.style.removeProperty('perspective-origin')
-      this.tvist.root.style.removeProperty('overflow')
-      this.tvist.root.style.removeProperty('padding')
-      this.tvist.root.style.removeProperty('box-sizing')
+      this.tvist.track.style.removeProperty('perspective')
+      this.tvist.track.style.removeProperty('-webkit-perspective')
+      this.tvist.track.style.removeProperty('perspective-origin')
+      this.tvist.track.style.removeProperty('overflow')
+      this.tvist.track.style.removeProperty('padding')
+      this.tvist.track.style.removeProperty('box-sizing')
       this.tvist.root.classList.remove(TVIST_CLASSES.cube)
     }
   }

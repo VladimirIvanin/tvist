@@ -38,14 +38,14 @@ export function setCubeEffect(
     translate: number,
     options: TvistOptions
 ): void {
-    const { container, root } = tvist
+    const { container, track } = tvist
     const cubeOptions = options.cubeEffect ?? {}
     const slideSize = tvist.engine.slideSizeValue
 
     // Container must have explicit size when slides are absolute (otherwise it collapses to 0)
     container.style.width = '100%'
     container.style.height = '100%'
-    // Use actual rendered width for cube geometry — avoids gap when root has padding
+    // Use actual rendered width for cube geometry — avoids gap when track has padding
     const faceWidth = container.clientWidth > 0 ? container.clientWidth : slideSize
     const zOffset = faceWidth / 2
     
@@ -56,16 +56,14 @@ export function setCubeEffect(
     // Perspective must be on the parent of the 3D transformed element.
     // Smaller value = stronger depth (closer bigger, farther smaller).
     const perspectivePx = cubeOptions.perspective ?? 800
-    root.style.perspective = `${perspectivePx}px`
-    root.style.webkitPerspective = `${perspectivePx}px`
+    track.style.perspective = `${perspectivePx}px`
+    track.style.webkitPerspective = `${perspectivePx}px`
     // Lower perspective-origin so the join between cube faces appears lower (natural view from above)
     const perspectiveOriginY = cubeOptions.perspectiveOriginY ?? 60
-    root.style.perspectiveOrigin = `50% ${perspectiveOriginY}%`
+    track.style.perspectiveOrigin = `50% ${perspectiveOriginY}%`
     
-    // Note: We do NOT set overflow: visible on root anymore.
-    // _base.scss sets overflow: hidden, which is correct to prevent page scrollbars.
-    // Since preserve-3d is on the container (child of root), root's overflow: hidden
-    // simply clips the 3D scene without flattening the container's 3D context.
+    // Note: track has overflow: hidden by default (from _base.scss).
+    // For cube effect we override it to visible via CSS class .tvist-v1--cube > .tvist-v1__track.
 
 
     container.style.transformStyle = 'preserve-3d'
