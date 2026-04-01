@@ -12,12 +12,15 @@ describe('GridModule', () => {
     Tvist.registerModule('grid', GridModule)
     
     document.body.innerHTML = ''
-    container = document.createElement('div')
-    container.className = TVIST_CLASSES.block
-    container.innerHTML = `
-      <div class="${TVIST_CLASSES.container}"></div>
+    const root = document.createElement('div')
+    root.className = TVIST_CLASSES.block
+    root.innerHTML = `
+      <div class="${TVIST_CLASSES.track}">
+        <div class="${TVIST_CLASSES.container}"></div>
+      </div>
     `
-    document.body.appendChild(container)
+    document.body.appendChild(root)
+    container = root
   })
 
   afterEach(() => {

@@ -22,13 +22,15 @@ describe('Engine - endIndex logic', () => {
     it('should limit scrollTo to endIndex when perPage > 1', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
-            <div class="${TVIST_CLASSES.slide}">6</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+              <div class="${TVIST_CLASSES.slide}">6</div>
+            </div>
           </div>
         </div>
       `
@@ -51,13 +53,15 @@ describe('Engine - endIndex logic', () => {
     it('should allow scrolling to any index in loop mode', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
-            <div class="${TVIST_CLASSES.slide}">6</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+              <div class="${TVIST_CLASSES.slide}">6</div>
+            </div>
           </div>
         </div>
       `
@@ -76,12 +80,14 @@ describe('Engine - endIndex logic', () => {
     it('should work correctly with perPage = 1', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+            </div>
           </div>
         </div>
       `
@@ -111,8 +117,10 @@ describe('Engine - endIndex logic', () => {
       testCases.forEach(({ slides, perPage, expectedEndIndex }) => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: slides }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: slides }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
           </div>
         `
@@ -133,13 +141,15 @@ describe('Engine - endIndex logic', () => {
     it('should return false when at endIndex', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
-            <div class="${TVIST_CLASSES.slide}">6</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+              <div class="${TVIST_CLASSES.slide}">6</div>
+            </div>
           </div>
         </div>
       `
@@ -159,13 +169,15 @@ describe('Engine - endIndex logic', () => {
     it('should return true in loop mode even at endIndex', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
-            <div class="${TVIST_CLASSES.slide}">6</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+              <div class="${TVIST_CLASSES.slide}">6</div>
+            </div>
           </div>
         </div>
       `
@@ -185,13 +197,15 @@ describe('Engine - endIndex logic', () => {
     it('should not scroll beyond endIndex', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
-            <div class="${TVIST_CLASSES.slide}">6</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+              <div class="${TVIST_CLASSES.slide}">6</div>
+            </div>
           </div>
         </div>
       `
@@ -215,11 +229,13 @@ describe('Engine - endIndex logic', () => {
     it('should set endIndex to slideCount - 1 when autoWidth: true', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}" style="width: 200px">1</div>
-            <div class="${TVIST_CLASSES.slide}" style="width: 300px">2</div>
-            <div class="${TVIST_CLASSES.slide}" style="width: 250px">3</div>
-            <div class="${TVIST_CLASSES.slide}" style="width: 280px">4</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}" style="width: 200px">1</div>
+              <div class="${TVIST_CLASSES.slide}" style="width: 300px">2</div>
+              <div class="${TVIST_CLASSES.slide}" style="width: 250px">3</div>
+              <div class="${TVIST_CLASSES.slide}" style="width: 280px">4</div>
+            </div>
           </div>
         </div>
       `

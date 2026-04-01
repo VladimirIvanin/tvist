@@ -32,10 +32,12 @@ describe('NavigationModule', () => {
     it('should inject SVG icons into empty arrow buttons by default', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -61,10 +63,12 @@ describe('NavigationModule', () => {
     it('should NOT inject SVG when addIcons is false', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -88,10 +92,12 @@ describe('NavigationModule', () => {
     it('should NOT inject SVG when button already has custom element content', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}">
             <span>←</span>
@@ -119,10 +125,12 @@ describe('NavigationModule', () => {
     it('should NOT inject SVG when button has text content', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}">‹</button>
           <button class="${TVIST_CLASSES.arrowNext}">›</button>
@@ -146,10 +154,12 @@ describe('NavigationModule', () => {
     it('should NOT inject SVG when button does not have arrow class', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button id="custom-prev"></button>
           <button id="custom-next"></button>
@@ -174,10 +184,12 @@ describe('NavigationModule', () => {
     it('should inject SVG into custom buttons if they have arrow class', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button id="custom-prev" class="${TVIST_CLASSES.arrowPrev}"></button>
           <button id="custom-next" class="${TVIST_CLASSES.arrowNext}"></button>
@@ -204,10 +216,12 @@ describe('NavigationModule', () => {
     it('should disable prev arrow at start without loop', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -235,10 +249,12 @@ describe('NavigationModule', () => {
     it('should disable next arrow at end without loop', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -271,10 +287,12 @@ describe('NavigationModule', () => {
     it('should keep arrows enabled with loop mode', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -297,10 +315,12 @@ describe('NavigationModule', () => {
     it('should keep arrows enabled with rewind mode', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -323,10 +343,12 @@ describe('NavigationModule', () => {
     it('should hide arrows when there are too few slides', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -351,10 +373,12 @@ describe('NavigationModule', () => {
     it('should navigate to next slide on next arrow click', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -379,10 +403,12 @@ describe('NavigationModule', () => {
     it('should navigate to prev slide on prev arrow click', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -408,10 +434,12 @@ describe('NavigationModule', () => {
     it('should not navigate when clicking disabled arrow', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -439,10 +467,12 @@ describe('NavigationModule', () => {
     it('should work with custom arrow selectors', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
         </div>
         <button id="my-prev">Prev</button>
@@ -467,10 +497,12 @@ describe('NavigationModule', () => {
     it('should work with custom disabled class', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>

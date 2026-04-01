@@ -32,8 +32,10 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should hide arrows by default when there is only one page', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -61,9 +63,11 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should hide arrows when perPage equals slide count', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -88,10 +92,12 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should show arrows when hideWhenSinglePage is false even if locked', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -122,10 +128,12 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should show arrows when there are multiple pages', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -155,10 +163,12 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should hide arrows when slidesPerGroup makes it single page', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -184,11 +194,13 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should show arrows when slidesPerGroup creates multiple pages', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -216,8 +228,10 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should hide arrows in loop mode when hideWhenSinglePage is true and single page', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -242,10 +256,12 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should show arrows in loop mode when there are multiple pages', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -274,10 +290,12 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should update visibility when perPage changes via breakpoints', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -317,8 +335,10 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should use BEM classes by default', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -343,8 +363,10 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should support custom hidden class', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -372,8 +394,10 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should hide arrows when slider is locked with hideWhenSinglePage: true (default)', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>
@@ -395,8 +419,10 @@ describe('NavigationModule - hideWhenSinglePage', () => {
     it('should show arrows when slider is locked with hideWhenSinglePage: false', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <button class="${TVIST_CLASSES.arrowPrev}"></button>
           <button class="${TVIST_CLASSES.arrowNext}"></button>

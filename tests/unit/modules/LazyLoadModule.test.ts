@@ -24,15 +24,17 @@ describe('LazyLoadModule', () => {
     it('should not load images immediately when lazy is enabled', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">
-              <img data-src="image1.jpg" alt="Image 1">
-            </div>
-            <div class="${TVIST_CLASSES.slide}">
-              <img data-src="image2.jpg" alt="Image 2">
-            </div>
-            <div class="${TVIST_CLASSES.slide}">
-              <img data-src="image3.jpg" alt="Image 3">
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">
+                <img data-src="image1.jpg" alt="Image 1">
+              </div>
+              <div class="${TVIST_CLASSES.slide}">
+                <img data-src="image2.jpg" alt="Image 2">
+              </div>
+              <div class="${TVIST_CLASSES.slide}">
+                <img data-src="image3.jpg" alt="Image 3">
+              </div>
             </div>
           </div>
         </div>
@@ -53,9 +55,11 @@ describe('LazyLoadModule', () => {
     it('should create spinner elements for lazy images', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">
-              <img data-src="image1.jpg" alt="Image 1">
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">
+                <img data-src="image1.jpg" alt="Image 1">
+              </div>
             </div>
           </div>
         </div>
@@ -72,12 +76,14 @@ describe('LazyLoadModule', () => {
     it('should register images with srcset attribute', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">
-              <img data-src="image.jpg" data-srcset="image-400.jpg 400w, image-800.jpg 800w" alt="Image">
-            </div>
-            <div class="${TVIST_CLASSES.slide}">
-              <img data-src="image2.jpg" alt="Image 2">
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">
+                <img data-src="image.jpg" data-srcset="image-400.jpg 400w, image-800.jpg 800w" alt="Image">
+              </div>
+              <div class="${TVIST_CLASSES.slide}">
+                <img data-src="image2.jpg" alt="Image 2">
+              </div>
             </div>
           </div>
         </div>
@@ -95,9 +101,11 @@ describe('LazyLoadModule', () => {
     it('should emit lazyLoaded event when image loads', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">
-              <img data-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Image">
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">
+                <img data-src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Image">
+              </div>
             </div>
           </div>
         </div>
@@ -126,11 +134,13 @@ describe('LazyLoadModule', () => {
     it('should respect preloadPrevNext setting', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image1.jpg" alt="1"></div>
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image2.jpg" alt="2"></div>
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image3.jpg" alt="3"></div>
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image4.jpg" alt="4"></div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image1.jpg" alt="1"></div>
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image2.jpg" alt="2"></div>
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image3.jpg" alt="3"></div>
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image4.jpg" alt="4"></div>
+            </div>
           </div>
         </div>
       `
@@ -155,10 +165,12 @@ describe('LazyLoadModule', () => {
     it('should provide loadAll method', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image1.jpg" alt="1"></div>
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image2.jpg" alt="2"></div>
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image3.jpg" alt="3"></div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image1.jpg" alt="1"></div>
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image2.jpg" alt="2"></div>
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image3.jpg" alt="3"></div>
+            </div>
           </div>
         </div>
       `
@@ -175,9 +187,11 @@ describe('LazyLoadModule', () => {
     it('should provide loadSlide method', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image1.jpg" alt="1"></div>
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image2.jpg" alt="2"></div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image1.jpg" alt="1"></div>
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image2.jpg" alt="2"></div>
+            </div>
           </div>
         </div>
       `
@@ -196,9 +210,11 @@ describe('LazyLoadModule', () => {
     it('should handle lazy option update', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image1.jpg" alt="1"></div>
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image2.jpg" alt="2"></div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image1.jpg" alt="1"></div>
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image2.jpg" alt="2"></div>
+            </div>
           </div>
         </div>
       `
@@ -225,8 +241,10 @@ describe('LazyLoadModule', () => {
     it('should not activate when lazy is undefined', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image1.jpg" alt="1"></div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image1.jpg" alt="1"></div>
+            </div>
           </div>
         </div>
       `
@@ -245,9 +263,11 @@ describe('LazyLoadModule', () => {
     it('should handle slides without images', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">Text only</div>
-            <div class="${TVIST_CLASSES.slide}"><img data-src="image.jpg" alt="Image"></div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">Text only</div>
+              <div class="${TVIST_CLASSES.slide}"><img data-src="image.jpg" alt="Image"></div>
+            </div>
           </div>
         </div>
       `
@@ -262,9 +282,11 @@ describe('LazyLoadModule', () => {
     it('should register images even if they have src when data-src is present', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">
-              <img src="placeholder.jpg" data-src="final.jpg" alt="Image with placeholder">
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">
+                <img src="placeholder.jpg" data-src="final.jpg" alt="Image with placeholder">
+              </div>
             </div>
           </div>
         </div>
