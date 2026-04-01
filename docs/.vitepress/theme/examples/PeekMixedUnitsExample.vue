@@ -49,6 +49,10 @@ onBeforeUnmount(() => {
   border-radius: 8px;
 }
 
+.tvist-v1__track {
+  height: 100%;
+}
+
 .tvist-v1__container {
   height: 100%;
 }

@@ -164,6 +164,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.tvist-v1__track {
+  height: 100%;
+}
+
 .demo-wrapper {
   margin: 20px 0;
   padding: 20px;
