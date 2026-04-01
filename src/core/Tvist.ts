@@ -854,6 +854,25 @@ export class Tvist {
   }
 
   /**
+   * Количество оригинальных слайдов (без клонов).
+   * В режиме loop.withClones не учитывает клонированные слайды по краям.
+   */
+  get originalSlideCount(): number {
+    return this._slides.filter(
+      (el) => !el.classList.contains(TVIST_CLASSES.slideClone)
+    ).length
+  }
+
+  /**
+   * Общее количество слайдов в DOM (включая клоны).
+   * В режиме loop.withClones включает клонированные слайды по краям.
+   * Совпадает с originalSlideCount если loop.withClones не используется.
+   */
+  get slideCount(): number {
+    return this._slides.length
+  }
+
+  /**
    * Получить текущий индекс активного слайда
    */
   get activeIndex(): number {

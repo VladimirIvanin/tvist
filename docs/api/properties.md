@@ -264,6 +264,53 @@ const activeSlide = slider.slides.find(slide =>
 )
 ```
 
+### originalSlideCount
+
+```typescript
+readonly originalSlideCount: number
+```
+
+Количество **оригинальных** слайдов без учёта клонов.
+
+- В обычном режиме и при `loop: true` без клонов совпадает с `slideCount` и `slides.length`
+- В режиме `loop: { withClones: true }` возвращает количество реальных слайдов без клонов по краям
+
+**Примеры:**
+
+```javascript
+// Количество реальных слайдов
+console.log(slider.originalSlideCount) // например, 5
+
+// Расчёт прогресса по реальным слайдам
+const logicalProgress =
+  (slider.realIndex ?? slider.activeIndex) / (slider.originalSlideCount - 1)
+```
+
+### slideCount
+
+```typescript
+readonly slideCount: number
+```
+
+Общее количество слайдов в DOM, включая клоны.
+
+- В обычном режиме и при `loop: true` без клонов совпадает с `originalSlideCount` и `slides.length`
+- В режиме `loop: { withClones: true }` больше `originalSlideCount`, так как включает клоны по краям
+
+**Примеры:**
+
+```javascript
+// Все слайды внутри трека (включая клоны loop.withClones)
+console.log(slider.slideCount)
+
+// Диагностика клонов в loop.withClones
+if (slider.slideCount > slider.originalSlideCount) {
+  console.log(
+    `Loop с клонами: всего ${slider.slideCount}, оригиналов ${slider.originalSlideCount}`
+  )
+}
+```
+
 ## Состояние
 
 ### activeIndex

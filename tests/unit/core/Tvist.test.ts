@@ -6,6 +6,7 @@ import { createSliderFixture, createInvalidSliderFixture, createEmptySliderFixtu
 import type { SliderFixture } from '../../fixtures'
 import '../../../src/modules/navigation'
 import '../../../src/modules/pagination'
+import '../../../src/modules/loop'
 
 describe('Tvist', () => {
   let fixture: SliderFixture
@@ -534,6 +535,24 @@ describe('Tvist', () => {
 
       slider.scrollTo(0, true)
       expect(slider.canScrollPrev).toBe(false)
+    })
+
+    it('should return originalSlideCount and slideCount without loop clones', () => {
+      const slider = new Tvist(fixture.root)
+
+      expect(slider.originalSlideCount).toBe(5)
+      expect(slider.slideCount).toBe(5)
+    })
+
+    it('should return different originalSlideCount and slideCount with loop clones', () => {
+      const slider = new Tvist(fixture.root, {
+        loop: { enabled: true, withClones: true },
+      })
+
+      // Оригинальных слайдов по-прежнему 5
+      expect(slider.originalSlideCount).toBe(5)
+      // В DOM должны появиться клоны по краям
+      expect(slider.slideCount).toBeGreaterThan(slider.originalSlideCount)
     })
   })
 
