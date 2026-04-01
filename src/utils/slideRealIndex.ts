@@ -67,14 +67,18 @@ export function findDomIndexByRealIndexForTransition(
   if (direction === 'prev') {
     for (let j = matches.length - 1; j >= 0; j--) {
       const idx = matches[j]
+      if (idx == null) continue
       if (idx < referenceDomIndex) return idx
     }
-    return matches[matches.length - 1]
+    const last = matches[matches.length - 1]
+    return last ?? -1
   }
   for (const idx of matches) {
+    if (idx == null) continue
     if (idx > referenceDomIndex) return idx
   }
-  return matches[0]
+  const first = matches[0]
+  return first ?? -1
 }
 
 /**

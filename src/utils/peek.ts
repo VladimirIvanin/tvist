@@ -112,9 +112,12 @@ export function getPeekValue(
  * Если значение равно '0px', свойство удаляется (присваивается ''),
  * чтобы не загрязнять inline-стили нулевыми значениями.
  */
-function setPaddingOrRemove(element: HTMLElement, prop: keyof CSSStyleDeclaration, value: string): void {
-  const style = element.style as CSSStyleDeclaration & Record<string, string>
-  style[prop] = value === '0px' ? '' : value
+function setPaddingOrRemove(
+  element: HTMLElement,
+  prop: 'paddingTop' | 'paddingBottom' | 'paddingLeft' | 'paddingRight',
+  value: string
+): void {
+  element.style[prop] = value === '0px' ? '' : value
 }
 
 /**
