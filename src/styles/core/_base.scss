@@ -97,6 +97,10 @@
   
   // Вертикальная ориентация
   &--vertical {
+    > .#{$tvist-block}__track {
+      height: 100%;
+    }
+    
     > .#{$tvist-block}__track > .#{$tvist-block}__container {
       flex-direction: column;
     }
