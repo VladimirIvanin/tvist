@@ -16,12 +16,14 @@ import VideoDocExample from '../.vitepress/theme/examples/VideoDocExample.vue'
 
 ```html
 <div class="tvist-v1">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">
-      <video src="hero.mp4" muted playsinline></video>
-    </div>
-    <div class="tvist-v1__slide">
-      <img src="photo.jpg" alt="Фото" />
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">
+        <video src="hero.mp4" muted playsinline></video>
+      </div>
+      <div class="tvist-v1__slide">
+        <img src="photo.jpg" alt="Фото" />
+      </div>
     </div>
   </div>
 </div>

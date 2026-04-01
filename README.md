@@ -50,10 +50,12 @@ npm install tvist
 
 ```html
 <div id="slider" class="tvist-v1">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">Слайд 1</div>
-    <div class="tvist-v1__slide">Слайд 2</div>
-    <div class="tvist-v1__slide">Слайд 3</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">Слайд 1</div>
+      <div class="tvist-v1__slide">Слайд 2</div>
+      <div class="tvist-v1__slide">Слайд 3</div>
+    </div>
   </div>
 </div>
 ```

@@ -49,7 +49,8 @@ onMounted(() => {
 ### Горизонтальный слайдер
 
 <div ref="basicRef" class="tvist-v1" style="margin-bottom: 2rem; position: relative; height: 300px;">
-  <div class="tvist-v1__container">
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
     <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 1
       <div style="position: absolute; bottom: 60px; font-size: 14px; opacity: 0.8;">
@@ -68,6 +69,7 @@ onMounted(() => {
     <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 5
     </div>
+    </div>
   </div>
 </div>
 
@@ -82,7 +84,8 @@ const slider = new Tvist('.tvist', {
 ### Вертикальный слайдер
 
 <div ref="verticalRef" class="tvist-v1 tvist--vertical" style="height: 400px; margin-bottom: 2rem; position: relative;">
-  <div class="tvist-v1__container">
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
     <div class="tvist-v1__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 1
       <div style="position: absolute; left: 20px; font-size: 14px; opacity: 0.8;">
@@ -97,6 +100,7 @@ const slider = new Tvist('.tvist', {
     </div>
     <div class="tvist-v1__slide" style="height: 400px; min-height: 400px; flex-shrink: 0; background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 4
+    </div>
     </div>
   </div>
 </div>
@@ -115,7 +119,8 @@ const slider = new Tvist('.tvist', {
 Скроллбар автоматически скрывается при бездействии.
 
 <div ref="hiddenRef" class="tvist-v1" style="margin-bottom: 2rem; position: relative; height: 300px;">
-  <div class="tvist-v1__container">
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
     <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 1
       <div style="position: absolute; bottom: 60px; font-size: 14px; opacity: 0.8;">
@@ -127,6 +132,7 @@ const slider = new Tvist('.tvist', {
     </div>
     <div class="tvist-v1__slide" style="height: 300px; min-height: 300px; flex-shrink: 0; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
       Слайд 3
+    </div>
     </div>
   </div>
 </div>
@@ -243,8 +249,10 @@ const slider = new Tvist('.tvist', {
 **HTML:**
 ```html
 <div class="tvist-v1">
-  <div class="tvist-v1__container">
-    <!-- слайды -->
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <!-- слайды -->
+    </div>
   </div>
 </div>
 

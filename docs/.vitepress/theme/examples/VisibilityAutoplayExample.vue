@@ -13,10 +13,12 @@
 
     <div ref="sliderContainer" :style="{ display: isVisible ? 'block' : 'none' }">
       <div class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide" v-for="i in 5" :key="i">
-            <div class="slide-content">
-              Slide {{ i }}
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide" v-for="i in 5" :key="i">
+              <div class="slide-content">
+                Slide {{ i }}
+              </div>
             </div>
           </div>
         </div>

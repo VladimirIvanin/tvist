@@ -145,17 +145,19 @@ slider.updateOptions({
 ```html
 <div class="partners-slider">
   <div class="tvist-v1">
-    <div class="tvist-v1__container">
-      <div class="tvist-v1__slide">
-        <img src="logo1.png" alt="Partner 1">
+    <div class="tvist-v1__track">
+      <div class="tvist-v1__container">
+        <div class="tvist-v1__slide">
+          <img src="logo1.png" alt="Partner 1">
+        </div>
+        <div class="tvist-v1__slide">
+          <img src="logo2.png" alt="Partner 2">
+        </div>
+        <div class="tvist-v1__slide">
+          <img src="logo3.png" alt="Partner 3">
+        </div>
+        <!-- ... -->
       </div>
-      <div class="tvist-v1__slide">
-        <img src="logo2.png" alt="Partner 2">
-      </div>
-      <div class="tvist-v1__slide">
-        <img src="logo3.png" alt="Partner 3">
-      </div>
-      <!-- ... -->
     </div>
   </div>
 </div>
@@ -176,15 +178,17 @@ new Tvist('.partners-slider .tvist', {
 ```html
 <div class="news-ticker">
   <div class="tvist-v1">
-    <div class="tvist-v1__container">
-      <div class="tvist-v1__slide">
-        <span class="news-item">🔥 Новость 1</span>
-      </div>
-      <div class="tvist-v1__slide">
-        <span class="news-item">📢 Новость 2</span>
-      </div>
-      <div class="tvist-v1__slide">
-        <span class="news-item">⚡ Новость 3</span>
+    <div class="tvist-v1__track">
+      <div class="tvist-v1__container">
+        <div class="tvist-v1__slide">
+          <span class="news-item">🔥 Новость 1</span>
+        </div>
+        <div class="tvist-v1__slide">
+          <span class="news-item">📢 Новость 2</span>
+        </div>
+        <div class="tvist-v1__slide">
+          <span class="news-item">⚡ Новость 3</span>
+        </div>
       </div>
     </div>
   </div>

@@ -2,11 +2,13 @@
   <ExampleCard title="Автопрокрутка" description="Автоматическая смена слайдов + пагинация">
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide">A</div>
-          <div class="tvist-v1__slide">B</div>
-          <div class="tvist-v1__slide">C</div>
-          <div class="tvist-v1__slide">D</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">A</div>
+            <div class="tvist-v1__slide">B</div>
+            <div class="tvist-v1__slide">C</div>
+            <div class="tvist-v1__slide">D</div>
+          </div>
         </div>
         <div class="tvist-v1__pagination"></div>
       </div>

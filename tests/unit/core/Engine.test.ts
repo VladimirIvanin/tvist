@@ -13,6 +13,9 @@ describe('Engine', () => {
     root.className = TVIST_CLASSES.block
     root.style.width = '1000px'
 
+    const track = document.createElement('div')
+    track.className = TVIST_CLASSES.track
+
     const sliderContainer = document.createElement('div')
     sliderContainer.className = TVIST_CLASSES.container
 
@@ -23,12 +26,17 @@ describe('Engine', () => {
       sliderContainer.appendChild(slide)
     }
 
-    root.appendChild(sliderContainer)
+    track.appendChild(sliderContainer)
+    root.appendChild(track)
     document.body.appendChild(root)
     container = root
 
     // Мокируем offsetWidth для JSDOM
     Object.defineProperty(root, 'offsetWidth', {
+      configurable: true,
+      value: 1000
+    })
+    Object.defineProperty(track, 'offsetWidth', {
       configurable: true,
       value: 1000
     })

@@ -12,12 +12,16 @@
 
 ```html
 <div class="tvist-v1" id="parent">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">
-      <div class="tvist-v1" id="nested">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide">A</div>
-          <div class="tvist-v1__slide">B</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">
+        <div class="tvist-v1" id="nested">
+          <div class="tvist-v1__track">
+            <div class="tvist-v1__container">
+              <div class="tvist-v1__slide">A</div>
+              <div class="tvist-v1__slide">B</div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

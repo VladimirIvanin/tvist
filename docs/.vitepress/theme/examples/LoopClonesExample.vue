@@ -5,11 +5,13 @@
   >
     <div class="demo-wrapper">
       <div class="tvist-v1" ref="sliderEl">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide">1</div>
-          <div class="tvist-v1__slide">2</div>
-          <div class="tvist-v1__slide">3</div>
-          <div class="tvist-v1__slide">4</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">1</div>
+            <div class="tvist-v1__slide">2</div>
+            <div class="tvist-v1__slide">3</div>
+            <div class="tvist-v1__slide">4</div>
+          </div>
         </div>
       </div>
 
@@ -86,7 +88,6 @@ onUnmounted(() => {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 16px;
-  overflow: hidden;
 }
 
 .tvist-v1__slide {

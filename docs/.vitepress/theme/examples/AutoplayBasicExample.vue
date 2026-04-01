@@ -2,29 +2,31 @@
   <ExampleCard title="Базовый Autoplay" description="Автоматическая смена слайдов с паузой при наведении">
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">1</div>
-              <div class="slide-text">Первый слайд</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">1</div>
+                <div class="slide-text">Первый слайд</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">2</div>
-              <div class="slide-text">Второй слайд</div>
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">2</div>
+                <div class="slide-text">Второй слайд</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">3</div>
-              <div class="slide-text">Третий слайд</div>
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">3</div>
+                <div class="slide-text">Третий слайд</div>
+              </div>
             </div>
-          </div>
-          <div class="tvist-v1__slide">
-            <div class="slide-content">
-              <div class="slide-number">4</div>
-              <div class="slide-text">Четвёртый слайд</div>
+            <div class="tvist-v1__slide">
+              <div class="slide-content">
+                <div class="slide-number">4</div>
+                <div class="slide-text">Четвёртый слайд</div>
+              </div>
             </div>
           </div>
         </div>
@@ -99,7 +101,6 @@ onUnmounted(() => {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   margin-bottom: 20px;
-  overflow: hidden;
   position: relative;
 }
 

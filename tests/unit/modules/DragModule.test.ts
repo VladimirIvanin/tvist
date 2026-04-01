@@ -1094,6 +1094,8 @@ describe('DragModule — holdToPause: pointerdown не всплывает к р�
     innerRoot.className = TVIST_CLASSES.block
     innerRoot.style.width = '500px'
     innerRoot.style.height = '300px'
+    const innerTrack = document.createElement('div')
+    innerTrack.className = TVIST_CLASSES.track
     const innerContainer = document.createElement('div')
     innerContainer.className = TVIST_CLASSES.container
     const innerSlide = document.createElement('div')
@@ -1102,7 +1104,8 @@ describe('DragModule — holdToPause: pointerdown не всплывает к р�
     innerSlide.style.width = '500px'
     innerSlide.style.height = '300px'
     innerContainer.appendChild(innerSlide)
-    innerRoot.appendChild(innerContainer)
+    innerTrack.appendChild(innerContainer)
+    innerRoot.appendChild(innerTrack)
     outer.slides[0].appendChild(innerRoot)
 
     Object.defineProperty(innerRoot, 'offsetWidth', { configurable: true, value: 500 })

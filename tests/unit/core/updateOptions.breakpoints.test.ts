@@ -21,9 +21,11 @@ describe('updateOptions - breakpoints lock/unlock', () => {
     container = document.createElement('div')
     container.innerHTML = `
       <div class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide">Slide 1</div>
-          <div class="tvist-v1__slide">Slide 2</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">Slide 1</div>
+            <div class="tvist-v1__slide">Slide 2</div>
+          </div>
         </div>
         <div class="tvist-v1__arrows">
           <button class="tvist-v1__arrow tvist-v1__arrow--prev"></button>

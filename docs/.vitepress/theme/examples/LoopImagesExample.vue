@@ -49,7 +49,6 @@ onBeforeUnmount(() => {
   height: 320px;
   background: #f5f5f5;
   border-radius: 8px;
-  overflow: hidden;
 }
 
 .tvist-v1__container {

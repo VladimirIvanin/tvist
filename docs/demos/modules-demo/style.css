@@ -73,7 +73,6 @@ h2 {
 /* Слайдер 1 - С драгом и навигацией */
 #slider1 {
   position: relative;
-  overflow: hidden;
   border-radius: 12px;
 }
 
@@ -91,7 +90,6 @@ h2 {
 /* Слайдер 2 - С пагинацией */
 #slider2 {
   position: relative;
-  overflow: hidden;
   border-radius: 12px;
 }
 
@@ -109,7 +107,6 @@ h2 {
 /* Слайдер 3 - Адаптивный */
 #slider3 {
   position: relative;
-  overflow: hidden;
   border-radius: 12px;
 }
 
@@ -128,7 +125,6 @@ h2 {
 /* Слайдер 4 - Fraction */
 #slider4 {
   position: relative;
-  overflow: hidden;
   border-radius: 12px;
 }
 

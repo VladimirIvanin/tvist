@@ -34,6 +34,7 @@ export interface SliderFixtureConfig {
  */
 export interface SliderFixture {
   root: HTMLElement
+  track: HTMLElement
   container: HTMLElement
   slides: HTMLElement[]
   cleanup: () => void
@@ -74,6 +75,10 @@ export function createSliderFixture(config: SliderFixtureConfig = {}): SliderFix
   root.style.height = `${height}px`
   if (id) root.id = id
 
+  // Создаём track (viewport с overflow: hidden)
+  const track = document.createElement('div')
+  track.className = TVIST_CLASSES.track
+
   // Создаём container
   const container = document.createElement('div')
   container.className = TVIST_CLASSES.container
@@ -90,7 +95,8 @@ export function createSliderFixture(config: SliderFixtureConfig = {}): SliderFix
     slides.push(slide)
   }
 
-  root.appendChild(container)
+  track.appendChild(container)
+  root.appendChild(track)
   document.body.appendChild(root)
 
   // Мокируем offsetWidth и clientWidth для тестового окружения (happy-dom)
@@ -110,6 +116,26 @@ export function createSliderFixture(config: SliderFixtureConfig = {}): SliderFix
   })
 
   Object.defineProperty(root, 'clientHeight', {
+    configurable: true,
+    value: height,
+  })
+
+  Object.defineProperty(track, 'offsetWidth', {
+    configurable: true,
+    value: width,
+  })
+
+  Object.defineProperty(track, 'offsetHeight', {
+    configurable: true,
+    value: height,
+  })
+
+  Object.defineProperty(track, 'clientWidth', {
+    configurable: true,
+    value: width,
+  })
+
+  Object.defineProperty(track, 'clientHeight', {
     configurable: true,
     value: height,
   })
@@ -142,7 +168,7 @@ export function createSliderFixture(config: SliderFixtureConfig = {}): SliderFix
     }
   }
 
-  return { root, container, slides, cleanup }
+  return { root, track, container, slides, cleanup }
 }
 
 /**
@@ -164,19 +190,33 @@ export function createInvalidSliderFixture(): { root: HTMLElement; cleanup: () =
 }
 
 /**
- * Создаёт пустой слайдер (с container но без слайдов)
+ * Создаёт пустой слайдер (с track и container, но без слайдов)
  */
 export function createEmptySliderFixture(): SliderFixture {
   const root = document.createElement('div')
   root.className = TVIST_CLASSES.block
   root.style.width = '1000px'
 
+  const track = document.createElement('div')
+  track.className = TVIST_CLASSES.track
+
   const container = document.createElement('div')
   container.className = TVIST_CLASSES.container
-  root.appendChild(container)
+  track.appendChild(container)
+  root.appendChild(track)
   document.body.appendChild(root)
 
   Object.defineProperty(root, 'offsetWidth', {
+    configurable: true,
+    value: 1000,
+  })
+
+  Object.defineProperty(track, 'offsetWidth', {
+    configurable: true,
+    value: 1000,
+  })
+
+  Object.defineProperty(track, 'clientWidth', {
     configurable: true,
     value: 1000,
   })
@@ -187,7 +227,7 @@ export function createEmptySliderFixture(): SliderFixture {
     }
   }
 
-  return { root, container, slides: [], cleanup }
+  return { root, track, container, slides: [], cleanup }
 }
 
 /**

@@ -8,15 +8,17 @@
     </div>
 
     <div class="tvist-v1" ref="slider">
-      <div class="tvist-v1__container">
-        <div 
-          v-for="i in 9" 
-          :key="i" 
-          class="tvist-v1__slide"
-        >
-          <div class="slide-content">
-            <span class="slide-label">Slide</span>
-            <span class="slide-number">{{ i }}</span>
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div 
+            v-for="i in 9" 
+            :key="i" 
+            class="tvist-v1__slide"
+          >
+            <div class="slide-content">
+              <span class="slide-label">Slide</span>
+              <span class="slide-number">{{ i }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -107,7 +109,6 @@ onBeforeUnmount(() => {
   background: #fafafa;
   border-radius: 12px;
   padding: 48px 0;
-  overflow: hidden;
 }
 
 .slide-content {

@@ -18,10 +18,12 @@ describe('VisibilityModule', () => {
     root = document.createElement('div')
     root.className = 'tvist-v1'
     root.innerHTML = `
-      <div class="tvist-v1__container">
-        <div class="tvist-v1__slide">Slide 1</div>
-        <div class="tvist-v1__slide">Slide 2</div>
-        <div class="tvist-v1__slide">Slide 3</div>
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div class="tvist-v1__slide">Slide 1</div>
+          <div class="tvist-v1__slide">Slide 2</div>
+          <div class="tvist-v1__slide">Slide 3</div>
+        </div>
       </div>
     `
     document.body.appendChild(root)

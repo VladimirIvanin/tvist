@@ -65,11 +65,13 @@ new Tvist('.tvist', {
 **HTML:**
 ```html
 <div class="tvist-v1">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">1</div>
-    <div class="tvist-v1__slide">2</div>
-    <div class="tvist-v1__slide">3</div>
-    <div class="tvist-v1__slide">4</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">1</div>
+      <div class="tvist-v1__slide">2</div>
+      <div class="tvist-v1__slide">3</div>
+      <div class="tvist-v1__slide">4</div>
+    </div>
   </div>
 </div>
 ```

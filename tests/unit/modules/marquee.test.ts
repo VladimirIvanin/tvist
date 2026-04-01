@@ -17,10 +17,12 @@ describe('MarqueeModule', () => {
     root = document.createElement('div')
     root.className = TVIST_CLASSES.block
     root.innerHTML = `
-      <div class="${TVIST_CLASSES.container}">
-        <div class="${TVIST_CLASSES.slide}">Slide 1</div>
-        <div class="${TVIST_CLASSES.slide}">Slide 2</div>
-        <div class="${TVIST_CLASSES.slide}">Slide 3</div>
+      <div class="${TVIST_CLASSES.track}">
+        <div class="${TVIST_CLASSES.container}">
+          <div class="${TVIST_CLASSES.slide}">Slide 1</div>
+          <div class="${TVIST_CLASSES.slide}">Slide 2</div>
+          <div class="${TVIST_CLASSES.slide}">Slide 3</div>
+        </div>
       </div>
     `
     document.body.appendChild(root)

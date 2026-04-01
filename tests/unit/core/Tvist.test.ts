@@ -40,12 +40,12 @@ describe('Tvist', () => {
       }).toThrow('Tvist: element "#nonexistent" not found')
     })
 
-    it('should throw error if container not found', () => {
+    it('should throw error if track not found', () => {
       const { root: invalidRoot, cleanup } = createInvalidSliderFixture()
 
       expect(() => {
         new Tvist(invalidRoot)
-      }).toThrow(/container "\.[^"]+__container" not found/)
+      }).toThrow(/track "\.[^"]+__track" not found/)
 
       cleanup()
     })
@@ -469,6 +469,10 @@ describe('Tvist', () => {
 
       fixture.root.style.width = '1200px'
       Object.defineProperty(fixture.root, 'offsetWidth', {
+        configurable: true,
+        value: 1200
+      })
+      Object.defineProperty(fixture.track, 'offsetWidth', {
         configurable: true,
         value: 1200
       })

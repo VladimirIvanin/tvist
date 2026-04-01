@@ -91,15 +91,17 @@ const slider = new Tvist('.tvist', {
 
 ```html
 <div class="tvist-v1">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">1</div>
-    <div class="tvist-v1__slide">2</div>
-    <div class="tvist-v1__slide">3</div>
-    <div class="tvist-v1__slide">4</div>
-    <div class="tvist-v1__slide">5</div>
-    <div class="tvist-v1__slide">6</div>
-    <div class="tvist-v1__slide">7</div>
-    <div class="tvist-v1__slide">8</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">1</div>
+      <div class="tvist-v1__slide">2</div>
+      <div class="tvist-v1__slide">3</div>
+      <div class="tvist-v1__slide">4</div>
+      <div class="tvist-v1__slide">5</div>
+      <div class="tvist-v1__slide">6</div>
+      <div class="tvist-v1__slide">7</div>
+      <div class="tvist-v1__slide">8</div>
+    </div>
   </div>
 </div>
 ```

@@ -64,7 +64,9 @@ const slider = new Tvist('.slider', {
 
 ```html
 <div class="tvist-v1">
-  <div class="tvist-v1__container">...</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">...</div>
+  </div>
   <button class="tvist-v1__arrow tvist-v1__arrow--prev"></button>
   <button class="tvist-v1__arrow tvist-v1__arrow--next"></button>
   <div class="tvist-v1__pagination"></div>
@@ -88,12 +90,14 @@ const slider = new Tvist('.slider', {
 </div>
 
 <div class="tvist-v1" id="my-slider">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">1</div>
-    <div class="tvist-v1__slide">2</div>
-    <div class="tvist-v1__slide">3</div>
-    <div class="tvist-v1__slide">4</div>
-    <div class="tvist-v1__slide">5</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">1</div>
+      <div class="tvist-v1__slide">2</div>
+      <div class="tvist-v1__slide">3</div>
+      <div class="tvist-v1__slide">4</div>
+      <div class="tvist-v1__slide">5</div>
+    </div>
   </div>
 </div>
 ```

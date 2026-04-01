@@ -491,7 +491,6 @@ function applyPreset(preset: string) {
 }
 
 .tvist-v1 {
-  overflow: hidden;
   margin-bottom: 1rem;
 }
 

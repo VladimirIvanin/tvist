@@ -14,21 +14,23 @@
         
         <div ref="containerRef" class="products-container">
           <div class="tvist-v1">
-            <div class="tvist-v1__container">
-              <div 
-                v-for="product in products" 
-                :key="product.id" 
-                class="tvist-v1__slide product-card"
-              >
-                <div class="product-image" :style="{ background: product.color }">
-                  <div class="product-badge" v-if="product.badge">{{ product.badge }}</div>
-                </div>
-                <div class="product-info">
-                  <h4 class="product-title">{{ product.title }}</h4>
-                  <p class="product-description">{{ product.description }}</p>
-                  <div class="product-footer">
-                    <span class="product-price">{{ product.price }}</span>
-                    <button class="product-btn">В корзину</button>
+            <div class="tvist-v1__track">
+              <div class="tvist-v1__container">
+                <div 
+                  v-for="product in products" 
+                  :key="product.id" 
+                  class="tvist-v1__slide product-card"
+                >
+                  <div class="product-image" :style="{ background: product.color }">
+                    <div class="product-badge" v-if="product.badge">{{ product.badge }}</div>
+                  </div>
+                  <div class="product-info">
+                    <h4 class="product-title">{{ product.title }}</h4>
+                    <p class="product-description">{{ product.description }}</p>
+                    <div class="product-footer">
+                      <span class="product-price">{{ product.price }}</span>
+                      <button class="product-btn">В корзину</button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -205,7 +207,6 @@ onUnmounted(() => {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
 }
 
 /* Когда слайдер отключен (десктоп) - показываем как сетку */

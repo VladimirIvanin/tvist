@@ -8,21 +8,23 @@
     </div>
 
     <div class="tvist-v1" ref="slider">
-      <div class="tvist-v1__container">
-        <div 
-          v-for="i in 12" 
-          :key="i" 
-          class="tvist-v1__slide"
-        >
-          <div class="slide-content">
-            <div class="slide-inner">
-              <span class="slide-number">{{ i }}</span>
-              <span 
-                v-if="i === activeIndex + 1" 
-                class="slide-badge"
-              >
-                ACTIVE
-              </span>
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div 
+            v-for="i in 12" 
+            :key="i" 
+            class="tvist-v1__slide"
+          >
+            <div class="slide-content">
+              <div class="slide-inner">
+                <span class="slide-number">{{ i }}</span>
+                <span 
+                  v-if="i === activeIndex + 1" 
+                  class="slide-badge"
+                >
+                  ACTIVE
+                </span>
+              </div>
             </div>
           </div>
         </div>

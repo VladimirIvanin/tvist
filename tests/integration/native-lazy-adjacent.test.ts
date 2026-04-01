@@ -12,14 +12,16 @@ function buildSlider(slidesCount: number): HTMLElement {
   const wrap = document.createElement('div')
   wrap.innerHTML = `
     <div class="${TVIST_CLASSES.block}">
-      <div class="${TVIST_CLASSES.container}">
-        ${Array.from(
-          { length: slidesCount },
-          (_, i) =>
-            `<div class="${TVIST_CLASSES.slide}">
-              <img data-slide="${i}" src="https://example.com/s${i}.jpg" alt="" loading="lazy" />
-            </div>`
-        ).join('')}
+      <div class="${TVIST_CLASSES.track}">
+        <div class="${TVIST_CLASSES.container}">
+          ${Array.from(
+            { length: slidesCount },
+            (_, i) =>
+              `<div class="${TVIST_CLASSES.slide}">
+                <img data-slide="${i}" src="https://example.com/s${i}.jpg" alt="" loading="lazy" />
+              </div>`
+          ).join('')}
+        </div>
       </div>
     </div>
   `

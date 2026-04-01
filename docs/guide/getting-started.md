@@ -8,15 +8,17 @@
 
 ```html
 <div class="tvist-v1">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">
-      <img src="slide-1.jpg" alt="Slide 1">
-    </div>
-    <div class="tvist-v1__slide">
-      <img src="slide-2.jpg" alt="Slide 2">
-    </div>
-    <div class="tvist-v1__slide">
-      <img src="slide-3.jpg" alt="Slide 3">
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">
+        <img src="slide-1.jpg" alt="Slide 1">
+      </div>
+      <div class="tvist-v1__slide">
+        <img src="slide-2.jpg" alt="Slide 2">
+      </div>
+      <div class="tvist-v1__slide">
+        <img src="slide-3.jpg" alt="Slide 3">
+      </div>
     </div>
   </div>
 </div>
@@ -66,12 +68,14 @@ HTML с элементами навигации:
 
 ```html
 <div class="tvist-v1">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">Slide 1</div>
-    <div class="tvist-v1__slide">Slide 2</div>
-    <div class="tvist-v1__slide">Slide 3</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">Slide 1</div>
+      <div class="tvist-v1__slide">Slide 2</div>
+      <div class="tvist-v1__slide">Slide 3</div>
+    </div>
   </div>
-  
+
   <!-- Стрелки навигации -->
   <div class="tvist-button-prev">←</div>
   <div class="tvist-button-next">→</div>
@@ -177,10 +181,12 @@ console.log(slider.slides.length); // Количество слайдов
 </head>
 <body>
   <div class="tvist-v1">
-    <div class="tvist-v1__container">
-      <div class="tvist-v1__slide">Слайд 1</div>
-      <div class="tvist-v1__slide">Слайд 2</div>
-      <div class="tvist-v1__slide">Слайд 3</div>
+    <div class="tvist-v1__track">
+      <div class="tvist-v1__container">
+        <div class="tvist-v1__slide">Слайд 1</div>
+        <div class="tvist-v1__slide">Слайд 2</div>
+        <div class="tvist-v1__slide">Слайд 3</div>
+      </div>
     </div>
     <div class="tvist-button-prev">←</div>
     <div class="tvist-button-next">→</div>

@@ -28,11 +28,13 @@ import AutoHeightExample from '../.vitepress/theme/examples/AutoHeightExample.vu
 
 ```html
 <div class="tvist-v1">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide" style="width: 180px">Узкий</div>
-    <div class="tvist-v1__slide" style="width: 280px">Средний</div>
-    <div class="tvist-v1__slide" style="width: 380px">Широкий</div>
-    <!-- ... -->
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide" style="width: 180px">Узкий</div>
+      <div class="tvist-v1__slide" style="width: 280px">Средний</div>
+      <div class="tvist-v1__slide" style="width: 380px">Широкий</div>
+      <!-- ... -->
+    </div>
   </div>
 </div>
 ```

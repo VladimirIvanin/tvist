@@ -1,14 +1,16 @@
 <template>
   <div class="center-loop-example">
     <div class="tvist-v1" ref="slider">
-      <div class="tvist-v1__container">
-        <div 
-          v-for="i in 7" 
-          :key="i" 
-          class="tvist-v1__slide"
-        >
-          <div class="slide-content">
-            <span class="slide-number">{{ i }}</span>
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div 
+            v-for="i in 7" 
+            :key="i" 
+            class="tvist-v1__slide"
+          >
+            <div class="slide-content">
+              <span class="slide-number">{{ i }}</span>
+            </div>
           </div>
         </div>
       </div>

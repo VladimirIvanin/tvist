@@ -112,7 +112,6 @@ onUnmounted(() => {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   margin-bottom: 16px;
-  overflow: hidden;
 }
 
 .parent-slider .tvist-v1__slide {
@@ -148,7 +147,6 @@ onUnmounted(() => {
   flex: 1;
   min-height: 200px;
   border-radius: 10px;
-  overflow: hidden;
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
 }
 

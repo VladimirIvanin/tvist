@@ -54,10 +54,12 @@ describe('Autoplay + Pagination + Loop integration', () => {
   it('should update pagination when autoplay transitions from last to first slide in loop mode', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -118,10 +120,12 @@ describe('Autoplay + Pagination + Loop integration', () => {
   it('should correctly update pagination through multiple loop cycles', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -172,10 +176,12 @@ describe('Autoplay + Pagination + Loop integration', () => {
   it('should update fraction pagination when transitioning from last to first in loop mode', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -216,10 +222,12 @@ describe('Autoplay + Pagination + Loop integration', () => {
   it('should emit slideChangeEnd event with correct index when looping', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -263,13 +271,15 @@ describe('Autoplay + Pagination + Loop integration', () => {
   it('should handle pagination with perPage > 1 in loop mode', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
-          <div class="${TVIST_CLASSES.slide}">4</div>
-          <div class="${TVIST_CLASSES.slide}">5</div>
-          <div class="${TVIST_CLASSES.slide}">6</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+            <div class="${TVIST_CLASSES.slide}">6</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -311,12 +321,14 @@ describe('Autoplay + Pagination + Loop integration', () => {
   it('should handle rapid navigation in loop mode', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
-          <div class="${TVIST_CLASSES.slide}">4</div>
-          <div class="${TVIST_CLASSES.slide}">5</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+            <div class="${TVIST_CLASSES.slide}">5</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -381,11 +393,13 @@ describe('Autoplay + Pagination + Loop integration', () => {
   it('should keep pagination in sync after rapid scrollTo in loop mode (instant)', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
-          <div class="${TVIST_CLASSES.slide}">4</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -410,10 +424,12 @@ describe('Autoplay + Pagination + Loop integration', () => {
   it('should not emit reachEnd before last slide delay in non-loop with animated transitions', async () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+          </div>
         </div>
       </div>
     `
@@ -488,11 +504,13 @@ describe('Autoplay + Pagination + Drag (no loop, rewind)', () => {
   it('should pause autoplay on dragStart so slide does not change during drag', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
-          <div class="${TVIST_CLASSES.slide}">4</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -533,11 +551,13 @@ describe('Autoplay + Pagination + Drag (no loop, rewind)', () => {
   it('should keep pagination in sync after dragEnd and snap to a slide', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
-          <div class="${TVIST_CLASSES.slide}">4</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -570,11 +590,13 @@ describe('Autoplay + Pagination + Drag (no loop, rewind)', () => {
   it('should clamp scrollTo(-1) to index 0 when loop is false and update pagination', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
-          <div class="${TVIST_CLASSES.slide}">4</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -600,11 +622,13 @@ describe('Autoplay + Pagination + Drag (no loop, rewind)', () => {
   it('should clamp scrollTo(beyond endIndex) when loop is false and update pagination', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
-          <div class="${TVIST_CLASSES.slide}">4</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -633,11 +657,13 @@ describe('Autoplay + Pagination + Drag (no loop, rewind)', () => {
   it('should stay on slide 0 after drag right when autoplay is enabled (pause must clear timer)', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
-          <div class="${TVIST_CLASSES.slide}">4</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
@@ -688,11 +714,13 @@ describe('Autoplay + Pagination + Drag (no loop, rewind)', () => {
   it('should rewind to 0 when dragging forward past the last slide with rewind enabled', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
-          <div class="${TVIST_CLASSES.slide}">4</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+            <div class="${TVIST_CLASSES.slide}">4</div>
+          </div>
         </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>

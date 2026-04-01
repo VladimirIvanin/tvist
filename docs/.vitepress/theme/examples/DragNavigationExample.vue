@@ -2,12 +2,14 @@
   <ExampleCard title="Драг и стрелки" description="Перетаскивание мышью/тачем + стрелки навигации">
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide">1</div>
-          <div class="tvist-v1__slide">2</div>
-          <div class="tvist-v1__slide">3</div>
-          <div class="tvist-v1__slide">4</div>
-          <div class="tvist-v1__slide">5</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">1</div>
+            <div class="tvist-v1__slide">2</div>
+            <div class="tvist-v1__slide">3</div>
+            <div class="tvist-v1__slide">4</div>
+            <div class="tvist-v1__slide">5</div>
+          </div>
         </div>
         <button class="tvist-v1__arrow tvist-v1__arrow--prev"></button>
         <button class="tvist-v1__arrow tvist-v1__arrow--next"></button>
@@ -21,12 +23,14 @@
 **HTML:**
 ```html
 <div class="tvist-v1">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">1</div>
-    <div class="tvist-v1__slide">2</div>
-    <div class="tvist-v1__slide">3</div>
-    <div class="tvist-v1__slide">4</div>
-    <div class="tvist-v1__slide">5</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">1</div>
+      <div class="tvist-v1__slide">2</div>
+      <div class="tvist-v1__slide">3</div>
+      <div class="tvist-v1__slide">4</div>
+      <div class="tvist-v1__slide">5</div>
+    </div>
   </div>
   <!-- SVG иконки добавляются автоматически -->
   <button class="tvist-v1__arrow tvist-v1__arrow--prev"></button>
@@ -107,7 +111,6 @@ onUnmounted(() => {
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
   position: relative;
 }
 

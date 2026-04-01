@@ -21,11 +21,13 @@ import '../../src/modules/pagination'
 function createSliderHTML(): string {
   return `
     <div class="${TVIST_CLASSES.block}">
-      <div class="${TVIST_CLASSES.container}">
-        <div class="${TVIST_CLASSES.slide}">Slide 1</div>
-        <div class="${TVIST_CLASSES.slide}">Slide 2</div>
-        <div class="${TVIST_CLASSES.slide}">Slide 3</div>
-        <div class="${TVIST_CLASSES.slide}">Slide 4</div>
+      <div class="${TVIST_CLASSES.track}">
+        <div class="${TVIST_CLASSES.container}">
+          <div class="${TVIST_CLASSES.slide}">Slide 1</div>
+          <div class="${TVIST_CLASSES.slide}">Slide 2</div>
+          <div class="${TVIST_CLASSES.slide}">Slide 3</div>
+          <div class="${TVIST_CLASSES.slide}">Slide 4</div>
+        </div>
       </div>
       <div class="${TVIST_CLASSES.pagination}"></div>
     </div>

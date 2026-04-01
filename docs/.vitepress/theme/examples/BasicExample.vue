@@ -2,12 +2,14 @@
   <ExampleCard title="Basic Slider" description="Простой слайдер с навигацией и информацией о текущем слайде" :detailsLink="detailsLink">
     <div class="demo-wrapper">
       <div ref="sliderEl" class="tvist-v1">
-        <div class="tvist-v1__container">
-          <div class="tvist-v1__slide">Slide 1</div>
-          <div class="tvist-v1__slide">Slide 2</div>
-          <div class="tvist-v1__slide">Slide 3</div>
-          <div class="tvist-v1__slide">Slide 4</div>
-          <div class="tvist-v1__slide">Slide 5</div>
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">Slide 1</div>
+            <div class="tvist-v1__slide">Slide 2</div>
+            <div class="tvist-v1__slide">Slide 3</div>
+            <div class="tvist-v1__slide">Slide 4</div>
+            <div class="tvist-v1__slide">Slide 5</div>
+          </div>
         </div>
       </div>
 
@@ -73,7 +75,6 @@ onUnmounted(() => {
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   margin-bottom: 20px;
-  overflow: hidden;
 }
 
 .tvist-v1__slide {

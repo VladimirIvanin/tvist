@@ -27,21 +27,23 @@ import ProductCardsExample from '../.vitepress/theme/examples/ProductCardsExampl
 
 ```html
 <div class="tvist-v1">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide product-card">
-      <div class="product-image">
-        <div class="product-badge">ХИТ</div>
-      </div>
-      <div class="product-info">
-        <h4 class="product-title">Смартфон Galaxy X</h4>
-        <p class="product-description">Флагманский смартфон</p>
-        <div class="product-footer">
-          <span class="product-price">49 990 ₽</span>
-          <button class="product-btn">В корзину</button>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide product-card">
+        <div class="product-image">
+          <div class="product-badge">ХИТ</div>
+        </div>
+        <div class="product-info">
+          <h4 class="product-title">Смартфон Galaxy X</h4>
+          <p class="product-description">Флагманский смартфон</p>
+          <div class="product-footer">
+            <span class="product-price">49 990 ₽</span>
+            <button class="product-btn">В корзину</button>
+          </div>
         </div>
       </div>
+      <!-- Остальные карточки -->
     </div>
-    <!-- Остальные карточки -->
   </div>
 </div>
 ```
@@ -54,7 +56,6 @@ import ProductCardsExample from '../.vitepress/theme/examples/ProductCardsExampl
   background: white;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  overflow: hidden;
 }
 
 /* Когда слайдер отключен (десктоп) - показываем как сетку */
@@ -173,9 +174,11 @@ window.addEventListener('beforeunload', () => {
 ```vue
 <template>
   <div class="tvist-v1">
-    <div class="tvist-v1__container">
-      <div v-for="product in products" :key="product.id" class="tvist-v1__slide product-card">
-        <!-- Контент карточки -->
+    <div class="tvist-v1__track">
+      <div class="tvist-v1__container">
+        <div v-for="product in products" :key="product.id" class="tvist-v1__slide product-card">
+          <!-- Контент карточки -->
+        </div>
       </div>
     </div>
   </div>
@@ -288,12 +291,14 @@ function ProductCards() {
 
   return (
     <div className="tvist">
-      <div className="tvist-v1__container">
+      <div className="tvist-v1__track">
+        <div className="tvist-v1__container">
         {products.map(product => (
           <div key={product.id} className="tvist-v1__slide product-card">
             {/* Контент карточки */}
           </div>
         ))}
+        </div>
       </div>
     </div>
   )

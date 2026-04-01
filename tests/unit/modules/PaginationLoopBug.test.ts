@@ -25,11 +25,13 @@ describe('PaginationModule - Loop Bug Investigation', () => {
   it('should track realIndex and activeIndex through two loop cycles', async () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">Slide 1</div>
-          <div class="${TVIST_CLASSES.slide}">Slide 2</div>
-          <div class="${TVIST_CLASSES.slide}">Slide 3</div>
-        </div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">Slide 1</div>
+            <div class="${TVIST_CLASSES.slide}">Slide 2</div>
+            <div class="${TVIST_CLASSES.slide}">Slide 3</div>
+          </div>
+        </div>        
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
     `
@@ -99,11 +101,13 @@ describe('PaginationModule - Loop Bug Investigation', () => {
   it('should track data-tvist-slide-index attribute through loop cycles', async () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">Slide 1</div>
-          <div class="${TVIST_CLASSES.slide}">Slide 2</div>
-          <div class="${TVIST_CLASSES.slide}">Slide 3</div>
-        </div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">Slide 1</div>
+            <div class="${TVIST_CLASSES.slide}">Slide 2</div>
+            <div class="${TVIST_CLASSES.slide}">Slide 3</div>
+          </div>
+        </div>        
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
     `
@@ -156,11 +160,13 @@ describe('PaginationModule - Loop Bug Investigation', () => {
   it('should handle drag during second loop cycle', async () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">Slide 1</div>
-          <div class="${TVIST_CLASSES.slide}">Slide 2</div>
-          <div class="${TVIST_CLASSES.slide}">Slide 3</div>
-        </div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">Slide 1</div>
+            <div class="${TVIST_CLASSES.slide}">Slide 2</div>
+            <div class="${TVIST_CLASSES.slide}">Slide 3</div>
+          </div>
+        </div>        
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
     `
@@ -213,11 +219,13 @@ describe('PaginationModule - Loop Bug Investigation', () => {
   it('should check getCurrentSlideIndex during drag on second cycle', async () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">Slide 1</div>
-          <div class="${TVIST_CLASSES.slide}">Slide 2</div>
-          <div class="${TVIST_CLASSES.slide}">Slide 3</div>
-        </div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">Slide 1</div>
+            <div class="${TVIST_CLASSES.slide}">Slide 2</div>
+            <div class="${TVIST_CLASSES.slide}">Slide 3</div>
+          </div>
+        </div>        
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
     `

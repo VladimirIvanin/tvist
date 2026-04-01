@@ -26,15 +26,17 @@
 
 ```html
 <div class="tvist-v1">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">
-      <img data-src="image1.jpg" alt="Slide 1">
-    </div>
-    <div class="tvist-v1__slide">
-      <img data-src="image2.jpg" alt="Slide 2">
-    </div>
-    <div class="tvist-v1__slide">
-      <img data-src="image3.jpg" alt="Slide 3">
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">
+        <img data-src="image1.jpg" alt="Slide 1">
+      </div>
+      <div class="tvist-v1__slide">
+        <img data-src="image2.jpg" alt="Slide 2">
+      </div>
+      <div class="tvist-v1__slide">
+        <img data-src="image3.jpg" alt="Slide 3">
+      </div>
     </div>
   </div>
 </div>
