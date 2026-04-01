@@ -193,7 +193,8 @@ export class DragModule extends Module {
     const { engine, slides } = this.tvist;
     const perPage = this.options.perPage ?? 1;
 
-    if (this.options.loop || this.isMarqueeActive) {
+    const loopEnabled = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
+    if (loopEnabled || this.isMarqueeActive) {
       // При loop или marquee границ нет (бесконечная прокрутка)
       this.minPosition = Infinity;
       this.maxPosition = -Infinity;
@@ -214,7 +215,7 @@ export class DragModule extends Module {
       console.warn('[DragModule] Границы обновлены:', {
         minPosition: this.minPosition,
         maxPosition: this.maxPosition,
-        loop: this.options.loop,
+        loop: this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false),
         center: this.options.center,
         peekTrim: this.options.peekTrim !== false,
         slidesCount: slides.length,
@@ -603,7 +604,7 @@ export class DragModule extends Module {
       startIndex: this.startIndex,
       wasAnimating: this.wasAnimating,
       animationTarget: this.animationTarget,
-      loop: this.options.loop,
+      loop: this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false),
       rewind: this.options.rewind,
       autoplay: this.options.autoplay,
       slidesCount: this.tvist.slides.length,
@@ -683,7 +684,8 @@ export class DragModule extends Module {
         // Но для "маленьких" loop-каруселей (slidesCount <= perPage + 1)
         // первый loopFix при drag только создаёт визуальные дыры, поэтому
         // в таком случае мы его пропускаем.
-        if (this.options.loop && this.isFirstMove) {
+        const loopEnabledDrag = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
+        if (loopEnabledDrag && this.isFirstMove) {
           if (this.isMarqueeActive) {
             // В режиме marquee НЕ вызываем loopFix при драге.
             // engine.location уже синхронизирован с визуальной позицией в MarqueeModule.pause().
@@ -789,28 +791,35 @@ export class DragModule extends Module {
       newPosition = this.startPosition + distance;
 
       // В marquee с loop режимом не применяем rubberband
-      if (this.options.rubberband !== false && !this.options.loop) {
-        newPosition = this.applyRubberbandToPosition(newPosition);
-      }
-    } else if (this.options.center && !this.options.loop) {
-      // При center: true (без loop) нужно учитывать centerOffset для корректного расчета
-      // Получаем базовую позицию слайда без centerOffset
-      const basePosition = -this.tvist.engine.getSlidePosition(this.startIndex);
-      // Получаем centerOffset для текущего слайда
-      const centerOffset = this.tvist.engine.getCenterOffset(this.startIndex);
-      // Рассчитываем новую позицию: базовая позиция + центрирование + смещение от драга
-      newPosition = basePosition + centerOffset + distance;
-
-      // Применяем rubberband на границах (только если включен)
-      if (this.options.rubberband !== false) {
+      const loopEnabledRubber = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
+      if (this.options.rubberband !== false && !loopEnabledRubber) {
         newPosition = this.applyRubberbandToPosition(newPosition);
       }
     } else {
-      // Применяем rubberband на границах (только если включен)
-      if (this.options.rubberband !== false) {
-        distance = this.applyRubberband(distance);
+      const loopEnabledCenter =
+        this.options.loop === true ||
+        (typeof this.options.loop === 'object' && this.options.loop.enabled !== false);
+
+      if (this.options.center && !loopEnabledCenter) {
+        // При center: true (без loop) нужно учитывать centerOffset для корректного расчета
+        // Получаем базовую позицию слайда без centerOffset
+        const basePosition = -this.tvist.engine.getSlidePosition(this.startIndex);
+        // Получаем centerOffset для текущего слайда
+        const centerOffset = this.tvist.engine.getCenterOffset(this.startIndex);
+        // Рассчитываем новую позицию: базовая позиция + центрирование + смещение от драга
+        newPosition = basePosition + centerOffset + distance;
+
+        // Применяем rubberband на границах (только если включен)
+        if (this.options.rubberband !== false) {
+          newPosition = this.applyRubberbandToPosition(newPosition);
+        }
+      } else {
+        // Применяем rubberband на границах (только если включен)
+        if (this.options.rubberband !== false) {
+          distance = this.applyRubberband(distance);
+        }
+        newPosition = this.startPosition + distance;
       }
-      newPosition = this.startPosition + distance;
     }
     this.tvist.engine.location.set(newPosition);
 
@@ -826,7 +835,7 @@ export class DragModule extends Module {
 
     // Проверяем покрытие viewport контентом и подставляем слайды при необходимости
     // Работает для всех loop-режимов (обычный loop и marquee + loop)
-    if (this.options.loop) {
+    if (this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)) {
       this.checkContentCoverageAndFix(newPosition, point);
     }
 
@@ -873,7 +882,8 @@ export class DragModule extends Module {
       }, 0);
 
       // Проверяем и ограничиваем позицию после drag (rubberband мог вывести за границы)
-      if (!this.options.loop) {
+      const loopEnabledFree = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
+      if (!loopEnabledFree) {
         const currentPosition = this.tvist.engine.location.get();
         let clampedPosition = currentPosition;
 
@@ -903,7 +913,7 @@ export class DragModule extends Module {
         dragDistance: this.currentX - this.startX,
         willSnap: !this.isMarqueeActive,
         dragMode: this.options.drag,
-        loop: this.options.loop,
+        loop: this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false),
         rewind: this.options.rewind,
       });
       this.emit('dragEnd', e);
@@ -1197,7 +1207,7 @@ export class DragModule extends Module {
    */
   private calculateVelocity(): number {
     // В loop режиме или если не превышены границы - считаем velocity
-    const isLoop = this.options.loop;
+    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false);
     const currentPosition = this.tvist.engine.location.get();
     const exceeded = currentPosition > this.minPosition || currentPosition < this.maxPosition;
 
@@ -1234,7 +1244,7 @@ export class DragModule extends Module {
   private startMomentum(initialVelocity: number): void {
     // Проверяем, не за границами ли мы уже (для не-loop режима)
     const currentPosition = this.tvist.engine.location.get();
-    const isLoop = this.options.loop;
+    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false);
 
     if (this.options.debug) {
       console.warn('[DragModule] startMomentum:', {
@@ -1419,7 +1429,7 @@ export class DragModule extends Module {
       startPosition: this.startPosition,
       threshold,
       realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-      loop: this.options.loop,
+      loop: this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false),
       rewind: this.options.rewind,
     });
 

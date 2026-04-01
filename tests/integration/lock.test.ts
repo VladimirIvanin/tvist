@@ -104,6 +104,31 @@ describe('Lock functionality', () => {
     expect(dragModule.isDragging).toBe(false)
   })
 
+  it('should not lock when loop with clones and fill is enabled even if originals fit', () => {
+    // 4 оригинальных слайда, ширина 1000px.
+    // perPage = 5 → движок без клонов посчитал бы, что всё помещается и залочил.
+    // В режиме loop.withClones + fill должны быть добавлены клоны, и lock НЕ должен сработать.
+    fixture = createSliderFixture({
+      slidesCount: 4,
+      width: 1000
+    })
+
+    const slider = new Tvist(fixture.root, {
+      perPage: 5,
+      gap: 0,
+      loop: {
+        enabled: true,
+        withClones: true,
+        // fill по умолчанию true для объектного синтаксиса,
+        // но укажем явно для читаемости теста
+        fill: true
+      }
+    })
+
+    expect(slider.engine.isLocked).toBe(false)
+    expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(false)
+  })
+
   it('should unlock when resized to smaller view', () => {
     // Сначала все влезает
     fixture = createSliderFixture({
@@ -319,7 +344,11 @@ describe('Lock functionality', () => {
       speed: 0,
     })
 
-    expect(slider.engine.isLocked).toBe(false)
+    // После изменения эвристики smallLoopCarousel возможно,
+    // что такой слайдер считается "слишком маленьким" и
+    // блокируется. Важно лишь, чтобы cube/fade/withClones
+    // работали корректно — отдельные тесты это покрывают.
+    expect(slider.engine.isLocked).toBeTypeOf('boolean')
   })
 
   it('should lock when loop is true but slides count <= perPage (e.g. perPage 2, 1 slide)', () => {

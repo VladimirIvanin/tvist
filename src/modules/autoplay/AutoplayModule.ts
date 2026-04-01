@@ -377,7 +377,7 @@ export class AutoplayModule extends Module {
           } else {
             this.run()
           }
-        } else if (byAutoplay && this.config && !this.options.loop && this.config.delay < (this.options.speed ?? 300)) {
+        } else if (byAutoplay && this.config && !(this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)) && this.config.delay < (this.options.speed ?? 300)) {
           // Non-loop + очень короткий delay: следующий autoplay-тик запускаем
           // после завершения перехода.
           this.run()
@@ -593,7 +593,8 @@ export class AutoplayModule extends Module {
         const indexBefore = this.tvist.activeIndex
         const slidesPerPage = this.options.perPage ?? 1
         const endIndex = Math.max(0, this.tvist.slides.length - slidesPerPage)
-        const boundaryAttempt = !this.options.loop && !this.options.rewind && indexBefore >= endIndex
+        const loopEnabled = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
+        const boundaryAttempt = !loopEnabled && !this.options.rewind && indexBefore >= endIndex
         
         this.transitionByAutoplay = true
         this.lastAutoplayNextAt = performance.now()
@@ -611,7 +612,8 @@ export class AutoplayModule extends Module {
         // В не-loop режиме при delay < speed продолжаем цикл из slideChangeEnd.
         const speed = this.options.speed ?? 300
         if (!this.config?.waitForVideo) {
-          if (this.config && !this.options.loop && this.config.delay < speed) {
+          const loopEnabledDelay = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
+          if (this.config && !loopEnabledDelay && this.config.delay < speed) {
             // no-op: continue from slideChangeEnd
           } else {
             this.run()
@@ -641,7 +643,7 @@ export class AutoplayModule extends Module {
                 this.transitionByAutoplay = false
                 this.clearTransitionByAutoplayFallback()
                 this.emitAutoplayProgress(this.tvist.realIndex ?? this.tvist.activeIndex, 1)
-                if (!this.options.loop) {
+                if (!(this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
                   this.tvist.emit('reachEnd')
                 }
                 this.stop()
@@ -653,13 +655,13 @@ export class AutoplayModule extends Module {
           this.transitionByAutoplay = false
           this.clearTransitionByAutoplayFallback()
           this.emitAutoplayProgress(this.tvist.realIndex ?? this.tvist.activeIndex, 1)
-          if (!this.options.loop) {
+          if (!(this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
             this.tvist.emit('reachEnd')
           }
           this.stop()
           this.debugLog('autoplay boundary reached (no index change)', {
             indexBefore,
-            loop: this.options.loop === true,
+            loop: this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false),
           })
         }, boundaryDelay)
       }

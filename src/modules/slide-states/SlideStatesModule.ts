@@ -137,7 +137,7 @@ export class SlideStatesModule extends Module {
     if (!activeSlide) return
 
     const activeAttr = activeSlide.getAttribute('data-tvist-slide-index')
-    const isLoop = activeAttr !== null || this.options.loop === true
+    const isLoop = activeAttr !== null || this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
 
     let activeLogicalIndex = activeIndex
     const originalCount = slides.length
@@ -243,7 +243,7 @@ export class SlideStatesModule extends Module {
 
     // Режим Loop: по атрибуту на слайде (после инита Loop) или по опции (до проставления атрибутов)
     const activeAttr = activeSlide.getAttribute('data-tvist-slide-index')
-    const isLoop = activeAttr !== null || this.options.loop === true
+    const isLoop = activeAttr !== null || this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
 
     let activeLogicalIndex = activeIndex
     const originalCount = slides.length

@@ -5,9 +5,16 @@
 <script setup>
 import LoopExample from '../.vitepress/theme/examples/LoopExample.vue'
 import LoopPeekGapExample from '../.vitepress/theme/examples/LoopPeekGapExample.vue'
+import LoopClonesExample from '../.vitepress/theme/examples/LoopClonesExample.vue'
 </script>
 
 <LoopExample />
+
+## Loop с объектной конфигурацией и клонами
+
+Живой пример с использованием нового синтаксиса:
+
+<LoopClonesExample />
 
 ## Loop + perPage: 1 с изображениями
 
@@ -27,10 +34,29 @@ import LoopPeekGapExample from '../.vitepress/theme/examples/LoopPeekGapExample.
 new Tvist('.tvist', {
   gap: 0,
   perPage: 1,
+  // Классический loop без клонов (back-compat):
   loop: true,
   arrows: true,
   pagination: true,
   drag: true
+})
+```
+
+## Loop с объектной конфигурацией и клонами
+
+Новый формат настройки loop позволяет включить/выключить режим и управлять клонами:
+
+```js
+new Tvist('.tvist', {
+  perPage: 1,
+  gap: 0,
+  loop: {
+    enabled: true,     // эквивалент loop: true
+    withClones: true,  // включаем систему DOM-клонов
+  },
+  arrows: true,
+  pagination: true,
+  drag: true,
 })
 ```
 

@@ -193,7 +193,7 @@ export class NavigationModule extends Module {
     const perPage = options.perPage ?? 1
     const slidesPerGroup = options.slidesPerGroup ?? 1
     const slideCount = slides.length
-    const isLoop = options.loop === true
+    const isLoop = options.loop === true || (typeof options.loop === 'object' && options.loop.enabled !== false)
 
     if (slideCount === 0) return 0
 
@@ -255,8 +255,10 @@ export class NavigationModule extends Module {
     // Показываем стрелки (убираем класс single-page)
     this.updateRootClass(false)
 
+    const loopEnabled = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
+
     // С loop или rewind всегда можно листать (если не заблокирован)
-    if (this.options.loop || this.options.rewind) {
+    if (loopEnabled || this.options.rewind) {
       this.enableArrow(this.prevButton, disabledClass)
       this.enableArrow(this.nextButton, disabledClass)
       this.showArrow(this.prevButton, hiddenClass)

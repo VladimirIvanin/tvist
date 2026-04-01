@@ -61,7 +61,7 @@ export class MarqueeModule extends Module {
 
     // ВАЖНО: Marquee требует loop для бесшовной прокрутки
     // Автоматически включаем loop, если он не был включен
-    if (!this.options.loop) {
+    if (!(this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
       // Обновляем опции через updateOptions для корректной инициализации всех модулей
       this.tvist.updateOptions({ loop: true })
     }

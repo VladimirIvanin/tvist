@@ -8,6 +8,7 @@
  */
 
 import { Module } from '../Module'
+import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 
@@ -41,8 +42,15 @@ export class LoopModule extends Module {
   }
 
   init(): void {
-    if (!this.options.loop) return
+    const { enabled: loopEnabled, withClones } = this.getLoopConfig()
+
+    if (!loopEnabled) return
     if (this.isInitialized) return
+
+    // В режиме withClones создаём DOM-клоны один раз при инициализации.
+    if (withClones) {
+      this.createClones()
+    }
 
     const slidesCount = this.tvist.slides.length
     if (slidesCount < 1) return
@@ -96,7 +104,12 @@ export class LoopModule extends Module {
    * Обработка обновления опций
    */
   override onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
-    if (newOptions.loop === true) {
+    const loopOpt = newOptions.loop
+    const loopEnabled =
+      loopOpt === true ||
+      (typeof loopOpt === 'object' && loopOpt.enabled !== false)
+
+    if (loopEnabled) {
       this.init()
     } else if (newOptions.loop === false) {
       this.destroy()
@@ -164,7 +177,9 @@ export class LoopModule extends Module {
       initial = false
     } = params
 
-    if (!this.options.loop) return this.tvist.engine.index.get()
+    const { enabled: loopEnabled } = this.getLoopConfig()
+
+    if (!loopEnabled) return this.tvist.engine.index.get()
 
     log('LoopFix called', {
       slideRealIndex,
@@ -521,5 +536,73 @@ export class LoopModule extends Module {
 
     this.isInitialized = false
     log('Destroy complete')
+  }
+
+  /**
+   * Нормализованный конфиг loop.
+   */
+  private getLoopConfig(): { enabled: boolean; withClones: boolean } {
+    const raw = this.options.loop
+
+    if (raw === true) {
+      // Старый синтаксис: включён loop без клонов
+      return { enabled: true, withClones: false }
+    }
+
+    if (typeof raw === 'object' && raw !== null) {
+      const enabled = raw.enabled !== false
+      const withClones = raw.withClones === true
+      return { enabled, withClones }
+    }
+
+    return { enabled: false, withClones: false }
+  }
+
+  /**
+   * Создаёт DOM-клоны по краям для режима withClones.
+   * Количество клонов берётся пропорционально perPage/slidesPerGroup,
+   * чтобы избежать lock и сохранить бесконечный эффект.
+   */
+  private createClones(): void {
+    const slides = this.tvist.slides
+    const container = this.tvist.container
+
+    const originalCount = slides.length
+    if (originalCount === 0) return
+
+    const perPage = this.options.perPage ?? 1
+    const slidesPerGroup = this.options.slidesPerGroup ?? 1
+    const base = typeof perPage === 'number' ? perPage : 1
+    const clonesPerSide = Math.max(base, slidesPerGroup) * 2
+
+    const originals = [...slides]
+
+    // Клоны в хвост
+    for (let i = 0; i < clonesPerSide; i += 1) {
+      const original = originals[i % originalCount]
+      const clone = original.cloneNode(true) as HTMLElement
+      clone.classList.add(TVIST_CLASSES.slideClone)
+      const realIndexAttr = original.getAttribute('data-tvist-slide-index')
+      if (realIndexAttr != null) {
+        clone.setAttribute('data-tvist-slide-index', realIndexAttr)
+      }
+      container.appendChild(clone)
+    }
+
+    // Клоны в голову (в обратном порядке)
+    const headFragment = document.createDocumentFragment()
+    for (let i = 0; i < clonesPerSide; i += 1) {
+      const original = originals[(originalCount - 1 - (i % originalCount) + originalCount) % originalCount]
+      const clone = original.cloneNode(true) as HTMLElement
+      clone.classList.add(TVIST_CLASSES.slideClone)
+      const realIndexAttr = original.getAttribute('data-tvist-slide-index')
+      if (realIndexAttr != null) {
+        clone.setAttribute('data-tvist-slide-index', realIndexAttr)
+      }
+      headFragment.prepend(clone)
+    }
+    container.prepend(headFragment)
+
+    this.tvist.updateSlidesList()
   }
 }

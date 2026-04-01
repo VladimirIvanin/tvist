@@ -153,7 +153,7 @@ export class PaginationModule extends Module {
     const { slides } = this.tvist
     const perPage = this.options.perPage ?? 1
     const slideCount = slides.length
-    const isLoop = this.options.loop === true
+    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
     
     if (slideCount === 0) return 0
     
@@ -172,7 +172,7 @@ export class PaginationModule extends Module {
     const perPage = this.options.perPage ?? 1
     const slidesPerGroup = this.options.slidesPerGroup ?? 1
     const slideCount = slides.length
-    const isLoop = this.options.loop === true
+    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
 
     if (slideCount === 0) return 0
 
@@ -445,7 +445,7 @@ export class PaginationModule extends Module {
   private getCurrentSlideIndex(): number {
     const activeIndex = this.tvist.activeIndex
     
-    if (!this.options.loop) {
+    if (!(this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
       return activeIndex
     }
     
@@ -538,7 +538,7 @@ export class PaginationModule extends Module {
     // Вычисляем количество страниц с учетом perPage
     const perPage = this.options.perPage ?? 1
     const slideCount = slides.length
-    const isLoop = this.options.loop === true
+    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
     
     // Вычисляем endIndex (последний допустимый индекс)
     const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
@@ -621,7 +621,7 @@ export class PaginationModule extends Module {
     const { slides } = this.tvist
     const perPage = this.options.perPage ?? 1
     const slideCount = slides.length
-    const isLoop = this.options.loop === true
+    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
     const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
     
     const currentPage = this.getCurrentSlideIndex() + 1
@@ -651,7 +651,7 @@ export class PaginationModule extends Module {
     const { slides } = this.tvist
     const perPage = this.options.perPage ?? 1
     const slideCount = slides.length
-    const isLoop = this.options.loop === true
+    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
     const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
 
     const currentPage = this.getCurrentSlideIndex() + 1

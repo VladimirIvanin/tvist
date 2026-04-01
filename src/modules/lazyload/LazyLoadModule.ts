@@ -216,7 +216,7 @@ export class LazyLoadModule extends Module {
     const totalSlides = slides.length
 
     // Для loop режима нужно учитывать циклический диапазон
-    if (this.options.loop) {
+    if (this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)) {
       // Простая проверка для loop: загружаем всё в пределах distance
       const diff = Math.abs(index - activeIndex)
       return diff <= distance || diff >= totalSlides - distance
