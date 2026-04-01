@@ -29,6 +29,8 @@ const dragLog = (..._args: unknown[]) => {
   }
 };
 
+const RUBBERBAND_FRICTION = 5;
+
 interface DragPoint {
   x: number;
   y: number;
@@ -43,6 +45,14 @@ interface HoldToPauseConfig {
   moveThreshold?: number;
 }
 
+type PointerEventHandler = (e: TouchEvent | MouseEvent | PointerEvent) => void;
+
+interface ManagedHandler {
+  event: string;
+  handler: PointerEventHandler | EventListener;
+  options?: AddEventListenerOptions;
+}
+
 export class DragModule extends Module {
   readonly name = 'drag';
 
@@ -50,22 +60,18 @@ export class DragModule extends Module {
   private startX = 0;
   private startY = 0;
   private startPosition = 0;
-  private startIndex = 0; // Индекс слайда при начале драга (для center mode)
-  private currentX = 0; // Текущая позиция курсора
+  private startIndex = 0;
+  private currentX = 0;
   private currentY = 0;
 
-  // Для восстановления анимации при коротком клике
   private wasAnimating = false;
   private animationTarget: number | null = null;
 
-  // RAF для momentum
   private animationId: number | null = null;
 
-  // Границы для rubberband
   private minPosition = 0;
   private maxPosition = 0;
 
-  // Кеш ссылок на модули и вычислений (избегаем повторных lookup на каждом pointermove)
   private loopModuleRef: {
     fix?: (params: {
       direction?: 'next' | 'prev';
@@ -76,16 +82,14 @@ export class DragModule extends Module {
   } | null = null;
   private isMarqueeActive = false;
 
-  // Настройки
-  private readonly FRICTION = 0.92; // более плавное затухание
-  private readonly MIN_VELOCITY = 0.05; // Снижен порог для более длинной инерции
-  private readonly LOG_INTERVAL = 200; // Интервал обновления базового события (мс)
-  private readonly TOUCH_ANGLE = 45; // Граница между скроллом и drag
-
+  private readonly FRICTION = 0.92;
+  private readonly MIN_VELOCITY = 0.05;
+  private readonly LOG_INTERVAL = 200;
+  private readonly TOUCH_ANGLE = 45;
   private readonly MIN_DRAG_DISTANCE = 5;
+
   private isPotentialDrag = false;
 
-  // Hold-to-pause
   private holdConfig: HoldToPauseConfig | null = null;
   private holdRoot: HTMLElement | null = null;
   private holdTimer: number | null = null;
@@ -97,19 +101,14 @@ export class DragModule extends Module {
   private holdPointerId: number | null = null;
   private holdCaptureTarget: HTMLElement | null = null;
 
-  // Флаги для loop
-  private isFirstMove = true; // Флаг первого движения
-  // Frame-based cooldown для coverageFix: после любого loopFix (isFirstMove или
-  // coverageFix) пропускаем N pointermove событий. Это предотвращает каскадный
-  // ping-pong (PREV→NEXT→PREV...) при быстрых drag-ах в маленьких каруселях.
+  private isFirstMove = true;
+  // Frame-based cooldown: после любого loopFix пропускаем N pointermove событий,
+  // предотвращая каскадный ping-pong при быстрых drag-ах в маленьких каруселях.
   private coverageFixCooldown = 0;
 
-  // Накопленный delta до начала drag (для вычитания из первого движения)
   private accumulatedDeltaBeforeDragStart = { x: 0, y: 0 };
-  // Флаг: нужно ли вычесть накопленный delta на следующем кадре
   private shouldSubtractAccumulatedDelta = false;
 
-  // Для расчёта velocity
   private lastMoveTime = 0;
   private baseEvent: DragPoint | null = null;
   private prevBaseEvent: DragPoint | null = null;
@@ -126,20 +125,18 @@ export class DragModule extends Module {
     this.updateCachedRefs();
     this.updateBounds();
 
-    // Обновляем границы при resize
     this.on('resized', () => this.updateBounds());
-
-    // Слушаем сдвиг позиций (от LoopModule)
     this.on('positionShifted', this.onPositionShifted);
-
-    // Слушаем loopFix для обновления стартовой позиции
     this.on('loopFix', this.onLoopFix);
   }
 
-  /**
-   * Кешируем ссылки на модули и вычисляемые флаги,
-   * чтобы не делать lookup на каждом pointermove.
-   */
+  private get isLoopEnabled(): boolean {
+    return (
+      this.options.loop === true ||
+      (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
+    );
+  }
+
   private updateCachedRefs(): void {
     this.loopModuleRef = this.tvist.getModule('loop') as typeof this.loopModuleRef;
     this.isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined;
@@ -170,12 +167,6 @@ export class DragModule extends Module {
   private onPositionShifted = (delta: number): void => {
     if (this.isDragging) {
       this.startPosition += delta;
-
-      // Обновляем историю для корректного расчета скорости
-      // (хотя скорость зависит от относительного смещения, координаты в истории абсолютные?)
-      // В history мы храним clientX/clientY (экранные координаты), они не меняются при сдвиге слайдов.
-      // calculateVelocity использует (x - prevX). Это не зависит от slide position.
-      // Так что history обновлять не нужно.
     }
   };
 
@@ -184,22 +175,17 @@ export class DragModule extends Module {
   }
 
   /**
-   * Обновление границ для rubberband.
-   * При loop границ нет. Без loop: peekTrim — min/max без левого/правого peek.
-   * При center: true (без loop) используем getScrollPositionForIndex для корректного учета centerOffset.
-   * При marquee границ нет (свободная прокрутка).
+   * При loop или marquee границ нет (бесконечная прокрутка).
+   * При center (без loop) используем getScrollPositionForIndex для учёта centerOffset.
    */
   private updateBounds(): void {
     const { engine, slides } = this.tvist;
     const perPage = this.options.perPage ?? 1;
 
-    const loopEnabled = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-    if (loopEnabled || this.isMarqueeActive) {
-      // При loop или marquee границ нет (бесконечная прокрутка)
+    if (this.isLoopEnabled || this.isMarqueeActive) {
       this.minPosition = Infinity;
       this.maxPosition = -Infinity;
     } else if (this.options.center) {
-      // При center: true (без loop) используем getScrollPositionForIndex, который уже учитывает centerOffset
       this.minPosition = engine.getScrollPositionForIndex(0);
       this.maxPosition = engine.getScrollPositionForIndex(slides.length - 1);
     } else {
@@ -210,12 +196,11 @@ export class DragModule extends Module {
         : -engine.getSlidePosition(slides.length - perPage);
     }
 
-    // Отладка границ
     if (this.options.debug) {
       console.warn('[DragModule] Границы обновлены:', {
         minPosition: this.minPosition,
         maxPosition: this.maxPosition,
-        loop: this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false),
+        loop: this.isLoopEnabled,
         center: this.options.center,
         peekTrim: this.options.peekTrim !== false,
         slidesCount: slides.length,
@@ -224,28 +209,84 @@ export class DragModule extends Module {
     }
   }
 
-  /**
-   * Подключение event listeners
-   */
+  private manageEvents(
+    action: 'add' | 'remove',
+    target: EventTarget,
+    handlers: ManagedHandler[]
+  ): void {
+    for (const { event, handler, options } of handlers) {
+      const listener = handler as EventListener;
+      if (action === 'add') {
+        target.addEventListener(event, listener, options);
+      } else {
+        target.removeEventListener(event, listener);
+      }
+    }
+  }
+
   private attachEvents(): void {
     const { root } = this.tvist;
 
-    // Используем Pointer Events если поддерживаются (они покрывают mouse и touch)
-    // Иначе используем отдельные обработчики для mouse и touch
     if ('PointerEvent' in window) {
       root.addEventListener('pointerdown', this.onPointerDown);
     } else {
-      // Fallback для старых браузеров
       root.addEventListener('touchstart', this.onPointerDown, { passive: true });
       root.addEventListener('mousedown', this.onPointerDown);
     }
 
-    // Предотвращаем нативный drag-and-drop (браузер перехватывает pointer events
-    // при попытке перетащить изображение или выделенный текст внутри слайдов)
     root.addEventListener('dragstart', this.onDragStart);
-
-    // Класс --draggable: user-select: none, cursor: grab, touch-action
     root.classList.add(TVIST_CLASSES.draggable);
+  }
+
+  private detachEvents(): void {
+    const { root } = this.tvist;
+
+    if ('PointerEvent' in window) {
+      root.removeEventListener('pointerdown', this.onPointerDown);
+    } else {
+      root.removeEventListener('touchstart', this.onPointerDown);
+      root.removeEventListener('mousedown', this.onPointerDown);
+    }
+
+    root.removeEventListener('dragstart', this.onDragStart);
+    root.classList.remove(TVIST_CLASSES.draggable);
+    this.removeDocumentEvents();
+  }
+
+  private addDocumentEvents(): void {
+    if ('PointerEvent' in window) {
+      this.manageEvents('add', document, [
+        { event: 'pointermove', handler: this.onPointerMove },
+        { event: 'pointerup', handler: this.onPointerUp },
+        { event: 'pointercancel', handler: this.onPointerUp },
+      ]);
+    } else {
+      this.manageEvents('add', document, [
+        { event: 'touchmove', handler: this.onPointerMove, options: { passive: false } },
+        { event: 'touchend', handler: this.onPointerUp },
+        { event: 'touchcancel', handler: this.onPointerUp },
+        { event: 'mousemove', handler: this.onPointerMove },
+        { event: 'mouseup', handler: this.onPointerUp },
+      ]);
+    }
+  }
+
+  private removeDocumentEvents(): void {
+    if ('PointerEvent' in window) {
+      this.manageEvents('remove', document, [
+        { event: 'pointermove', handler: this.onPointerMove },
+        { event: 'pointerup', handler: this.onPointerUp },
+        { event: 'pointercancel', handler: this.onPointerUp },
+      ]);
+    } else {
+      this.manageEvents('remove', document, [
+        { event: 'touchmove', handler: this.onPointerMove },
+        { event: 'touchend', handler: this.onPointerUp },
+        { event: 'touchcancel', handler: this.onPointerUp },
+        { event: 'mousemove', handler: this.onPointerMove },
+        { event: 'mouseup', handler: this.onPointerUp },
+      ]);
+    }
   }
 
   private normalizeHoldToPause(raw: TvistOptions['holdToPause']): HoldToPauseConfig | null {
@@ -282,55 +323,60 @@ export class DragModule extends Module {
     this.attachHoldEvents();
   }
 
-  private attachHoldEvents(): void {
+  private manageHoldEvents(action: 'add' | 'remove'): void {
     if (!this.holdRoot) return;
 
     if ('PointerEvent' in window) {
-      this.holdRoot.addEventListener('pointerdown', this.onHoldPointerDown);
-      this.holdRoot.addEventListener('lostpointercapture', this.onLostPointerCapture);
+      this.manageEvents(action, this.holdRoot, [
+        { event: 'pointerdown', handler: this.onHoldPointerDown },
+        { event: 'lostpointercapture', handler: this.onLostPointerCapture },
+      ]);
     } else {
-      this.holdRoot.addEventListener('touchstart', this.onHoldPointerDown, { passive: true });
-      this.holdRoot.addEventListener('mousedown', this.onHoldPointerDown);
+      this.manageEvents(action, this.holdRoot, [
+        { event: 'touchstart', handler: this.onHoldPointerDown, options: { passive: true } },
+        { event: 'mousedown', handler: this.onHoldPointerDown },
+      ]);
     }
+  }
+
+  private attachHoldEvents(): void {
+    this.manageHoldEvents('add');
   }
 
   private detachHoldEvents(): void {
-    if (!this.holdRoot) return;
-
-    if ('PointerEvent' in window) {
-      this.holdRoot.removeEventListener('pointerdown', this.onHoldPointerDown);
-      this.holdRoot.removeEventListener('lostpointercapture', this.onLostPointerCapture);
-    } else {
-      this.holdRoot.removeEventListener('touchstart', this.onHoldPointerDown);
-      this.holdRoot.removeEventListener('mousedown', this.onHoldPointerDown);
-    }
+    this.manageHoldEvents('remove');
     this.holdRoot = null;
   }
 
-  /**
-   * Предотвращение нативного drag-and-drop
-   */
+  private manageHoldDocumentEvents(action: 'add' | 'remove'): void {
+    if ('PointerEvent' in window) {
+      this.manageEvents(action, document, [
+        { event: 'pointermove', handler: this.onHoldPointerMove },
+        { event: 'pointerup', handler: this.onHoldPointerUp },
+        { event: 'pointercancel', handler: this.onHoldPointerUp },
+      ]);
+    } else {
+      this.manageEvents(action, document, [
+        { event: 'touchmove', handler: this.onHoldPointerMove, options: { passive: true } },
+        { event: 'touchend', handler: this.onHoldPointerUp },
+        { event: 'touchcancel', handler: this.onHoldPointerUp },
+        { event: 'mousemove', handler: this.onHoldPointerMove },
+        { event: 'mouseup', handler: this.onHoldPointerUp },
+      ]);
+    }
+  }
+
+  private addHoldDocumentEvents(): void {
+    this.manageHoldDocumentEvents('add');
+  }
+
+  private removeHoldDocumentEvents(): void {
+    this.manageHoldDocumentEvents('remove');
+  }
+
   private onDragStart = (e: Event): void => {
     e.preventDefault();
   };
-
-  /**
-   * Отключение event listeners
-   */
-  private detachEvents(): void {
-    const { root } = this.tvist;
-
-    if ('PointerEvent' in window) {
-      root.removeEventListener('pointerdown', this.onPointerDown);
-    } else {
-      root.removeEventListener('touchstart', this.onPointerDown);
-      root.removeEventListener('mousedown', this.onPointerDown);
-    }
-
-    root.removeEventListener('dragstart', this.onDragStart);
-    root.classList.remove(TVIST_CLASSES.draggable);
-    this.removeDocumentEvents();
-  }
 
   private onHoldPointerDown = (e: TouchEvent | MouseEvent | PointerEvent): void => {
     if (!this.holdConfig || !this.holdRoot) return;
@@ -347,7 +393,6 @@ export class DragModule extends Module {
     const point = this.getPointerPosition(e);
     if (!point) return;
 
-    // Не отдаём удержание родительскому Tvist (вложенные слайдеры, stories)
     e.stopPropagation();
 
     this.cancelHoldTracking();
@@ -396,34 +441,6 @@ export class DragModule extends Module {
 
     this.addHoldDocumentEvents();
   };
-
-  private addHoldDocumentEvents(): void {
-    if ('PointerEvent' in window) {
-      document.addEventListener('pointermove', this.onHoldPointerMove);
-      document.addEventListener('pointerup', this.onHoldPointerUp);
-      document.addEventListener('pointercancel', this.onHoldPointerUp);
-    } else {
-      document.addEventListener('touchmove', this.onHoldPointerMove, { passive: true });
-      document.addEventListener('touchend', this.onHoldPointerUp);
-      document.addEventListener('touchcancel', this.onHoldPointerUp);
-      document.addEventListener('mousemove', this.onHoldPointerMove);
-      document.addEventListener('mouseup', this.onHoldPointerUp);
-    }
-  }
-
-  private removeHoldDocumentEvents(): void {
-    if ('PointerEvent' in window) {
-      document.removeEventListener('pointermove', this.onHoldPointerMove);
-      document.removeEventListener('pointerup', this.onHoldPointerUp);
-      document.removeEventListener('pointercancel', this.onHoldPointerUp);
-    } else {
-      document.removeEventListener('touchmove', this.onHoldPointerMove);
-      document.removeEventListener('touchend', this.onHoldPointerUp);
-      document.removeEventListener('touchcancel', this.onHoldPointerUp);
-      document.removeEventListener('mousemove', this.onHoldPointerMove);
-      document.removeEventListener('mouseup', this.onHoldPointerUp);
-    }
-  }
 
   private onLostPointerCapture = (e: Event): void => {
     if (!this.holdActive && !this.holdPending) return;
@@ -533,66 +550,41 @@ export class DragModule extends Module {
     this.holdCaptureTarget = null;
   }
 
-  /**
-   * Начало драга
-   */
   private onPointerDown = (e: TouchEvent | MouseEvent | PointerEvent): void => {
-    // Игнорируем если уже драгаем
     if (this.isDragging) return;
-
-    // Игнорируем если слайдер заблокирован
     if (this.tvist.engine.isLocked) return;
-
-    // Игнорируем правую кнопку мыши
     if ('button' in e && e.button !== 0) return;
 
     const target = e.target as HTMLElement;
-    // Вложенный Tvist: жест относится ближайшему root, родитель не должен ловить всплытие
     const nearestBlock = target?.closest?.(`.${TVIST_CLASSES.block}`);
     if (nearestBlock && nearestBlock !== this.tvist.root) return;
-
-    // Проверяем focusable элементы
     if (this.isFocusableElement(target)) return;
 
     const point = this.getPointerPosition(e);
     if (!point) return;
 
-    // Только подготавливаемся, но не начинаем драг сразу (ждем threshold)
     this.isPotentialDrag = true;
     this.startX = point.x;
     this.startY = point.y;
     this.currentX = point.x;
     this.currentY = point.y;
     this.startIndex = this.tvist.engine.index.get();
-
-    // Разрешаем клики (пока не начался реальный драг)
     this.tvist.allowClick = true;
 
-    // Приостанавливаем marquee если активен.
-    // MarqueeModule.pause() сам синхронизирует engine.location с визуальной позицией.
     const marqueeModule = this.tvist.getModule('marquee') as { pause?: () => void };
     marqueeModule?.pause?.();
 
-    // startPosition читаем ПОСЛЕ паузы marquee
-    // (если marquee активен, engine.location уже синхронизирован в pause())
     this.startPosition = this.tvist.engine.location.get();
 
-    // Сбрасываем события для velocity tracking
     this.baseEvent = null;
     this.prevBaseEvent = null;
     this.lastMoveTime = 0;
-
-    // Сбрасываем флаги для loop
     this.isFirstMove = true;
-
-    // Сбрасываем накопленный delta
     this.accumulatedDeltaBeforeDragStart = { x: 0, y: 0 };
     this.shouldSubtractAccumulatedDelta = false;
 
-    // Запоминаем состояние анимации для возможного восстановления
     this.wasAnimating = this.tvist.engine.animator.isAnimating();
     if (this.wasAnimating) {
-      // Сохраняем целевой индекс анимации (activeIndex уже обновлен)
       this.animationTarget = this.tvist.engine.activeIndex;
     }
 
@@ -604,7 +596,7 @@ export class DragModule extends Module {
       startIndex: this.startIndex,
       wasAnimating: this.wasAnimating,
       animationTarget: this.animationTarget,
-      loop: this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false),
+      loop: this.isLoopEnabled,
       rewind: this.options.rewind,
       autoplay: this.options.autoplay,
       slidesCount: this.tvist.slides.length,
@@ -612,17 +604,11 @@ export class DragModule extends Module {
       expectedLocationForIndex3: this.tvist.engine.getScrollPositionForIndex(3),
     });
 
-    // Останавливаем активную анимацию если была
     this.stopMomentum();
     this.tvist.engine.animator.stop();
-
-    // Добавляем move/up listeners
     this.addDocumentEvents();
   };
 
-  /**
-   * Движение при драге
-   */
   private onPointerMove = (e: TouchEvent | MouseEvent | PointerEvent): void => {
     if (!this.isPotentialDrag && !this.isDragging) return;
 
@@ -630,216 +616,39 @@ export class DragModule extends Module {
     if (!point) return;
 
     const now = Date.now();
-
-    // Сохраняем текущую позицию курсора
     this.currentX = point.x;
     this.currentY = point.y;
 
-    // Направление (horizontal/vertical)
     const isHorizontal = this.options.direction !== 'vertical';
     let deltaX = point.x - this.startX;
     let deltaY = point.y - this.startY;
     const moveDistance = Math.hypot(deltaX, deltaY);
 
-    // Если еще не начали драг, решаем: это скролл страницы или drag слайдера
     if (!this.isDragging) {
-      if (moveDistance > this.MIN_DRAG_DISTANCE) {
-        // Определяем угол жеста относительно оси слайдера
-        let isScrolling: boolean | undefined;
-        if (moveDistance >= 5) {
-          const absX = Math.abs(deltaX);
-          const absY = Math.abs(deltaY);
-          const touchAngle = (Math.atan2(absY, absX) * 180) / Math.PI;
-          if (isHorizontal) {
-            // Горизонтальный слайдер: большие углы = вертикальный скролл
-            isScrolling = touchAngle > this.TOUCH_ANGLE;
-          } else {
-            // Вертикальный слайдер: большие углы относительно вертикали = горизонтальный скролл
-            isScrolling = 90 - touchAngle > this.TOUCH_ANGLE;
-          }
-        }
+      if (moveDistance <= this.MIN_DRAG_DISTANCE) return;
 
-        // Если распознали скролл, не стартуем drag вообще — отдаём жест странице
-        if (isScrolling) {
-          this.isPotentialDrag = false;
-          this.wasAnimating = false;
-          this.animationTarget = null;
-          // Не мешаем кликам и не вызываем preventDefault — пусть браузер сам скроллит
-          return;
-        }
-
-        if (this.holdConfig?.cancelOnDrag !== false) {
-          this.finishHold();
-        }
-        this.isDragging = true;
-
-        // Запрещаем клики при начале реального драга
-        this.tvist.allowClick = false;
-
-        // Останавливаем активную анимацию только когда начинается реальный драг
-        this.stopMomentum();
-        this.tvist.engine.animator.stop();
-
-        // КРИТИЧНО: вызываем loopFix ДО первого применения transform.
-        // Но для "маленьких" loop-каруселей (slidesCount <= perPage + 1)
-        // первый loopFix при drag только создаёт визуальные дыры, поэтому
-        // в таком случае мы его пропускаем.
-        const loopEnabledDrag = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-        if (loopEnabledDrag && this.isFirstMove) {
-          if (this.isMarqueeActive) {
-            // В режиме marquee НЕ вызываем loopFix при драге.
-            // engine.location уже синхронизирован с визуальной позицией в MarqueeModule.pause().
-            // Слайды уже расставлены MarqueeModule для непрерывной прокрутки.
-            this.isFirstMove = false;
-          } else {
-            const slidesCount = this.tvist.slides.length
-            const perPage = this.options.perPage ?? 1
-
-            // Маленькая карусель: полностью отключаем первый loopFix для drag.
-            if (slidesCount <= perPage + 1) {
-              this.isFirstMove = false
-            } else if (this.loopModuleRef?.fix) {
-              // Определяем направление движения:
-              // Движение вправо (delta > 0) = движение к началу = 'prev'
-              // Движение влево (delta < 0) = движение к концу = 'next'
-              const delta = isHorizontal ? deltaX : deltaY;
-              const direction = delta > 0 ? 'prev' : 'next';
-
-              dragLog('firstMove loopFix (before)', {
-                direction,
-                activeIndex: this.tvist.engine.index.get(),
-                realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-                location: this.tvist.engine.location.get(),
-              });
-
-              this.loopModuleRef.fix({ direction });
-              this.isFirstMove = false;
-
-              // Для обычного режима: обновляем startPosition
-              this.startPosition = this.tvist.engine.location.get();
-              this.startX = point.x;
-              this.startY = point.y;
-              this.startIndex = this.tvist.engine.index.get();
-              this.coverageFixCooldown = 5;
-
-              dragLog('firstMove loopFix (after)', {
-                activeIndex: this.tvist.engine.index.get(),
-                realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-                startPosition: this.startPosition,
-                startIndex: this.startIndex,
-              });
-            }
-          }
-        }
-
-        this.baseEvent = { x: point.x, y: point.y, time: now };
-        this.lastMoveTime = now;
-
-        // Запоминаем накопленный delta до начала drag
-        // Это delta накопился пока мы ждали превышения MIN_DRAG_DISTANCE
-        // Мы вычтем его на СЛЕДУЮЩЕМ кадре
-        this.accumulatedDeltaBeforeDragStart = {
-          x: deltaX,
-          y: deltaY,
-        };
-        this.shouldSubtractAccumulatedDelta = true;
-
-        dragLog('dragStart', {
-          activeIndex: this.tvist.engine.index.get(),
-          realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-          startIndex: this.startIndex,
-          startPosition: this.startPosition,
-          accumulatedDelta: this.accumulatedDeltaBeforeDragStart,
-        });
-        this.emit('dragStart', e);
-        // Добавляем класс dragging (отключает transition)
-        this.tvist.root.classList.add(TVIST_CLASSES.dragging);
-      } else {
-        return; // Ждем превышения порога
-      }
+      const started = this.tryStartDrag(e, point, deltaX, deltaY, isHorizontal, now);
+      if (!started) return;
     }
 
-    // КРИТИЧНО: вычитаем накопленный delta на СЛЕДУЮЩЕМ кадре после dragStart
-    // Это предотвращает "перекидывание" слайда из-за delta, накопленного до превышения MIN_DRAG_DISTANCE
     if (this.shouldSubtractAccumulatedDelta) {
       deltaX -= this.accumulatedDeltaBeforeDragStart.x;
       deltaY -= this.accumulatedDeltaBeforeDragStart.y;
-      // Сбрасываем флаг после первого применения
       this.shouldSubtractAccumulatedDelta = false;
       this.accumulatedDeltaBeforeDragStart = { x: 0, y: 0 };
     }
 
-    const delta = isHorizontal ? deltaX : deltaY;
-
-    // direction change loopFix УДАЛЁН:
-    // Ранее при смене направления drag вызывался loopFix, но это создавало
-    // каскадные сбросы startX/startPosition. Каждый сброс давал dragDelta ≈ 0
-    // на следующем кадре, что провоцировало ложные coverageFix и новые direction change.
-    // Теперь покрытие viewport обеспечивается только через checkContentCoverageAndFix,
-    // который срабатывает по реальным пустотам (с проверкой направления и порога).
-
-    // Применяем dragSpeed
-    const dragSpeed = this.options.dragSpeed ?? 1;
-    let distance = delta * dragSpeed;
-
-    // Устанавливаем позицию
-    let newPosition: number;
-
-    if (this.isMarqueeActive) {
-      // startPosition уже синхронизирован с визуальной позицией marquee (через pause() в onPointerDown)
-      // и корректируется в onLoopFix после перестановки слайдов
-      newPosition = this.startPosition + distance;
-
-      // В marquee с loop режимом не применяем rubberband
-      const loopEnabledRubber = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-      if (this.options.rubberband !== false && !loopEnabledRubber) {
-        newPosition = this.applyRubberbandToPosition(newPosition);
-      }
-    } else {
-      const loopEnabledCenter =
-        this.options.loop === true ||
-        (typeof this.options.loop === 'object' && this.options.loop.enabled !== false);
-
-      if (this.options.center && !loopEnabledCenter) {
-        // При center: true (без loop) нужно учитывать centerOffset для корректного расчета
-        // Получаем базовую позицию слайда без centerOffset
-        const basePosition = -this.tvist.engine.getSlidePosition(this.startIndex);
-        // Получаем centerOffset для текущего слайда
-        const centerOffset = this.tvist.engine.getCenterOffset(this.startIndex);
-        // Рассчитываем новую позицию: базовая позиция + центрирование + смещение от драга
-        newPosition = basePosition + centerOffset + distance;
-
-        // Применяем rubberband на границах (только если включен)
-        if (this.options.rubberband !== false) {
-          newPosition = this.applyRubberbandToPosition(newPosition);
-        }
-      } else {
-        // Применяем rubberband на границах (только если включен)
-        if (this.options.rubberband !== false) {
-          distance = this.applyRubberband(distance);
-        }
-        newPosition = this.startPosition + distance;
-      }
-    }
+    const newPosition = this.computeDragPosition(deltaX, deltaY, isHorizontal);
     this.tvist.engine.location.set(newPosition);
 
-    // Применяем transform напрямую (без пересчёта размеров)
-    dragLog('applying transform', {
-      newPosition,
-      locationBefore: this.tvist.engine.location.get(),
-    });
+    dragLog('applying transform', { newPosition, locationBefore: this.tvist.engine.location.get() });
     this.tvist.engine.applyTransform();
-    dragLog('transform applied', {
-      locationAfter: this.tvist.engine.location.get(),
-    });
+    dragLog('transform applied', { locationAfter: this.tvist.engine.location.get() });
 
-    // Проверяем покрытие viewport контентом и подставляем слайды при необходимости
-    // Работает для всех loop-режимов (обычный loop и marquee + loop)
-    if (this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)) {
+    if (this.isLoopEnabled) {
       this.checkContentCoverageAndFix(newPosition, point);
     }
 
-    // Обновляем базовое событие если прошло достаточно времени
     const elapsed = now - this.lastMoveTime;
     if (elapsed > this.LOG_INTERVAL) {
       this.prevBaseEvent = this.baseEvent;
@@ -847,53 +656,174 @@ export class DragModule extends Module {
       this.lastMoveTime = now;
     }
 
-    // Emit события
     this.emit('drag', e);
 
-    // Prevent default для touch-жестов, чтобы браузер не перехватывал скролл.
-    // В окружениях с PointerEvent реальные тач-события приходят как pointermove
-    // c pointerType: 'touch', а не как touchmove, поэтому проверяем pointerType.
-    const pointerType = this.getPointerType(e);
-    if (pointerType === 'touch') {
+    if (this.getPointerType(e) === 'touch') {
       e.preventDefault();
     }
   };
 
   /**
-   * Окончание драга
+   * Определяет, является ли жест скроллом страницы или drag-ом слайдера.
+   * Возвращает true если drag начался, false если жест отдан браузеру.
    */
+  private tryStartDrag(
+    e: TouchEvent | MouseEvent | PointerEvent,
+    point: { x: number; y: number },
+    deltaX: number,
+    deltaY: number,
+    isHorizontal: boolean,
+    now: number
+  ): boolean {
+    const absX = Math.abs(deltaX);
+    const absY = Math.abs(deltaY);
+    const touchAngle = (Math.atan2(absY, absX) * 180) / Math.PI;
+    const isScrolling = isHorizontal
+      ? touchAngle > this.TOUCH_ANGLE
+      : 90 - touchAngle > this.TOUCH_ANGLE;
+
+    if (isScrolling) {
+      this.isPotentialDrag = false;
+      this.wasAnimating = false;
+      this.animationTarget = null;
+      return false;
+    }
+
+    if (this.holdConfig?.cancelOnDrag !== false) {
+      this.finishHold();
+    }
+
+    this.isDragging = true;
+    this.tvist.allowClick = false;
+    this.stopMomentum();
+    this.tvist.engine.animator.stop();
+
+    this.applyFirstMoveLoopFix(deltaX, deltaY, isHorizontal, point);
+
+    this.baseEvent = { x: point.x, y: point.y, time: now };
+    this.lastMoveTime = now;
+    this.accumulatedDeltaBeforeDragStart = { x: deltaX, y: deltaY };
+    this.shouldSubtractAccumulatedDelta = true;
+
+    dragLog('dragStart', {
+      activeIndex: this.tvist.engine.index.get(),
+      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
+      startIndex: this.startIndex,
+      startPosition: this.startPosition,
+      accumulatedDelta: this.accumulatedDeltaBeforeDragStart,
+    });
+
+    this.emit('dragStart', e);
+    this.tvist.root.classList.add(TVIST_CLASSES.dragging);
+    return true;
+  }
+
+  /**
+   * Вызывает loopFix перед первым применением transform.
+   * Пропускается для маленьких каруселей и marquee-режима.
+   */
+  private applyFirstMoveLoopFix(
+    deltaX: number,
+    deltaY: number,
+    isHorizontal: boolean,
+    point: { x: number; y: number }
+  ): void {
+    if (!this.isLoopEnabled || !this.isFirstMove) return;
+
+    if (this.isMarqueeActive) {
+      this.isFirstMove = false;
+      return;
+    }
+
+    const slidesCount = this.tvist.slides.length;
+    const perPage = this.options.perPage ?? 1;
+
+    if (slidesCount <= perPage + 1) {
+      this.isFirstMove = false;
+      return;
+    }
+
+    if (!this.loopModuleRef?.fix) return;
+
+    const delta = isHorizontal ? deltaX : deltaY;
+    const direction = delta > 0 ? 'prev' : 'next';
+
+    dragLog('firstMove loopFix (before)', {
+      direction,
+      activeIndex: this.tvist.engine.index.get(),
+      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
+      location: this.tvist.engine.location.get(),
+    });
+
+    this.loopModuleRef.fix({ direction });
+    this.isFirstMove = false;
+
+    this.startPosition = this.tvist.engine.location.get();
+    this.startX = point.x;
+    this.startY = point.y;
+    this.startIndex = this.tvist.engine.index.get();
+    this.coverageFixCooldown = 5;
+
+    dragLog('firstMove loopFix (after)', {
+      activeIndex: this.tvist.engine.index.get(),
+      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
+      startPosition: this.startPosition,
+      startIndex: this.startIndex,
+    });
+  }
+
+  /**
+   * Вычисляет новую позицию track с учётом режима (marquee, center, обычный).
+   */
+  private computeDragPosition(deltaX: number, deltaY: number, isHorizontal: boolean): number {
+    const dragSpeed = this.options.dragSpeed ?? 1;
+    const delta = isHorizontal ? deltaX : deltaY;
+    const distance = delta * dragSpeed;
+
+    if (this.isMarqueeActive) {
+      const newPosition = this.startPosition + distance;
+      if (this.options.rubberband !== false && !this.isLoopEnabled) {
+        return this.applyRubberbandToPosition(newPosition);
+      }
+      return newPosition;
+    }
+
+    if (this.options.center && !this.isLoopEnabled) {
+      const basePosition = -this.tvist.engine.getSlidePosition(this.startIndex);
+      const centerOffset = this.tvist.engine.getCenterOffset(this.startIndex);
+      const newPosition = basePosition + centerOffset + distance;
+      if (this.options.rubberband !== false) {
+        return this.applyRubberbandToPosition(newPosition);
+      }
+      return newPosition;
+    }
+
+    const effectiveDistance =
+      this.options.rubberband !== false ? this.applyRubberband(distance) : distance;
+    return this.startPosition + effectiveDistance;
+  }
+
   private onPointerUp = (e: TouchEvent | MouseEvent | PointerEvent): void => {
     if (!this.isPotentialDrag && !this.isDragging) return;
 
     const wasDragging = this.isDragging;
     this.isPotentialDrag = false;
 
-    // Если был драг
     if (this.isDragging) {
       this.isDragging = false;
-
-      // Восстанавливаем transition (удаляем класс)
       this.tvist.root.classList.remove(TVIST_CLASSES.dragging);
 
-      // Восстанавливаем возможность кликов после завершения текущего event loop
-      // Это предотвращает срабатывание клика сразу после окончания драга
       setTimeout(() => {
         this.tvist.allowClick = true;
       }, 0);
 
-      // Проверяем и ограничиваем позицию после drag (rubberband мог вывести за границы)
-      const loopEnabledFree = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-      if (!loopEnabledFree) {
+      if (!this.isLoopEnabled) {
         const currentPosition = this.tvist.engine.location.get();
-        let clampedPosition = currentPosition;
+        const clampedPosition = Math.min(
+          this.minPosition,
+          Math.max(this.maxPosition, currentPosition)
+        );
 
-        if (currentPosition > this.minPosition) {
-          clampedPosition = this.minPosition;
-        } else if (currentPosition < this.maxPosition) {
-          clampedPosition = this.maxPosition;
-        }
-
-        // Если позиция была скорректирована, устанавливаем её
         if (clampedPosition !== currentPosition) {
           this.tvist.engine.location.set(clampedPosition);
           this.tvist.engine.applyTransform();
@@ -913,17 +843,13 @@ export class DragModule extends Module {
         dragDistance: this.currentX - this.startX,
         willSnap: !this.isMarqueeActive,
         dragMode: this.options.drag,
-        loop: this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false),
+        loop: this.isLoopEnabled,
         rewind: this.options.rewind,
       });
+
       this.emit('dragEnd', e);
 
-      if (this.isMarqueeActive) {
-        // MarqueeModule сам подхватит позицию из engine.location через resume()
-        // при получении события dragEnd (уже emitted выше).
-        // Не делаем snap — marquee продолжит прокрутку.
-      } else {
-        // Применяем инерцию или snap для обычного режима
+      if (!this.isMarqueeActive) {
         if (this.options.drag === 'free') {
           this.startMomentum(velocity);
         } else {
@@ -931,65 +857,19 @@ export class DragModule extends Module {
         }
       }
     } else if (!wasDragging && this.wasAnimating && this.animationTarget !== null) {
-      // Если не было драга, но была анимация - возобновляем её
-      // Используем scrollTo без immediate чтобы продолжить анимацию
       this.tvist.scrollTo(this.animationTarget, false);
     }
 
-    // Если не было реального drag (tap) — возобновляем marquee если был на паузе.
-    // MarqueeModule.resume() безопасен для вызова если не на паузе (проверка внутри).
     if (!wasDragging) {
       const mq = this.tvist.getModule('marquee') as { resume?: () => void };
       mq?.resume?.();
     }
 
-    // Сбрасываем флаги
     this.wasAnimating = false;
     this.animationTarget = null;
-
-    // Удаляем listeners в любом случае
     this.removeDocumentEvents();
   };
 
-  /**
-   * Добавление document listeners (для move/up вне container)
-   */
-  private addDocumentEvents(): void {
-    if ('PointerEvent' in window) {
-      document.addEventListener('pointermove', this.onPointerMove);
-      document.addEventListener('pointerup', this.onPointerUp);
-      document.addEventListener('pointercancel', this.onPointerUp);
-    } else {
-      // Fallback: touch + mouse для браузеров без Pointer Events
-      // Non-passive для touchmove (нужен preventDefault)
-      document.addEventListener('touchmove', this.onPointerMove, { passive: false });
-      document.addEventListener('touchend', this.onPointerUp);
-      document.addEventListener('touchcancel', this.onPointerUp);
-      document.addEventListener('mousemove', this.onPointerMove);
-      document.addEventListener('mouseup', this.onPointerUp);
-    }
-  }
-
-  /**
-   * Удаление document listeners
-   */
-  private removeDocumentEvents(): void {
-    if ('PointerEvent' in window) {
-      document.removeEventListener('pointermove', this.onPointerMove);
-      document.removeEventListener('pointerup', this.onPointerUp);
-      document.removeEventListener('pointercancel', this.onPointerUp);
-    } else {
-      document.removeEventListener('touchmove', this.onPointerMove);
-      document.removeEventListener('touchend', this.onPointerUp);
-      document.removeEventListener('touchcancel', this.onPointerUp);
-      document.removeEventListener('mousemove', this.onPointerMove);
-      document.removeEventListener('mouseup', this.onPointerUp);
-    }
-  }
-
-  /**
-   * Получение позиции pointer (универсально для touch/mouse)
-   */
   private getPointerPosition(
     e: TouchEvent | MouseEvent | PointerEvent
   ): { x: number; y: number } | null {
@@ -1003,9 +883,6 @@ export class DragModule extends Module {
     return null;
   }
 
-  /**
-   * Проверка на focusable элемент
-   */
   private isFocusableElement(element: HTMLElement): boolean {
     const focusableSelectors =
       this.options.focusableElements ?? 'input, textarea, select, button, a[href], [tabindex]';
@@ -1016,7 +893,6 @@ export class DragModule extends Module {
   /**
    * Проверяет покрытие viewport контентом и вызывает loopFix при необходимости.
    * Работает для всех loop-режимов (обычный loop и marquee + loop).
-   * Заменяет старую проверку по индексу — использует реальные позиции слайдов.
    */
   private checkContentCoverageAndFix(
     currentPosition: number,
@@ -1028,25 +904,17 @@ export class DragModule extends Module {
 
     const viewportSize = this.tvist.engine.containerSizeValue;
 
-    // Для "маленьких" loop-каруселей (мало слайдов относительно perPage)
-    // не имеет смысла coverageFix: контент и так почти всегда полностью
-    // покрывает viewport, а перестановки дают только визуальные прыжки.
-    // Для marquee-режима coverageFix всегда должен работать (даже на маленьких
-    // каруселях) — именно он подставляет слайды и устраняет дыры.
-    // Ограничение по "маленьким" каруселям применяем только для обычного loop.
+    // Для обычного loop (не marquee) пропускаем маленькие карусели —
+    // перестановки дают только визуальные прыжки.
     if (!this.isMarqueeActive) {
       const slidesCount = this.tvist.slides.length;
       const perPage = this.options.perPage ?? 1;
-      if (slidesCount <= perPage + 1) {
-        return;
-      }
+      if (slidesCount <= perPage + 1) return;
     }
 
-    // Координаты viewport в пространстве контента
     const vpStart = -currentPosition;
     const vpEnd = vpStart + viewportSize;
 
-    // Границы контента
     const slides = this.tvist.slides;
     if (slides.length === 0) return;
 
@@ -1055,32 +923,21 @@ export class DragModule extends Module {
     const contentEnd =
       this.tvist.engine.getSlidePosition(lastIdx) + this.tvist.engine.getSlideSize(lastIdx);
 
-    // Проверяем только ту сторону, в которую тянет пользователь.
-    // Это предотвращает пинг-понг: coverageFix PREV → viewport сдвигается →
-    // coverageFix NEXT → viewport сдвигается обратно → бесконечный цикл.
     const isHoriz = this.options.direction !== 'vertical';
     const dragDelta = isHoriz ? point.x - this.startX : point.y - this.startY;
 
-    // Пропускаем проверку если |dragDelta| слишком мал — направление ненадёжно.
+    // Пропускаем если |dragDelta| слишком мал — направление ненадёжно.
     // После каждого loopFix startX сбрасывается к point.x, и на следующем кадре
     // dragDelta ≈ 0.4px с произвольным знаком, что вызывает ложные срабатывания.
     const MIN_COVERAGE_DRAG_DELTA = 10;
-    if (Math.abs(dragDelta) < MIN_COVERAGE_DRAG_DELTA) {
-      return;
-    }
+    if (Math.abs(dragDelta) < MIN_COVERAGE_DRAG_DELTA) return;
 
-    // Frame-based cooldown: после любого loopFix (isFirstMove или coverageFix)
-    // пропускаем N pointermove событий. При быстрых drag-ах в маленьких каруселях
-    // coverageFix вызывает ping-pong (PREV→NEXT→PREV...) потому что каждый fix
-    // сдвигает viewport к противоположному краю контента. Пауза в N кадров
-    // даёт позиции стабилизироваться.
     if (this.coverageFixCooldown > 0) {
       this.coverageFixCooldown--;
       return;
     }
 
-    // Буфер = -5px: игнорируем субпиксельные зазоры от floating point,
-    // реагируем только на реальные видимые пустоты (> 5px).
+    // Буфер -5px: игнорируем субпиксельные зазоры, реагируем только на реальные пустоты.
     const buffer = -5;
 
     let fixed = false;
@@ -1106,130 +963,84 @@ export class DragModule extends Module {
     }
 
     if (fixed) {
-      // После loopFix обновляем стартовые точки drag для корректного расчёта delta
       this.startPosition = this.tvist.engine.location.get();
       this.startX = point.x;
       this.startY = point.y;
       this.startIndex = this.tvist.engine.index.get();
-
-      // Cooldown: пропускаем следующие N pointermove для стабилизации
-              this.coverageFixCooldown = 5;
+      this.coverageFixCooldown = 5;
     }
   }
 
   /**
    * Находит индекс слайда, ближайшего к левому краю viewport.
-   * Используется для определения корректного activeSlideIndex при coverageFix NEXT,
-   * чтобы loopFix переместил правильное количество слайдов и сделал верную коррекцию позиции.
-   *
-   * Проблема: если передать lastIdx, loopFix перемещает слишком много слайдов
-   * (например, 3 из 4) и коррекция создаёт пустоту на противоположном краю.
-   * Используя слайд у левого края viewport, мы перемещаем только слайды,
-   * которые уже за пределами видимости (слева от viewport).
+   * Используется для корректного activeSlideIndex при coverageFix NEXT.
    */
   private findSlideNearViewportEdge(viewportLeft: number, slides: HTMLElement[]): number {
-    // Находим последний слайд, чья позиция <= viewport left.
-    // Позиции слайдов отсортированы по возрастанию, поэтому выходим
-    // из цикла как только позиция превысила viewportLeft.
     let nearestIdx = 0;
     for (let i = 0; i < slides.length; i++) {
       const pos = this.tvist.engine.getSlidePosition(i);
       if (pos > viewportLeft) break;
       nearestIdx = i;
     }
-
-    // Гарантируем минимум 1, чтобы порог append-проверки в loopFix
-    // (activeIdx + slidesPerView > slidesCount - loopedSlides) всегда срабатывал.
-    // При index=0 проверка может не пройти для маленьких каруселей.
+    // Гарантируем минимум 1, чтобы порог append-проверки в loopFix всегда срабатывал.
     return Math.max(nearestIdx, 1);
   }
 
-  /**
-   * Rubberband эффект
-   * Простое деление на константу для сопротивления за границами
-   */
   private applyRubberband(distance: number): number {
     const position = this.startPosition + distance;
 
-    // Внутри границ - полное движение БЕЗ сопротивления
     if (position >= this.maxPosition && position <= this.minPosition) {
       return distance;
     }
 
-    const FRICTION = 5;
-
-    // Вычисляем, какая часть distance выходит за границу
     let inBounds = distance;
     let outOfBounds = 0;
 
     if (position > this.minPosition) {
-      // Вышли за правую границу
       const overflow = position - this.minPosition;
       inBounds = distance - overflow;
       outOfBounds = overflow;
     } else if (position < this.maxPosition) {
-      // Вышли за левую границу
       const overflow = this.maxPosition - position;
       inBounds = distance + overflow;
       outOfBounds = -overflow;
     }
 
-    // Часть внутри границ движется нормально, часть за границей - с трением
-    return inBounds + outOfBounds / FRICTION;
+    return inBounds + outOfBounds / RUBBERBAND_FRICTION;
   }
 
-  /**
-   * Rubberband эффект для абсолютной позиции (используется в center режиме)
-   */
   private applyRubberbandToPosition(position: number): number {
-    // Внутри границ - возвращаем позицию как есть
     if (position >= this.maxPosition && position <= this.minPosition) {
       return position;
     }
 
-    const FRICTION = 5;
-
     if (position > this.minPosition) {
-      // Вышли за правую границу
       const overflow = position - this.minPosition;
-      return this.minPosition + overflow / FRICTION;
+      return this.minPosition + overflow / RUBBERBAND_FRICTION;
     } else if (position < this.maxPosition) {
-      // Вышли за левую границу
       const overflow = this.maxPosition - position;
-      return this.maxPosition - overflow / FRICTION;
+      return this.maxPosition - overflow / RUBBERBAND_FRICTION;
     }
 
     return position;
   }
 
-  /**
-   * Вычисление velocity по последнему событию
-   */
   private calculateVelocity(): number {
-    // В loop режиме или если не превышены границы - считаем velocity
-    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false);
     const currentPosition = this.tvist.engine.location.get();
     const exceeded = currentPosition > this.minPosition || currentPosition < this.maxPosition;
 
-    if (!isLoop && exceeded) {
-      return 0; // Не применяем momentum если за границами
-    }
+    if (!this.isLoopEnabled && exceeded) return 0;
 
     const now = Date.now();
     const currentPoint = { x: this.currentX, y: this.currentY, time: now };
 
-    // Используем prevBaseEvent если baseEvent совпадает с текущим
     const basePoint =
       this.baseEvent?.time === now && this.prevBaseEvent ? this.prevBaseEvent : this.baseEvent;
 
     if (!basePoint) return 0;
 
     const timeDiff = now - basePoint.time;
-
-    // Если времени прошло слишком много или слишком мало - нет velocity
-    if (timeDiff === 0 || timeDiff >= this.LOG_INTERVAL) {
-      return 0;
-    }
+    if (timeDiff === 0 || timeDiff >= this.LOG_INTERVAL) return 0;
 
     const isHorizontal = this.options.direction !== 'vertical';
     const distance = isHorizontal ? currentPoint.x - basePoint.x : currentPoint.y - basePoint.y;
@@ -1237,14 +1048,8 @@ export class DragModule extends Module {
     return distance / timeDiff;
   }
 
-  /**
-   * Momentum scroll (free mode)
-   * Простая инерционная анимация с затуханием
-   */
   private startMomentum(initialVelocity: number): void {
-    // Проверяем, не за границами ли мы уже (для не-loop режима)
     const currentPosition = this.tvist.engine.location.get();
-    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false);
 
     if (this.options.debug) {
       console.warn('[DragModule] startMomentum:', {
@@ -1252,15 +1057,14 @@ export class DragModule extends Module {
         initialVelocity,
         minPosition: this.minPosition,
         maxPosition: this.maxPosition,
-        isLoop,
+        isLoop: this.isLoopEnabled,
       });
     }
 
-    if (!isLoop) {
+    if (!this.isLoopEnabled) {
       const isOutOfBounds =
         currentPosition > this.minPosition || currentPosition < this.maxPosition;
 
-      // Если за границами - не применяем momentum, сразу snap
       if (isOutOfBounds) {
         if (this.options.debug) {
           console.warn('[DragModule] Out of bounds, skipping momentum');
@@ -1272,7 +1076,6 @@ export class DragModule extends Module {
       }
     }
 
-    // Если velocity слишком маленькая - пропускаем momentum
     if (Math.abs(initialVelocity) < 0.1) {
       if (this.options.drag !== 'free' || this.options.freeSnap) {
         this.snapToNearest(initialVelocity);
@@ -1281,22 +1084,16 @@ export class DragModule extends Module {
     }
 
     const flickPower = this.options.flickPower ?? 600;
-
-    // Преобразуем velocity (px/ms) в начальную скорость для анимации
-    // Умножаем на flickPower для более выраженного эффекта
-    let velocity = (initialVelocity * flickPower) / 60; // Делим на 60 для нормализации к FPS
+    let velocity = (initialVelocity * flickPower) / 60;
 
     const animate = (): void => {
-      // Применяем friction для плавного затухания
       velocity *= this.FRICTION;
 
-      // Обновляем позицию
       const currentPos = this.tvist.engine.location.get();
       let newPosition = currentPos + velocity;
 
-      // Проверяем границы (если не loop)
       let hitBoundary = false;
-      if (!isLoop) {
+      if (!this.isLoopEnabled) {
         if (newPosition > this.minPosition) {
           newPosition = this.minPosition;
           velocity = 0;
@@ -1309,19 +1106,13 @@ export class DragModule extends Module {
       }
 
       this.tvist.engine.location.set(newPosition);
-
-      // Применяем transform напрямую (без пересчёта размеров)
       this.tvist.engine.applyTransform();
-
-      // Сообщаем о скролле для LoopModule
       this.emit('scroll');
 
-      // Продолжаем если velocity достаточная
       if (Math.abs(velocity) > this.MIN_VELOCITY && !hitBoundary) {
         this.animationId = requestAnimationFrame(animate);
       } else {
         this.stopMomentum();
-        // Финальный snap если не free mode ИЛИ если включён freeSnap
         if (this.options.drag !== 'free' || this.options.freeSnap) {
           this.snapToNearest(initialVelocity);
         }
@@ -1331,25 +1122,16 @@ export class DragModule extends Module {
     animate();
   }
 
-  /**
-   * Snap к ближайшему слайду
-   * Две стратегии: threshold для обычного режима, nearest для free+snap
-   */
   private snapToNearest(_velocity: number): void {
     const isFreeSnap = this.options.drag === 'free' && this.options.freeSnap;
 
     if (isFreeSnap) {
-      // Free+Snap: находим БЛИЖАЙШИЙ слайд к текущей позиции
       this.snapToNearestSlide();
     } else {
-      // Обычный режим: используем threshold от стартовой позиции
       this.snapWithThreshold();
     }
   }
 
-  /**
-   * Free+Snap: находим ближайший слайд к текущей позиции
-   */
   private snapToNearestSlide(): void {
     const { engine, slides } = this.tvist;
     const currentPosition = engine.location.get();
@@ -1357,7 +1139,6 @@ export class DragModule extends Module {
     let nearestIndex = 0;
     let minDistance = Infinity;
 
-    // Ищем слайд, чья позиция ближе всего к текущей
     for (let i = 0; i < slides.length; i++) {
       const slidePosition = engine.getScrollPositionForIndex(i);
       const distance = Math.abs(currentPosition - slidePosition);
@@ -1379,9 +1160,6 @@ export class DragModule extends Module {
     engine.scrollTo(nearestIndex);
   }
 
-  /**
-   * Обычный snap: используем threshold от начальной позиции drag
-   */
   private snapWithThreshold(): void {
     const { engine } = this.tvist;
     const startIndex = engine.activeIndex;
@@ -1400,21 +1178,13 @@ export class DragModule extends Module {
     const dragDistance = isHorizontal ? this.currentX - this.startX : this.currentY - this.startY;
 
     const threshold = Math.max(slideSize * 0.2, 80);
-
-    // Вычисляем количество слайдов для перемещения
     const exactSlidesMoved = -dragDistance / slideWithGap;
     let slidesMoved = Math.round(exactSlidesMoved);
 
-    // Применяем порог (threshold)
     if (Math.abs(dragDistance) < threshold) {
-      // Если драг меньше порога, остаемся на месте
       slidesMoved = 0;
-    } else {
-      // Если превысили порог, но round дал 0 (маленький драг),
-      // форсируем перемещение на 1 слайд
-      if (slidesMoved === 0) {
-        slidesMoved = dragDistance > 0 ? -1 : 1;
-      }
+    } else if (slidesMoved === 0) {
+      slidesMoved = dragDistance > 0 ? -1 : 1;
     }
 
     const targetIndex = startIndex + slidesMoved;
@@ -1429,7 +1199,7 @@ export class DragModule extends Module {
       startPosition: this.startPosition,
       threshold,
       realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-      loop: this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false),
+      loop: this.isLoopEnabled,
       rewind: this.options.rewind,
     });
 
@@ -1437,9 +1207,6 @@ export class DragModule extends Module {
     engine.scrollTo(targetIndex);
   }
 
-  /**
-   * Остановка momentum анимации
-   */
   private stopMomentum(): void {
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId);
@@ -1447,19 +1214,12 @@ export class DragModule extends Module {
     }
   }
 
-  /**
-   * Хук при resize
-   */
   override onResize(): void {
     this.updateCachedRefs();
     this.updateBounds();
   }
 
-  /**
-   * Хук при динамическом обновлении опций (updateOptions)
-   */
   override onOptionsUpdate(): void {
-    // Как при обычном окончании hold: иначе autoplay/video остаются на паузе, holdActive — true
     this.finishHold();
     this.detachHoldEvents();
     this.setupHoldToPause();
