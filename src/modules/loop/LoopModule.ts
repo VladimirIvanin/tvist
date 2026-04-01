@@ -575,11 +575,10 @@ export class LoopModule extends Module {
     const base = typeof perPage === 'number' ? perPage : 1
     const clonesPerSide = Math.max(base, slidesPerGroup) * 2
 
-    const originals = [...slides]
-
     // Клоны в хвост
     for (let i = 0; i < clonesPerSide; i += 1) {
-      const original = originals[i % originalCount]
+      const original = slides[i % originalCount]
+      if (!original) continue
       const clone = original.cloneNode(true) as HTMLElement
       clone.classList.add(TVIST_CLASSES.slideClone)
       const realIndexAttr = original.getAttribute('data-tvist-slide-index')
@@ -592,7 +591,9 @@ export class LoopModule extends Module {
     // Клоны в голову (в обратном порядке)
     const headFragment = document.createDocumentFragment()
     for (let i = 0; i < clonesPerSide; i += 1) {
-      const original = originals[(originalCount - 1 - (i % originalCount) + originalCount) % originalCount]
+      const original =
+        slides[(originalCount - 1 - (i % originalCount) + originalCount) % originalCount]
+      if (!original) continue
       const clone = original.cloneNode(true) as HTMLElement
       clone.classList.add(TVIST_CLASSES.slideClone)
       const realIndexAttr = original.getAttribute('data-tvist-slide-index')

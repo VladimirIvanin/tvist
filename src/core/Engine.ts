@@ -897,28 +897,21 @@ export class Engine {
     //
     // При этом важно не блокировать слайдер в кейсах с peek, когда последний
     // слайд виден только частично и есть заметный диапазон для листания.
-    const isLoop =
+    if (
       this.options.loop === true ||
       (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-
-    if (isLoop) {
-      const loopOpts = this.options.loop
-      const withClonesAndFill =
-        typeof loopOpts === 'object' &&
-        loopOpts !== null &&
-        loopOpts.withClones === true &&
-        loopOpts.fill !== false
+    ) {
       const smallLoopCarousel = slideCount <= perPage + 1
 
-      if (!smallLoopCarousel && !withClonesAndFill) {
-        // Обычный большой loop без fill-клонов — блокируем только если
-        // весь контент действительно влезает.
+      if (!smallLoopCarousel) {
+        // Обычный большой loop — блокируем только если весь контент
+        // действительно влезает.
         this.setLocked(contentFits, isDisabled)
         return
       }
 
-      // Для smallLoopCarousel и/или c withClones+fill используем эвристику.
-      let shouldLock = !withClonesAndFill && contentFits
+      // Для smallLoopCarousel используем эвристику.
+      let shouldLock = contentFits
 
       if (!shouldLock) {
         // Контент формально не влезает, но могли получить ситуацию как в
@@ -931,7 +924,7 @@ export class Engine {
         const MIN_MEANINGFUL_SCROLL = referenceSlideSize * 0.6
 
         if (scrollRange < MIN_MEANINGFUL_SCROLL) {
-          shouldLock = !withClonesAndFill
+          shouldLock = true
         }
       }
 
