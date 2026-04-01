@@ -31,10 +31,12 @@ describe('Loop basic: next() wrap', () => {
   it('next() from last slide wraps to first (realIndex=0)', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+          </div>
         </div>
       </div>
     `
@@ -74,10 +76,12 @@ describe('Loop basic: next() wrap', () => {
   it('slideChangeStart events fire with correct indices through full loop cycle', () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          <div class="${TVIST_CLASSES.slide}">1</div>
-          <div class="${TVIST_CLASSES.slide}">2</div>
-          <div class="${TVIST_CLASSES.slide}">3</div>
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            <div class="${TVIST_CLASSES.slide}">1</div>
+            <div class="${TVIST_CLASSES.slide}">2</div>
+            <div class="${TVIST_CLASSES.slide}">3</div>
+          </div>
         </div>
       </div>
     `

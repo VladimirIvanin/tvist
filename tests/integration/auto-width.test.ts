@@ -8,12 +8,16 @@ import { Tvist } from '../../src/core/Tvist'
 
 describe('Auto Width / Auto Height integration', () => {
   let root: HTMLElement
+  let track: HTMLElement
   let container: HTMLElement
 
   beforeEach(() => {
     root = document.createElement('div')
     root.className = TVIST_CLASSES.block
     root.style.width = '800px'
+
+    track = document.createElement('div')
+    track.className = TVIST_CLASSES.track
 
     container = document.createElement('div')
     container.className = TVIST_CLASSES.container
@@ -27,7 +31,8 @@ describe('Auto Width / Auto Height integration', () => {
       container.appendChild(slide)
     })
 
-    root.appendChild(container)
+    track.appendChild(container)
+    root.appendChild(track)
     document.body.appendChild(root)
 
     Object.defineProperty(root, 'offsetWidth', { configurable: true, value: 800 })

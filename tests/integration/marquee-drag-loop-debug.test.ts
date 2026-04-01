@@ -19,12 +19,14 @@ describe('DEBUG: Marquee + Drag + Loop', () => {
     root.className = TVIST_CLASSES.block
     root.style.width = '800px'
     root.innerHTML = `
-      <div class="${TVIST_CLASSES.container}">
-        <div class="${TVIST_CLASSES.slide}" style="width: 200px;">Slide 1</div>
-        <div class="${TVIST_CLASSES.slide}" style="width: 200px;">Slide 2</div>
-        <div class="${TVIST_CLASSES.slide}" style="width: 200px;">Slide 3</div>
-        <div class="${TVIST_CLASSES.slide}" style="width: 200px;">Slide 4</div>
-        <div class="${TVIST_CLASSES.slide}" style="width: 200px;">Slide 5</div>
+      <div class="${TVIST_CLASSES.track}">
+        <div class="${TVIST_CLASSES.container}">
+          <div class="${TVIST_CLASSES.slide}" style="width: 200px;">Slide 1</div>
+          <div class="${TVIST_CLASSES.slide}" style="width: 200px;">Slide 2</div>
+          <div class="${TVIST_CLASSES.slide}" style="width: 200px;">Slide 3</div>
+          <div class="${TVIST_CLASSES.slide}" style="width: 200px;">Slide 4</div>
+          <div class="${TVIST_CLASSES.slide}" style="width: 200px;">Slide 5</div>
+        </div>
       </div>
     `
     document.body.appendChild(root)

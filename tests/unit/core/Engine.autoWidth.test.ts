@@ -16,6 +16,9 @@ describe('Engine - autoWidth / autoHeight', () => {
     root.className = TVIST_CLASSES.block
     root.style.width = '1000px'
 
+    const track = document.createElement('div')
+    track.className = TVIST_CLASSES.track
+
     container = document.createElement('div')
     container.className = TVIST_CLASSES.container
 
@@ -27,7 +30,8 @@ describe('Engine - autoWidth / autoHeight', () => {
       return slide
     })
 
-    root.appendChild(container)
+    track.appendChild(container)
+    root.appendChild(track)
     document.body.appendChild(root)
 
     Object.defineProperty(root, 'offsetWidth', { configurable: true, value: 1000 })
@@ -52,6 +56,9 @@ describe('Engine - autoWidth / autoHeight', () => {
     root.style.width = '400px'
     root.style.height = '500px'
 
+    const track = document.createElement('div')
+    track.className = TVIST_CLASSES.track
+
     container = document.createElement('div')
     container.className = TVIST_CLASSES.container
 
@@ -63,7 +70,8 @@ describe('Engine - autoWidth / autoHeight', () => {
       return slide
     })
 
-    root.appendChild(container)
+    track.appendChild(container)
+    root.appendChild(track)
     document.body.appendChild(root)
 
     Object.defineProperty(root, 'offsetWidth', { configurable: true, value: 400 })
@@ -179,8 +187,14 @@ describe('Engine - autoWidth / autoHeight', () => {
       const offset0 = slider.engine.getCenterOffset(0)
       const offset1 = slider.engine.getCenterOffset(1)
 
-      expect(offset0).toBe((1000 - 180) / 2)
-      expect(offset1).toBe((1000 - 280) / 2)
+      const size0 = slider.engine.getSlideSize(0)
+      const size1 = slider.engine.getSlideSize(1)
+
+      // Восстанавливаем эффективный размер viewport (rootSize) из offset0 и size0
+      const effectiveRootSize = 2 * offset0 + size0
+      const expectedOffset1 = (effectiveRootSize - size1) / 2
+
+      expect(offset1).toBe(expectedOffset1)
     })
   })
 

@@ -4,18 +4,23 @@ import { Tvist } from '@core/Tvist'
 
 describe('Engine Navigation Mode', () => {
   let container: HTMLElement
+  let root: HTMLElement
   let tvist: Tvist
 
   beforeEach(() => {
     // Создаем DOM структуру
-    container = document.createElement('div')
-    container.className = TVIST_CLASSES.block
-    container.innerHTML = `
-      <div class="${TVIST_CLASSES.container}">
-        ${Array.from({ length: 8 }).map((_, i) => `<div class="${TVIST_CLASSES.slide}">${i}</div>`).join('')}
+    root = document.createElement('div')
+    root.className = TVIST_CLASSES.block
+    root.innerHTML = `
+      <div class="${TVIST_CLASSES.track}">
+        <div class="${TVIST_CLASSES.container}">
+          ${Array.from({ length: 8 }).map((_, i) => `<div class="${TVIST_CLASSES.slide}">${i}</div>`).join('')}
+        </div>
       </div>
     `
-    document.body.appendChild(container)
+    document.body.appendChild(root)
+
+    container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
     // Мокаем размеры
     Object.defineProperties(HTMLElement.prototype, {
@@ -33,7 +38,7 @@ describe('Engine Navigation Mode', () => {
   })
 
   it('should restrict index to endIndex by default', () => {
-    tvist = new Tvist(container, {
+    tvist = new Tvist(root, {
       perPage: 4,
       speed: 0 // instant
     })
@@ -45,7 +50,7 @@ describe('Engine Navigation Mode', () => {
   })
 
   it('should allow index beyond endIndex when isNavigation is true', () => {
-    tvist = new Tvist(container, {
+    tvist = new Tvist(root, {
       perPage: 4,
       isNavigation: true,
       speed: 0
@@ -81,13 +86,16 @@ describe('Engine Navigation Mode', () => {
     // @ts-ignore
     HTMLElement.prototype.getBoundingClientRect = () => ({ width: 630 } as DOMRect)
 
-    container.innerHTML = `
-      <div class="${TVIST_CLASSES.container}">
-        ${Array.from({ length: 6 }).map((_, i) => `<div class="${TVIST_CLASSES.slide}">${i}</div>`).join('')}
+    root.innerHTML = `
+      <div class="${TVIST_CLASSES.track}">
+        <div class="${TVIST_CLASSES.container}">
+          ${Array.from({ length: 6 }).map((_, i) => `<div class="${TVIST_CLASSES.slide}">${i}</div>`).join('')}
+        </div>
       </div>
     `
+    container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
     
-    tvist = new Tvist(container, {
+    tvist = new Tvist(root, {
       perPage: 4,
       gap: 10,
       isNavigation: true,

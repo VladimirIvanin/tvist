@@ -15,8 +15,10 @@ function createSliderHTML(count = 3): string {
 
   return `
     <div class="${TVIST_CLASSES.block}">
-      <div class="${TVIST_CLASSES.container}">
-        ${slides}
+      <div class="${TVIST_CLASSES.track}">
+        <div class="${TVIST_CLASSES.container}">
+          ${slides}
+        </div>
       </div>
     </div>
   `
