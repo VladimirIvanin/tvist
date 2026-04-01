@@ -158,13 +158,15 @@ describe('PaginationModule', () => {
     it('should navigate to correct slide when clicking bullet', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
-            <div class="${TVIST_CLASSES.slide}">6</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+              <div class="${TVIST_CLASSES.slide}">6</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -196,13 +198,15 @@ describe('PaginationModule', () => {
     it('should show correct page numbers with perPage > 1', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
-            <div class="${TVIST_CLASSES.slide}">6</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+              <div class="${TVIST_CLASSES.slide}">6</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -227,13 +231,15 @@ describe('PaginationModule', () => {
     it('should calculate progress based on valid positions', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
-            <div class="${TVIST_CLASSES.slide}">6</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+              <div class="${TVIST_CLASSES.slide}">6</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -268,8 +274,10 @@ describe('PaginationModule', () => {
       it('should create limited bullets with even distribution (10 slides, limit 5)', () => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -297,8 +305,10 @@ describe('PaginationModule', () => {
       it('should handle remainder with center strategy (7 slides, limit 2)', () => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -328,8 +338,10 @@ describe('PaginationModule', () => {
       it('should handle remainder with left strategy (7 slides, limit 2)', () => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -358,8 +370,10 @@ describe('PaginationModule', () => {
       it('should handle remainder with center strategy (10 slides, limit 3)', () => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -391,8 +405,10 @@ describe('PaginationModule', () => {
       it('should handle remainder with right strategy (7 slides, limit 2)', () => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -421,8 +437,10 @@ describe('PaginationModule', () => {
       it('should activate correct bullet based on slide index', async () => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -470,8 +488,10 @@ describe('PaginationModule', () => {
       it('should work with perPage > 1', () => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 12 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 12 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -497,8 +517,10 @@ describe('PaginationModule', () => {
       it('should create limited bullets with center distribution (10 slides, limit 5)', () => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -533,8 +555,10 @@ describe('PaginationModule', () => {
         // Точка 2: слайд 6
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 7 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -568,8 +592,10 @@ describe('PaginationModule', () => {
       it('should activate correct bullet in center strategy', async () => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -610,8 +636,10 @@ describe('PaginationModule', () => {
       it('should handle limit=2 with center strategy', () => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -641,8 +669,10 @@ describe('PaginationModule', () => {
       it('should handle limit=1 with center strategy', () => {
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -675,8 +705,10 @@ describe('PaginationModule', () => {
         // Точка 4: слайд 9 (последний)
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -733,8 +765,10 @@ describe('PaginationModule', () => {
         // Точка 4: слайд 10
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 11 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 11 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -783,8 +817,10 @@ describe('PaginationModule', () => {
         // Точка 3: слайд 8 (край справа)
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 9 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 9 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -830,8 +866,10 @@ describe('PaginationModule', () => {
         // Точка 5: слайд 11
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 12 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 12 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -880,8 +918,10 @@ describe('PaginationModule', () => {
         // Точка 6: слайд 14
         container.innerHTML = `
           <div class="${TVIST_CLASSES.block}">
-            <div class="${TVIST_CLASSES.container}">
-              ${Array.from({ length: 15 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            <div class="${TVIST_CLASSES.track}">
+              <div class="${TVIST_CLASSES.container}">
+                ${Array.from({ length: 15 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+              </div>
             </div>
             <div class="${TVIST_CLASSES.pagination}"></div>
           </div>
@@ -913,8 +953,10 @@ describe('PaginationModule', () => {
     it('should not use limit when limit >= total slides', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            ${Array.from({ length: 5 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 5 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -936,8 +978,10 @@ describe('PaginationModule', () => {
     it('should click bullet and navigate to group start', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              ${Array.from({ length: 10 }, (_, i) => `<div class="${TVIST_CLASSES.slide}">${i + 1}</div>`).join('')}
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -969,12 +1013,14 @@ describe('PaginationModule', () => {
     it('should not flicker active bullet during incomplete drag (with loop)', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -1038,12 +1084,14 @@ describe('PaginationModule', () => {
     it('should update active bullet after successful drag (with loop)', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -1084,12 +1132,14 @@ describe('PaginationModule', () => {
     it('should work correctly with autoplay + loop + drag', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
-            <div class="${TVIST_CLASSES.slide}">5</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+              <div class="${TVIST_CLASSES.slide}">5</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -1133,10 +1183,12 @@ describe('PaginationModule', () => {
     it('should handle pagination correctly on second loop cycle with drag', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -1196,10 +1248,12 @@ describe('PaginationModule', () => {
     it('should not flicker pagination during drag on second loop cycle with autoplay', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>

@@ -20,6 +20,9 @@ describe('AutoWidth - No Gaps on Prev Navigation', () => {
     root.className = TVIST_CLASSES.block
     root.style.width = `${containerWidth}px`
 
+    const track = document.createElement('div')
+    track.className = TVIST_CLASSES.track
+
     container = document.createElement('div')
     container.className = TVIST_CLASSES.container
 
@@ -32,11 +35,13 @@ describe('AutoWidth - No Gaps on Prev Navigation', () => {
       return slide
     })
 
-    root.appendChild(container)
+    track.appendChild(container)
+    root.appendChild(track)
     document.body.appendChild(root)
 
     // Мокируем размеры для happy-dom
     Object.defineProperty(root, 'offsetWidth', { configurable: true, value: containerWidth })
+    Object.defineProperty(track, 'offsetWidth', { configurable: true, value: containerWidth })
     slides.forEach((slide, i) => {
       Object.defineProperty(slide, 'offsetWidth', { configurable: true, value: slideWidths[i] })
       Object.defineProperty(slide, 'offsetHeight', { configurable: true, value: 150 })

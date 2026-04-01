@@ -19,6 +19,9 @@ function appendInnerTvistRoot(
   innerRoot.style.width = `${rootWidth}px`
   innerRoot.style.height = `${rootHeight}px`
 
+  const innerTrack = document.createElement('div')
+  innerTrack.className = TVIST_CLASSES.track
+
   const innerContainer = document.createElement('div')
   innerContainer.className = TVIST_CLASSES.container
 
@@ -33,7 +36,8 @@ function appendInnerTvistRoot(
     innerSlides.push(slide)
   }
 
-  innerRoot.appendChild(innerContainer)
+  innerTrack.appendChild(innerContainer)
+  innerRoot.appendChild(innerTrack)
   hostSlide.textContent = ''
   hostSlide.appendChild(innerRoot)
 
@@ -41,6 +45,9 @@ function appendInnerTvistRoot(
   Object.defineProperty(innerRoot, 'offsetHeight', { configurable: true, value: rootHeight })
   Object.defineProperty(innerRoot, 'clientWidth', { configurable: true, value: rootWidth })
   Object.defineProperty(innerRoot, 'clientHeight', { configurable: true, value: rootHeight })
+
+  Object.defineProperty(innerTrack, 'offsetWidth', { configurable: true, value: rootWidth })
+  Object.defineProperty(innerTrack, 'clientWidth', { configurable: true, value: rootWidth })
 
   Object.defineProperty(innerContainer, 'offsetWidth', { configurable: true, value: rootWidth })
   Object.defineProperty(innerContainer, 'clientWidth', { configurable: true, value: rootWidth })

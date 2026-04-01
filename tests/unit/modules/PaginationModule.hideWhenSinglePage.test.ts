@@ -32,8 +32,10 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should hide pagination when hideWhenSinglePage is true and there is only one page', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -55,9 +57,11 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should hide pagination when perPage equals slide count', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -79,10 +83,12 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should show pagination when hideWhenSinglePage is false even if locked', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -109,10 +115,12 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should show pagination when there are multiple pages', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -136,10 +144,12 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should hide pagination when slidesPerGroup makes it single page', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -162,11 +172,13 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should show pagination when slidesPerGroup creates multiple pages', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
-            <div class="${TVIST_CLASSES.slide}">4</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+              <div class="${TVIST_CLASSES.slide}">4</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -191,8 +203,10 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should hide pagination in loop mode when hideWhenSinglePage is true and single page', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -214,10 +228,12 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should show pagination in loop mode when there are multiple pages', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -241,8 +257,10 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should hide bullets pagination when one page', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -262,8 +280,10 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should hide fraction pagination when one page', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -283,8 +303,10 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should hide progress pagination when one page', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -306,10 +328,12 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should update visibility when perPage changes via breakpoints', async () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -345,8 +369,10 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should hide pagination when slider is locked with hideWhenSinglePage: true (default)', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -365,8 +391,10 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should show pagination when slider is locked with hideWhenSinglePage: false', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -390,9 +418,11 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should render correct number of bullets and hide when one page', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>
@@ -419,10 +449,12 @@ describe('PaginationModule - hideWhenSinglePage', () => {
     it('should render multiple bullets and show when multiple pages', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
-          <div class="${TVIST_CLASSES.container}">
-            <div class="${TVIST_CLASSES.slide}">1</div>
-            <div class="${TVIST_CLASSES.slide}">2</div>
-            <div class="${TVIST_CLASSES.slide}">3</div>
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
           </div>
           <div class="${TVIST_CLASSES.pagination}"></div>
         </div>

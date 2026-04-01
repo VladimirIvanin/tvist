@@ -11,11 +11,13 @@ describe('Peek integration', () => {
     root = document.createElement('div')
     root.className = TVIST_CLASSES.block
     root.innerHTML = `
-      <div class="${TVIST_CLASSES.container}">
-        <div class="${TVIST_CLASSES.slide}">Slide 1</div>
-        <div class="${TVIST_CLASSES.slide}">Slide 2</div>
-        <div class="${TVIST_CLASSES.slide}">Slide 3</div>
-        <div class="${TVIST_CLASSES.slide}">Slide 4</div>
+      <div class="${TVIST_CLASSES.track}">
+        <div class="${TVIST_CLASSES.container}">
+          <div class="${TVIST_CLASSES.slide}">Slide 1</div>
+          <div class="${TVIST_CLASSES.slide}">Slide 2</div>
+          <div class="${TVIST_CLASSES.slide}">Slide 3</div>
+          <div class="${TVIST_CLASSES.slide}">Slide 4</div>
+        </div>
       </div>
     `
     document.body.appendChild(root)
@@ -25,6 +27,8 @@ describe('Peek integration', () => {
     root.style.height = '500px'
 
     // Мокируем offsetWidth/offsetHeight для тестовой среды
+    const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
+
     Object.defineProperty(root, 'offsetWidth', {
       configurable: true,
       value: 1000
@@ -32,6 +36,15 @@ describe('Peek integration', () => {
     Object.defineProperty(root, 'offsetHeight', {
       configurable: true,
       value: 500
+    })
+
+    Object.defineProperty(track, 'offsetWidth', {
+      configurable: true,
+      value: 1000,
+    })
+    Object.defineProperty(track, 'offsetHeight', {
+      configurable: true,
+      value: 500,
     })
   })
 
@@ -53,10 +66,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingLeft).toBe('50px')
-      expect(container.style.paddingRight).toBe('50px')
+      expect(track.style.paddingLeft).toBe('50px')
+      expect(track.style.paddingRight).toBe('50px')
     })
 
     it('should apply string peek to container', () => {
@@ -66,10 +79,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingLeft).toBe('2rem')
-      expect(container.style.paddingRight).toBe('2rem')
+      expect(track.style.paddingLeft).toBe('2rem')
+      expect(track.style.paddingRight).toBe('2rem')
     })
 
     it('should apply object peek with different left/right values', () => {
@@ -79,10 +92,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingLeft).toBe('30px')
-      expect(container.style.paddingRight).toBe('70px')
+      expect(track.style.paddingLeft).toBe('30px')
+      expect(track.style.paddingRight).toBe('70px')
     })
 
     it('should apply object peek with mixed units', () => {
@@ -92,10 +105,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingLeft).toBe('1rem')
-      expect(container.style.paddingRight).toBe('50px')
+      expect(track.style.paddingLeft).toBe('1rem')
+      expect(track.style.paddingRight).toBe('50px')
     })
 
     it('should handle partial object peek', () => {
@@ -105,10 +118,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingLeft).toBe('50px')
-      expect(container.style.paddingRight).toBe('0px')
+      expect(track.style.paddingLeft).toBe('50px')
+      expect(track.style.paddingRight).toBe('0px')
     })
   })
 
@@ -120,10 +133,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingTop).toBe('50px')
-      expect(container.style.paddingBottom).toBe('50px')
+      expect(track.style.paddingTop).toBe('50px')
+      expect(track.style.paddingBottom).toBe('50px')
     })
 
     it('should apply object peek with different top/bottom values', () => {
@@ -133,10 +146,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingTop).toBe('30px')
-      expect(container.style.paddingBottom).toBe('70px')
+      expect(track.style.paddingTop).toBe('30px')
+      expect(track.style.paddingBottom).toBe('70px')
     })
   })
 
@@ -191,10 +204,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingLeft).toBe('0px')
-      expect(container.style.paddingRight).toBe('0px')
+      expect(track.style.paddingLeft).toBe('0px')
+      expect(track.style.paddingRight).toBe('0px')
     })
   })
 
@@ -206,10 +219,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingLeft).toBe('1rem')
-      expect(container.style.paddingRight).toBe('1rem')
+      expect(track.style.paddingLeft).toBe('1rem')
+      expect(track.style.paddingRight).toBe('1rem')
     })
 
     it('should work with percentage units', () => {
@@ -219,10 +232,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingLeft).toBe('10%')
-      expect(container.style.paddingRight).toBe('10%')
+      expect(track.style.paddingLeft).toBe('10%')
+      expect(track.style.paddingRight).toBe('10%')
     })
 
     it('should work with em units', () => {
@@ -232,10 +245,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingLeft).toBe('2em')
-      expect(container.style.paddingRight).toBe('2em')
+      expect(track.style.paddingLeft).toBe('2em')
+      expect(track.style.paddingRight).toBe('2em')
     })
   })
 
@@ -247,10 +260,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingLeft).toBe('0px')
-      expect(container.style.paddingRight).toBe('0px')
+      expect(track.style.paddingLeft).toBe('0px')
+      expect(track.style.paddingRight).toBe('0px')
     })
 
     it('should handle empty object peek', () => {
@@ -260,10 +273,10 @@ describe('Peek integration', () => {
       }
 
       tvist = new Tvist(root, options)
-      const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
 
-      expect(container.style.paddingLeft).toBe('0px')
-      expect(container.style.paddingRight).toBe('0px')
+      expect(track.style.paddingLeft).toBe('0px')
+      expect(track.style.paddingRight).toBe('0px')
     })
   })
 })

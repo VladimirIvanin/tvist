@@ -133,7 +133,12 @@ describe('Engine', () => {
 
     // Изменяем размер контейнера и мокаем новый offsetWidth
     root.style.width = '1200px'
+    const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
     Object.defineProperty(root, 'offsetWidth', {
+      configurable: true,
+      value: 1200
+    })
+    Object.defineProperty(track, 'offsetWidth', {
       configurable: true,
       value: 1200
     })
@@ -262,7 +267,12 @@ describe('Engine', () => {
 
     // Resize to 1500 => perPage = floor(1500/400) = 3
     root.style.width = '1500px'
+    const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
     Object.defineProperty(root, 'offsetWidth', {
+      configurable: true,
+      value: 1500
+    })
+    Object.defineProperty(track, 'offsetWidth', {
       configurable: true,
       value: 1500
     })
@@ -273,6 +283,10 @@ describe('Engine', () => {
     // Resize to 300 => perPage = floor(300/400) = 0 -> should be 1
     root.style.width = '300px'
     Object.defineProperty(root, 'offsetWidth', {
+      configurable: true,
+      value: 300
+    })
+    Object.defineProperty(track, 'offsetWidth', {
       configurable: true,
       value: 300
     })

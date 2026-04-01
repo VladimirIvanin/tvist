@@ -34,17 +34,20 @@ describe('SlideStates integration', () => {
     // Создаём HTML
     const html = `
       <div class="${TVIST_CLASSES.block}">
-        <div class="${TVIST_CLASSES.container}">
-          ${Array.from({ length: slidesCount }, (_, i) => 
-            `<div class="${TVIST_CLASSES.slide}">Slide ${i + 1}</div>`
-          ).join('')}
+        <div class="${TVIST_CLASSES.track}">
+          <div class="${TVIST_CLASSES.container}">
+            ${Array.from({ length: slidesCount }, (_, i) => 
+              `<div class="${TVIST_CLASSES.slide}">Slide ${i + 1}</div>`
+            ).join('')}
+          </div>
         </div>
       </div>
     `
     container.innerHTML = html
 
     const root = container.querySelector(`.${TVIST_CLASSES.block}`) as HTMLElement
-    const containerEl = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+    const trackEl = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
+    const containerEl = trackEl.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
     const slides = Array.from(containerEl.querySelectorAll(`.${TVIST_CLASSES.slide}`)) as HTMLElement[]
 
     // Мокаем размеры root
@@ -60,8 +63,9 @@ describe('SlideStates integration', () => {
       toJSON: () => ({})
     }
 
-    // Мокаем getBoundingClientRect для root
+    // Мокаем getBoundingClientRect для root и track
     root.getBoundingClientRect = () => rootRect as DOMRect
+    trackEl.getBoundingClientRect = () => rootRect as DOMRect
 
     // Мокаем размеры слайдов
     slides.forEach((slide, index) => {
@@ -80,11 +84,12 @@ describe('SlideStates integration', () => {
       slide.getBoundingClientRect = () => slideRect as DOMRect
     })
 
-    // Мокаем offsetWidth для слайдов
+    // Мокаем offsetWidth для root/track/слайдов
     Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
       configurable: true,
       get: function() {
         if (this === root) return rootWidth
+        if (this === trackEl) return rootWidth
         if (slides.includes(this)) return slideWidth
         return 0
       }
