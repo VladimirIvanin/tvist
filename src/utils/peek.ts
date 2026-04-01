@@ -113,8 +113,8 @@ export function getPeekValue(
  * чтобы не загрязнять inline-стили нулевыми значениями.
  */
 function setPaddingOrRemove(element: HTMLElement, prop: keyof CSSStyleDeclaration, value: string): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ;(element.style as any)[prop] = value === '0px' ? '' : value
+  const style = element.style as CSSStyleDeclaration & Record<string, string>
+  style[prop] = value === '0px' ? '' : value
 }
 
 /**

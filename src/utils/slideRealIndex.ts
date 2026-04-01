@@ -58,19 +58,23 @@ export function findDomIndexByRealIndexForTransition(
     }
   }
   if (matches.length === 0) return -1
-  if (matches.length === 1) return matches[0]!
+  if (matches.length === 1) {
+    const singleMatch = matches[0]
+    if (singleMatch == null) return -1
+    return singleMatch
+  }
 
   if (direction === 'prev') {
     for (let j = matches.length - 1; j >= 0; j--) {
-      const idx = matches[j]!
+      const idx = matches[j]
       if (idx < referenceDomIndex) return idx
     }
-    return matches[matches.length - 1]!
+    return matches[matches.length - 1]
   }
   for (const idx of matches) {
     if (idx > referenceDomIndex) return idx
   }
-  return matches[0]!
+  return matches[0]
 }
 
 /**
