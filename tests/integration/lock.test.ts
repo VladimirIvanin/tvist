@@ -273,6 +273,55 @@ describe('Lock functionality', () => {
     expect(slider.engine.isLocked).toBe(false)
   })
 
+  it('should lock small loop slider when scroll range is too small (all small slides almost fully visible)', () => {
+    // Кейс с маленькими слайдами и loop:
+    // slidesCount: 4, perPage: 3, gap: 32, peek ~100, width ~450-500.
+    // Все 4 слайда почти одновременно влезают в viewport, и реальный диапазон
+    // скролла меньше "осмысленного" шага — с точки зрения пользователя
+    // пролистывать фактически некуда, слайдер должен считаться заблокированным.
+    fixture = createSliderFixture({
+      slidesCount: 4,
+      width: 480,
+      slideWidth: 130,
+    })
+
+    const slider = new Tvist(fixture.root, {
+      perPage: 3,
+      gap: 32,
+      loop: true,
+      peek: 90,
+      speed: 0,
+    })
+
+    // Форсируем перерасчёт после применения peek и gap
+    slider.update()
+
+    expect(slider.engine.isLocked).toBe(true)
+  })
+
+  it('should not lock loop slider with peek when last slide is only partially visible', () => {
+    // Реальный кейс:
+    // loop: true, perPage: 3, gap: 32, peek: 120, slidesCount: 4, width ~1103.
+    // При такой конфигурации последний слайд частично виден за счёт peek.
+    // Раньше эвристика smallLoopCarousel (slideCount <= perPage + 1) приводила
+    // к lock даже при том, что контент не полностью помещался.
+    // Слайдер НЕ должен быть заблокирован.
+    fixture = createSliderFixture({
+      slidesCount: 4,
+      width: 1103,
+    })
+
+    const slider = new Tvist(fixture.root, {
+      perPage: 3,
+      gap: 32,
+      loop: true,
+      peek: 120,
+      speed: 0,
+    })
+
+    expect(slider.engine.isLocked).toBe(false)
+  })
+
   it('should lock when loop is true but slides count <= perPage (e.g. perPage 2, 1 slide)', () => {
     // perPage 2, loop true, 1 слайд — листать некуда, должен сработать lock
     fixture = createSliderFixture({

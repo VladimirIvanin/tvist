@@ -883,11 +883,45 @@ export class Engine {
     const contentFits = this.getContentSize() <= this.containerSize + 1
 
     // Дополнительная эвристика для loop: если уникальных слайдов мало и они
-    // все одновременно попадают в viewport (contentFits), то листать
-    // "по кругу" визуально некуда — считаем такой слайдер заблокированным.
+    // все одновременно попадают в viewport, то листать "по кругу" визуально
+    // некуда — считаем такой слайдер заблокированным.
+    //
+    // Учитываем два фактора:
+    // 1) Контент целиком влезает в viewport (contentFits).
+    // 2) Даже если контент немного выходит за пределы viewport, но диапазон
+    //    доступного скролла слишком мал относительно размера слайда, листать
+    //    "некуда" с точки зрения пользователя (слайды почти статичны).
+    //
+    // При этом важно не блокировать слайдер в кейсах с peek, когда последний
+    // слайд виден только частично и есть заметный диапазон для листания.
     if (this.options.loop) {
       const smallLoopCarousel = slideCount <= perPage + 1
-      this.setLocked(contentFits || smallLoopCarousel, isDisabled)
+
+      if (!smallLoopCarousel) {
+        // Обычный большой loop — блокируем только если весь контент
+        // действительно влезает.
+        this.setLocked(contentFits, isDisabled)
+        return
+      }
+
+      let shouldLock = contentFits
+
+      if (!shouldLock) {
+        // Контент формально не влезает, но могли получить ситуацию как в
+        // промо-слайдере: много маленьких слайдов, все почти видны сразу,
+        // а реальный диапазон скролла меньше, чем "осмысленный" шаг.
+        const minScroll = this.getMinScrollPosition()
+        const maxScroll = this.getMaxScrollPosition()
+        const scrollRange = Math.abs(minScroll - maxScroll)
+        const referenceSlideSize = this.getSlideSize(0)
+        const MIN_MEANINGFUL_SCROLL = referenceSlideSize * 0.6
+
+        if (scrollRange < MIN_MEANINGFUL_SCROLL) {
+          shouldLock = true
+        }
+      }
+
+      this.setLocked(shouldLock, isDisabled)
       return
     }
 
