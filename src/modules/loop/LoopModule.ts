@@ -7,16 +7,8 @@
 
 import { Module } from '../Module'
 import { TVIST_CLASSES } from '../../core/constants'
-import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 import { findDomIndexByRealIndex } from '../../utils/slideRealIndex'
-
-const LOOP_DEBUG = false
-const log = (_msg: string, _data?: unknown) => {
-  if (LOOP_DEBUG) {
-    // debug logging
-  }
-}
 
 interface LoopFixParams {
   slideRealIndex?: number
@@ -24,35 +16,25 @@ interface LoopFixParams {
   direction?: 'next' | 'prev'
   setTranslate?: boolean
   activeSlideIndex?: number
-  initial?: boolean // Первый вызов при инициализации
+  /** Первый вызов при инициализации */
+  initial?: boolean
 }
 
 export class LoopModule extends Module {
   readonly name = 'loop'
-  
+
   /** Количество слайдов в буфере для loop (вычисляется динамически) */
   public loopedSlides = 0
-  
-  /** Флаг инициализации */
-  private isInitialized = false
 
-  constructor(tvist: Tvist, options: TvistOptions) {
-    super(tvist, options)
-  }
+  private isInitialized = false
 
   init(): void {
     const { enabled: loopEnabled, withClones } = this.getLoopConfig()
 
-    if (!loopEnabled) return
-    if (this.isInitialized) return
+    if (!loopEnabled || this.isInitialized) return
 
-    // В режиме withClones создаём DOM-клоны один раз при инициализации.
     if (withClones) {
       this.createClones()
-      // После добавления клонов Counter.max всё ещё равен числу оригиналов.
-      // engine.update() пересчитывает Counter.max/endIndex до нового slides.length,
-      // иначе engine.index.set(domIndex) нормализует индекс по старому max
-      // и слайдер стартует на клоне вместо оригинала.
       this.tvist.engine.update()
     }
 
@@ -60,58 +42,30 @@ export class LoopModule extends Module {
     if (slidesCount < 1) return
 
     this.isInitialized = true
-    log('Init started', { slidesCount })
 
-    // 2. Первый loopFix для начальной расстановки слайдов
     const initialRealIndex = this.options.start ?? 0
     const bothDirections = this.options.center ?? false
-    
+
     this.loopFix({
       slideRealIndex: initialRealIndex,
       direction: bothDirections ? undefined : 'next',
-      initial: true
+      initial: true,
     })
 
-    log('Init complete', { 
-      loopedSlides: this.loopedSlides, 
-      totalSlides: this.tvist.slides.length,
-      activeIndex: this.tvist.engine.index.get()
-    })
-
-    // Подписываемся на beforeTransitionStart для автоматического loopFix
     this.on('beforeTransitionStart', (data: { index: number; direction: 'next' | 'prev' }) => {
-      log('beforeTransitionStart received', data)
-      this.loopFix({
-        direction: data.direction,
-      })
+      this.loopFix({ direction: data.direction })
     })
-    
-    // Патчим геттер realIndex
+
     Object.defineProperty(this.tvist, 'realIndex', {
-      get: () => {
-        const result = this.getRealIndex()
-        if (LOOP_DEBUG) {
-          log('realIndex getter called', { result, activeIndex: this.tvist.engine.index.get() })
-        }
-        return result
-      },
-      configurable: true
-    })
-    
-    log('realIndex getter installed', {
-      hasGetter: 'realIndex' in this.tvist,
-      testValue: this.tvist.realIndex
+      get: () => this.getRealIndex(),
+      configurable: true,
     })
   }
 
-  /**
-   * Обработка обновления опций
-   */
   override onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
     const loopOpt = newOptions.loop
     const loopEnabled =
-      loopOpt === true ||
-      (typeof loopOpt === 'object' && loopOpt.enabled !== false)
+      loopOpt === true || (typeof loopOpt === 'object' && loopOpt.enabled !== false)
 
     if (loopEnabled) {
       this.init()
@@ -121,15 +75,15 @@ export class LoopModule extends Module {
   }
 
   /**
-   * Публичный метод для вызова loopFix из других модулей
-   * Возвращает скорректированный индекс после loopFix
+   * Публичный вызов loopFix из других модулей.
+   * Возвращает скорректированный активный индекс.
    */
   public fix(params: LoopFixParams = {}): number {
     return this.loopFix(params)
   }
 
   /**
-   * Получить текущее состояние transform для отладки и тестирования
+   * Состояние transform для отладки и тестирования.
    */
   public getTransformState(): {
     location: number
@@ -150,27 +104,10 @@ export class LoopModule extends Module {
       transform: this.tvist.container.style.transform,
       slidesOrder: slides.map(s => s.getAttribute('data-tvist-slide-index') ?? '?'),
       slidesText: slides.map(s => s.textContent?.trim() || '?'),
-      loopedSlides: this.loopedSlides
+      loopedSlides: this.loopedSlides,
     }
   }
 
-  /**
-   * Остановить анимацию и залогировать текущее состояние (для тестирования)
-   */
-  public pause(label?: string): void {
-    // Останавливаем анимацию
-    this.tvist.engine.animator.stop()
-    if (LOOP_DEBUG) {
-      const state = this.getTransformState()
-      const prefix = label ? `[Loop Pause: ${label}]` : '[Loop Pause]'
-      log(prefix, state)
-    }
-  }
-
-  /**
-   * Основная логика loop: перестановка слайдов и коррекция позиции
-   * Возвращает скорректированный активный индекс
-   */
   private loopFix(params: LoopFixParams = {}): number {
     const {
       slideRealIndex,
@@ -178,62 +115,24 @@ export class LoopModule extends Module {
       direction,
       setTranslate,
       activeSlideIndex,
-      initial = false
+      initial = false,
     } = params
 
     const { enabled: loopEnabled, withClones } = this.getLoopConfig()
-
     if (!loopEnabled) return this.tvist.engine.index.get()
-
-    log('LoopFix called', {
-      slideRealIndex,
-      slideTo,
-      direction,
-      setTranslate,
-      activeSlideIndex,
-      initial,
-      currentIndex: this.tvist.engine.index.get(),
-      currentLocation: this.tvist.engine.location.get(),
-      currentTarget: this.tvist.engine.target.get()
-    })
 
     this.emit('beforeLoopFix')
 
     const slides = this.tvist.slides
     const container = this.tvist.container
     const slidesCount = slides.length
-
-    // Вычисляем slidesPerView
-    const perPage = this.options.perPage ?? 1
-    let slidesPerView = typeof perPage === 'number' ? perPage : 1
-
-    // Для center режима, если четное количество, делаем нечетным
     const bothDirections = this.options.center ?? false
-    if (bothDirections && slidesPerView % 2 === 0) {
-      slidesPerView = slidesPerView + 1
-    }
 
-    // Вычисляем loopedSlides (буфер для loop)
-    const slidesPerGroup = this.options.slidesPerGroup ?? 1
-    let loopedSlides = bothDirections
-      ? Math.max(slidesPerGroup, Math.ceil(slidesPerView / 2))
-      : slidesPerView // Используем slidesPerView по умолчанию, если slidesPerGroup < slidesPerView? 
-                      // loopedSlides = params.loopedSlides || params.slidesPerView
-    
-    // Если loopedSlides явно не задан (у нас нет опции loopedSlides), используем slidesPerView для надежности
-    // Но если slidesPerGroup > slidesPerView (редко), то берем его
-    if (!bothDirections) {
-      loopedSlides = Math.max(slidesPerGroup, slidesPerView)
-    }
-
-    // Округляем до кратности группе
-    if (loopedSlides % slidesPerGroup !== 0) {
-      loopedSlides += slidesPerGroup - (loopedSlides % slidesPerGroup)
-    }
-
+    const loopedSlides = this.computeLoopedSlides(bothDirections)
     this.loopedSlides = loopedSlides
 
-    // Проверка достаточности слайдов
+    const slidesPerView = this.getSlidesPerView(bothDirections)
+
     if (slidesCount < slidesPerView + loopedSlides) {
       console.warn(
         '[Tvist Loop] Warning: Not enough slides for loop mode. Need at least',
@@ -243,227 +142,80 @@ export class LoopModule extends Module {
       )
     }
 
-    // Определяем активный индекс
     const activeIndex = activeSlideIndex ?? this.tvist.engine.index.get()
+
+    if (withClones && !initial) {
+      this.teleportIfNeeded(activeIndex, slidesPerView, slidesCount)
+    }
 
     const isNext = direction === 'next' || !direction
     const isPrev = direction === 'prev' || !direction
 
-    let slidesPrepended = 0
-    let slidesAppended = 0
-
-    const prependSlidesIndexes: number[] = []
-    const appendSlidesIndexes: number[] = []
-
-    // Вычисляем activeColIndexWithShift для bothDirections
     const activeColIndexWithShift =
       activeIndex +
       (bothDirections && typeof setTranslate === 'undefined' ? -slidesPerView / 2 + 0.5 : 0)
 
-    log('Loop check', {
-      activeIndex,
-      activeColIndexWithShift,
-      loopedSlides,
-      slidesPerView,
-      slidesCount,
-      isPrev,
-      isNext,
-      needPrepend: activeColIndexWithShift < loopedSlides,
-      needAppend: activeColIndexWithShift + slidesPerView > slidesCount - loopedSlides
-    })
+    const prependIndexes = !withClones && isPrev
+      ? this.preparePrependIndexes(activeColIndexWithShift, loopedSlides, slidesCount)
+      : []
 
-    // withClones: буфер фиксирован в DOM. Когда активный слайд слишком близко к краю,
-    // телепортируем на эквивалентный слайд (тот же realIndex) в середине ленты —
-    // мгновенно, без анимации, чтобы следующий переход всегда имел достаточный буфер.
-    if (withClones && !initial) {
-      const safeZone = slidesPerView // минимальный буфер от края
-      const needsTeleport = activeIndex < safeZone || activeIndex >= slidesCount - safeZone
+    const appendIndexes = !withClones && isNext && prependIndexes.length === 0
+      ? this.prepareAppendIndexes(activeColIndexWithShift, slidesPerView, loopedSlides, slidesCount)
+      : []
 
-      if (needsTeleport) {
-        const currentRealIndex = this.getRealIndex()
-        // Ищем оригинальный (не клон) слайд с тем же realIndex — он всегда в середине ленты
-        const targetDomIndex = findDomIndexByRealIndex(slides, currentRealIndex, { preferNonClone: true })
-        if (targetDomIndex !== -1 && targetDomIndex !== activeIndex) {
-          const newPosition = this.tvist.engine.getScrollPositionForIndex(targetDomIndex)
-          this.tvist.engine.index.set(targetDomIndex)
-          this.tvist.engine.location.set(newPosition)
-          this.tvist.engine.target.set(newPosition)
-          this.tvist.engine.applyTransform()
-          log('withClones teleport', { from: activeIndex, to: targetDomIndex, realIndex: currentRealIndex })
-        }
-      }
-    }
-
-    if (!withClones) {
-      // Prepend: если активный слайд слишком близко к началу
-      if (activeColIndexWithShift < loopedSlides && isPrev) {
-        slidesPrepended = Math.max(loopedSlides - activeColIndexWithShift, slidesPerGroup)
-        for (let i = 0; i < slidesPrepended; i += 1) {
-          const index = i - Math.floor(i / slidesCount) * slidesCount
-          prependSlidesIndexes.push(slidesCount - index - 1)
-        }
-        log('Prepend needed', { slidesPrepended, indexes: prependSlidesIndexes })
-      }
-      // Append: если активный слайд слишком близко к концу
-      else if (activeColIndexWithShift + slidesPerView > slidesCount - loopedSlides && isNext) {
-        slidesAppended = Math.max(
-          activeColIndexWithShift - (slidesCount - loopedSlides * 2),
-          slidesPerGroup
-        )
-        for (let i = 0; i < slidesAppended; i += 1) {
-          const index = i - Math.floor(i / slidesCount) * slidesCount
-          appendSlidesIndexes.push(index)
-        }
-        log('Append needed', { slidesAppended, indexes: appendSlidesIndexes })
-      } else {
-        log('No rearrangement needed')
-      }
-    } else {
-      log('withClones: skip DOM rearrangement')
-    }
-
-    // Запоминаем текущие позиции ДО изменения DOM 
-    const currentTranslate = this.tvist.engine.location.get()
     const oldSlidePositions: number[] = []
-    
     if (slideTo) {
-      // Сохраняем старые позиции слайдов
       for (let i = 0; i < slides.length; i++) {
         oldSlidePositions[i] = this.tvist.engine.getSlidePosition(i)
       }
     }
 
-    // Перемещаем слайды в DOM
-    if (isPrev && prependSlidesIndexes.length > 0) {
-      const fragment = document.createDocumentFragment()
-      // Собираем слайды в обратном порядке для prepend
-      for (let i = prependSlidesIndexes.length - 1; i >= 0; i--) {
-        const index = prependSlidesIndexes[i]
-        if (index !== undefined) {
-          const slide = slides[index]
-          if (slide) {
-            fragment.appendChild(slide)
-          }
-        }
-      }
-      container.prepend(fragment)
-    }
+    this.applyDomRearrangement(container, slides, isPrev, isNext, prependIndexes, appendIndexes)
 
-    if (isNext && appendSlidesIndexes.length > 0) {
-      const fragment = document.createDocumentFragment()
-      appendSlidesIndexes.forEach((index) => {
-        const slide = slides[index]
-        if (slide) {
-          fragment.appendChild(slide)
-        }
-      })
-      container.append(fragment)
-    }
-
-    // Принудительный reflow для синхронизации DOM 
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     container.offsetLeft
 
-    // Обновляем список слайдов после перемещения
     this.tvist.updateSlidesList()
 
-    // ВАЖНО: Обновляем индекс ДО вызова update(), чтобы модули (Pagination) видели корректный realIndex
     if (slideTo) {
-      if (prependSlidesIndexes.length > 0) {
-        this.tvist.engine.index.set(activeIndex + Math.ceil(slidesPrepended))
-      } else if (appendSlidesIndexes.length > 0) {
-        this.tvist.engine.index.set(activeIndex - slidesAppended)
+      if (prependIndexes.length > 0) {
+        this.tvist.engine.index.set(activeIndex + Math.ceil(prependIndexes.length))
+      } else if (appendIndexes.length > 0) {
+        this.tvist.engine.index.set(activeIndex - appendIndexes.length)
       }
     }
-    
-    // Если не было перестановки слайдов, НЕ вызываем update() вообще,
-    // чтобы не сбрасывать location/target во время drag или анимации.
-    // update() вызывается только когда реально изменился DOM (prepend/append).
-    if (prependSlidesIndexes.length === 0 && appendSlidesIndexes.length === 0) {
-      log('No rearrangement - skipping update()')
-    } else {
-      // Сохраняем текущий location перед update (чтобы не было скачка)
+
+    if (prependIndexes.length > 0 || appendIndexes.length > 0) {
       const locationBeforeUpdate = this.tvist.engine.location.get()
       const targetBeforeUpdate = this.tvist.engine.target.get()
-      
       this.tvist.update()
-      
-      // После update() восстанавливаем location/target если они были изменены
-      // (update() сбрасывает их на позицию текущего индекса)
       this.tvist.engine.location.set(locationBeforeUpdate)
       this.tvist.engine.target.set(targetBeforeUpdate)
-      log('Location preserved after update (with rearrangement)')
     }
 
-    // Корректируем позицию, чтобы избежать визуального прыжка
-    if (prependSlidesIndexes.length > 0) {
-      // Вычисляем разницу в позиции слайда (используем сохранённые позиции)
-      const oldSlidePosition = oldSlidePositions[activeIndex] ?? 0
-      // Используем activeIndex + slidesPrepended, что совпадает с новым индексом, который мы только что установили
-      const newSlidePosition = this.tvist.engine.getSlidePosition(activeIndex + Math.ceil(slidesPrepended))
-      const diff = newSlidePosition - oldSlidePosition
-
-      log('Prepend correction', {
+    if (prependIndexes.length > 0) {
+      this.correctPositionAfterRearrange(
         activeIndex,
-        slidesPrepended,
-        oldPosition: oldSlidePosition,
-        newPosition: newSlidePosition,
-        diff,
-        currentTranslate,
-        newTranslate: currentTranslate - diff,
-        slideTo
-      })
-
-      // Корректируем translate мгновенно
-      const newTranslate = currentTranslate - diff
-      this.tvist.engine.location.set(newTranslate)
-      this.tvist.engine.target.set(newTranslate)
-      
-      // Применяем transform
-      this.tvist.engine.applyTransform()
-
-    } else if (appendSlidesIndexes.length > 0) {
-      // Вычисляем разницу в позиции слайда (используем сохранённые позиции)
-      const oldSlidePosition = oldSlidePositions[activeIndex] ?? 0
-      // Используем activeIndex - slidesAppended, что совпадает с новым индексом
-      const newSlidePosition = this.tvist.engine.getSlidePosition(activeIndex - slidesAppended)
-      const diff = newSlidePosition - oldSlidePosition
-
-      log('Append correction', {
+        activeIndex + Math.ceil(prependIndexes.length),
+        oldSlidePositions
+      )
+    } else if (appendIndexes.length > 0) {
+      this.correctPositionAfterRearrange(
         activeIndex,
-        slidesAppended,
-        oldPosition: oldSlidePosition,
-        newPosition: newSlidePosition,
-        diff,
-        currentTranslate,
-        newTranslate: currentTranslate - diff,
-        slideTo
-      })
-
-      // Корректируем translate мгновенно 
-      const newTranslate = currentTranslate - diff
-      this.tvist.engine.location.set(newTranslate)
-      this.tvist.engine.target.set(newTranslate)
-      
-      // Применяем transform
-      this.tvist.engine.applyTransform()
+        activeIndex - appendIndexes.length,
+        oldSlidePositions
+      )
     }
 
-    // При инициализации или после перестановки нужно установить activeIndex на слайд с нужным realIndex
-    if ((initial || prependSlidesIndexes.length > 0 || appendSlidesIndexes.length > 0) && typeof slideRealIndex !== 'undefined') {
-      const slides = this.tvist.slides
-      const found = findDomIndexByRealIndex(slides, slideRealIndex, {
+    if (
+      (initial || prependIndexes.length > 0 || appendIndexes.length > 0) &&
+      typeof slideRealIndex !== 'undefined'
+    ) {
+      const found = findDomIndexByRealIndex(this.tvist.slides, slideRealIndex, {
         preferNonClone: withClones,
       })
       if (found !== -1) {
-        log('Index correction for realIndex', {
-          slideRealIndex,
-          foundAtIndex: found,
-          currentIndex: this.tvist.engine.index.get(),
-          initial
-        })
         this.tvist.engine.index.set(found)
-
         const targetPosition = this.tvist.engine.getScrollPositionForIndex(found)
         this.tvist.engine.location.set(targetPosition)
         this.tvist.engine.target.set(targetPosition)
@@ -472,39 +224,147 @@ export class LoopModule extends Module {
     }
 
     this.emit('loopFix')
-
-    const finalIndex = this.tvist.engine.index.get()
-    
-    log('LoopFix complete', {
-      prepended: prependSlidesIndexes.length,
-      appended: appendSlidesIndexes.length,
-      activeIndex: finalIndex
-    })
-    
-    return finalIndex
+    return this.tvist.engine.index.get()
   }
 
-  /**
-   * Возвращает "реальный" индекс (0..N-1) по data-tvist-slide-index
-   */
+  private getSlidesPerView(bothDirections: boolean): number {
+    const perPage = this.options.perPage ?? 1
+    let slidesPerView = typeof perPage === 'number' ? perPage : 1
+    if (bothDirections && slidesPerView % 2 === 0) {
+      slidesPerView += 1
+    }
+    return slidesPerView
+  }
+
+  private computeLoopedSlides(bothDirections: boolean): number {
+    const slidesPerView = this.getSlidesPerView(bothDirections)
+    const slidesPerGroup = this.options.slidesPerGroup ?? 1
+
+    let loopedSlides = bothDirections
+      ? Math.max(slidesPerGroup, Math.ceil(slidesPerView / 2))
+      : Math.max(slidesPerGroup, slidesPerView)
+
+    if (loopedSlides % slidesPerGroup !== 0) {
+      loopedSlides += slidesPerGroup - (loopedSlides % slidesPerGroup)
+    }
+
+    return loopedSlides
+  }
+
+  private preparePrependIndexes(
+    activeColIndexWithShift: number,
+    loopedSlides: number,
+    slidesCount: number
+  ): number[] {
+    if (activeColIndexWithShift >= loopedSlides) return []
+
+    const slidesPerGroup = this.options.slidesPerGroup ?? 1
+    const slidesPrepended = Math.max(loopedSlides - activeColIndexWithShift, slidesPerGroup)
+    const indexes: number[] = []
+    for (let i = 0; i < slidesPrepended; i++) {
+      indexes.push(slidesCount - (i % slidesCount) - 1)
+    }
+    return indexes
+  }
+
+  private prepareAppendIndexes(
+    activeColIndexWithShift: number,
+    slidesPerView: number,
+    loopedSlides: number,
+    slidesCount: number
+  ): number[] {
+    if (activeColIndexWithShift + slidesPerView <= slidesCount - loopedSlides) return []
+
+    const slidesPerGroup = this.options.slidesPerGroup ?? 1
+    const slidesAppended = Math.max(
+      activeColIndexWithShift - (slidesCount - loopedSlides * 2),
+      slidesPerGroup
+    )
+    const indexes: number[] = []
+    for (let i = 0; i < slidesAppended; i++) {
+      indexes.push(i % slidesCount)
+    }
+    return indexes
+  }
+
+  private applyDomRearrangement(
+    container: HTMLElement,
+    slides: readonly HTMLElement[],
+    isPrev: boolean,
+    isNext: boolean,
+    prependIndexes: number[],
+    appendIndexes: number[]
+  ): void {
+    if (isPrev && prependIndexes.length > 0) {
+      const fragment = document.createDocumentFragment()
+      for (let i = prependIndexes.length - 1; i >= 0; i--) {
+        const idx = prependIndexes[i]
+        const slide = idx !== undefined ? slides[idx] : undefined
+        if (slide) fragment.appendChild(slide)
+      }
+      container.prepend(fragment)
+    }
+
+    if (isNext && appendIndexes.length > 0) {
+      const fragment = document.createDocumentFragment()
+      appendIndexes.forEach(index => {
+        const slide = slides[index]
+        if (slide) fragment.appendChild(slide)
+      })
+      container.append(fragment)
+    }
+  }
+
+  private teleportIfNeeded(
+    activeIndex: number,
+    slidesPerView: number,
+    slidesCount: number
+  ): void {
+    const safeZone = slidesPerView
+    if (activeIndex >= safeZone && activeIndex < slidesCount - safeZone) return
+
+    const currentRealIndex = this.getRealIndex()
+    const targetDomIndex = findDomIndexByRealIndex(this.tvist.slides, currentRealIndex, {
+      preferNonClone: true,
+    })
+
+    if (targetDomIndex !== -1 && targetDomIndex !== activeIndex) {
+      const newPosition = this.tvist.engine.getScrollPositionForIndex(targetDomIndex)
+      this.tvist.engine.index.set(targetDomIndex)
+      this.tvist.engine.location.set(newPosition)
+      this.tvist.engine.target.set(newPosition)
+      this.tvist.engine.applyTransform()
+    }
+  }
+
+  private correctPositionAfterRearrange(
+    oldActiveIndex: number,
+    newActiveIndex: number,
+    oldSlidePositions: number[]
+  ): void {
+    const currentTranslate = this.tvist.engine.location.get()
+    const oldSlidePosition = oldSlidePositions[oldActiveIndex] ?? 0
+    const newSlidePosition = this.tvist.engine.getSlidePosition(newActiveIndex)
+    const diff = newSlidePosition - oldSlidePosition
+    const newTranslate = currentTranslate - diff
+
+    this.tvist.engine.location.set(newTranslate)
+    this.tvist.engine.target.set(newTranslate)
+    this.tvist.engine.applyTransform()
+  }
+
   private getRealIndex(): number {
     const slides = this.tvist.slides
     const activeIndex = this.tvist.engine.index.get()
-    
-    if (activeIndex < 0 || activeIndex >= slides.length) {
-      return 0
-    }
+
+    if (activeIndex < 0 || activeIndex >= slides.length) return 0
 
     const activeSlide = slides[activeIndex]
     if (!activeSlide) return 0
 
     const realIndexAttr = activeSlide.getAttribute('data-tvist-slide-index')
     if (realIndexAttr) {
-      const parsed = parseInt(realIndexAttr, 10)
-      if (LOOP_DEBUG) {
-        console.warn('[Loop] getRealIndex', { activeIndex, attr: realIndexAttr, parsed })
-      }
-      return parsed
+      return parseInt(realIndexAttr, 10)
     }
 
     return activeIndex
@@ -513,73 +373,45 @@ export class LoopModule extends Module {
   override destroy(): void {
     if (!this.isInitialized) return
 
-    log('Destroying loop...')
-
-    // Больше не нужно отписываться от beforeTransitionStart
-
     const slides = this.tvist.slides
     const container = this.tvist.container
-
-    // Получаем realIndex перед изменениями
     const realIndex = this.getRealIndex()
 
-    // Восстанавливаем исходный порядок слайдов по data-tvist-slide-index
     const newSlidesOrder: (HTMLElement | undefined)[] = []
-    
-    slides.forEach((slideEl) => {
+    slides.forEach(slideEl => {
       const indexAttr = slideEl.getAttribute('data-tvist-slide-index')
       if (indexAttr) {
-        const index = parseInt(indexAttr, 10)
-        newSlidesOrder[index] = slideEl
+        newSlidesOrder[parseInt(indexAttr, 10)] = slideEl
       }
     })
 
-    // Удаляем атрибуты
-    slides.forEach((slideEl) => {
-      slideEl.removeAttribute('data-tvist-slide-index')
-    })
+    slides.forEach(slideEl => slideEl.removeAttribute('data-tvist-slide-index'))
 
-    // Перестраиваем DOM в правильном порядке
     const fragment = document.createDocumentFragment()
-    newSlidesOrder.forEach((slideEl) => {
-      if (slideEl) {
-        fragment.appendChild(slideEl)
-      }
+    newSlidesOrder.forEach(slideEl => {
+      if (slideEl) fragment.appendChild(slideEl)
     })
     container.appendChild(fragment)
 
-    // Обновляем список слайдов
     this.tvist.updateSlidesList()
     this.tvist.update()
-
-    // Переходим на тот же реальный слайд
     this.tvist.scrollTo(realIndex, true)
-    
-    // Удаляем геттер
+
     if (Object.getOwnPropertyDescriptor(this.tvist, 'realIndex')) {
       const tvistAny = this.tvist as unknown as Record<string, unknown>
       delete tvistAny.realIndex
     }
 
     this.isInitialized = false
-    log('Destroy complete')
   }
 
-  /**
-   * Нормализованный конфиг loop.
-   */
   private getLoopConfig(): { enabled: boolean; withClones: boolean } {
     const raw = this.options.loop
 
-    if (raw === true) {
-      // Старый синтаксис: включён loop без клонов
-      return { enabled: true, withClones: false }
-    }
+    if (raw === true) return { enabled: true, withClones: false }
 
     if (typeof raw === 'object' && raw !== null) {
-      const enabled = raw.enabled !== false
-      const withClones = raw.withClones === true
-      return { enabled, withClones }
+      return { enabled: raw.enabled !== false, withClones: raw.withClones === true }
     }
 
     return { enabled: false, withClones: false }
@@ -587,49 +419,38 @@ export class LoopModule extends Module {
 
   /**
    * Создаёт DOM-клоны по краям для режима withClones.
-   * Количество клонов берётся пропорционально perPage/slidesPerGroup,
-   * чтобы избежать lock и сохранить бесконечный эффект.
    */
   private createClones(): void {
     const slides = this.tvist.slides
     const container = this.tvist.container
-
     const originalCount = slides.length
+
     if (originalCount === 0) return
 
     const perPage = this.options.perPage ?? 1
     const slidesPerGroup = this.options.slidesPerGroup ?? 1
     const base = typeof perPage === 'number' ? perPage : 1
-    // Минимум клонов с каждой стороны = perPage (чтобы viewport всегда был заполнен).
-    // Округляем вверх до кратного originalCount, чтобы клоны образовывали полные циклы.
     const needed = Math.max(base, slidesPerGroup)
     const clonesPerSide = Math.ceil(needed / originalCount) * originalCount
 
-    // Клоны в хвост
-    for (let i = 0; i < clonesPerSide; i += 1) {
+    for (let i = 0; i < clonesPerSide; i++) {
       const original = slides[i % originalCount]
       if (!original) continue
       const clone = original.cloneNode(true) as HTMLElement
       clone.classList.add(TVIST_CLASSES.slideClone)
       const realIndexAttr = original.getAttribute('data-tvist-slide-index')
-      if (realIndexAttr != null) {
-        clone.setAttribute('data-tvist-slide-index', realIndexAttr)
-      }
+      if (realIndexAttr != null) clone.setAttribute('data-tvist-slide-index', realIndexAttr)
       container.appendChild(clone)
     }
 
-    // Клоны в голову (в обратном порядке)
     const headFragment = document.createDocumentFragment()
-    for (let i = 0; i < clonesPerSide; i += 1) {
-      const original =
-        slides[(originalCount - 1 - (i % originalCount) + originalCount) % originalCount]
+    for (let i = 0; i < clonesPerSide; i++) {
+      const original = slides[(originalCount - 1 - (i % originalCount) + originalCount) % originalCount]
       if (!original) continue
       const clone = original.cloneNode(true) as HTMLElement
       clone.classList.add(TVIST_CLASSES.slideClone)
       const realIndexAttr = original.getAttribute('data-tvist-slide-index')
-      if (realIndexAttr != null) {
-        clone.setAttribute('data-tvist-slide-index', realIndexAttr)
-      }
+      if (realIndexAttr != null) clone.setAttribute('data-tvist-slide-index', realIndexAttr)
       headFragment.prepend(clone)
     }
     container.prepend(headFragment)

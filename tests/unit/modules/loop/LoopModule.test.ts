@@ -620,7 +620,7 @@ describe('LoopModule', () => {
     fixture10.cleanup()
   })
 
-  it('должен позволять использовать pause() для отладки', () => {
+  it('должен возвращать корректное состояние через getTransformState()', () => {
     slider = new Tvist(fixture.root, {
       loop: true,
       perPage: 1,
@@ -629,13 +629,8 @@ describe('LoopModule', () => {
 
     const loopModule = slider.getModule('loop') as any
 
-    // Делаем переход
     slider.next()
     
-    // Останавливаем и логируем
-    loopModule.pause('After next')
-    
-    // Проверяем, что метод не падает
     expect(loopModule.getTransformState).toBeDefined()
     const state = loopModule.getTransformState()
     
