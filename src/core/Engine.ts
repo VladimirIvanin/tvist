@@ -16,13 +16,6 @@ import {
   TVIST_SLIDE_INDEX_ATTR,
 } from '../utils/slideRealIndex'
 
-const ENGINE_DEBUG = false
-const engineLog = (_label: string, _data?: Record<string, unknown>) => {
-  if (ENGINE_DEBUG) {
-    // debug logging
-  }
-}
-
 /** Контекст для передачи между подметодами scrollTo */
 interface ScrollContext {
   requestedIndex: number
@@ -33,41 +26,31 @@ interface ScrollContext {
 }
 
 export class Engine {
-  // Позиции
-  readonly location: Vector1D // Текущая позиция
-  readonly target: Vector1D // Целевая позиция
-
-  // Индексы
-  readonly index: Counter // Текущий индекс слайда
-
-  // Анимация
+  readonly location: Vector1D
+  readonly target: Vector1D
+  readonly index: Counter
   readonly animator: Animator
 
-  // Кэш размеров
   private containerSize = 0
   private slideSize = 0
-  /** Размеры каждого слайда при autoWidth/autoHeight (измеренные из DOM) */
+  /** Размеры каждого слайда при autoWidth/autoHeight */
   private slideSizes: number[] = []
   private slidePositions: number[] = []
-  private peekStart = 0 // peek слева/сверху
-  private peekEnd = 0   // peek справа/снизу
+  private peekStart = 0
+  private peekEnd = 0
 
-  // Кэш scroll-позиций (инвалидируется в updateScrollCache)
   private cachedMinScroll = 0
   private cachedMaxScroll = 0
   private cachedRootSize = 0
   private scrollCacheValid = false
 
-  // Кэш размера root элемента (для оптимизации производительности)
   private cachedRootWidth = 0
   private cachedRootHeight = 0
   private rootSizeCacheValid = false
   private slideSizesCacheValid = false
 
-  // Состояние блокировки (когда контент меньше контейнера)
   private _isLocked = false
 
-  // Ссылки
   private tvist: Tvist
   private options: TvistOptions
 
@@ -76,23 +59,17 @@ export class Engine {
     this.options = options
 
     const startIndex = options.start ?? 0
-    const isLoop = options.loop === true || (typeof options.loop === 'object' && options.loop.enabled !== false)
 
     this.location = new Vector1D(0)
     this.target = new Vector1D(0)
-    // В режиме loop или navigation или center разрешаем выбирать любой слайд
-    this.index = new Counter(tvist.slides.length, startIndex, isLoop, this.calculateCounterEndIndex())
+    this.index = new Counter(tvist.slides.length, startIndex, this.isLoopEnabled(), this.calculateCounterEndIndex())
     this.animator = new Animator()
 
-    // Применяем peek к контейнеру
     this.applyPeek()
-    // Первичный расчёт размеров
     this.calculateSizes()
     this.calculatePositions()
-    // Проверяем блокировку после расчета размеров
     this.checkLock()
 
-    // Начальная позиция с учётом trim (в начале — без левого peek, в конце — без правого)
     const initialPos = this.getScrollPositionForIndex(startIndex)
     this.location.set(initialPos)
     this.target.set(initialPos)
@@ -141,9 +118,11 @@ export class Engine {
     return domIndex
   }
 
-  /**
-   * loop: { withClones: true } — отдельная ветка в getScrollPositionForIndex.
-   */
+  private isLoopEnabled(): boolean {
+    const l = this.options.loop
+    return l === true || (typeof l === 'object' && l !== null && l.enabled !== false)
+  }
+
   private isLoopWithClonesEnabled(): boolean {
     const l = this.options.loop
     return (
@@ -161,64 +140,39 @@ export class Engine {
     const basePosition = -this.getSlidePosition(index)
     const centerOffset = this.getCenterOffset(index)
 
-    if (this.options.loop && (this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
-      // В loop-режиме с center продолжаем просто добавлять смещение
-      if (this.options.center) {
+    if (this.isLoopEnabled()) {
+      if (this.options.center || this.isLoopWithClonesEnabled()) {
         const pos = basePosition + centerOffset
         return pos === 0 ? 0 : pos
       }
 
-      // withClones: длинная лента; clamp к [maxScroll, minScroll] сжимает несколько
-      // DOM-индексов у правого края в одну translate — activeIndex меняется, картинка нет («смешение»).
-      if (this.isLoopWithClonesEnabled()) {
-        const pos = basePosition + centerOffset
-        return pos === 0 ? 0 : pos
-      }
-
-      // Для обычного loop без центрирования ограничиваем позицию так,
-      // чтобы viewport не выходил за пределы контента (особенно важно при
-      // небольшом количестве слайдов и активном peek), иначе появляются "дыры".
+      // Ограничиваем позицию чтобы viewport не выходил за пределы контента
+      // (важно при небольшом количестве слайдов с peek, иначе появляются "дыры").
       if (!this.scrollCacheValid) this.updateScrollCache()
-      const minScroll = this.cachedMinScroll
-      const maxScroll = this.cachedMaxScroll
-
-      const clamped = Math.max(maxScroll, Math.min(minScroll, basePosition))
+      const clamped = Math.max(this.cachedMaxScroll, Math.min(this.cachedMinScroll, basePosition))
       return clamped === 0 ? 0 : clamped
     }
 
-    const endIndex = this.getEndIndex()
-    const peekTrim = this.options.peekTrim !== false
-    
-    // При центрировании применяем offset
     if (this.options.center) {
       const pos = basePosition + centerOffset
       return pos === 0 ? 0 : pos
     }
-    
-    // Без центрирования применяем старую логику с peekTrim
+
+    const endIndex = this.getEndIndex()
+    const peekTrim = this.options.peekTrim !== false
+
     if (index === 0) return peekTrim ? this.getMinScrollPosition() : 0
     if (index === endIndex) {
       const pos = peekTrim ? this.getMaxScrollPosition() : basePosition
       return pos === 0 ? 0 : pos
     }
-    
-    // В режиме autoWidth/autoHeight проверяем, не создаст ли basePosition дыру справа/снизу
-    const isAutoSize = (!this.options.direction || this.options.direction === 'horizontal') 
-      ? this.options.autoWidth 
-      : this.options.autoHeight
-    
-    if (isAutoSize && peekTrim) {
+
+    if (this.isAutoSize() && peekTrim) {
       const maxScroll = this.getMaxScrollPosition()
-      
-      // Если basePosition < maxScroll, значит последний слайд не дотянется до правого края
-      // и образуется "дыра". Используем maxScroll вместо basePosition.
-      if (basePosition < maxScroll) {
-        return maxScroll
-      }
+      if (basePosition < maxScroll) return maxScroll
     }
-    
-    const pos = basePosition
-    return pos === 0 ? 0 : pos
+
+    return basePosition === 0 ? 0 : basePosition
   }
 
   /**
@@ -266,10 +220,6 @@ export class Engine {
     applyPeek(this.tvist.container, this.options, maxPeek)
   }
 
-  /**
-   * Рассчитывает размеры контейнера и слайдов
-   * @param isDisabled - если true, то не применяем стили к DOM-элементам
-   */
   private calculateSizes(isDisabled = false): void {
     if (this.tvist.slides.length === 0) {
       this.resetSizes()
@@ -277,20 +227,15 @@ export class Engine {
     }
 
     this.updatePeekValues(isDisabled)
-    
     this.containerSize = this.getRootSize() - this.peekStart - this.peekEnd
 
     const isAutoSize = this.isAutoSize()
 
-    if (!isAutoSize) {
-      this.calculateFixedSlideSize()
-    } else {
-      this.slideSize = 0
-    }
-
     if (isAutoSize) {
+      this.slideSize = 0
       this.applyAndMeasureAutoSize(isDisabled)
     } else {
+      this.calculateFixedSlideSize()
       this.applyFixedSize(isDisabled)
     }
   }
@@ -383,8 +328,7 @@ export class Engine {
     
     if (!this.slideSizesCacheValid) {
       if (isDisabled) {
-        // Если слайдер выключен, мы не можем получить правильные размеры из DOM
-        // так как мы не применили стили. Оставляем предыдущие размеры или нули
+        // Стили не применены — оставляем предыдущие размеры или инициализируем нулями
         if (this.slideSizes.length === 0) {
           this.slideSizes = this.tvist.slides.map(() => 0)
         }
@@ -508,15 +452,13 @@ export class Engine {
    */
   private getEndIndex(): number {
     const slideCount = this.tvist.slides.length
-    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
 
-    if (isLoop || this.options.center || this.options.isNavigation || this.isAutoSize()) {
+    if (this.isLoopEnabled() || this.options.center || this.options.isNavigation || this.isAutoSize()) {
       return slideCount - 1
     }
 
     const perPage = this.options.perPage ?? 1
-    const end = slideCount - perPage
-    return Math.max(0, Math.min(end, slideCount - 1))
+    return Math.max(0, Math.min(slideCount - perPage, slideCount - 1))
   }
 
   /**
@@ -561,8 +503,7 @@ export class Engine {
   private calculateCounterEndIndex(): number {
     const slideCount = this.tvist.slides.length
     const perPage = this.options.perPage ?? 1
-    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-    return (isLoop || this.options.isNavigation || this.options.center)
+    return (this.isLoopEnabled() || this.options.isNavigation || this.options.center)
       ? slideCount - 1
       : Math.max(0, slideCount - perPage)
   }
@@ -603,16 +544,6 @@ export class Engine {
 
     this.index.set(ctx.clampedIndex)
 
-    engineLog('scrollTo', {
-      inputIndex: index,
-      ...ctx,
-      previousIndex,
-      instant,
-      loop: this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false),
-      endIndex,
-      stack: new Error().stack?.split('\n').slice(2, 6).join(' <- ')
-    })
-
     const targetPosition = this.clampTargetPosition(
       this.getScrollPositionForIndex(ctx.normalizedIndex),
       endIndex
@@ -630,14 +561,12 @@ export class Engine {
   }
 
   private resolveTargetIndex(index: number, endIndex: number, previousIndex: number): ScrollContext {
-    // Если включен режим навигации или center, разрешаем выбор слайдов за пределами endIndex
-    const loopEnabled = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
+    const loopEnabled = this.isLoopEnabled()
     let clampedIndex = loopEnabled || this.options.isNavigation || this.options.center
       ? index
       : Math.max(0, Math.min(index, endIndex))
 
-    // Rewind: если индекс вышел за пределы и включён rewind — перематываем
-    if (this.options.rewind && !(this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
+    if (this.options.rewind && !loopEnabled) {
       if (index > endIndex) {
         clampedIndex = 0
       } else if (index < 0) {
@@ -674,13 +603,10 @@ export class Engine {
     this.tvist.emit('beforeTransitionStart', { index: ctx.eventIndex, direction })
     const counterAfterEmit = this.index.get()
 
-    // LoopModule переставил слайды и обновил Counter на DOM-позицию текущего слайда.
-    // После перестановки DOM-позиция целевого слайда могла измениться.
-    // Находим DOM-позицию целевого слайда по его eventIndex (= realIndex).
-    if (counterBeforeEmit !== counterAfterEmit && (this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
-      const loopOpt = this.options.loop
-      const withClones = typeof loopOpt === 'object' && loopOpt !== null && loopOpt.withClones === true
-      // Ищем DOM-позицию слайда с data-tvist-slide-index === eventIndex
+    // LoopModule переставил слайды: DOM-позиция целевого слайда могла измениться.
+    // Ищем новую DOM-позицию по eventIndex (= realIndex).
+    if (counterBeforeEmit !== counterAfterEmit && this.isLoopEnabled()) {
+      const withClones = this.isLoopWithClonesEnabled()
       const targetDomIndex = withClones
         ? findDomIndexByRealIndexForTransition(
             this.tvist.slides,
@@ -694,22 +620,19 @@ export class Engine {
         ctx.clampedIndex = targetDomIndex
         ctx.normalizedIndex = targetDomIndex
       } else {
-        // Fallback: delta подход
+        // Fallback: delta-подход
         const delta = ctx.clampedIndex - counterBeforeEmit
         ctx.clampedIndex = counterAfterEmit + delta
         ctx.normalizedIndex = ((ctx.clampedIndex % this.index.max) + this.index.max) % this.index.max
       }
-      // indexChanged определяем по eventIndex (realIndex), а не по DOM-позиции.
-      // LoopModule мог переместить целевой слайд на ту же DOM-позицию, что и counterAfterEmit,
-      // но realIndex всё равно изменился — нужно эмитить события.
+      // realIndex изменился — события должны эмититься независимо от DOM-позиции
       ctx.indexChanged = true
     }
   }
 
   /** При навигации применяем ограничения (но не для center режима) */
   private clampTargetPosition(position: number, endIndex: number): number {
-    const loopEnabledForNav = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-    if (!this.options.isNavigation || loopEnabledForNav || this.options.center) {
+    if (!this.options.isNavigation || this.isLoopEnabled() || this.options.center) {
       return position
     }
     const peekTrim = this.options.peekTrim !== false
@@ -740,19 +663,9 @@ export class Engine {
 
     // Проверяем, нужна ли анимация для корректировки позиции
     const currentLocation = this.location.get()
-    const positionDiff = Math.abs(currentLocation - targetPosition)
-    const needsAnimation = positionDiff > 0.5 // tolerance 0.5px
-
-    engineLog('Position correction check', {
-      currentLocation,
-      targetPosition,
-      positionDiff,
-      needsAnimation,
-      indexChanged: ctx.indexChanged
-    })
+    const needsAnimation = Math.abs(currentLocation - targetPosition) > 0.5
 
     if (needsAnimation) {
-      // Запускаем анимацию для корректировки позиции
       this.animator.animate(
         currentLocation,
         targetPosition,
@@ -763,14 +676,7 @@ export class Engine {
           this.tvist.emit('scroll')
         },
         () => {
-          engineLog('Position correction completed', {
-            finalLocation: this.location.get(),
-            targetPosition,
-            normalizedIndex: ctx.normalizedIndex
-          })
-
-          // transitionEnd эмитим ВСЕГДА по завершении анимации,
-          // чтобы модули (AutoplayModule и др.) могли корректно реагировать
+          // transitionEnd эмитим всегда по завершении анимации
           this.tvist.emit('transitionEnd', ctx.eventIndex)
 
           if (ctx.indexChanged) {
@@ -780,9 +686,7 @@ export class Engine {
         }
       )
     } else if (!ctx.indexChanged) {
-      // Позиция уже корректна, но эмитим transitionEnd для модулей
-      // (например, AutoplayModule ждет это событие для resume)
-      // Используем microtask чтобы событие было асинхронным как после анимации
+      // Позиция уже корректна; microtask чтобы событие было асинхронным как после анимации
       void Promise.resolve().then(() => {
         this.tvist.emit('transitionEnd', ctx.eventIndex)
       })
@@ -791,7 +695,7 @@ export class Engine {
 
   /** Прогресс прокрутки 0..1 (только при !loop) */
   private emitProgress(): void {
-    if (this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)) return
+    if (this.isLoopEnabled()) return
     const minScroll = this.getMinScrollPosition()
     const maxScroll = this.getMaxScrollPosition()
     const range = maxScroll - minScroll
@@ -804,11 +708,10 @@ export class Engine {
   /** События достижения начала/конца (reachBeginning / reachEnd) */
   private emitReachEdge(ctx: ScrollContext, endIndex: number): void {
     const index = ctx.eventIndex
-    // reach-edge события эмитим только когда навигация действительно уткнулась в границу:
-    // requestedIndex вышел за пределы доступного диапазона.
-    const loopEnabledGuard = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-    const triedBeforeStart = !loopEnabledGuard && ctx.requestedIndex < 0
-    const triedAfterEnd = !loopEnabledGuard && !this.options.rewind && ctx.requestedIndex > endIndex
+    // reach-edge только когда requestedIndex вышел за пределы доступного диапазона
+    const loopEnabled = this.isLoopEnabled()
+    const triedBeforeStart = !loopEnabled && ctx.requestedIndex < 0
+    const triedAfterEnd = !loopEnabled && !this.options.rewind && ctx.requestedIndex > endIndex
 
     if (index <= 0 && triedBeforeStart) {
       this.tvist.emit('reachBeginning')
@@ -818,22 +721,11 @@ export class Engine {
     }
   }
 
-  /**
-   * Относительная прокрутка
-   * @param delta - смещение в слайдах
-   */
   scrollBy(delta: number): void {
     const targetIndex = this.index.get() + delta
-
-    // Определяем направление для loop
-    // Важно: в loop режиме направление определяется по знаку delta, а не по сравнению индексов
+    // В loop-режиме направление определяется по знаку delta, а не по сравнению индексов
     const direction = delta > 0 ? 'next' : delta < 0 ? 'prev' : undefined
-    
-    // Сохраняем направление для beforeTransitionStart
-    if (direction) {
-      this.tvist._scrollDirection = direction
-    }
-    
+    if (direction) this.tvist._scrollDirection = direction
     this.scrollTo(targetIndex)
   }
 
@@ -843,12 +735,6 @@ export class Engine {
   applyTransform(): void {
     const container = this.tvist.container
     const pos = this.location.get()
-
-    engineLog('applyTransform', {
-      position: pos,
-      activeIndex: this.index.get(),
-      target: this.target.get()
-    })
 
     if (this.options.direction === 'vertical') {
       container.style.transform = `translate3d(0, ${pos}px, 0)`
@@ -860,39 +746,25 @@ export class Engine {
     this.emitProgress()
   }
 
-  /**
-   * Обновление без применения стилей в DOM (используется когда слайдер disabled)
-   */
+  /** Пересчёт без применения стилей (слайдер disabled) */
   updateDisabled(): void {
-    // Инвалидируем кеши перед обновлением
     this.invalidateRootSizeCache()
     this.slideSizesCacheValid = false
-
-    // Получаем новые значения из опций, но не вызываем DOM-методы типа applyPeek
     this.calculateSizes(true)
     this.calculatePositions()
-    // Обновляем Counter.endIndex после изменения perPage
     this.updateCounterLimits()
-    // Проверяем блокировку после обновления (важно для resize). Передаём true чтобы не применять классы
     this.checkLock(true)
-    // НЕ применяем трансформации — только пересчитываем позиции
     this.syncPositionToIndex(false)
   }
 
-  /**
-   * Обновление размеров (вызывается при resize)
-   */
+  /** Пересчёт размеров и позиций (resize) */
   update(): void {
-    // Инвалидируем кеши перед обновлением
     this.invalidateRootSizeCache()
     this.slideSizesCacheValid = false
-
     this.applyPeek()
     this.calculateSizes()
     this.calculatePositions()
-    // Обновляем Counter.endIndex после изменения perPage
     this.updateCounterLimits()
-    // Проверяем блокировку после обновления (важно для resize)
     this.checkLock()
     this.syncPositionToIndex()
   }
@@ -912,46 +784,23 @@ export class Engine {
       return
     }
 
-    // Размеры доступны: проверяем, помещается ли контент полностью
     const contentFits = this.getContentSize() <= this.containerSize + 1
 
-    // Дополнительная эвристика для loop: если уникальных слайдов мало и они
-    // все одновременно попадают в viewport, то листать "по кругу" визуально
-    // некуда — считаем такой слайдер заблокированным.
-    //
-    // Учитываем два фактора:
-    // 1) Контент целиком влезает в viewport (contentFits).
-    // 2) Даже если контент немного выходит за пределы viewport, но диапазон
-    //    доступного скролла слишком мал относительно размера слайда, листать
-    //    "некуда" с точки зрения пользователя (слайды почти статичны).
-    //
-    // При этом важно не блокировать слайдер в кейсах с peek, когда последний
-    // слайд виден только частично и есть заметный диапазон для листания.
-    if (
-      this.options.loop === true ||
-      (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-    ) {
+    if (this.isLoopEnabled()) {
       const smallLoopCarousel = slideCount <= perPage + 1
 
       if (!smallLoopCarousel) {
-        // Обычный большой loop — блокируем только если весь контент
-        // действительно влезает.
         this.setLocked(contentFits, isDisabled)
         return
       }
 
-      // Для smallLoopCarousel используем эвристику.
+      // Для малого loop: дополнительно проверяем, достаточен ли диапазон скролла.
+      // Если он меньше 60% размера слайда, листать "некуда" с точки зрения пользователя.
       let shouldLock = contentFits
 
       if (!shouldLock) {
-        // Контент формально не влезает, но могли получить ситуацию как в
-        // промо-слайдере: много маленьких слайдов, все почти видны сразу,
-        // а реальный диапазон скролла меньше, чем "осмысленный" шаг.
-        const minScroll = this.getMinScrollPosition()
-        const maxScroll = this.getMaxScrollPosition()
-        const scrollRange = Math.abs(minScroll - maxScroll)
-        const referenceSlideSize = this.getSlideSize(0)
-        const MIN_MEANINGFUL_SCROLL = referenceSlideSize * 0.6
+        const scrollRange = Math.abs(this.getMinScrollPosition() - this.getMaxScrollPosition())
+        const MIN_MEANINGFUL_SCROLL = this.getSlideSize(0) * 0.6
 
         if (scrollRange < MIN_MEANINGFUL_SCROLL) {
           shouldLock = true
@@ -962,7 +811,6 @@ export class Engine {
       return
     }
 
-    // Для обычного режима дополнительно проверяем возможность скролла
     const cannotScroll = this.getMaxScrollPosition() >= this.getMinScrollPosition() - 1
 
     if (slideCount > perPage) {
@@ -1000,26 +848,19 @@ export class Engine {
   }
 
   private setLocked(isLocked: boolean, isDisabled = false): void {
-    // Если слайдер выключен, мы не должны менять его стейт блокировки, 
-    // чтобы при включении (enable) метод checkLock мог корректно обновить состояние и применить классы.
-    // Если мы обновим _isLocked здесь, то при enable() checkLock() вызовет setLocked() с тем же значением isLocked, 
-    // условие this._isLocked !== isLocked не выполнится, и классы не обновятся.
-    if (isDisabled) {
-      return
-    }
+    // В disabled-режиме не меняем стейт: при enable() checkLock() должен
+    // применить классы заново, что произойдёт только если _isLocked изменится.
+    if (isDisabled) return
 
     if (this._isLocked !== isLocked) {
       this._isLocked = isLocked
-      
       this.tvist.root.classList.toggle(TVIST_CLASSES.locked, isLocked)
-      
+
       if (isLocked) {
-        // При блокировке сбрасываем позицию на начало (индекс 0)
         this.index.set(0)
         const initialPos = this.getScrollPositionForIndex(0)
         this.location.set(initialPos)
         this.target.set(initialPos)
-        
         this.applyTransform()
         this.tvist.emit('lock')
       } else {
@@ -1100,9 +941,8 @@ export class Engine {
    */
   canScrollNext(): boolean {
     if (this.isLocked) return false
-    if ((this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)) || this.options.rewind) return true
+    if (this.isLoopEnabled() || this.options.rewind) return true
 
-    // В режиме навигации лимит - это последний слайд
     const limit = this.options.isNavigation
       ? this.tvist.slides.length - 1
       : this.getEndIndex()
@@ -1115,7 +955,7 @@ export class Engine {
    */
   canScrollPrev(): boolean {
     if (this.isLocked) return false
-    if ((this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)) || this.options.rewind) return true
+    if (this.isLoopEnabled() || this.options.rewind) return true
     return this.index.get() > 0
   }
 
