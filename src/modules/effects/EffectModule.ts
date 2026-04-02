@@ -4,6 +4,7 @@ import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 import { setFadeEffect } from './fade'
 import { setCubeEffect } from './cube'
+import { setStackEffect, cleanupStackCache } from './stack'
 
 export class EffectModule extends Module {
   name = 'effect'
@@ -16,7 +17,11 @@ export class EffectModule extends Module {
   }
 
   override shouldBeActive(): boolean {
-    return this.options.effect === 'fade' || this.options.effect === 'cube'
+    return (
+      this.options.effect === 'fade' ||
+      this.options.effect === 'cube' ||
+      this.options.effect === 'stack'
+    )
   }
 
   init(): void {
@@ -42,6 +47,10 @@ export class EffectModule extends Module {
       this.applyCubeRootStyles()
     }
 
+    if (this.options.effect === 'stack') {
+      this.applyStackRootStyles()
+    }
+
     this.tvist.on('setTranslate', this.setTranslateHandler)
   }
 
@@ -64,6 +73,10 @@ export class EffectModule extends Module {
     if (nextEffect === 'cube') {
       this.applyCubeRootStyles()
     }
+
+    if (nextEffect === 'stack') {
+      this.applyStackRootStyles()
+    }
   }
 
   private onSetTranslate(_tvist: Tvist, translate: number): void {
@@ -83,8 +96,16 @@ export class EffectModule extends Module {
     })
     
     if (this.options.effect === 'cube') {
-        setCubeEffect(this.tvist, translate, this.options)
+      setCubeEffect(this.tvist, translate, this.options)
     }
+
+    if (this.options.effect === 'stack') {
+      setStackEffect(this.tvist, translate, this.options)
+    }
+  }
+
+  private applyStackRootStyles(): void {
+    this.tvist.root.classList.add(TVIST_CLASSES.stack)
   }
 
   private applyCubeRootStyles(): void {
@@ -106,6 +127,9 @@ export class EffectModule extends Module {
       slide.querySelectorAll(`.${TVIST_CLASSES.block}-slide-shadow-cube`).forEach((shadow) => {
         shadow.remove()
       })
+      slide.querySelectorAll(`.${TVIST_CLASSES.block}-slide-shadow`).forEach((shadow) => {
+        shadow.remove()
+      })
     })
 
     if (effect === 'cube') {
@@ -120,6 +144,12 @@ export class EffectModule extends Module {
       this.tvist.track.style.removeProperty('padding')
       this.tvist.track.style.removeProperty('box-sizing')
       this.tvist.root.classList.remove(TVIST_CLASSES.cube)
+    }
+
+    if (effect === 'stack') {
+      this.tvist.container.style.transform = ''
+      this.tvist.root.classList.remove(TVIST_CLASSES.stack)
+      cleanupStackCache(this.tvist)
     }
   }
 }

@@ -1,0 +1,20 @@
+/**
+ * Tvist Stack Effect Styles
+ * Новый слайд выезжает поверх предыдущего
+ */
+
+@use '../core/variables' as *;
+
+.#{$tvist-block}--stack {
+  > .#{$tvist-block}__track {
+    overflow: visible;
+  }
+
+  > .#{$tvist-block}__track > .#{$tvist-block}__container > .#{$tvist-block}__slide {
+    pointer-events: none;
+
+    &.#{$tvist-block}__slide--active {
+      pointer-events: auto;
+    }
+  }
+}
