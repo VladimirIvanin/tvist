@@ -114,12 +114,14 @@ onUnmounted(() => {
 Классические кликабельные точки. Опция `clickable: true` включает переход по клику.
 
 <div ref="bulletsRef" class="tvist-v1 pagination-demo-slider">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">1</div>
-    <div class="tvist-v1__slide">2</div>
-    <div class="tvist-v1__slide">3</div>
-    <div class="tvist-v1__slide">4</div>
-    <div class="tvist-v1__slide">5</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">1</div>
+      <div class="tvist-v1__slide">2</div>
+      <div class="tvist-v1__slide">3</div>
+      <div class="tvist-v1__slide">4</div>
+      <div class="tvist-v1__slide">5</div>
+    </div>
   </div>
   <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
   <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
@@ -140,12 +142,14 @@ pagination: {
 Отображение в виде «текущий / всего» (например, 2 / 5). Можно переопределить разметку через `renderFraction(current, total)`.
 
 <div ref="fractionRef" class="tvist-v1 pagination-demo-slider">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">1</div>
-    <div class="tvist-v1__slide">2</div>
-    <div class="tvist-v1__slide">3</div>
-    <div class="tvist-v1__slide">4</div>
-    <div class="tvist-v1__slide">5</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">1</div>
+      <div class="tvist-v1__slide">2</div>
+      <div class="tvist-v1__slide">3</div>
+      <div class="tvist-v1__slide">4</div>
+      <div class="tvist-v1__slide">5</div>
+    </div>
   </div>
   <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
   <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
@@ -165,12 +169,14 @@ pagination: {
 Горизонтальная полоса, заполняющаяся по мере перехода к последнему слайду.
 
 <div ref="progressRef" class="tvist-v1 pagination-demo-slider">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">1</div>
-    <div class="tvist-v1__slide">2</div>
-    <div class="tvist-v1__slide">3</div>
-    <div class="tvist-v1__slide">4</div>
-    <div class="tvist-v1__slide">5</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">1</div>
+      <div class="tvist-v1__slide">2</div>
+      <div class="tvist-v1__slide">3</div>
+      <div class="tvist-v1__slide">4</div>
+      <div class="tvist-v1__slide">5</div>
+    </div>
   </div>
   <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
   <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
@@ -190,12 +196,14 @@ pagination: {
 Тип `custom` с функцией `renderCustom(current, total)` — вы возвращаете произвольный HTML (например, текст «Слайд 3 из 6» или свою разметку).
 
 <div ref="customRef" class="tvist-v1 pagination-demo-slider">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">1</div>
-    <div class="tvist-v1__slide">2</div>
-    <div class="tvist-v1__slide">3</div>
-    <div class="tvist-v1__slide">4</div>
-    <div class="tvist-v1__slide">5</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">1</div>
+      <div class="tvist-v1__slide">2</div>
+      <div class="tvist-v1__slide">3</div>
+      <div class="tvist-v1__slide">4</div>
+      <div class="tvist-v1__slide">5</div>
+    </div>
   </div>
   <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
   <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
