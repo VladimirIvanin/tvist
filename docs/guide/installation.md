@@ -22,38 +22,41 @@ pnpm add tvist
 
 ## CDN
 
-Для быстрого прототипирования можно использовать CDN:
+Браузерная сборка лежит в репозитории в каталоге **`browser-build/`** (не в `dist/` на npm). Подключение через CDN — **jsDelivr (GitHub)** или **raw.githubusercontent.com**.
+
+`@latest` в jsDelivr соответствует **последнему релизу на GitHub**; для фиксированной версии укажите тег (например `v1.14.4`). Острие ветки `main`: замените `@latest` на `@main`.
 
 ```html
-<!-- Последняя версия -->
-<link rel="stylesheet" href="https://unpkg.com/tvist/dist/tvist.css">
-<script src="https://unpkg.com/tvist/dist/tvist.umd.js"></script>
+<!-- jsDelivr — последний релиз GitHub -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css">
+<script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
 
-<!-- Конкретная версия (рекомендуется) -->
-<link rel="stylesheet" href="https://unpkg.com/tvist@1.0.0/dist/tvist.css">
-<script src="https://unpkg.com/tvist@1.0.0/dist/tvist.umd.js"></script>
+<!-- Закрепить версию (пример тега v1.14.4) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@v1.14.4/browser-build/tvist.css">
+<script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@v1.14.4/browser-build/tvist.min.js"></script>
 ```
 
-При использовании через CDN, Tvist будет доступен как глобальная переменная `Tvist`:
+После загрузки скрипта доступен глобальный конструктор **`TvistV1`**:
 
 ```javascript
-const slider = new Tvist.Tvist('.tvist', {
-  slidesPerView: 1
+const slider = new TvistV1('.tvist-v1', {
+  perPage: 1,
+  gap: 20,
 });
 ```
 
 ## Структура пакета
 
-После установки у вас будет доступ к следующим файлам:
+В публикуемом пакете ориентируйтесь на **`browser-build/`** (браузер: минифицированный JS и CSS):
 
 ```
 tvist/
-├── dist/
-│   ├── tvist.js          # ES модуль
-│   ├── tvist.umd.js      # UMD сборка для браузера
-│   ├── tvist.css         # Базовые стили
-│   └── tvist.css.map     # Source map для стилей
-├── src/                  # Исходный код (TypeScript)
+├── browser-build/
+│   ├── tvist.min.js          # Сборка для <script> (глобаль TvistV1)
+│   ├── tvist.css             # Стили
+│   ├── tvist.core.min.js     # Опционально: только ядро
+│   └── tvist.modules.min.js  # Опционально: модули отдельно
+├── src/                      # Исходный код (если включён в пакет)
 └── package.json
 ```
 

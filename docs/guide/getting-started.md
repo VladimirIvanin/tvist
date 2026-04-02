@@ -26,12 +26,14 @@
 
 ## Подключение через CDN
 
-Подключите стили и скрипт Tvist (после загрузки скрипта доступна глобальная переменная `TvistV1`):
+Подключите стили и скрипт из **`browser-build/`** через jsDelivr (GitHub). **`@latest`** — последний [релиз на GitHub](https://github.com/VladimirIvanin/tvist/releases); для ветки `main` используйте `@main`.
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/tvist@1.0.0/dist/tvist.css">
-<script src="https://unpkg.com/tvist@1.0.0/dist/tvist.umd.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css">
+<script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
 ```
+
+После загрузки скрипта доступен глобальный конструктор **`TvistV1`** — его используют примеры ниже.
 
 ## JavaScript
 
@@ -163,7 +165,7 @@ console.log(slider.slides.length); // Количество слайдов
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Мой первый Tvist слайдер</title>
-  <link rel="stylesheet" href="https://unpkg.com/tvist@1.0.0/dist/tvist.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css">
   <style>
     .tvist-v1 {
       max-width: 800px;
@@ -193,9 +195,8 @@ console.log(slider.slides.length); // Количество слайдов
     <div class="tvist-pagination"></div>
   </div>
 
-  <script src="https://unpkg.com/tvist@1.0.0/dist/tvist.umd.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
   <script>
-    var TvistV1 = window.TvistV1 || (window.Tvist && (window.Tvist.TvistV1 || window.Tvist.default || window.Tvist));
     var slider = new TvistV1('.tvist-v1', {
       perPage: 1,
       gap: 20,

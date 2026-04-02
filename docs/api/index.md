@@ -33,7 +33,7 @@
 
 ```javascript
 import Tvist from 'tvist'
-import 'tvist/dist/tvist.css'
+import 'tvist/browser-build/tvist.css'
 
 const slider = new Tvist('.slider', {
   perPage: 3,

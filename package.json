@@ -12,9 +12,11 @@
       "import": "./dist/tvist.esm.js",
       "require": "./dist/tvist.cjs.js"
     },
-    "./dist/tvist.css": "./dist/tvist.css"
+    "./dist/tvist.css": "./dist/tvist.css",
+    "./browser-build/tvist.css": "./browser-build/tvist.css"
   },
   "files": [
+    "browser-build",
     "dist",
     "src",
     "README.md",
