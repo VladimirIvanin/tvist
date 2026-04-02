@@ -59,10 +59,74 @@
           </div>
         </div>
       </div>
+      <div class="tvist-v1__pagination"></div>
     </div>
 
     <div class="drag-hint">
       💡 Попробуйте перетащить слайды мышью или пальцем
+    </div>
+
+    <h3 style="margin-top: 40px;">Free + autoWidth (без snap)</h3>
+    <p class="section-note">
+      Ширина слайдов задаётся в CSS — удобно для карточек разного размера. Свободная прокрутка без
+      выравнивания к слайду после отпускания.
+    </p>
+    <div ref="autoWidthFreeRef" class="tvist-v1 drag-free-autowidth-slider">
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div
+            v-for="(item, i) in autoWidthSlides"
+            :key="i"
+            class="tvist-v1__slide"
+            :style="{ width: item.width }"
+          >
+            <div class="autowidth-card">
+              <span class="autowidth-label">{{ item.label }}</span>
+              <span class="autowidth-size">{{ item.width }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 32px;">Free + Snap + autoWidth</h3>
+    <p class="section-note">
+      Те же слайды переменной ширины: после инерции позиция «прилипает» к ближайшему слайду.
+    </p>
+    <div ref="autoWidthSnapRef" class="tvist-v1 drag-free-autowidth-slider drag-free-autowidth-slider--snap">
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div
+            v-for="(item, i) in autoWidthSlides"
+            :key="'snap-' + i"
+            class="tvist-v1__slide"
+            :style="{ width: item.width }"
+          >
+            <div class="autowidth-card autowidth-card--alt">
+              <span class="autowidth-label">{{ item.label }}</span>
+              <span class="autowidth-size">{{ item.width }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top: 40px;">Free mode + пагинация</h3>
+    <p class="section-note">
+      Клик по точке перелистывает на соответствующую «страницу» (здесь по одному слайду на экран).
+    </p>
+    <div ref="paginationSliderRef" class="tvist-v1 drag-free-pagination-slider">
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div v-for="i in 6" :key="'p-' + i" class="tvist-v1__slide">
+            <div class="pagination-slide-card">
+              <span class="pagination-slide-num">{{ i }}</span>
+              <span class="pagination-slide-text">Слайд {{ i }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tvist-v1__pagination"></div>
     </div>
 
     <!-- Пример с peek -->
@@ -88,9 +152,24 @@ import { Tvist } from 'tvist'
 
 const sliderRef = ref<HTMLElement>()
 const peekSliderRef = ref<HTMLElement>()
+const autoWidthFreeRef = ref<HTMLElement>()
+const autoWidthSnapRef = ref<HTMLElement>()
+const paginationSliderRef = ref<HTMLElement>()
 
 let sliderInstance: Tvist | null = null
 let peekSliderInstance: Tvist | null = null
+let autoWidthFreeInstance: Tvist | null = null
+let autoWidthSnapInstance: Tvist | null = null
+let paginationSliderInstance: Tvist | null = null
+
+const autoWidthSlides = [
+  { label: 'Узкий', width: '160px' },
+  { label: 'Средний', width: '240px' },
+  { label: 'Широкий', width: '320px' },
+  { label: 'Средний', width: '220px' },
+  { label: 'Узкий', width: '180px' },
+  { label: 'Широкий', width: '300px' }
+] as const
 
 const currentMode = ref<'normal' | 'free' | 'freeSnap'>('free')
 const rubberband = ref(true)
@@ -129,11 +208,50 @@ onMounted(() => {
       peek: { left: 20, right: 20 }
     })
   }
+
+  if (autoWidthFreeRef.value) {
+    autoWidthFreeInstance = new Tvist(autoWidthFreeRef.value, {
+      drag: 'free',
+      freeSnap: false,
+      autoWidth: true,
+      perPage: 1,
+      gap: 16,
+      rubberband: true
+    })
+  }
+
+  if (autoWidthSnapRef.value) {
+    autoWidthSnapInstance = new Tvist(autoWidthSnapRef.value, {
+      drag: 'free',
+      freeSnap: true,
+      autoWidth: true,
+      perPage: 1,
+      gap: 16,
+      rubberband: true
+    })
+  }
+
+  if (paginationSliderRef.value) {
+    paginationSliderInstance = new Tvist(paginationSliderRef.value, {
+      drag: 'free',
+      freeSnap: true,
+      perPage: 1,
+      gap: 0,
+      speed: 400,
+      pagination: {
+        type: 'bullets',
+        clickable: true
+      }
+    })
+  }
 })
 
 onBeforeUnmount(() => {
   sliderInstance?.destroy()
   peekSliderInstance?.destroy()
+  autoWidthFreeInstance?.destroy()
+  autoWidthSnapInstance?.destroy()
+  paginationSliderInstance?.destroy()
 })
 
 function initSlider() {
@@ -332,6 +450,115 @@ function updateSettings() {
   color: #555;
   font-size: 14px;
   line-height: 1.6;
+}
+
+.section-note {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #666;
+}
+
+/* AutoWidth + free */
+.drag-free-autowidth-slider {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 0;
+  overflow: hidden;
+  margin-bottom: 8px;
+  border: 1px solid #e8e8e8;
+}
+
+.drag-free-autowidth-slider :deep(.tvist-v1__slide) {
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.autowidth-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
+  padding: 16px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  user-select: none;
+}
+
+.autowidth-card--alt {
+  background: linear-gradient(135deg, #4568dc 0%, #b06ab3 100%);
+}
+
+.autowidth-label {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.autowidth-size {
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+/* Pagination demo */
+.drag-free-pagination-slider {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  border: 1px solid #e8e8e8;
+}
+
+.drag-free-pagination-slider :deep(.tvist-v1__pagination) {
+  padding: 14px 0 18px;
+  justify-content: center;
+}
+
+.pagination-slide-card {
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #fff;
+  user-select: none;
+}
+
+.pagination-slide-num {
+  font-size: 56px;
+  font-weight: 700;
+  opacity: 0.95;
+}
+
+.pagination-slide-text {
+  font-size: 16px;
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.drag-free-pagination-slider
+  :deep(.tvist-v1__slide[data-tvist-slide-index='0']),
+.drag-free-pagination-slider
+  :deep(.tvist-v1__slide[data-tvist-slide-index='3']) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.drag-free-pagination-slider
+  :deep(.tvist-v1__slide[data-tvist-slide-index='1']),
+.drag-free-pagination-slider
+  :deep(.tvist-v1__slide[data-tvist-slide-index='4']) {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.drag-free-pagination-slider
+  :deep(.tvist-v1__slide[data-tvist-slide-index='2']),
+.drag-free-pagination-slider
+  :deep(.tvist-v1__slide[data-tvist-slide-index='5']) {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
 }
 
 /* Peek slider */

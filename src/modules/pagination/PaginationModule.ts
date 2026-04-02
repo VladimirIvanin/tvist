@@ -88,6 +88,14 @@ export class PaginationModule extends Module {
     this.on('lock', () => this.updateVisibility())
     this.on('unlock', () => this.updateVisibility())
 
+    // В free mode (drag: 'free') slideChangeStart/End не эмитятся при прокрутке —
+    // обновляем активный bullet по ближайшему слайду на каждом кадре scroll.
+    if (this.options.drag === 'free') {
+      this.on('scroll', () => {
+        this.updateActiveByPosition()
+      })
+    }
+
     this.render()
     this.updateActive()
     this.updateVisibility()
@@ -126,8 +134,8 @@ export class PaginationModule extends Module {
     }
     this.container = null
     this.bullets = []
-    // Очищаем кэш progress bar
     this.progressBarEl = null
+    this.lastFreeIndex = -1
   }
 
   public override shouldBeActive(): boolean {
@@ -750,6 +758,59 @@ export class PaginationModule extends Module {
   }
 
   /**
+   * Обновление активного элемента пагинации по текущей позиции трека.
+   * Используется в free mode, когда engine.activeIndex не обновляется при прокрутке.
+   */
+  private updateActiveByPosition(): void {
+    if (!this.container) return
+
+    const nearestIndex = this.getNearestSlideIndex()
+    if (nearestIndex === this.lastFreeIndex) return
+    this.lastFreeIndex = nearestIndex
+
+    const type = this.getType()
+
+    switch (type) {
+      case 'bullets':
+        this.updateBulletsActiveByIndex(nearestIndex)
+        break
+      case 'fraction':
+        this.renderFractionByIndex(nearestIndex)
+        break
+      case 'progress':
+        this.updateProgressActiveByIndex(nearestIndex)
+        break
+      case 'custom':
+        this.renderCustom()
+        break
+    }
+  }
+
+  private lastFreeIndex = -1
+
+  /**
+   * Возвращает индекс слайда, ближайшего к текущей позиции трека.
+   */
+  private getNearestSlideIndex(): number {
+    const { engine, slides } = this.tvist
+    const currentPosition = engine.location.get()
+
+    let nearestIndex = 0
+    let minDistance = Infinity
+
+    for (let i = 0; i < slides.length; i++) {
+      const slidePosition = engine.getScrollPositionForIndex(i)
+      const distance = Math.abs(currentPosition - slidePosition)
+      if (distance < minDistance) {
+        minDistance = distance
+        nearestIndex = i
+      }
+    }
+
+    return nearestIndex
+  }
+
+  /**
    * Обновление активного bullet
    */
   private updateBulletsActive(): void {
@@ -802,6 +863,71 @@ export class PaginationModule extends Module {
       const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
 
       const currentPage = this.getCurrentSlideIndex() + 1
+      const totalPages = slideCount === 0 ? 0 : endIndex + 1
+      const progress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0
+      this.progressBarEl.style.width = `${progress}%`
+    }
+  }
+
+  private updateBulletsActiveByIndex(slideIndex: number): void {
+    const pagination = this.options.pagination
+    const activeClass = typeof pagination === 'object' && pagination !== null
+      ? pagination.bulletActiveClass ?? TVIST_CLASSES.bulletActive
+      : TVIST_CLASSES.bulletActive
+
+    const activeBulletIndex = this.bulletGroups.length > 0
+      ? this.getActiveBulletIndex(slideIndex)
+      : slideIndex
+
+    this.bullets.forEach((bullet, bulletIndex) => {
+      if (bulletIndex === activeBulletIndex) {
+        bullet.classList.add(activeClass)
+        bullet.setAttribute('aria-current', 'true')
+      } else {
+        bullet.classList.remove(activeClass)
+        bullet.removeAttribute('aria-current')
+      }
+    })
+  }
+
+  private renderFractionByIndex(slideIndex: number): void {
+    if (!this.container) return
+
+    const pagination = this.options.pagination
+    const { slides } = this.tvist
+    const perPage = this.options.perPage ?? 1
+    const slideCount = slides.length
+    const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
+    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
+
+    const currentPage = slideIndex + 1
+    const totalPages = slideCount === 0 ? 0 : endIndex + 1
+
+    let html: string
+    if (typeof pagination === 'object' && pagination?.renderFraction) {
+      html = pagination.renderFraction(currentPage, totalPages)
+    } else {
+      html = `
+        <span class="${TVIST_CLASSES.paginationCurrent}">${currentPage}</span>
+        <span class="${TVIST_CLASSES.paginationSeparator}"> / </span>
+        <span class="${TVIST_CLASSES.paginationTotal}">${totalPages}</span>
+      `
+    }
+
+    this.container.innerHTML = html
+  }
+
+  private updateProgressActiveByIndex(slideIndex: number): void {
+    this.progressBarEl ??= this.container?.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`) ?? null
+
+    if (this.progressBarEl) {
+      const { slides } = this.tvist
+      const perPage = this.options.perPage ?? 1
+      const slideCount = slides.length
+      const isLoop = this.options.loop === true
+      const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
+
+      const currentPage = slideIndex + 1
       const totalPages = slideCount === 0 ? 0 : endIndex + 1
       const progress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0
       this.progressBarEl.style.width = `${progress}%`
