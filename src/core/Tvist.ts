@@ -405,11 +405,14 @@ export class Tvist {
     }, 100)
 
     if (typeof ResizeObserver !== 'undefined') {
+      // Наблюдаем за track, а не за root.
+      // track имеет overflow: hidden и его размер определяется внешним layout,
+      // а не содержимым — это предотвращает бесконечный цикл при display: grid
+      // у родителя (когда applyFixedSize меняет слайды → меняется root → снова update).
       this.resizeObserver = new ResizeObserver(() => {
-        // Используем throttle handler
         this.resizeHandler?.()
       })
-      this.resizeObserver.observe(this.root)
+      this.resizeObserver.observe(this.track)
     } else {
       // Fallback для старых браузеров
       window.addEventListener('resize', this.resizeHandler)
