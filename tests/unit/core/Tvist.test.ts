@@ -244,7 +244,7 @@ describe('Tvist', () => {
       slider.scrollTo(4, true)
       slider.next()
 
-      expect(slider.activeIndex).toBe(0)
+      expect(slider.realIndex).toBe(0)
     })
   })
 
