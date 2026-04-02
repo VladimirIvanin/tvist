@@ -44,15 +44,17 @@
     </div>
 
     <div ref="sliderRef" class="tvist-v1 drag-free-slider">
-      <div class="tvist-v1__container">
-        <div v-for="i in 10" :key="i" class="tvist-v1__slide">
-          <div class="slide-card">
-            <div class="slide-number">{{ i }}</div>
-            <div class="slide-title">Слайд {{ i }}</div>
-            <div class="slide-description">
-              {{ currentMode === 'free' ? 'Свободная прокрутка' : 
-                 currentMode === 'freeSnap' ? 'Free + Snap' : 
-                 'Обычный режим' }}
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div v-for="i in 10" :key="i" class="tvist-v1__slide">
+            <div class="slide-card">
+              <div class="slide-number">{{ i }}</div>
+              <div class="slide-title">Слайд {{ i }}</div>
+              <div class="slide-description">
+                {{ currentMode === 'free' ? 'Свободная прокрутка' : 
+                  currentMode === 'freeSnap' ? 'Free + Snap' : 
+                  'Обычный режим' }}
+              </div>
             </div>
           </div>
         </div>
@@ -66,11 +68,13 @@
     <!-- Пример с peek -->
     <h3 style="margin-top: 40px;">Free mode с Peek</h3>
     <div ref="peekSliderRef" class="tvist-v1 drag-free-peek-slider">
-      <div class="tvist-v1__container">
-        <div v-for="i in 8" :key="i" class="tvist-v1__slide">
-          <div class="peek-card">
-            <div class="peek-icon">🎨</div>
-            <div class="peek-title">Карточка {{ i }}</div>
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div v-for="i in 8" :key="i" class="tvist-v1__slide">
+            <div class="peek-card">
+              <div class="peek-icon">🎨</div>
+              <div class="peek-title">Карточка {{ i }}</div>
+            </div>
           </div>
         </div>
       </div>
