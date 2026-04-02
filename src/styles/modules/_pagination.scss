@@ -16,6 +16,8 @@
   align-items: center;
   justify-content: center;
   gap: var(--#{$tvist-block}-pagination-gap, 8px);
+  margin: 0;
+  padding: 0;
 
   // Hidden состояние (БЭМ модификатор)
   &--hidden {
@@ -72,10 +74,6 @@
 // Адаптивность
 @media (max-width: 768px) {
   .#{$tvist-block}__pagination {
-    --#{$tvist-block}-pagination-bottom: 5px;
-    --#{$tvist-block}-pagination-gap: 6px;
-    --#{$tvist-block}-bullet-size: 6px;
-    --#{$tvist-block}-bullet-active-width: 16px;
     --#{$tvist-block}-fraction-size: 12px;
     --#{$tvist-block}-progress-width: 150px;
   }
