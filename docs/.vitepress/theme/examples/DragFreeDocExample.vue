@@ -111,24 +111,6 @@
       </div>
     </div>
 
-    <h3 style="margin-top: 40px;">Free mode + пагинация</h3>
-    <p class="section-note">
-      Клик по точке перелистывает на соответствующую «страницу» (здесь по одному слайду на экран).
-    </p>
-    <div ref="paginationSliderRef" class="tvist-v1 drag-free-pagination-slider">
-      <div class="tvist-v1__track">
-        <div class="tvist-v1__container">
-          <div v-for="i in 6" :key="'p-' + i" class="tvist-v1__slide">
-            <div class="pagination-slide-card">
-              <span class="pagination-slide-num">{{ i }}</span>
-              <span class="pagination-slide-text">Слайд {{ i }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="tvist-v1__pagination"></div>
-    </div>
-
     <!-- Пример с peek -->
     <h3 style="margin-top: 40px;">Free mode с Peek</h3>
     <div ref="peekSliderRef" class="tvist-v1 drag-free-peek-slider">
