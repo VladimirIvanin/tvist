@@ -43,12 +43,14 @@ onUnmounted(() => {
 Стрелки и пагинация лежат **внутри** корневого элемента слайдера. Кнопки ищутся по классам `.tvist-v1__arrow--prev` / `.tvist-v1__arrow--next`, контейнер пагинации — `.tvist-v1__pagination`.
 
 <div ref="defaultRef" class="tvist-v1 nav-demo-slider">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide">1</div>
-    <div class="tvist-v1__slide">2</div>
-    <div class="tvist-v1__slide">3</div>
-    <div class="tvist-v1__slide">4</div>
-    <div class="tvist-v1__slide">5</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide">1</div>
+      <div class="tvist-v1__slide">2</div>
+      <div class="tvist-v1__slide">3</div>
+      <div class="tvist-v1__slide">4</div>
+      <div class="tvist-v1__slide">5</div>
+    </div>
   </div>
   <button class="tvist-v1__arrow tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
   <button class="tvist-v1__arrow tvist-v1__arrow--next" aria-label="Следующий"></button>
