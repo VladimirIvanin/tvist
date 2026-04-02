@@ -65,6 +65,10 @@ onUnmounted(() => {
   height: 100%;
 }
 
+.tvist-v1__track {
+  height: 100%;
+}
+
 .tvist-v1__slide {
   height: 100%;
   display: flex;
