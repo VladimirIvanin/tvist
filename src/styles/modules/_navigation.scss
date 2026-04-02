@@ -60,10 +60,8 @@
 
 // Стили для SVG иконки
 .#{$tvist-block}__arrow-icon {
-  width: 100%;
-  height: 100%;
-  max-width: 16px;
-  max-height: 16px;
+  width: var(--#{$tvist-block}-arrow-icon-size, 16px);
+  height: var(--#{$tvist-block}-arrow-icon-size, 16px);
   object-fit: contain;
   transform-origin: center;
   fill: currentColor;

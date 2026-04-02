@@ -6,6 +6,7 @@
 
 .#{$tvist-block}__pagination {
   position: absolute;
+  width: 95%;
   bottom: var(--#{$tvist-block}-pagination-bottom, 10px);
   left: 50%;
   transform: translateX(-50%);
