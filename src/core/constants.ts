@@ -35,6 +35,7 @@ export const TVIST_CLASSES = {
   singlePage: `${P}--single-page`,
   nav: `${P}--nav`,
   cube: `${P}--cube`,
+  stack: `${P}--stack`,
 
   scrollbar: `${P}__scrollbar`,
   scrollbarHorizontal: `${P}__scrollbar--horizontal`,

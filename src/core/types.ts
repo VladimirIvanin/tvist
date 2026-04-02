@@ -643,7 +643,7 @@ export interface TvistOptions {
    * Эффект перехода между слайдами
    * @default 'slide'
    */
-  effect?: 'slide' | 'fade' | 'cube' | 'card'
+  effect?: 'slide' | 'fade' | 'cube' | 'stack'
   
   /**
    * Настройки fade эффекта
@@ -653,6 +653,32 @@ export interface TvistOptions {
     crossFade?: boolean
   }
   
+  /**
+   * Настройки stack эффекта
+   */
+  stackEffect?: {
+    /**
+     * Режим наложения слайдов.
+     * - `'cover'` — активный слайд сверху, едет поверх следующего (как страница поверх стопки).
+     * - `'uncover'` — в покое как `cover`; в переходе next — накрываем карту, prev — снимаем
+     *   (нижний слайд на месте, верхний уезжает с `translate`).
+     * @default 'cover'
+     */
+    mode?: 'cover' | 'uncover'
+    /** Тени на слайдах. @default false */
+    slideShadows?: boolean
+    /** Лёгкий поворот слайдов стопки. @default false */
+    rotate?: boolean
+    /** Угол поворота на слайд (градусы). @default 2 */
+    perSlideRotate?: number
+    /** Смещение стопки вниз/вправо на слайд (px). 0 — без смещения. @default 0 */
+    perSlideOffset?: number
+    /** Уменьшение масштаба на слайд. 0 — без масштабирования. @default 0 */
+    perSlideScale?: number
+    /** Смещение по Z на слайд (px). 0 — без глубины. @default 0 */
+    perSlideDepth?: number
+  }
+
   /**
    * Настройки cube эффекта
    */

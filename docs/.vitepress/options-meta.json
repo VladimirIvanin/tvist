@@ -309,9 +309,9 @@
     },
     {
       "name": "loop",
-      "type": "boolean | 'auto'",
+      "type": "boolean | 'auto' | LoopOptions",
       "default": "false",
-      "description": "Бесконечная прокрутка. 'auto' - определяется автоматически на основе количества слайдов"
+      "description": "Бесконечная прокрутка. 'auto' - определяется автоматически на основе количества слайдов. Поддерживаются следующие варианты: - `false` — выключено (по умолчанию) - `true`  — включено (эквивалентно `{ enabled: true, withClones: false }`) - `'auto'` — режим автоопределения (как и раньше) - `LoopOptions` — объект с расширенной конфигурацией"
     },
     {
       "name": "rewind",
@@ -345,7 +345,7 @@
     },
     {
       "name": "effect",
-      "type": "'slide' | 'fade' | 'cube' | 'card'",
+      "type": "'slide' | 'fade' | 'cube' | 'stack'",
       "default": "'slide'",
       "description": "Эффект перехода между слайдами"
     },
@@ -363,6 +363,55 @@
         {
           "name": "crossFade",
           "type": "boolean",
+          "description": ""
+        }
+      ]
+    },
+    {
+      "name": "stackEffect",
+      "type": "object",
+      "default": "undefined",
+      "description": "Настройки stack эффекта",
+      "nested": [
+        {
+          "name": "stackEffect",
+          "type": "{",
+          "description": ""
+        },
+        {
+          "name": "mode",
+          "type": "'cover' | 'uncover'",
+          "default": "'cover'",
+          "description": "Режим наложения слайдов. - `'cover'` — активный слайд сверху, едет поверх следующего (как страница поверх стопки). - `'uncover'` — в покое как `cover`; в переходе next — накрываем карту, prev — снимаем (нижний слайд на месте, верхний уезжает с `translate`)."
+        },
+        {
+          "name": "slideShadows",
+          "type": "boolean",
+          "description": ""
+        },
+        {
+          "name": "rotate",
+          "type": "boolean",
+          "description": ""
+        },
+        {
+          "name": "perSlideRotate",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "perSlideOffset",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "perSlideScale",
+          "type": "number",
+          "description": ""
+        },
+        {
+          "name": "perSlideDepth",
+          "type": "number",
           "description": ""
         }
       ]
