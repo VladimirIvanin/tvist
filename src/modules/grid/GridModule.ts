@@ -327,6 +327,7 @@ export class GridModule extends Module {
 
     colWrapper.style.cssText = [
       `width: ${colWidth}`,
+      'height: 100%',
       'flex-shrink: 0',
       marginRight ? `margin-right: ${marginRight}` : '',
     ]
@@ -340,7 +341,7 @@ export class GridModule extends Module {
     originalSlide.classList.remove(TVIST_CLASSES.slide)
     originalSlide.classList.add(TVIST_CLASSES.gridItem)
     originalSlide.style.width = '100%'
-    originalSlide.style.height = '100%'
+    originalSlide.style.height = ''
     colWrapper.appendChild(originalSlide)
   }
 
