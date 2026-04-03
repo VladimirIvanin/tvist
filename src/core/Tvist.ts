@@ -92,6 +92,7 @@ export class Tvist {
   readonly track: HTMLElement
   readonly container: HTMLElement
   private _slides: HTMLElement[]
+  private _originalSlideCountCache: number | null = null
 
   // Опции
   readonly options: TvistOptions
@@ -845,6 +846,7 @@ export class Tvist {
    */
   updateSlidesList(): void {
     this._slides = getSlidesInTvistRoot(this.container, this.root)
+    this._originalSlideCountCache = null
   }
 
   /**
@@ -861,9 +863,10 @@ export class Tvist {
    * В режиме loop.withClones не учитывает клонированные слайды по краям.
    */
   get originalSlideCount(): number {
-    return this._slides.filter(
+    this._originalSlideCountCache ??= this._slides.filter(
       (el) => !el.classList.contains(TVIST_CLASSES.slideClone)
     ).length
+    return this._originalSlideCountCache
   }
 
   /**

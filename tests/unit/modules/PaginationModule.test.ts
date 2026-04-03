@@ -7,6 +7,7 @@ import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '@core/Tvist'
 // Импортируем модуль через index для автоматической регистрации
 import '../../../src/modules/pagination'
+import '../../../src/modules/loop'
 
 describe('PaginationModule', () => {
   let container: HTMLElement
@@ -78,6 +79,34 @@ describe('PaginationModule', () => {
 
       const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       expect(bullets.length).toBe(5)
+    })
+
+    it('loop.withClones: число точек равно числу оригинальных слайдов, не DOM-узлов', () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
+          </div>
+          <div class="${TVIST_CLASSES.pagination}"></div>
+        </div>
+      `
+
+      const root = container.querySelector(`.${TVIST_CLASSES.block}`)!
+      const slider = new Tvist(root, {
+        loop: { enabled: true, withClones: true },
+        speed: 0,
+        pagination: { type: 'bullets', clickable: false },
+      })
+
+      expect(slider.slideCount).toBeGreaterThan(slider.originalSlideCount)
+      expect(slider.originalSlideCount).toBe(3)
+
+      const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
+      expect(bullets.length).toBe(3)
     })
 
     it('should create correct number of bullets for various perPage values', () => {

@@ -554,6 +554,38 @@ describe('Tvist', () => {
       // В DOM должны появиться клоны по краям
       expect(slider.slideCount).toBeGreaterThan(slider.originalSlideCount)
     })
+
+    it('originalSlideCount: повторные вызовы возвращают кешированное значение без пересчёта', () => {
+      const slider = new Tvist(fixture.root)
+      const filterSpy = vi.spyOn(Array.prototype, 'filter')
+
+      const first = slider.originalSlideCount
+      const callsAfterFirst = filterSpy.mock.calls.length
+
+      const second = slider.originalSlideCount
+      const callsAfterSecond = filterSpy.mock.calls.length
+
+      expect(first).toBe(5)
+      expect(second).toBe(5)
+      // Второй вызов не должен вызывать filter — значение взято из кеша
+      expect(callsAfterSecond).toBe(callsAfterFirst)
+
+      filterSpy.mockRestore()
+    })
+
+    it('originalSlideCount: кеш сбрасывается после updateSlidesList', () => {
+      const slider = new Tvist(fixture.root)
+
+      expect(slider.originalSlideCount).toBe(5)
+
+      // Добавляем новый слайд в DOM вручную и обновляем список
+      const newSlide = document.createElement('div')
+      newSlide.className = TVIST_CLASSES.slide
+      fixture.container.appendChild(newSlide)
+      slider.updateSlidesList()
+
+      expect(slider.originalSlideCount).toBe(6)
+    })
   })
 
   describe('module registration', () => {
