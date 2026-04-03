@@ -1164,7 +1164,7 @@ export class DragModule extends Module {
     });
 
     this.applyLoopScrollDirectionHintForFreeSnap(currentIndex, nearestIndex, endVelocity);
-    engine.scrollTo(nearestIndex);
+    engine.scrollTo(nearestIndex, false, true);
   }
 
   private snapWithThreshold(): void {
@@ -1177,7 +1177,7 @@ export class DragModule extends Module {
 
     if (slideWithGap === 0) {
       dragLog('snapWithThreshold (no size)', { targetIndex: startIndex });
-      engine.scrollTo(startIndex);
+      engine.scrollTo(startIndex, false, true);
       return;
     }
 
@@ -1212,11 +1212,11 @@ export class DragModule extends Module {
       // targetIndex = startIndex + slidesMoved ненадёжен (приводил к rewind-поведению).
       // scrollBy сам выставляет _scrollDirection по знаку delta.
       dragLog('>>> CALLING engine.scrollBy', slidesMoved);
-      engine.scrollBy(slidesMoved);
+      engine.scrollBy(slidesMoved, true);
     } else {
       const targetIndex = startIndex + slidesMoved;
       dragLog('>>> CALLING engine.scrollTo', targetIndex);
-      engine.scrollTo(targetIndex);
+      engine.scrollTo(targetIndex, false, true);
     }
   }
 
