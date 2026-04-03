@@ -2,23 +2,24 @@ import { Module } from '../Module'
 import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
-import { resolveGridGapForAxis, resolveTrackGapFromOptions } from '../../utils/gridGap'
+import { resolveTrackGapFromOptions } from '../../utils/gridGap'
 
 /**
  * Grid Module
- * Позволяет располагать слайды в виде сетки (grid layout)
- * 
+ * Располагает слайды в виде сетки (grid layout).
+ *
+ * Размеры строк и колонок задаются через calc() — строгие значения,
+ * не зависящие от количества заполненных ячеек (как в splide-extension-grid).
+ *
  * В режиме dimensions каждый элемент массива [rows, cols] определяет
  * количество рядов и колонок для одной страницы (wrapper slide).
- * Оригинальные слайды последовательно распределяются по этим страницам.
  */
 export class GridModule extends Module {
   readonly name = 'grid'
-  
+
   private isActive = false
   private originalSlides: HTMLElement[] = []
   private wrapperSlides: HTMLElement[] = []
-  /** Сигнатура структуры сетки + отступов; при совпадении onUpdate не пересоздаёт DOM */
   private gridStructureKey = ''
 
   constructor(tvist: Tvist, options: TvistOptions) {
@@ -70,9 +71,6 @@ export class GridModule extends Module {
     this.fixEnginePositions()
   }
 
-  /**
-   * Ключ для решения, нужно ли пересобирать DOM сетки (rows/cols/dimensions и gap).
-   */
   private computeGridStructureKey(): string {
     const { grid, gap: globalGap = 0 } = this.options
     if (!grid) return ''
@@ -87,9 +85,6 @@ export class GridModule extends Module {
     return `f:${String(grid.rows ?? '')}:${String(grid.cols ?? '')}:${gapFingerprint}`
   }
 
-  /**
-   * Стабильная строка по настройкам gap (совпадает с тем, как {@link getGapValue} их читает).
-   */
   private gapFingerprintForStructureKey(
     gridGap: NonNullable<TvistOptions['grid']>['gap'] | undefined,
     globalGap: string | number
@@ -109,59 +104,93 @@ export class GridModule extends Module {
 
   public override shouldBeActive(): boolean {
     const { grid } = this.options
-    // Активен если есть grid опции и заданы rows/cols или dimensions
     return !!grid && (!!grid.rows || !!grid.cols || (!!grid.dimensions && grid.dimensions.length > 0))
   }
 
-  /**
-   * Проверяет, используется ли режим dimensions
-   */
   private hasDimensions(): boolean {
     const { grid } = this.options
     return !!(grid?.dimensions && grid.dimensions.length > 0)
   }
 
   /**
-   * Создает grid структуру с вложенными элементами 
-   * Поддерживает как фиксированную сетку (rows + cols), так и dimensions
+   * Возвращает единицу gap как CSS-строку (px или переданное значение).
    */
+  private gapUnit(value: string | number | undefined): string {
+    if (value === undefined || value === 0 || value === '0') return '0px'
+    if (typeof value === 'number') return `${value}px`
+    return value.endsWith('px') || value.endsWith('%') || value.endsWith('em') || value.endsWith('rem')
+      ? value
+      : `${value}px`
+  }
+
+  /**
+   * Возвращает CSS calc() строку для ширины одной колонки.
+   * Формула: calc(100% / cols - colGap * (cols - 1) / cols)
+   */
+  private calcColWidth(cols: number, colGap: string | number | undefined): string {
+    const gap = this.gapUnit(colGap)
+    if (gap === '0px' || cols === 1) {
+      return `calc(${100 / cols}%)`
+    }
+    return `calc(${100 / cols}% - ${gap} * ${(cols - 1) / cols})`
+  }
+
+  /**
+   * Возвращает CSS calc() строку для высоты одной строки.
+   * Формула: calc(100% / rows - rowGap * (rows - 1) / rows)
+   */
+  private calcRowHeight(rows: number, rowGap: string | number | undefined): string {
+    const gap = this.gapUnit(rowGap)
+    if (gap === '0px' || rows === 1) {
+      return `calc(${100 / rows}%)`
+    }
+    return `calc(${100 / rows}% - ${gap} * ${(rows - 1) / rows})`
+  }
+
+  private getGaps(): { row: string | number | undefined; col: string | number | undefined } {
+    const { grid, gap: globalGap } = this.options
+    if (!grid) return { row: undefined, col: undefined }
+
+    const gridGap = grid.gap
+
+    if (gridGap === undefined) {
+      return { row: globalGap, col: globalGap }
+    }
+
+    if (typeof gridGap === 'object') {
+      return {
+        row: gridGap.row ?? globalGap,
+        col: gridGap.col ?? globalGap,
+      }
+    }
+
+    return { row: gridGap, col: gridGap }
+  }
+
   private buildGrid(): void {
     const { grid } = this.options
     if (!grid) return
 
-    // Сохраняем оригинальные слайды только если ещё не сохранены
     if (this.originalSlides.length === 0) {
       this.originalSlides = Array.from(this.tvist.slides)
     }
-    
-    // Очищаем контейнер
+
     const container = this.tvist.container
     container.innerHTML = ''
-    
-    // Для grid используем flexbox
     container.style.display = 'flex'
-    
-    // Создаем wrapper-слайды (страницы)
+
     this.wrapperSlides = []
-    
+
     if (this.hasDimensions()) {
-      // Режим dimensions: каждый элемент [rows, cols] = одна страница
       this.buildDimensionsGrid()
     } else {
-      // Фиксированная сетка: все страницы одинаковые rows × cols
       this.buildFixedGrid()
     }
-    
-    // Обновляем список слайдов в Tvist
+
     this.tvist.updateSlidesList()
-    // До первого engine.update() движок ещё не выставил margin между страницами —
-    // задаём их здесь, чтобы fixEnginePositions() сразу видел верную геометрию.
     this.applyInterPageGaps()
   }
 
-  /**
-   * Создает grid с фиксированными размерами (все страницы rows × cols)
-   */
   private buildFixedGrid(): void {
     const { grid } = this.options
     if (!grid?.rows || !grid?.cols) return
@@ -183,11 +212,6 @@ export class GridModule extends Module {
     this.tvist.container.appendChild(fragment)
   }
 
-  /**
-   * Создает grid с переменными размерами страниц (dimensions)
-   * dimensions = [ [rows1, cols1], [rows2, cols2], ... ]
-   * Каждый элемент определяет размер одной страницы
-   */
   private buildDimensionsGrid(): void {
     const { grid } = this.options
     const specs = grid?.dimensions
@@ -210,7 +234,9 @@ export class GridModule extends Module {
   }
 
   /**
-   * Заполняет одну страницу сеткой rows×cols; возвращает индекс следующего оригинального слайда.
+   * Заполняет одну страницу сеткой rows×cols.
+   * Размеры строк и колонок задаются через calc() — строго, без растяжения.
+   * Возвращает индекс следующего оригинального слайда.
    */
   private fillGridPage(
     pageRoot: HTMLElement,
@@ -218,10 +244,16 @@ export class GridModule extends Module {
     cols: number,
     startSlideIndex: number
   ): number {
+    const { row: rowGap, col: colGap } = this.getGaps()
+    const rowHeight = this.calcRowHeight(rows, rowGap)
+    const colWidth = this.calcColWidth(cols, colGap)
+    const rowGapUnit = this.gapUnit(rowGap)
+    const colGapUnit = this.gapUnit(colGap)
+
     let index = startSlideIndex
 
     for (let row = 0; row < rows; row++) {
-      const rowEl = this.createRowElement(row, rows)
+      const rowEl = this.createRowElement(row, rows, rowHeight, rowGapUnit)
       const rowFragment = document.createDocumentFragment()
 
       for (let col = 0; col < cols; col++) {
@@ -229,7 +261,7 @@ export class GridModule extends Module {
 
         const slide = this.originalSlides[index]
         if (slide) {
-          const colWrapper = this.createColWrapper(col, cols)
+          const colWrapper = this.createColWrapper(col, cols, colWidth, colGapUnit)
           this.wrapSlide(slide, colWrapper)
           rowFragment.appendChild(colWrapper)
         }
@@ -243,9 +275,6 @@ export class GridModule extends Module {
     return index
   }
 
-  /**
-   * Создает внешний слайд (страницу)
-   */
   private createOuterSlide(): HTMLElement {
     const outerSlide = document.createElement('div')
     outerSlide.className = `${TVIST_CLASSES.slide} ${TVIST_CLASSES.slideGridPage}`
@@ -254,37 +283,60 @@ export class GridModule extends Module {
   }
 
   /**
-   * Создает элемент ряда
+   * Строка сетки с фиксированной высотой через calc().
    */
-  private createRowElement(rowIndex: number, totalRows: number): HTMLElement {
+  private createRowElement(
+    rowIndex: number,
+    totalRows: number,
+    rowHeight: string,
+    rowGapUnit: string
+  ): HTMLElement {
     const rowEl = document.createElement('div')
     rowEl.className = TVIST_CLASSES.gridRow
-    rowEl.style.cssText = `
-      display: flex;
-      flex: 1;
-      ${rowIndex < totalRows - 1 ? `margin-bottom: ${this.getGapValue('row')}px;` : ''}
-    `
+
+    const isLast = rowIndex === totalRows - 1
+    const marginBottom = !isLast && rowGapUnit !== '0px' ? rowGapUnit : ''
+
+    rowEl.style.cssText = [
+      `height: ${rowHeight}`,
+      'display: flex',
+      'flex-shrink: 0',
+      marginBottom ? `margin-bottom: ${marginBottom}` : '',
+      'padding: 0',
+    ]
+      .filter(Boolean)
+      .join('; ')
+
     return rowEl
   }
 
   /**
-   * Создает обертку для колонки
+   * Колонка сетки с фиксированной шириной через calc().
    */
-  private createColWrapper(colIndex: number, totalCols: number): HTMLElement {
+  private createColWrapper(
+    colIndex: number,
+    totalCols: number,
+    colWidth: string,
+    colGapUnit: string
+  ): HTMLElement {
     const colWrapper = document.createElement('div')
     colWrapper.className = TVIST_CLASSES.gridCol
-    colWrapper.style.cssText = `
-      flex: 1;
-      ${colIndex < totalCols - 1 ? `margin-right: ${this.getGapValue('col')}px;` : ''}
-    `
+
+    const isLast = colIndex === totalCols - 1
+    const marginRight = !isLast && colGapUnit !== '0px' ? colGapUnit : ''
+
+    colWrapper.style.cssText = [
+      `width: ${colWidth}`,
+      'flex-shrink: 0',
+      marginRight ? `margin-right: ${marginRight}` : '',
+    ]
+      .filter(Boolean)
+      .join('; ')
+
     return colWrapper
   }
 
-  /**
-   * Оборачивает оригинальный слайд в колонку
-   */
   private wrapSlide(originalSlide: HTMLElement, colWrapper: HTMLElement): void {
-    // Убираем класс tvist-v1__slide, чтобы updateSlidesList не находил его
     originalSlide.classList.remove(TVIST_CLASSES.slide)
     originalSlide.classList.add(TVIST_CLASSES.gridItem)
     originalSlide.style.width = '100%'
@@ -292,19 +344,6 @@ export class GridModule extends Module {
     colWrapper.appendChild(originalSlide)
   }
 
-  /**
-   * Получает значение gap для строк или колонок
-   */
-  private getGapValue(axis: 'row' | 'col'): number {
-    const { grid, gap: globalGap = 0 } = this.options
-    if (!grid) return 0
-    return resolveGridGapForAxis(grid, globalGap, axis)
-  }
-
-  /**
-   * Margin между wrapper-слайдами (страницами). Внутри страницы отступы задают ряды/колонки.
-   * Значение совпадает с {@link resolveTrackGapFromOptions} (для drag и визуальной согласованности).
-   */
   private applyInterPageGaps(): void {
     const trackGap = resolveTrackGapFromOptions(this.options)
     const isVertical = this.options.direction === 'vertical'
@@ -324,19 +363,14 @@ export class GridModule extends Module {
     })
   }
 
-  /**
-   * Удаляет grid структуру и восстанавливает оригинальные слайды
-   */
   private removeGrid(): void {
     if (this.originalSlides.length > 0) {
-      // Восстанавливаем оригинальные слайды
       const container = this.tvist.container
       container.style.display = ''
       container.innerHTML = ''
-      
+
       const fragment = document.createDocumentFragment()
       this.originalSlides.forEach(slide => {
-        // Восстанавливаем класс tvist-v1__slide
         slide.classList.remove(TVIST_CLASSES.gridItem)
         slide.classList.add(TVIST_CLASSES.slide)
         slide.style.width = ''
@@ -344,30 +378,23 @@ export class GridModule extends Module {
         fragment.appendChild(slide)
       })
       container.appendChild(fragment)
-      
-      // Обновляем список слайдов
+
       this.tvist.updateSlidesList()
-      
+
       this.originalSlides = []
       this.wrapperSlides = []
     }
   }
 
-  /**
-   * Пересчитываем позиции слайдов для grid и обновляем состояние Engine
-   */
   private fixEnginePositions(): void {
     const engine = this.tvist.engine
     const slides = this.tvist.slides
 
     this.applyInterPageGaps()
 
-    // Для grid с wrapper-слайдами позиции простые: каждая страница - это один слайд
-    // offsetLeft уже правильный для каждой страницы
     const newPositions = slides.map(slide => slide.offsetLeft)
     engine.setSlidePositions(newPositions)
-    
-    // Размер слайда = ширина страницы
+
     if (slides.length > 0) {
       const firstSlide = slides[0]
       if (firstSlide) {
@@ -376,16 +403,13 @@ export class GridModule extends Module {
       }
     }
 
-    // Нужно обновить текущую позицию (location/target), так как Engine мог рассчитать её 
-    // по старой (линейной) логике во время update()
     const currentIndex = engine.index.get()
     const correctPosition = engine.getScrollPositionForIndex(currentIndex)
 
     engine.target.set(correctPosition)
     engine.location.set(correctPosition)
     engine.applyTransform()
-    
-    // Проверяем блокировку после обновления позиций (возможно контент теперь влезает)
+
     engine.checkLock()
   }
 }
