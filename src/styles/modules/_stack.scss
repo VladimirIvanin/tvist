@@ -18,3 +18,17 @@
     }
   }
 }
+
+// Наложение при slideShadows (opacity задаётся в JS)
+.#{$tvist-block}-slide-shadow {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0) 35%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
+}

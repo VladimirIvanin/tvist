@@ -1,6 +1,6 @@
 # Stack: стопка папок
 
-Горизонтальная стопка с **peek слева**: виден край предыдущих слайдов. Для спокойной анимации без логики «снятия карты» здесь используется **`cover`**; вертикальный **`uncover`** с `peek.top` — на отдельной странице [Stack uncover — вертикально](./stack-vertical-uncover).
+Горизонтальная стопка с **peek слева**: виден край предыдущих слайдов. Для спокойной анимации без логики «снятия карты» здесь используется **`cover`**. Вертикальный **`uncover`** с `peek.top` показан на той же странице, что и базовый stack: [Stack Effect](./effect-stack).
 
 <script setup>
 import StackFoldersExample from '../.vitepress/theme/examples/StackFoldersExample.vue'
@@ -37,4 +37,4 @@ const slider = new Tvist(root, {
 ## См. также
 
 - [Stack Effect](./effect-stack) — режимы cover / uncover и опции `stackEffect`
-- [Stack uncover — вертикально](./stack-vertical-uncover) — `direction: 'vertical'` и `peek.top`
+- [Stack Effect](./effect-stack) — вертикальный uncover с `peek.top` на той же странице (второй блок демо)

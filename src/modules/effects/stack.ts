@@ -82,6 +82,7 @@ export function setStackEffect(
   const perSlideRotate = stackOptions.perSlideRotate ?? 2
   const perSlideScale = stackOptions.perSlideScale ?? 0
   const perSlideDepth = stackOptions.perSlideDepth ?? 0
+  const perSlideOffset = stackOptions.perSlideOffset ?? 0
   const isVertical = options.direction === 'vertical'
 
   const slideSize = tvist.engine.slideSizeValue
@@ -136,13 +137,6 @@ export function setStackEffect(
       const tCover = coverStackTranslatePx(progress, slidePosition, translate, slideSize)
       setTranslate2D(isVertical, tCover, '0px', (v) => { tX = v }, (v) => { tY = v })
 
-      // Extra transforms for already-viewed stack (perSlideOffset/Scale/Depth)
-      if (progress < 0) {
-        tZ = perSlideDepth > 0 ? -perSlideDepth * absProgress : 0
-        scale = perSlideScale > 0 ? Math.max(1 - perSlideScale * absProgress, 0.5) : 1
-        rotateZ = rotate ? perSlideRotate * absProgress : 0
-      }
-
       slide.style.zIndex = coverStackZIndex(progress, numSlides)
     } else {
       // UNCOVER: в покое — как cover (стопка). В переходе next/prev — «карты»: накрываем / снимаем.
@@ -151,15 +145,22 @@ export function setStackEffect(
         : coverStackTranslatePx(progress, slidePosition, translate, slideSize)
       setTranslate2D(isVertical, tUncover, '0px', (v) => { tX = v }, (v) => { tY = v })
 
-      if (progress < 0) {
-        tZ = perSlideDepth > 0 ? -perSlideDepth * absProgress : 0
-        scale = perSlideScale > 0 ? Math.max(1 - perSlideScale * absProgress, 0.5) : 1
-        rotateZ = rotate ? perSlideRotate * absProgress : 0
-      }
-
       slide.style.zIndex = uncoverInTransition
         ? uncoverTransitionZIndex(progress, numSlides)
         : coverStackZIndex(progress, numSlides)
+    }
+
+    // Уже просмотренные слайды (progress < 0): глубина, масштаб, поворот, смещение стопки вправо/вниз
+    if (progress < 0) {
+      tZ = perSlideDepth > 0 ? -perSlideDepth * absProgress : 0
+      scale = perSlideScale > 0 ? Math.max(1 - perSlideScale * absProgress, 0.5) : 1
+      rotateZ = rotate ? perSlideRotate * absProgress : 0
+      if (perSlideOffset > 0) {
+        const delta = perSlideOffset * absProgress
+        const px = (s: string) => parseFloat(s) || 0
+        tX = `${px(tX) + delta}px`
+        tY = `${px(tY) + delta}px`
+      }
     }
 
     slide.style.transform = `translate3d(${tX}, ${tY}, ${tZ}px) rotateZ(${rotateZ}deg) scale(${scale})`
