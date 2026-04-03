@@ -1,7 +1,7 @@
 <template>
   <ExampleCard title="Stack Effect — горизонтальный" description="Новый слайд выезжает поверх предыдущего">
     <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist-v1">
+      <div ref="sliderEl" class="tvist-v1 tvist-v1--horizontal-stack">
         <div class="tvist-v1__track">
           <div class="tvist-v1__container">
             <div class="tvist-v1__slide">1</div>
@@ -56,16 +56,23 @@
     </div>
   </ExampleCard>
 
-  <ExampleCard title="Stack Effect — вертикальный" description="direction: 'vertical'">
-    <div class="demo-wrapper">
-      <div ref="sliderVEl" class="tvist-v1 tvist-v1--vertical-demo">
+  <ExampleCard
+    title="Stack Effect — вертикальный uncover"
+    description="direction: 'vertical', mode: 'uncover', peek.top — сверху виден край стопки (как peek.left у горизонтали)"
+  >
+    <div class="demo-wrapper demo-wrapper--vertical-uncover">
+      <div ref="sliderVEl" class="tvist-v1 tvist-v1--vertical-uncover">
         <div class="tvist-v1__track">
           <div class="tvist-v1__container">
-            <div class="tvist-v1__slide">1</div>
-            <div class="tvist-v1__slide">2</div>
-            <div class="tvist-v1__slide">3</div>
-            <div class="tvist-v1__slide">4</div>
-            <div class="tvist-v1__slide">5</div>
+            <div
+              v-for="(item, i) in verticalItems"
+              :key="i"
+              class="tvist-v1__slide v-uncover-slide"
+              :style="{ '--v-hue': item.hue }"
+            >
+              <span class="v-uncover-slide__num">{{ i + 1 }}</span>
+              <span class="v-uncover-slide__label">{{ item.label }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -74,12 +81,16 @@
         <button @click="sliderV?.prev()">↑ Назад</button>
         <button @click="sliderV?.next()">Вперёд ↓</button>
       </div>
+
+      <p class="vertical-uncover-hint">
+        Базовый вертикальный stack без peek — тот же <code>direction: 'vertical'</code>, что в блоке кода ниже на странице.
+      </p>
     </div>
   </ExampleCard>
 
   <ExampleCard title="Stack Effect + Scrollbar" description="С полосой прокрутки">
     <div class="demo-wrapper">
-      <div ref="sliderSEl" class="tvist-v1" style="position: relative;">
+      <div ref="sliderSEl" class="tvist-v1 tvist-v1--horizontal-stack" style="position: relative;">
         <div class="tvist-v1__track">
           <div class="tvist-v1__container">
             <div class="tvist-v1__slide">1</div>
@@ -118,6 +129,14 @@ const perSlideOffset = ref(0)
 const perSlideScale = ref(0)
 const perSlideDepth = ref(0)
 
+const verticalItems = [
+  { label: 'Верх', hue: 210 },
+  { label: 'Второй', hue: 175 },
+  { label: 'Третий', hue: 265 },
+  { label: 'Четвёртый', hue: 32 },
+  { label: 'Низ', hue: 340 },
+]
+
 function build() {
   if (!sliderEl.value) return
   slider.value = new Tvist(sliderEl.value, {
@@ -137,9 +156,18 @@ function build() {
 
 function buildVertical() {
   if (!sliderVEl.value) return
+  sliderV.value?.destroy()
   sliderV.value = new Tvist(sliderVEl.value, {
-    effect: 'stack',
     direction: 'vertical',
+    effect: 'stack',
+    stackEffect: {
+      mode: 'uncover',
+      slideShadows: true,
+      perSlideDepth: 34,
+      perSlideScale: 0.04,
+      rotate: false,
+    },
+    peek: { top: 48 },
     speed: 400,
     loop: true,
   })
@@ -184,23 +212,98 @@ onUnmounted(() => {
 }
 
 .tvist-v1 {
-  height: 360px;
   border-radius: 16px;
   overflow: hidden;
   margin-bottom: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
 }
 
-.tvist-v1--vertical-demo {
-  height: 300px;
+.tvist-v1--horizontal-stack {
+  height: 360px;
 }
 
-.tvist-v1 :deep(.tvist-v1__track),
-.tvist-v1 :deep(.tvist-v1__container) {
+.demo-wrapper--vertical-uncover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tvist-v1--vertical-uncover {
+  width: 100%;
+  max-width: 320px;
+  height: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  background: #e2e8f0;
+}
+
+.tvist-v1--vertical-uncover :deep(.tvist-v1__track),
+.tvist-v1--vertical-uncover :deep(.tvist-v1__container) {
   height: 100%;
 }
 
-.tvist-v1 :deep(.tvist-v1__slide) {
+.tvist-v1--vertical-uncover :deep(.tvist-v1__slide) {
+  height: 100%;
+  padding: 10px 12px 12px;
+  box-sizing: border-box;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  border-radius: 12px;
+}
+
+.v-uncover-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #fff;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(
+    145deg,
+    hsl(var(--v-hue, 210), 62%, 52%) 0%,
+    hsl(var(--v-hue, 210), 55%, 38%) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.v-uncover-slide__num {
+  font-size: 52px;
+  line-height: 1;
+}
+
+.v-uncover-slide__label {
+  font-size: 14px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.vertical-uncover-hint {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #666;
+  text-align: center;
+}
+
+.vertical-uncover-hint code {
+  font-size: 11px;
+  background: #eee;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+.tvist-v1--horizontal-stack :deep(.tvist-v1__track),
+.tvist-v1--horizontal-stack :deep(.tvist-v1__container) {
+  height: 100%;
+}
+
+.tvist-v1--horizontal-stack :deep(.tvist-v1__slide) {
   height: 100%;
   display: flex;
   align-items: center;
@@ -211,11 +314,11 @@ onUnmounted(() => {
   border-radius: 16px;
 }
 
-.tvist-v1 :deep(.tvist-v1__slide[data-tvist-slide-index="0"]) { background: linear-gradient(135deg, #667eea, #764ba2); }
-.tvist-v1 :deep(.tvist-v1__slide[data-tvist-slide-index="1"]) { background: linear-gradient(135deg, #f093fb, #f5576c); }
-.tvist-v1 :deep(.tvist-v1__slide[data-tvist-slide-index="2"]) { background: linear-gradient(135deg, #4facfe, #00f2fe); }
-.tvist-v1 :deep(.tvist-v1__slide[data-tvist-slide-index="3"]) { background: linear-gradient(135deg, #43e97b, #38f9d7); }
-.tvist-v1 :deep(.tvist-v1__slide[data-tvist-slide-index="4"]) { background: linear-gradient(135deg, #fa709a, #fee140); }
+.tvist-v1--horizontal-stack :deep(.tvist-v1__slide[data-tvist-slide-index="0"]) { background: linear-gradient(135deg, #667eea, #764ba2); }
+.tvist-v1--horizontal-stack :deep(.tvist-v1__slide[data-tvist-slide-index="1"]) { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.tvist-v1--horizontal-stack :deep(.tvist-v1__slide[data-tvist-slide-index="2"]) { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.tvist-v1--horizontal-stack :deep(.tvist-v1__slide[data-tvist-slide-index="3"]) { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+.tvist-v1--horizontal-stack :deep(.tvist-v1__slide[data-tvist-slide-index="4"]) { background: linear-gradient(135deg, #fa709a, #fee140); }
 
 .controls {
   display: flex;

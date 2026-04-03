@@ -83,6 +83,8 @@ const slider = new Tvist('.tvist-v1', {
 
 ## Вертикальный режим
 
+Базовый вариант — только направление:
+
 ```javascript
 const slider = new Tvist('.tvist-v1', {
   effect: 'stack',
@@ -92,4 +94,21 @@ const slider = new Tvist('.tvist-v1', {
 })
 ```
 
-Живой пример **вертикального uncover** с `peek.top`: [Stack uncover — вертикально](./stack-vertical-uncover).
+На демо выше второй блок — **вертикальный uncover** с `peek: { top: 48 }` и `stackEffect.mode: 'uncover'`:
+
+```javascript
+const slider = new Tvist(root, {
+  direction: 'vertical',
+  effect: 'stack',
+  stackEffect: {
+    mode: 'uncover',
+    slideShadows: true,
+    perSlideDepth: 34,
+    perSlideScale: 0.04,
+    rotate: false,
+  },
+  peek: { top: 48 },
+  speed: 400,
+  loop: true,
+})
+```

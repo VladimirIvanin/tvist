@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { Tvist } from '@core/Tvist'
-import { TVIST_CLASSES } from '@core/constants'
+import { TVIST_CLASSES, TVIST_CSS_PREFIX } from '@core/constants'
 import { EffectModule } from '@modules/effects/EffectModule'
 import { createSliderFixture } from '../../../fixtures'
 import type { SliderFixture } from '../../../fixtures'
@@ -64,6 +64,33 @@ describe('Stack Effect', () => {
     for (let i = 1; i < slider.slides.length; i++) {
       expect(zActive).toBeGreaterThan(parseInt(slider.slides[i].style.zIndex))
     }
+  })
+
+  it('perSlideOffset сдвигает просмотренные слайды вправо и вниз', () => {
+    const off = 12
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      speed: 0,
+      stackEffect: { perSlideOffset: off },
+    })
+    const ss = slider.engine.slideSizeValue
+    slider.next()
+    // slide[0]: progress = -1 → базовый translateX(-ss), плюс off по X и Y
+    expect(slider.slides[0].style.transform).toContain(
+      `translate3d(-${ss - off}px, ${off}px, 0px)`
+    )
+  })
+
+  it('slideShadows: в слайде создаётся элемент тени', () => {
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      speed: 0,
+      stackEffect: { slideShadows: true },
+    })
+    const shadowClass = `${TVIST_CSS_PREFIX}-slide-shadow`
+    const el = slider.slides[0].querySelector(`.${shadowClass}`)
+    expect(el).toBeInstanceOf(HTMLElement)
+    expect((el as HTMLElement).style.opacity).toBeDefined()
   })
 
   // --- Переход на следующий слайд ---
