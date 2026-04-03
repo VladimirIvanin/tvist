@@ -137,6 +137,17 @@ export class DragModule extends Module {
     );
   }
 
+  /**
+   * Нет отдельной «страницы» прокрутки (все слайды помещаются в perPage) —
+   * loopFix на драге не вызываем (и избегаем лишних прыжков).
+   * При 2 слайдах и perPage 1 здесь false — перестановка нужна уже во время драга.
+   */
+  private shouldSkipLoopDomReorderDuringDrag(): boolean {
+    const slidesCount = this.tvist.slides.length;
+    const perPage = this.options.perPage ?? 1;
+    return slidesCount <= perPage;
+  }
+
   private updateCachedRefs(): void {
     this.loopModuleRef = this.tvist.getModule('loop') as typeof this.loopModuleRef;
     this.isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined;
@@ -735,10 +746,7 @@ export class DragModule extends Module {
       return;
     }
 
-    const slidesCount = this.tvist.slides.length;
-    const perPage = this.options.perPage ?? 1;
-
-    if (slidesCount <= perPage + 1) {
+    if (this.shouldSkipLoopDomReorderDuringDrag()) {
       this.isFirstMove = false;
       return;
     }
@@ -904,13 +912,10 @@ export class DragModule extends Module {
 
     const viewportSize = this.tvist.engine.containerSizeValue;
 
-    // Для обычного loop (не marquee) пропускаем маленькие карусели —
-    // перестановки дают только визуальные прыжки.
-    if (!this.isMarqueeActive) {
-      const slidesCount = this.tvist.slides.length;
-      const perPage = this.options.perPage ?? 1;
-      if (slidesCount <= perPage + 1) return;
-    }
+    // Нет «страниц» для прокрутки (все слайды в одном perPage) — перестановки не нужны.
+    // Раньше отсекали slidesCount <= perPage + 1, из‑за чего при 2 слайдах и perPage 1
+    // loopFix вызывался только после mouseup.
+    if (!this.isMarqueeActive && this.shouldSkipLoopDomReorderDuringDrag()) return;
 
     const vpStart = -currentPosition;
     const vpEnd = vpStart + viewportSize;
@@ -1126,15 +1131,16 @@ export class DragModule extends Module {
     const isFreeSnap = this.options.drag === 'free' && this.options.freeSnap;
 
     if (isFreeSnap) {
-      this.snapToNearestSlide();
+      this.snapToNearestSlide(_velocity);
     } else {
       this.snapWithThreshold();
     }
   }
 
-  private snapToNearestSlide(): void {
+  private snapToNearestSlide(endVelocity: number): void {
     const { engine, slides } = this.tvist;
     const currentPosition = engine.location.get();
+    const currentIndex = engine.index.get();
 
     let nearestIndex = 0;
     let minDistance = Infinity;
@@ -1153,10 +1159,11 @@ export class DragModule extends Module {
       currentPosition,
       nearestIndex,
       minDistance,
-      activeIndex: engine.index.get(),
+      activeIndex: currentIndex,
       realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
     });
 
+    this.applyLoopScrollDirectionHintForFreeSnap(currentIndex, nearestIndex, endVelocity);
     engine.scrollTo(nearestIndex);
   }
 
@@ -1187,12 +1194,9 @@ export class DragModule extends Module {
       slidesMoved = dragDistance > 0 ? -1 : 1;
     }
 
-    const targetIndex = startIndex + slidesMoved;
-
     dragLog('snapWithThreshold', {
       startIndex,
       startIndexFromEngine: this.startIndex,
-      targetIndex,
       slidesMoved,
       dragDistance,
       currentLocation: engine.location.get(),
@@ -1203,8 +1207,42 @@ export class DragModule extends Module {
       rewind: this.options.rewind,
     });
 
-    dragLog('>>> CALLING engine.scrollTo', targetIndex);
-    engine.scrollTo(targetIndex);
+    if (this.isLoopEnabled) {
+      // В loop-режиме DOM переставляется во время драга, поэтому абсолютный
+      // targetIndex = startIndex + slidesMoved ненадёжен (приводил к rewind-поведению).
+      // scrollBy сам выставляет _scrollDirection по знаку delta.
+      dragLog('>>> CALLING engine.scrollBy', slidesMoved);
+      engine.scrollBy(slidesMoved);
+    } else {
+      const targetIndex = startIndex + slidesMoved;
+      dragLog('>>> CALLING engine.scrollTo', targetIndex);
+      engine.scrollTo(targetIndex);
+    }
+  }
+
+  /**
+   * freeSnap + loop: направление по скорости жеста; при почти нулевой — по кратчайшему шагу по кругу.
+   * Используется только в режиме freeSnap (drag: 'free' + freeSnap: true).
+   */
+  private applyLoopScrollDirectionHintForFreeSnap(
+    currentIndex: number,
+    nearestIndex: number,
+    velocity: number
+  ): void {
+    if (!this.isLoopEnabled || currentIndex === nearestIndex) return;
+
+    if (Math.abs(velocity) >= 0.05) {
+      this.tvist._scrollDirection = velocity > 0 ? 'prev' : 'next';
+      return;
+    }
+
+    const len = this.tvist.slides.length;
+    if (len <= 1) return;
+
+    const forward = (nearestIndex - currentIndex + len) % len;
+    const backward = (currentIndex - nearestIndex + len) % len;
+    if (forward < backward) this.tvist._scrollDirection = 'next';
+    else if (backward < forward) this.tvist._scrollDirection = 'prev';
   }
 
   private stopMomentum(): void {
