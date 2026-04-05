@@ -671,12 +671,43 @@ export interface TvistOptions {
     rotate?: boolean
     /** Угол поворота на слайд (градусы). @default 2 */
     perSlideRotate?: number
-    /** Смещение стопки вниз/вправо на слайд (px). 0 — без смещения. @default 0 */
+    /**
+     * Смещение стопки на слайд (px). При `stackLayout: 'pile'` — только поперёк оси прокрутки
+     * (вертикаль: вправо, горизонталь: вниз), чтобы колода не разъезжалась вдоль рельса.
+     * @default 0
+     */
     perSlideOffset?: number
     /** Уменьшение масштаба на слайд. 0 — без масштабирования. @default 0 */
     perSlideScale?: number
     /** Смещение по Z на слайд (px). 0 — без глубины. @default 0 */
     perSlideDepth?: number
+    /**
+     * Раскладка «ожидающих» слайдов (`progress > 0`) в покое.
+     * - `'track'` — каждый слайд на своей позиции вдоль оси (`-slidePosition`), как рельс.
+     * - `'pile'` — ожидающие (`progress > 0`) делят с активным текущий `translate` по оси; на root
+     *   вешается модификатор `--stack-pile`: слайды `position: absolute` в контейнере (иначе остаются
+     *   в потоке и идут столбиком). Веер: `rotate` / `perSlideOffset` / `perSlideScale` / `perSlideDepth`.
+     * @default 'track'
+     */
+    stackLayout?: 'track' | 'pile'
+    /**
+     * Внутренние отступы трека (px), как у `cubeEffect.viewportPadding`: запас под `rotate` и тени,
+     * без использования `peek`.
+     * @default 0 (не задаётся)
+     */
+    viewportPadding?: number
+    /**
+     * Масштаб только для расчёта z-index: `progress / zIndexProgressScale`.
+     * Значения меньше 1 дают более раннюю перестановку слоёв (как в Swiper Cards).
+     * @default 1
+     */
+    zIndexProgressScale?: number
+    /**
+     * Доля визуального смещения слайдов, которые следуют за `translate` движка (`cover` в переходе,
+     * `uncover` — слой с `progress > 0`). Меньше 1 — короткий «снос» карты без полного хода по оси.
+     * @default 1
+     */
+    slideTravelRatio?: number
   }
 
   /**
