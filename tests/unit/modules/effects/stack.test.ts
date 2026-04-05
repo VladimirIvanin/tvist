@@ -32,6 +32,21 @@ describe('Stack Effect', () => {
     expect(slider.root.classList.contains(TVIST_CLASSES.stack)).toBe(true)
   })
 
+  it('stackLayout: pile — класс --stack-pile и контейнер на весь track', () => {
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      stackEffect: { stackLayout: 'pile' },
+    })
+    expect(fixture.root.classList.contains(TVIST_CLASSES.stackPile)).toBe(true)
+    expect(slider.container.style.width).toBe('100%')
+    expect(slider.container.style.height).toBe('100%')
+  })
+
+  it('stack без pile — нет класса --stack-pile', () => {
+    slider = new Tvist(fixture.root, { effect: 'stack' })
+    expect(fixture.root.classList.contains(TVIST_CLASSES.stackPile)).toBe(false)
+  })
+
   it('должен принудительно устанавливать perPage: 1', () => {
     slider = new Tvist(fixture.root, { effect: 'stack', perPage: 3 })
     expect(slider.options.perPage).toBe(1)
@@ -56,6 +71,117 @@ describe('Stack Effect', () => {
     expect(slider.slides[1].style.transform).toContain(`translate3d(-${ss}px`)
     // slide[2]: slidePosition=2000 → translateX(-2000px)
     expect(slider.slides[2].style.transform).toContain(`translate3d(-${ss * 2}px`)
+  })
+
+  it('stackLayout: pile — ожидающие на том же translate, что активный (колода в одном слоте)', () => {
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      speed: 0,
+      stackEffect: { stackLayout: 'pile' },
+    })
+    expect(slider.slides[1].style.transform).toContain('translate3d(0px, 0px, 0px)')
+    expect(slider.slides[2].style.transform).toContain('translate3d(0px, 0px, 0px)')
+    expect(slider.slides[3].style.transform).toContain('translate3d(0px, 0px, 0px)')
+  })
+
+  it('stackLayout: pile + rotate — ожидающие слайды с поворотом (веер колоды)', () => {
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      speed: 0,
+      stackEffect: { stackLayout: 'pile', rotate: true, perSlideRotate: 2 },
+    })
+    // slide[2]: progress = 2 → 2° * 2 = 4°
+    expect(slider.slides[2].style.transform).toContain('rotateZ(4')
+  })
+
+  it('stackLayout: pile — после next() ось прокрутки локально 0 (без глобального translate)', () => {
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      speed: 0,
+      stackEffect: { stackLayout: 'pile' },
+    })
+    slider.next()
+    expect(slider.slides[slider.activeIndex].style.transform).toContain('translate3d(0px, 0px, 0px)')
+    expect(slider.slides[2].style.transform).toContain('translate3d(0px, 0px, 0px)')
+    expect(slider.slides[3].style.transform).toContain('translate3d(0px, 0px, 0px)')
+  })
+
+  it('pile + perSlideOffset (горизонталь): активный и ожидающие на одном X; просмотренные на −slideSize', () => {
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      speed: 0,
+      loop: true,
+      stackEffect: { stackLayout: 'pile', perSlideOffset: 8, rotate: false },
+    })
+    slider.next()
+    const ss = slider.engine.slideSizeValue
+    const parseTX = (tf: string) => {
+      const m = tf.match(/translate3d\((-?[\d.]+)px/)
+      return m ? parseFloat(m[1]) : NaN
+    }
+    const refX = parseTX(slider.slides[slider.activeIndex].style.transform)
+    slider.slides.forEach((slide, i) => {
+      const x = parseTX(slide.style.transform)
+      if (i < slider.activeIndex) {
+        expect(Math.abs(x - (-ss))).toBeLessThan(0.5)
+      } else {
+        expect(Math.abs(x - refX)).toBeLessThan(0.5)
+      }
+    })
+  })
+
+  it('viewportPadding задаёт padding и box-sizing на track', () => {
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      speed: 0,
+      stackEffect: { viewportPadding: 16 },
+    })
+    expect(fixture.track.style.paddingTop).toBe('16px')
+    expect(fixture.track.style.paddingLeft).toBe('16px')
+    expect(fixture.track.style.boxSizing).toBe('border-box')
+  })
+
+  it('destroy() снимает padding track при viewportPadding', () => {
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      speed: 0,
+      stackEffect: { viewportPadding: 12 },
+    })
+    slider.destroy()
+    expect(fixture.track.style.padding).toBe('')
+    slider = null as unknown as Tvist
+  })
+
+  it('slideTravelRatio < 1 — смещение переходящего слайда короче полного хода', () => {
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      speed: 0,
+      stackEffect: { slideTravelRatio: 0.5 },
+    })
+    const engine = slider.engine as { location: { set: (v: number) => void } }
+    engine.location.set(-500)
+    slider.emit('setTranslate', slider, -500)
+    expect(slider.slides[0].style.transform).toContain('translate3d(-250px, 0px, 0px)')
+  })
+
+  it('zIndexProgressScale < 1 — z-index уходит вниз раньше, чем при scale 1', () => {
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      speed: 0,
+      stackEffect: { zIndexProgressScale: 0.2 },
+    })
+    const engine = slider.engine as { location: { set: (v: number) => void } }
+    engine.location.set(-200)
+    slider.emit('setTranslate', slider, -200)
+    expect(slider.slides[0].style.zIndex).toBe('0')
+  })
+
+  it('по умолчанию при слабом translate активный слайд сохраняет верхний z-index', () => {
+    slider = new Tvist(fixture.root, { effect: 'stack', speed: 0 })
+    const engine = slider.engine as { location: { set: (v: number) => void } }
+    engine.location.set(-200)
+    slider.emit('setTranslate', slider, -200)
+    expect(parseInt(slider.slides[0].style.zIndex, 10)).toBeGreaterThan(0)
   })
 
   it('активный слайд имеет наибольший z-index', () => {
@@ -221,6 +347,19 @@ describe('Stack Effect', () => {
     slider = null as unknown as Tvist
   })
 
+  it('destroy() снимает --stack-pile и размеры контейнера', () => {
+    slider = new Tvist(fixture.root, {
+      effect: 'stack',
+      speed: 0,
+      stackEffect: { stackLayout: 'pile' },
+    })
+    slider.destroy()
+    expect(fixture.root.classList.contains(TVIST_CLASSES.stackPile)).toBe(false)
+    expect(fixture.container.style.width).toBe('')
+    expect(fixture.container.style.height).toBe('')
+    slider = null as unknown as Tvist
+  })
+
   // --- Вертикальный режим ---
 
   describe('вертикальный режим', () => {
@@ -255,6 +394,458 @@ describe('Stack Effect', () => {
       vSlider.next()
       expect(vSlider.activeIndex).toBe(1)
       expect(vSlider.slides[1].style.transform).toContain(`translate3d(0px, -${ss}px, 0px)`)
+    })
+
+    /** Регрессия: pile + absolute — не тащить глобальный scroll в transform (было translateY(-slideSize)). */
+    it('pile + vertical: после next активный без смещения по оси (0, 0 в локали вьюпорта)', () => {
+      vSlider = new Tvist(vFixture.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        stackEffect: { stackLayout: 'pile', mode: 'uncover' },
+      })
+      vSlider.next()
+      expect(vSlider.slides[vSlider.activeIndex].style.transform).toContain('translate3d(0px, 0px, 0px)')
+    })
+
+    /**
+     * Регрессия: первый кадр next (translate=0, active уже 1) — offsetNorm давал progress=1 и полный rotate;
+     * веер на активном наращиваем по доле анимации (pileDecorAnimT), иначе «падение» в начале.
+     */
+    it('pile + uncover + rotate: кадр translate=0 при анимации на слайд 1 — активный rotateZ(0)', () => {
+      const local = createSliderFixture({ slidesCount: 4, width: 320, height: 400 })
+      const s = new Tvist(local.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        loop: true,
+        stackEffect: {
+          mode: 'uncover',
+          stackLayout: 'pile',
+          rotate: true,
+          perSlideRotate: 2,
+        },
+      })
+      const ss = s.engine.slideSizeValue
+      const eng = s.engine as unknown as {
+        index: { set: (v: number) => void }
+        target: { set: (v: number) => void }
+        location: { set: (v: number) => void }
+      }
+      eng.index.set(1)
+      eng.target.set(-ss)
+      eng.location.set(0)
+      vi.spyOn(s.engine.animator, 'isAnimating').mockReturnValue(true)
+      s.emit('setTranslate', s, 0)
+      expect(s.slides[1].style.transform).toContain('rotateZ(0deg)')
+      vi.restoreAllMocks()
+      s.destroy()
+      local.cleanup()
+    })
+
+    /**
+     * Регрессия: perSlideOffset только по X; по Y активный и стопка совпадают, просмотренные −slideSize.
+     */
+    it('pile + perSlideOffset + next: один translateY у активного и ожидающих; просмотренные −slideSize', () => {
+      const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
+      const s = new Tvist(local.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        loop: true,
+        stackEffect: {
+          mode: 'uncover',
+          stackLayout: 'pile',
+          perSlideOffset: 8,
+          rotate: true,
+          perSlideRotate: 2,
+        },
+      })
+      s.next()
+      const ss = s.engine.slideSizeValue
+      const parseTY = (tf: string) => {
+        const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
+        return m ? parseFloat(m[1]) : NaN
+      }
+      const refY = parseTY(s.slides[s.activeIndex].style.transform)
+      s.slides.forEach((slide, i) => {
+        const y = parseTY(slide.style.transform)
+        if (i < s.activeIndex) {
+          expect(Math.abs(y - (-ss))).toBeLessThan(0.5)
+        } else {
+          expect(Math.abs(y - refY)).toBeLessThan(0.5)
+        }
+      })
+      s.destroy()
+      local.cleanup()
+    })
+
+    /** Регрессия: rebase(rest) + progress<=-1 давали +slideSize по Y («все уезжают вниз»). */
+    it('pile + uncover: после двух next ни у одного слайда translateY > 0', () => {
+      const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
+      const s = new Tvist(local.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        loop: true,
+        stackEffect: {
+          mode: 'uncover',
+          stackLayout: 'pile',
+          perSlideOffset: 8,
+          rotate: true,
+          perSlideRotate: 2,
+        },
+      })
+      s.next()
+      s.next()
+      const parseTY = (tf: string) => {
+        const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
+        return m ? parseFloat(m[1]) : NaN
+      }
+      s.slides.forEach((slide) => {
+        expect(parseTY(slide.style.transform)).toBeLessThanOrEqual(0)
+      })
+      s.destroy()
+      local.cleanup()
+    })
+
+    /**
+     * Позиции: при pile раньше все progress≤−1 давали один rawAlong — после rebase два просмотренных
+     * сливались в translateY −slideSize (как в vertical-uncover в доке). Нужен каскад по глубине.
+     */
+    it('pile + uncover: после двух next просмотренные разведены по Y (каскад −2ss и −ss)', () => {
+      const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
+      const s = new Tvist(local.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        loop: true,
+        stackEffect: {
+          mode: 'uncover',
+          stackLayout: 'pile',
+          perSlideOffset: 8,
+          rotate: true,
+          perSlideRotate: 2,
+        },
+      })
+      s.next()
+      s.next()
+      const ss = s.engine.slideSizeValue
+      const parseTY = (tf: string) => {
+        const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
+        return m ? parseFloat(m[1]) : NaN
+      }
+      const y0 = parseTY(s.slides[0].style.transform)
+      const y1 = parseTY(s.slides[1].style.transform)
+      expect(y0).toBeLessThan(y1 - ss * 0.5)
+      expect(y1).toBeCloseTo(-ss, 0)
+      expect(y0).toBeCloseTo(-2 * ss, 0)
+      s.destroy()
+      local.cleanup()
+    })
+
+    /**
+     * Анимация: второй next (active уже 2, translate между −ss и −2ss) — rotate на активном
+     * должен идти по pileDecorAnimT, а не от полного progress=1 (иначе «рывок» в начале шага).
+     */
+    it('pile + uncover + rotate: середина анимации 1→2 — активный rotateZ ≈ perSlideRotate * доля пути', () => {
+      const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
+      const s = new Tvist(local.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        loop: true,
+        stackEffect: {
+          mode: 'uncover',
+          stackLayout: 'pile',
+          rotate: true,
+          perSlideRotate: 2,
+        },
+      })
+      s.next()
+      const ss = s.engine.slideSizeValue
+      expect(s.activeIndex).toBe(1)
+      const eng = s.engine as unknown as {
+        index: { set: (v: number) => void }
+        target: { set: (v: number) => void }
+        location: { set: (v: number) => void }
+      }
+      eng.index.set(2)
+      eng.target.set(-ss * 2)
+      const translateMid = -ss * 1.375
+      eng.location.set(translateMid)
+      vi.spyOn(s.engine.animator, 'isAnimating').mockReturnValue(true)
+      s.emit('setTranslate', s, translateMid)
+      const parseRZ = (tf: string) => {
+        const m = tf.match(/rotateZ\(([-\d.eE]+)deg\)/)
+        return m ? parseFloat(m[1]) : NaN
+      }
+      const t = (translateMid - (-ss * 2 + ss)) / (-ss)
+      expect(t).toBeCloseTo(0.375, 5)
+      const expectDeg = 2 * t
+      expect(parseRZ(s.slides[2].style.transform)).toBeCloseTo(expectDeg, 1)
+      vi.restoreAllMocks()
+      s.destroy()
+      local.cleanup()
+    })
+
+    /**
+     * Локализация бага из доки: у слайда 0 getScrollPosition=0 — «сырой translate» совпадал с формулой
+     * translate−rest; у слайда 1 rest=−ss — нужен tY = translate−rest(1), иначе шаг 1→2 «улетает».
+     */
+    it('pile + uncover: середина 1→2 — уходящий слайд[1].tY = translate − rest(1)', () => {
+      const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
+      const s = new Tvist(local.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        loop: true,
+        stackEffect: {
+          mode: 'uncover',
+          stackLayout: 'pile',
+          perSlideOffset: 8,
+        },
+      })
+      s.next()
+      const ss = s.engine.slideSizeValue
+      const eng = s.engine as unknown as {
+        index: { set: (v: number) => void }
+        target: { set: (v: number) => void }
+        location: { set: (v: number) => void }
+      }
+      eng.index.set(2)
+      eng.target.set(-ss * 2)
+      const tr = -Math.round(ss * 1.35)
+      eng.location.set(tr)
+      vi.spyOn(s.engine.animator, 'isAnimating').mockReturnValue(true)
+      s.emit('setTranslate', s, tr)
+      const parseTY = (tf: string) => {
+        const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
+        return m ? parseFloat(m[1]) : NaN
+      }
+      const rest1 = s.engine.getScrollPositionForIndex(1)
+      expect(parseTY(s.slides[1].style.transform)).toBeCloseTo(tr - rest1, 0)
+      vi.restoreAllMocks()
+      s.destroy()
+      local.cleanup()
+    })
+
+    /**
+     * Та же ветка, что в логах: после handoff active=2 при translate=−ss слайд 1 ещё в стопке (tY≈0),
+     * затем по мере translate→−2ss tY монотонно уходит в минус (не залипание на 0).
+     */
+    it('pile + uncover: анимация 1→2 — tY слайда[1] монотонно не растёт', () => {
+      const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
+      const s = new Tvist(local.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        loop: true,
+        stackEffect: { mode: 'uncover', stackLayout: 'pile' },
+      })
+      s.next()
+      const ss = s.engine.slideSizeValue
+      const eng = s.engine as unknown as {
+        index: { set: (v: number) => void }
+        target: { set: (v: number) => void }
+        location: { set: (v: number) => void }
+      }
+      eng.index.set(2)
+      eng.target.set(-ss * 2)
+      vi.spyOn(s.engine.animator, 'isAnimating').mockReturnValue(true)
+      const parseTY = (tf: string) => {
+        const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
+        return m ? parseFloat(m[1]) : NaN
+      }
+      const trs = [-ss, -ss - ss * 0.25, -ss - ss * 0.5, -ss * 2]
+      const ys = trs.map((tr) => {
+        eng.location.set(tr)
+        s.emit('setTranslate', s, tr)
+        return parseTY(s.slides[1].style.transform)
+      })
+      for (let k = 1; k < ys.length; k++) {
+        expect(ys[k]).toBeLessThanOrEqual(ys[k - 1] + 1e-6)
+      }
+      vi.restoreAllMocks()
+      s.destroy()
+      local.cleanup()
+    })
+
+    it('pile + uncover: mid-next (анимация) — translateY не уходит в плюс', () => {
+      const local = createSliderFixture({ slidesCount: 4, width: 320, height: 400 })
+      const s = new Tvist(local.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        stackEffect: {
+          mode: 'uncover',
+          stackLayout: 'pile',
+          perSlideOffset: 8,
+        },
+      })
+      const ss = s.engine.slideSizeValue
+      const eng = s.engine as unknown as {
+        target: { set: (v: number) => void }
+        location: { set: (v: number) => void }
+      }
+      eng.target.set(-ss)
+      eng.location.set(-ss * 0.45)
+      vi.spyOn(s.engine.animator, 'isAnimating').mockReturnValue(true)
+      s.emit('setTranslate', s, -ss * 0.45)
+      const parseTY = (tf: string) => {
+        const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
+        return m ? parseFloat(m[1]) : NaN
+      }
+      s.slides.forEach((slide) => {
+        expect(parseTY(slide.style.transform)).toBeLessThanOrEqual(0)
+      })
+      vi.restoreAllMocks()
+      s.destroy()
+      local.cleanup()
+    })
+
+    /**
+     * Регрессия: movingNext использовал translate > target + ε — за ~0.5px до конца
+     * uncover гас и давал скачок (артефакт). При ratio<1 ветки расходятся на последнем участке.
+     */
+    /**
+     * Регрессия: второй next() поднимает activeIndex до 2, пока translate ещё −slideSize —
+     * без нормализации progress слайд 1 получал pin −slidePosition и прыгал в pile.
+     */
+    it('pile + uncover: кадр «active уже 2, translate ещё −ss» — предыдущий без скачка по Y', () => {
+      const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
+      const s = new Tvist(local.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        loop: true,
+        stackEffect: {
+          mode: 'uncover',
+          stackLayout: 'pile',
+          slideTravelRatio: 0.4,
+        },
+      })
+      s.next()
+      const ss = s.engine.slideSizeValue
+      expect(s.activeIndex).toBe(1)
+      const eng = s.engine as unknown as {
+        index: { set: (v: number) => void }
+        target: { set: (v: number) => void }
+        location: { set: (v: number) => void }
+      }
+      eng.index.set(2)
+      eng.target.set(-ss * 2)
+      eng.location.set(-ss)
+      vi.spyOn(s.engine.animator, 'isAnimating').mockReturnValue(true)
+      s.emit('setTranslate', s, -ss)
+      const parseTY = (tf: string) => {
+        const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
+        return m ? parseFloat(m[1]) : NaN
+      }
+      expect(Math.abs(parseTY(s.slides[1].style.transform))).toBeLessThan(2)
+      vi.restoreAllMocks()
+      s.destroy()
+      local.cleanup()
+    })
+
+    it('pile + uncover + slideTravelRatio<1: у цели анимации при isAnimating ещё uncover (нет скачка tY)', () => {
+      const local = createSliderFixture({ slidesCount: 4, width: 320, height: 400 })
+      const s = new Tvist(local.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        loop: false,
+        stackEffect: {
+          mode: 'uncover',
+          stackLayout: 'pile',
+          slideTravelRatio: 0.4,
+        },
+      })
+      s.next()
+      const ss = s.engine.slideSizeValue
+      expect(s.activeIndex).toBe(1)
+
+      const parseTY = (tf: string) => {
+        const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
+        return m ? parseFloat(m[1]) : NaN
+      }
+
+      const eng = s.engine as unknown as {
+        target: { set: (v: number) => void }
+        location: { set: (v: number) => void }
+      }
+      eng.target.set(-ss)
+      const nearEnd = -ss + 0.35
+      eng.location.set(nearEnd)
+      vi.spyOn(s.engine.animator, 'isAnimating').mockReturnValue(true)
+      s.emit('setTranslate', s, nearEnd)
+      const tyNear = parseTY(s.slides[1].style.transform)
+
+      s.emit('setTranslate', s, -ss)
+      const tyEnd = parseTY(s.slides[1].style.transform)
+
+      expect(Math.abs(tyNear - tyEnd)).toBeLessThan(2)
+      expect(tyNear).toBeLessThan(-0.02)
+
+      vi.restoreAllMocks()
+      s.destroy()
+      local.cleanup()
+    })
+
+    /**
+     * Почему остальные тесты не ловят «прыжок» в начале анимации: при speed: 0 Animator сразу
+     * ставит location в target — нет кадров, где activeIndex уже новый, а translate ещё старый.
+     * Здесь первый тик RAF после next() со слайда 1 → 2: просмотренный слайд[0] остаётся у −slideSize по Y.
+     */
+    it('pile + uncover + speed>0: первый кадр next(1→2) — просмотренный слайд не отрывается от −slideSize по Y', async () => {
+      vi.useFakeTimers({
+        toFake: [
+          'setTimeout',
+          'setInterval',
+          'Date',
+          'requestAnimationFrame',
+          'cancelAnimationFrame',
+        ],
+      })
+      const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
+      const s = new Tvist(local.root, {
+        direction: 'vertical',
+        effect: 'stack',
+        speed: 0,
+        loop: true,
+        stackEffect: {
+          mode: 'uncover',
+          stackLayout: 'pile',
+          perSlideOffset: 8,
+          rotate: true,
+          perSlideRotate: 2,
+        },
+      })
+      try {
+        s.next()
+        const ss = s.engine.slideSizeValue
+        expect(s.activeIndex).toBe(1)
+        const parseTY = (tf: string) => {
+          const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
+          return m ? parseFloat(m[1]) : NaN
+        }
+        const tyPrevAtRest = parseTY(s.slides[0].style.transform)
+        expect(Math.abs(tyPrevAtRest - (-ss))).toBeLessThan(2)
+
+        s.updateOptions({ speed: 400 })
+        s.next()
+        await vi.advanceTimersByTimeAsync(32)
+
+        const locAfterTick = s.engine.location.get()
+        expect(locAfterTick).toBeLessThan(-ss - 0.01)
+
+        const tyPrevFirstFrame = parseTY(s.slides[0].style.transform)
+        expect(Math.abs(tyPrevFirstFrame - (-ss))).toBeLessThan(ss * 0.2)
+      } finally {
+        s.destroy()
+        local.cleanup()
+        vi.useRealTimers()
+      }
     })
   })
 
@@ -331,6 +922,29 @@ describe('Stack Effect', () => {
       expect(slider.slides[1].style.transform).toContain(`translate3d(-${ss}px, 0px, 0px)`)
       expect(slider.slides[0].style.transform).toContain(`translate3d(-${ss}px, 0px, 0px)`)
       expect(slider.slides[2].style.transform).toContain(`translate3d(-${ss * 2}px`)
+    })
+
+    /**
+     * Регрессия (pile/track): на последнем кадре анимации translate === target, isAnimating ещё true —
+     * раньше uncover гас, z-index следующего слайда как у cover («3»), нужен режим карт («7» для 4 слайдов).
+     */
+    it('translate===target и isAnimating — z-index следующего как в uncover-переходе, не как в cover', () => {
+      slider = new Tvist(fixture.root, { effect: 'stack', speed: 0, stackEffect: { mode: 'uncover' } })
+      const ss = slider.engine.slideSizeValue
+      slider.next()
+      expect(slider.activeIndex).toBe(1)
+
+      const engine = slider.engine as any
+      engine.target.set(-ss)
+      engine.location.set(-ss)
+      vi.spyOn(slider.engine.animator, 'isAnimating').mockReturnValue(true)
+      slider.emit('setTranslate', slider, -ss)
+
+      expect(slider.slides[2].style.zIndex).toBe('7')
+
+      vi.restoreAllMocks()
+      slider.emit('setTranslate', slider, -ss)
+      expect(slider.slides[2].style.zIndex).toBe('3')
     })
 
     it('во время next: уходящий закреплён, следующий с translate (target задан)', () => {
