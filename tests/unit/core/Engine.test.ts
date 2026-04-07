@@ -218,6 +218,31 @@ describe('Engine', () => {
     expect(transform).toContain('translate3d')
   })
 
+  it('should round translate by default', () => {
+    const slider = new Tvist(root, {
+      perPage: 1,
+      speed: 0,
+    })
+
+    slider.engine.location.set(-10.6)
+    slider.engine.applyTransform()
+
+    expect(slider.container.style.transform).toContain('translate3d(-11px, 0, 0)')
+  })
+
+  it('should keep fractional translate when roundLengths is false', () => {
+    const slider = new Tvist(root, {
+      perPage: 1,
+      speed: 0,
+      roundLengths: false,
+    })
+
+    slider.engine.location.set(-10.6)
+    slider.engine.applyTransform()
+
+    expect(slider.container.style.transform).toContain('translate3d(-10.6px, 0, 0)')
+  })
+
   it('should handle vertical direction', () => {
     const slider = new Tvist(root, {
       perPage: 1,

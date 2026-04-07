@@ -756,7 +756,8 @@ export class Engine {
    */
   applyTransform(): void {
     const container = this.tvist.container
-    const pos = this.location.get()
+    const rawPos = this.location.get()
+    const pos = this.options.roundLengths === false ? rawPos : Math.round(rawPos)
 
     if (this.options.direction === 'vertical') {
       container.style.transform = `translate3d(0, ${pos}px, 0)`

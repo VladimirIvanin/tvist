@@ -43,6 +43,7 @@ const DEFAULT_OPTIONS: Partial<TvistOptions> = {
   perPage: 1,
   slidesPerGroup: 1,
   gap: 0,
+  roundLengths: true,
   speed: 300,
   direction: 'horizontal',
   drag: true,
@@ -532,12 +533,16 @@ export class Tvist {
       newOptions.breakpoints !== undefined ||
       newOptions.breakpointsBase !== undefined
 
+    const needsTransformReapply = newOptions.roundLengths !== undefined
+
     if (needsRecalculation && this._isEnabled) {
       this.update()
     } else if (needsRecalculation && !this._isEnabled) {
       // Если слайдер выключен — очищаем стили и обновляем внутренний state Engine без DOM
       this.clearSliderStyles()
       this.engine.updateDisabled()
+    } else if (needsTransformReapply && this._isEnabled) {
+      this.engine.applyTransform()
     }
 
     // Уведомляем модули об изменении опций

@@ -362,6 +362,14 @@ export interface TvistOptions {
    * @default 0
    */
   gap?: number
+
+  /**
+   * Округлять translate и размеры до целых пикселей при применении в DOM.
+   * Помогает убрать субпиксельные щели/мыло на некоторых DPR и браузерах.
+   * Аналогично `roundLengths` в Swiper.
+   * @default true
+   */
+  roundLengths?: boolean
   
   /**
    * Peek — отступы, показывающие часть соседних слайдов (чтобы было видно, что есть ещё слайды).

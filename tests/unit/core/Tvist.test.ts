@@ -72,6 +72,7 @@ describe('Tvist', () => {
       expect(slider.options.perPage).toBe(3)
       expect(slider.options.gap).toBe(20)
       expect(slider.options.speed).toBe(300) // default
+      expect(slider.options.roundLengths).toBe(true) // default (как в Swiper)
     })
 
     it('should have version', () => {
