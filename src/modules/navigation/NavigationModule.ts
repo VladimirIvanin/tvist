@@ -168,21 +168,40 @@ export class NavigationModule extends Module {
   }
 
   /**
+   * Атрибут `disabled` в HTML допустим для button/input/select/textarea и др.
+   * Для ссылок и div с классом стрелки он невалиден — опираемся на aria-disabled и класс.
+   */
+  private supportsNativeDisabled(el: HTMLElement): boolean {
+    const t = el.tagName.toLowerCase()
+    return (
+      t === 'button' ||
+      t === 'input' ||
+      t === 'select' ||
+      t === 'textarea' ||
+      t === 'optgroup' ||
+      t === 'option' ||
+      t === 'fieldset'
+    )
+  }
+
+  private isArrowDisabled(arrow: HTMLElement | null): boolean {
+    return arrow?.getAttribute('aria-disabled') === 'true'
+  }
+
+  /**
    * Клик на prev
    */
   private onPrevClick(): void {
-    if (!this.prevButton?.hasAttribute('disabled')) {
-      this.tvist.prev()
-    }
+    if (this.isArrowDisabled(this.prevButton)) return
+    this.tvist.prev()
   }
 
   /**
    * Клик на next
    */
   private onNextClick(): void {
-    if (!this.nextButton?.hasAttribute('disabled')) {
-      this.tvist.next()
-    }
+    if (this.isArrowDisabled(this.nextButton)) return
+    this.tvist.next()
   }
 
   /**
@@ -308,7 +327,11 @@ export class NavigationModule extends Module {
    * Выключить стрелку
    */
   private disableArrow(arrow: HTMLElement, disabledClass: string): void {
-    arrow.setAttribute('disabled', '')
+    if (this.supportsNativeDisabled(arrow)) {
+      arrow.setAttribute('disabled', '')
+    } else {
+      arrow.removeAttribute('disabled')
+    }
     arrow.classList.add(disabledClass)
     arrow.setAttribute('aria-disabled', 'true')
   }

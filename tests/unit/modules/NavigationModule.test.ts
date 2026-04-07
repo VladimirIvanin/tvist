@@ -213,6 +213,37 @@ describe('NavigationModule', () => {
   })
 
   describe('Arrow states', () => {
+    it('should apply disabled class on non-button arrows (aria-disabled, no native disabled)', () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
+          </div>
+          <div role="button" tabindex="0" class="${TVIST_CLASSES.arrowPrev}"></div>
+          <div role="button" tabindex="0" class="${TVIST_CLASSES.arrowNext}"></div>
+        </div>
+      `
+
+      new Tvist(container.querySelector(`.${TVIST_CLASSES.block}`)!, {
+        arrows: true,
+        loop: false
+      })
+
+      const prevArrow = container.querySelector(`.${TVIST_CLASSES.arrowPrev}`)
+      const nextArrow = container.querySelector(`.${TVIST_CLASSES.arrowNext}`)
+
+      expect(prevArrow?.hasAttribute('disabled')).toBe(false)
+      expect(prevArrow?.classList.contains(TVIST_CLASSES.arrowDisabled)).toBe(true)
+      expect(prevArrow?.getAttribute('aria-disabled')).toBe('true')
+
+      expect(nextArrow?.hasAttribute('disabled')).toBe(false)
+      expect(nextArrow?.classList.contains(TVIST_CLASSES.arrowDisabled)).toBe(false)
+    })
+
     it('should disable prev arrow at start without loop', () => {
       container.innerHTML = `
         <div class="${TVIST_CLASSES.block}">
