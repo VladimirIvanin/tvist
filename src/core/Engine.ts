@@ -707,10 +707,17 @@ export class Engine {
         },
         easingFn
       )
-    } else if (!ctx.indexChanged) {
-      // Позиция уже корректна; microtask чтобы событие было асинхронным как после анимации
+    } else {
+      // Позиция уже корректна (needsAnimation=false); microtask чтобы событие было
+      // асинхронным как после анимации. Эмитируем transitionEnd всегда, slideChangeEnd
+      // — только если индекс изменился (например, drag довёл до граничной позиции).
       void Promise.resolve().then(() => {
         this.tvist.emit('transitionEnd', ctx.eventIndex)
+
+        if (ctx.indexChanged) {
+          this.tvist.emit('slideChangeEnd', ctx.eventIndex)
+          this.emitReachEdge(ctx, endIndex)
+        }
       })
     }
   }
