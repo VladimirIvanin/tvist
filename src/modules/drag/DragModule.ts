@@ -137,6 +137,10 @@ export class DragModule extends Module {
     );
   }
 
+  private get isLoopWithClonesEnabled(): boolean {
+    return typeof this.options.loop === 'object' && this.options.loop.withClones === true;
+  }
+
   /**
    * Нет отдельной «страницы» прокрутки (все слайды помещаются в perPage) —
    * loopFix на драге не вызываем (и избегаем лишних прыжков).
@@ -636,7 +640,18 @@ export class DragModule extends Module {
     const moveDistance = Math.hypot(deltaX, deltaY);
 
     if (!this.isDragging) {
-      if (moveDistance <= this.MIN_DRAG_DISTANCE) return;
+      const canStartWithoutThresholdWhenInterruptingAnimation =
+        this.wasAnimating && (!this.isLoopEnabled || this.isLoopWithClonesEnabled);
+
+      // Если пользователь прервал текущий snap-аним, перехватываем drag сразу
+      // (без стандартного порога), чтобы не было "тупняка" при быстром re-drag.
+      // Но для loop без клонов сохраняем порог: ранний loopFix может сдвинуть
+      // порядок DOM слишком рано и визуально "прятать" слайд.
+      if (
+        !canStartWithoutThresholdWhenInterruptingAnimation &&
+        moveDistance <= this.MIN_DRAG_DISTANCE
+      )
+        return;
 
       const started = this.tryStartDrag(e, point, deltaX, deltaY, isHorizontal, now);
       if (!started) return;
@@ -740,6 +755,15 @@ export class DragModule extends Module {
     point: { x: number; y: number }
   ): void {
     if (!this.isLoopEnabled || !this.isFirstMove) return;
+
+    // При прерывании активной snap-анимации ранний first-move loopFix в режиме
+    // loop без клонов может переставить DOM раньше нужного момента, из-за чего
+    // визуально "исчезает" крайний слайд. В этом сценарии даём coverage-fix
+    // сработать позже, только при реальной необходимости.
+    if (this.wasAnimating && !this.isLoopWithClonesEnabled) {
+      this.isFirstMove = false;
+      return;
+    }
 
     if (this.isMarqueeActive) {
       this.isFirstMove = false;

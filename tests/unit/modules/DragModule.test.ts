@@ -429,6 +429,101 @@ describe('DragModule', () => {
       const expectedPosition = slider.engine.getScrollPositionForIndex(1)
       expect(Math.abs(finalPosition - expectedPosition)).toBeLessThan(1)
     })
+
+    it('должен начинать drag без порога при прерывании snap-анимации', async () => {
+      slider.updateOptions({ speed: 500 })
+
+      slider.scrollTo(1)
+      await waitForAnimation(100)
+
+      const dragStartSpy = vi.fn()
+      slider.on('dragStart', dragStartSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+
+      // Меньше MIN_DRAG_DISTANCE (=5), но во время прерванной анимации
+      // drag должен стартовать сразу.
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 197, clientY: 100 })
+      )
+      expect(dragStartSpy).toHaveBeenCalledOnce()
+
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 180, clientY: 100 })
+      )
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 180, clientY: 100 })
+      )
+    })
+
+    it('не должен стартовать drag без порога в loop без клонов при прерывании анимации', async () => {
+      slider.destroy()
+      slider = new Tvist(fixture.root, {
+        drag: true,
+        speed: 500,
+        loop: true, // loop без клонов
+      })
+
+      slider.scrollTo(1)
+      await waitForAnimation(100)
+
+      const dragStartSpy = vi.fn()
+      slider.on('dragStart', dragStartSpy)
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+
+      // Меньше порога: в loop без клонов drag не стартует.
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 197, clientY: 100 })
+      )
+      expect(dragStartSpy).not.toHaveBeenCalled()
+
+      // После нормального смещения drag должен стартовать.
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 180, clientY: 100 })
+      )
+      expect(dragStartSpy).toHaveBeenCalledOnce()
+
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 180, clientY: 100 })
+      )
+    })
+
+    it('в loop без клонов не должен переставлять DOM на первом move при прерывании анимации', async () => {
+      slider.destroy()
+      slider = new Tvist(fixture.root, {
+        drag: true,
+        speed: 500,
+        loop: true,
+        perPage: 1,
+      })
+
+      slider.scrollTo(1)
+      await waitForAnimation(100)
+
+      const orderBefore = [...slider.slides].map((s) => s.getAttribute('data-tvist-slide-index'))
+
+      fixture.container.dispatchEvent(
+        createMouseEvent('mousedown', { clientX: 200, clientY: 100 })
+      )
+      document.dispatchEvent(
+        createMouseEvent('mousemove', { clientX: 180, clientY: 100 })
+      )
+
+      const orderAfterFirstMove = [...slider.slides].map((s) =>
+        s.getAttribute('data-tvist-slide-index')
+      )
+      expect(orderAfterFirstMove).toEqual(orderBefore)
+
+      document.dispatchEvent(
+        createMouseEvent('mouseup', { clientX: 180, clientY: 100 })
+      )
+    })
+
     it('НЕ должен останавливать анимацию при коротком клике', async () => {
       // Увеличиваем скорость анимации для теста
       slider.updateOptions({ speed: 500 })
