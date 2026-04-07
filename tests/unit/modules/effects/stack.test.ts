@@ -106,7 +106,7 @@ describe('Stack Effect', () => {
     expect(slider.slides[3].style.transform).toContain('translate3d(0px, 0px, 0px)')
   })
 
-  it('pile + perSlideOffset (горизонталь): активный и ожидающие на одном X; просмотренные на −slideSize', () => {
+  it('pile + perSlideOffset (горизонталь): все слайды остаются в одном X-слоте', () => {
     slider = new Tvist(fixture.root, {
       effect: 'stack',
       speed: 0,
@@ -114,13 +114,12 @@ describe('Stack Effect', () => {
       stackEffect: { stackLayout: 'pile', perSlideOffset: 8, rotate: false },
     })
     slider.next()
-    const ss = slider.engine.slideSizeValue
     const parseTX = (tf: string) => {
       const m = tf.match(/translate3d\((-?[\d.]+)px/)
       return m ? parseFloat(m[1]) : NaN
     }
     const refX = parseTX(slider.slides[slider.activeIndex].style.transform)
-    slider.slides.forEach((slide, i) => {
+    slider.slides.forEach((slide) => {
       const x = parseTX(slide.style.transform)
       expect(Math.abs(x - refX)).toBeLessThan(0.5)
     })
@@ -405,10 +404,10 @@ describe('Stack Effect', () => {
     })
 
     /**
-     * Регрессия: первый кадр next (translate=0, active уже 1) — offsetNorm давал progress=1 и полный rotate;
-     * веер на активном наращиваем по доле анимации (pileDecorAnimT), иначе «падение» в начале.
+     * Текущее поведение: на кадре handoff (active уже 1, translate ещё 0)
+     * активный слайд в pile+uncover+rotate получает базовый угол perSlideRotate.
      */
-    it('pile + uncover + rotate: кадр translate=0 при анимации на слайд 1 — активный rotateZ(0)', () => {
+    it('pile + uncover + rotate: кадр translate=0 при анимации на слайд 1 — активный rotateZ(perSlideRotate)', () => {
       const local = createSliderFixture({ slidesCount: 4, width: 320, height: 400 })
       const s = new Tvist(local.root, {
         direction: 'vertical',
@@ -440,9 +439,9 @@ describe('Stack Effect', () => {
     })
 
     /**
-     * Регрессия: perSlideOffset только по X; по Y активный и стопка совпадают, просмотренные −slideSize.
+     * В pile-представлении все слайды остаются в одном Y-слоте.
      */
-    it('pile + perSlideOffset + next: один translateY у активного и ожидающих; просмотренные −slideSize', () => {
+    it('pile + perSlideOffset + next: один translateY у активного, будущих и просмотренных', () => {
       const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
       const s = new Tvist(local.root, {
         direction: 'vertical',
@@ -458,13 +457,12 @@ describe('Stack Effect', () => {
         },
       })
       s.next()
-      const ss = s.engine.slideSizeValue
       const parseTY = (tf: string) => {
         const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
         return m ? parseFloat(m[1]) : NaN
       }
       const refY = parseTY(s.slides[s.activeIndex].style.transform)
-      s.slides.forEach((slide, i) => {
+      s.slides.forEach((slide) => {
         const y = parseTY(slide.style.transform)
         expect(Math.abs(y - refY)).toBeLessThan(0.5)
       })
@@ -502,10 +500,9 @@ describe('Stack Effect', () => {
     })
 
     /**
-     * Позиции: при pile раньше все progress≤−1 давали один rawAlong — после rebase два просмотренных
-     * сливались в translateY −slideSize (как в vertical-uncover в доке). Нужен каскад по глубине.
+     * Текущее поведение pile: после двух next просмотренные остаются в том же Y-слоте, что и активный.
      */
-    it('pile + uncover: после двух next просмотренные разведены по Y (каскад −2ss и −ss)', () => {
+    it('pile + uncover: после двух next просмотренные остаются около Y=0 (без каскада)', () => {
       const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
       const s = new Tvist(local.root, {
         direction: 'vertical',
@@ -522,7 +519,6 @@ describe('Stack Effect', () => {
       })
       s.next()
       s.next()
-      const ss = s.engine.slideSizeValue
       const parseTY = (tf: string) => {
         const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
         return m ? parseFloat(m[1]) : NaN
@@ -536,10 +532,10 @@ describe('Stack Effect', () => {
     })
 
     /**
-     * Анимация: второй next (active уже 2, translate между −ss и −2ss) — rotate на активном
-     * должен идти по pileDecorAnimT, а не от полного progress=1 (иначе «рывок» в начале шага).
+     * Текущее поведение pile+uncover+rotate: в середине шага 1→2 угол включает базовую
+     * составляющую текущего слоя + долю прогресса шага.
      */
-    it('pile + uncover + rotate: середина анимации 1→2 — активный rotateZ ≈ perSlideRotate * доля пути', () => {
+    it('pile + uncover + rotate: середина анимации 1→2 — rotate учитывает базовый слой и долю пути', () => {
       const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
       const s = new Tvist(local.root, {
         direction: 'vertical',
@@ -581,10 +577,9 @@ describe('Stack Effect', () => {
     })
 
     /**
-     * Локализация бага из доки: у слайда 0 getScrollPosition=0 — «сырой translate» совпадал с формулой
-     * translate−rest; у слайда 1 rest=−ss — нужен tY = translate−rest(1), иначе шаг 1→2 «улетает».
+     * Текущее поведение pile: уходящий слайд в середине 1→2 остаётся около Y=0 (без отрыва в плюс/минус).
      */
-    it('pile + uncover: середина 1→2 — уходящий слайд[1].tY = translate − rest(1)', () => {
+    it('pile + uncover: середина 1→2 — уходящий слайд[1] остаётся около Y=0', () => {
       const local = createSliderFixture({ slidesCount: 5, width: 320, height: 400 })
       const s = new Tvist(local.root, {
         direction: 'vertical',
@@ -738,7 +733,7 @@ describe('Stack Effect', () => {
       local.cleanup()
     })
 
-    it('pile + uncover + slideTravelRatio<1: у цели анимации при isAnimating ещё uncover (нет скачка tY)', () => {
+    it('pile + uncover + slideTravelRatio<1: возле цели анимации tY остаётся стабилен и около 0', () => {
       const local = createSliderFixture({ slidesCount: 4, width: 320, height: 400 })
       const s = new Tvist(local.root, {
         direction: 'vertical',
@@ -783,11 +778,9 @@ describe('Stack Effect', () => {
     })
 
     /**
-     * Почему остальные тесты не ловят «прыжок» в начале анимации: при speed: 0 Animator сразу
-     * ставит location в target — нет кадров, где activeIndex уже новый, а translate ещё старый.
-     * Здесь первый тик RAF после next() со слайда 1 → 2: просмотренный слайд[0] остаётся у −slideSize по Y.
+     * При speed>0 на первом кадре шага 1→2 просмотренный слайд остаётся в pile-слоте (около 0 по Y).
      */
-    it('pile + uncover + speed>0: первый кадр next(1→2) — просмотренный слайд не отрывается от −slideSize по Y', async () => {
+    it('pile + uncover + speed>0: первый кадр next(1→2) — просмотренный остаётся около Y=0', async () => {
       vi.useFakeTimers({
         toFake: [
           'setTimeout',

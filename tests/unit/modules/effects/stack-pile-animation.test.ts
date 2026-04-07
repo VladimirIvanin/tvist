@@ -173,7 +173,7 @@ describe('Stack Effect - Pile Animation Issues', () => {
       expect(Math.abs(ty3After)).toBeLessThan(1)
     })
 
-    it('просмотренные слайды должны быть в стопке (translateY < 0)', () => {
+    it('просмотренные слайды в pile не уходят вниз (translateY <= 0)', () => {
       slider = new Tvist(fixture.root, {
         direction: 'vertical',
         effect: 'stack',
