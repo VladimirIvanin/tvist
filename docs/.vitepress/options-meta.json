@@ -37,6 +37,12 @@
       "description": "Расстояние между слайдами в пикселях"
     },
     {
+      "name": "roundLengths",
+      "type": "boolean",
+      "default": "true",
+      "description": "Округлять translate и размеры до целых пикселей при применении в DOM. Помогает убрать субпиксельные щели/мыло на некоторых DPR и браузерах. Аналогично `roundLengths` в Swiper."
+    },
+    {
       "name": "peek",
       "type": "number | string",
       "default": "undefined",
@@ -80,6 +86,12 @@
       "type": "number",
       "default": "300",
       "description": "Скорость анимации перехода в миллисекундах"
+    },
+    {
+      "name": "navThrottleMs",
+      "type": "number",
+      "default": "0",
+      "description": "Минимальный интервал (мс) между вызовами next()/prev() при отсутствии анимации перехода. Пока идёт анимация (animator), повторные вызовы всё равно игнорируются. Полезно при speed: 0 или при серии программных вызовов."
     },
     {
       "name": "direction",
@@ -402,7 +414,8 @@
         {
           "name": "perSlideOffset",
           "type": "number",
-          "description": ""
+          "default": "0",
+          "description": "Смещение стопки на слайд (px). При `stackLayout: 'pile'` — только поперёк оси прокрутки (вертикаль: вправо, горизонталь: вниз), чтобы колода не разъезжалась вдоль рельса."
         },
         {
           "name": "perSlideScale",
@@ -413,6 +426,30 @@
           "name": "perSlideDepth",
           "type": "number",
           "description": ""
+        },
+        {
+          "name": "stackLayout",
+          "type": "'track' | 'pile'",
+          "default": "'track'",
+          "description": "Раскладка «ожидающих» слайдов (`progress > 0`) в покое. - `'track'` — каждый слайд на своей позиции вдоль оси (`-slidePosition`), как рельс. - `'pile'` — ожидающие (`progress > 0`) делят с активным текущий `translate` по оси; на root вешается модификатор `--stack-pile`: слайды `position: absolute` в контейнере (иначе остаются в потоке и идут столбиком). Веер: `rotate` / `perSlideOffset` / `perSlideScale` / `perSlideDepth`."
+        },
+        {
+          "name": "viewportPadding",
+          "type": "number",
+          "default": "0 (не задаётся)",
+          "description": "Внутренние отступы трека (px), как у `cubeEffect.viewportPadding`: запас под `rotate` и тени, без использования `peek`."
+        },
+        {
+          "name": "zIndexProgressScale",
+          "type": "number",
+          "default": "1",
+          "description": "Масштаб только для расчёта z-index: `progress / zIndexProgressScale`. Значения меньше 1 дают более раннюю перестановку слоёв (как в Swiper Cards)."
+        },
+        {
+          "name": "slideTravelRatio",
+          "type": "number",
+          "default": "1",
+          "description": "Доля визуального смещения слайдов, которые следуют за `translate` движка (`cover` в переходе, `uncover` — слой с `progress > 0`). Меньше 1 — короткий «снос» карты без полного хода по оси."
         }
       ]
     },
