@@ -4,7 +4,7 @@
 
 import { Vector1D } from './Vector1D'
 import { Counter } from './Counter'
-import { Animator } from './Animator'
+import { Animator, easings, type EasingFunction } from './Animator'
 import { TVIST_CLASSES } from './constants'
 import type { Tvist } from './Tvist'
 import type { TvistOptions } from './types'
@@ -15,6 +15,10 @@ import {
   findDomIndexByRealIndexForTransition,
   TVIST_SLIDE_INDEX_ATTR,
 } from '../utils/slideRealIndex'
+
+/** Как Splide Scroll: длительность snap после drag = max(|dx|/base, min) */
+const DRAG_SNAP_BASE_VELOCITY_PX_PER_MS = 1.5
+const DRAG_SNAP_MIN_DURATION_MS = 800
 
 /** Контекст для передачи между подметодами scrollTo */
 interface ScrollContext {
@@ -532,8 +536,9 @@ export class Engine {
    * Переход к слайду
    * @param index - индекс целевого слайда
    * @param instant - мгновенный переход без анимации
+   * @param afterDragSnap - смягчённый snap после отпускания (длительность от расстояния, как Splide)
    */
-  scrollTo(index: number, instant = false): void {
+  scrollTo(index: number, instant = false, afterDragSnap = false): void {
     const endIndex = this.getEndIndex()
     const previousIndex = this.index.get()
     const ctx = this.resolveTargetIndex(index, endIndex, previousIndex)
@@ -556,7 +561,7 @@ export class Engine {
     if (instant) {
       this.performInstantScroll(targetPosition, ctx, endIndex)
     } else {
-      this.performAnimatedScroll(targetPosition, ctx, endIndex)
+      this.performAnimatedScroll(targetPosition, ctx, endIndex, afterDragSnap)
     }
   }
 
@@ -652,9 +657,14 @@ export class Engine {
     }
   }
 
-  private performAnimatedScroll(targetPosition: number, ctx: ScrollContext, endIndex: number): void {
+  private performAnimatedScroll(
+    targetPosition: number,
+    ctx: ScrollContext,
+    endIndex: number,
+    afterDragSnap: boolean
+  ): void {
     this.target.set(targetPosition)
-    const speed = this.options.speed ?? 300
+    const defaultSpeed = this.options.speed ?? 300
 
     if (ctx.indexChanged) {
       this.tvist.emit('transitionStart', ctx.eventIndex)
@@ -665,11 +675,22 @@ export class Engine {
     const currentLocation = this.location.get()
     const needsAnimation = Math.abs(currentLocation - targetPosition) > 0.5
 
+    const travel = Math.abs(currentLocation - targetPosition)
+    let duration = defaultSpeed
+    let easingFn: EasingFunction = easings.easeOutQuad
+    if (afterDragSnap) {
+      duration = Math.max(
+        travel / DRAG_SNAP_BASE_VELOCITY_PX_PER_MS,
+        DRAG_SNAP_MIN_DURATION_MS
+      )
+      easingFn = easings.easeOutQuart
+    }
+
     if (needsAnimation) {
       this.animator.animate(
         currentLocation,
         targetPosition,
-        speed,
+        duration,
         (value) => {
           this.location.set(value)
           this.applyTransform()
@@ -683,7 +704,8 @@ export class Engine {
             this.tvist.emit('slideChangeEnd', ctx.eventIndex)
             this.emitReachEdge(ctx, endIndex)
           }
-        }
+        },
+        easingFn
       )
     } else if (!ctx.indexChanged) {
       // Позиция уже корректна; microtask чтобы событие было асинхронным как после анимации
@@ -721,12 +743,12 @@ export class Engine {
     }
   }
 
-  scrollBy(delta: number): void {
+  scrollBy(delta: number, afterDragSnap = false): void {
     const targetIndex = this.index.get() + delta
     // В loop-режиме направление определяется по знаку delta, а не по сравнению индексов
     const direction = delta > 0 ? 'next' : delta < 0 ? 'prev' : undefined
     if (direction) this.tvist._scrollDirection = direction
-    this.scrollTo(targetIndex)
+    this.scrollTo(targetIndex, false, afterDragSnap)
   }
 
   /**

@@ -14,6 +14,8 @@ export const easings = {
   easeOutQuad: (t: number) => t * (2 - t),
   easeInOutQuad: (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
   easeOutCubic: (t: number) => --t * t * t + 1,
+  /** Как easing в Splide Scroll (free + snap) */
+  easeOutQuart: (t: number) => 1 - Math.pow(1 - t, 4),
   easeOutQuint: (t: number) => 1 + --t * t * t * t * t,
 } as const
 

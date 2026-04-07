@@ -115,8 +115,8 @@ describe('ThumbsModule + DragModule Integration', () => {
       type: 'touch'
     })
     
-    // Ждём завершения анимации snap
-    await waitForAnimation(400)
+    // Snap после drag ≥800ms + синхронизация main через scrollTo (~speed)
+    await waitForAnimation(1100)
     
     // Оба слайдера должны перейти к предыдущему слайду
     expect(thumbSlider.activeIndex).toBe(3)
