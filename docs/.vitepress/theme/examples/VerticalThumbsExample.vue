@@ -243,6 +243,10 @@ onUnmounted(() => {
   height: 100%;
 }
 
+.tvist-main .tvist-v1__track {
+  height: 100%;
+}
+
 .tvist-main :deep(.tvist-v1__slide) {
   font-size: 3rem;
   display: flex;
