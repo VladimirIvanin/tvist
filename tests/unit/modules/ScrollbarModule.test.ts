@@ -19,6 +19,49 @@ import {
   type SliderFixture,
 } from '../../fixtures'
 
+function emitDragStart(thumbEl: HTMLElement, clientX: number, clientY: number): void {
+  if ('PointerEvent' in window) {
+    thumbEl.dispatchEvent(new PointerEvent('pointerdown', {
+      clientX,
+      clientY,
+      pointerType: 'mouse',
+      button: 0,
+      bubbles: true,
+    }))
+  } else {
+    thumbEl.dispatchEvent(new MouseEvent('mousedown', {
+      clientX,
+      clientY,
+      bubbles: true,
+    }))
+  }
+}
+
+function emitDragMove(clientX: number, clientY: number): void {
+  if ('PointerEvent' in window) {
+    document.dispatchEvent(new PointerEvent('pointermove', {
+      clientX,
+      clientY,
+      pointerType: 'mouse',
+      bubbles: true,
+    }))
+  } else {
+    document.dispatchEvent(new MouseEvent('mousemove', {
+      clientX,
+      clientY,
+      bubbles: true,
+    }))
+  }
+}
+
+function emitDragEnd(): void {
+  if ('PointerEvent' in window) {
+    document.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }))
+  } else {
+    document.dispatchEvent(new MouseEvent('mouseup', { bubbles: true }))
+  }
+}
+
 describe('ScrollbarModule', () => {
   let fixture: SliderFixture
   let slider: Tvist
@@ -255,12 +298,7 @@ describe('ScrollbarModule', () => {
       expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(false)
 
       // Начинаем перетаскивание
-      const mouseDownEvent = new MouseEvent('mousedown', {
-        clientX: 100,
-        clientY: 50,
-        bubbles: true,
-      })
-      thumbEl!.dispatchEvent(mouseDownEvent)
+      emitDragStart(thumbEl!, 100, 50)
 
       // Класс dragging должен добавиться
       expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(true)
@@ -287,20 +325,10 @@ describe('ScrollbarModule', () => {
       vi.spyOn(trackEl!, 'getBoundingClientRect').mockReturnValue(mockRect as DOMRect)
 
       // Начинаем перетаскивание
-      const mouseDownEvent = new MouseEvent('mousedown', {
-        clientX: 0,
-        clientY: 0,
-        bubbles: true,
-      })
-      thumbEl!.dispatchEvent(mouseDownEvent)
+      emitDragStart(thumbEl!, 0, 0)
 
       // Перемещаем мышь
-      const mouseMoveEvent = new MouseEvent('mousemove', {
-        clientX: 300,
-        clientY: 0,
-        bubbles: true,
-      })
-      document.dispatchEvent(mouseMoveEvent)
+      emitDragMove(300, 0)
 
       // Позиция ползунка должна обновиться
       const thumbLeft = parseFloat(thumbEl?.style.left || '0')
@@ -313,15 +341,11 @@ describe('ScrollbarModule', () => {
       expect(thumbEl).toBeTruthy()
 
       // Начинаем и завершаем перетаскивание
-      thumbEl!.dispatchEvent(new MouseEvent('mousedown', {
-        clientX: 100,
-        clientY: 50,
-        bubbles: true,
-      }))
+      emitDragStart(thumbEl!, 100, 50)
       
       expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(true)
 
-      document.dispatchEvent(new MouseEvent('mouseup'))
+      emitDragEnd()
       
       // Класс dragging должен удалиться
       expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(false)
@@ -352,22 +376,14 @@ describe('ScrollbarModule', () => {
       expect(slider.activeIndex).toBe(0)
 
       // Начинаем перетаскивание с позиции 100px
-      thumbEl!.dispatchEvent(new MouseEvent('mousedown', {
-        clientX: 100,
-        clientY: 0,
-        bubbles: true,
-      }))
+      emitDragStart(thumbEl!, 100, 0)
 
       // Перемещаем вправо на значительное расстояние (400px)
       // Это должно переместить слайдер вправо примерно на 2-3 слайда
-      document.dispatchEvent(new MouseEvent('mousemove', {
-        clientX: 500,
-        clientY: 0,
-        bubbles: true,
-      }))
+      emitDragMove(500, 0)
 
       // Завершаем перетаскивание
-      document.dispatchEvent(new MouseEvent('mouseup'))
+      emitDragEnd()
 
       // Ждём snap анимации
       await waitForAnimation(350)
@@ -382,18 +398,31 @@ describe('ScrollbarModule', () => {
       expect(thumbEl).toBeTruthy()
 
       // Touch start
-      const touchStartEvent = new TouchEvent('touchstart', {
-        touches: [
-          { clientX: 100, clientY: 50 } as Touch,
-        ],
-        bubbles: true,
-      })
-      thumbEl!.dispatchEvent(touchStartEvent)
+      if ('PointerEvent' in window) {
+        thumbEl!.dispatchEvent(new PointerEvent('pointerdown', {
+          clientX: 100,
+          clientY: 50,
+          pointerType: 'touch',
+          bubbles: true,
+        }))
+      } else {
+        const touchStartEvent = new TouchEvent('touchstart', {
+          touches: [
+            { clientX: 100, clientY: 50 } as Touch,
+          ],
+          bubbles: true,
+        })
+        thumbEl!.dispatchEvent(touchStartEvent)
+      }
 
       expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(true)
 
       // Touch end
-      document.dispatchEvent(new TouchEvent('touchend'))
+      if ('PointerEvent' in window) {
+        document.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }))
+      } else {
+        document.dispatchEvent(new TouchEvent('touchend'))
+      }
       
       expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(false)
     })

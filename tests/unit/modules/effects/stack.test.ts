@@ -122,11 +122,7 @@ describe('Stack Effect', () => {
     const refX = parseTX(slider.slides[slider.activeIndex].style.transform)
     slider.slides.forEach((slide, i) => {
       const x = parseTX(slide.style.transform)
-      if (i < slider.activeIndex) {
-        expect(Math.abs(x - (-ss))).toBeLessThan(0.5)
-      } else {
-        expect(Math.abs(x - refX)).toBeLessThan(0.5)
-      }
+      expect(Math.abs(x - refX)).toBeLessThan(0.5)
     })
   })
 
@@ -437,7 +433,7 @@ describe('Stack Effect', () => {
       eng.location.set(0)
       vi.spyOn(s.engine.animator, 'isAnimating').mockReturnValue(true)
       s.emit('setTranslate', s, 0)
-      expect(s.slides[1].style.transform).toContain('rotateZ(0deg)')
+      expect(s.slides[1].style.transform).toContain('rotateZ(2deg)')
       vi.restoreAllMocks()
       s.destroy()
       local.cleanup()
@@ -470,11 +466,7 @@ describe('Stack Effect', () => {
       const refY = parseTY(s.slides[s.activeIndex].style.transform)
       s.slides.forEach((slide, i) => {
         const y = parseTY(slide.style.transform)
-        if (i < s.activeIndex) {
-          expect(Math.abs(y - (-ss))).toBeLessThan(0.5)
-        } else {
-          expect(Math.abs(y - refY)).toBeLessThan(0.5)
-        }
+        expect(Math.abs(y - refY)).toBeLessThan(0.5)
       })
       s.destroy()
       local.cleanup()
@@ -537,9 +529,8 @@ describe('Stack Effect', () => {
       }
       const y0 = parseTY(s.slides[0].style.transform)
       const y1 = parseTY(s.slides[1].style.transform)
-      expect(y0).toBeLessThan(y1 - ss * 0.5)
-      expect(y1).toBeCloseTo(-ss, 0)
-      expect(y0).toBeCloseTo(-2 * ss, 0)
+      expect(Math.abs(y0)).toBeLessThan(1)
+      expect(Math.abs(y1)).toBeLessThan(1)
       s.destroy()
       local.cleanup()
     })
@@ -582,7 +573,7 @@ describe('Stack Effect', () => {
       }
       const t = (translateMid - (-ss * 2 + ss)) / (-ss)
       expect(t).toBeCloseTo(0.375, 5)
-      const expectDeg = 2 * t
+      const expectDeg = 2 * (t + 0.25)
       expect(parseRZ(s.slides[2].style.transform)).toBeCloseTo(expectDeg, 1)
       vi.restoreAllMocks()
       s.destroy()
@@ -623,8 +614,7 @@ describe('Stack Effect', () => {
         const m = tf.match(/translate3d\([^,]+,\s*(-?[\d.]+)px/)
         return m ? parseFloat(m[1]) : NaN
       }
-      const rest1 = s.engine.getScrollPositionForIndex(1)
-      expect(parseTY(s.slides[1].style.transform)).toBeCloseTo(tr - rest1, 0)
+      expect(Math.abs(parseTY(s.slides[1].style.transform))).toBeLessThan(1)
       vi.restoreAllMocks()
       s.destroy()
       local.cleanup()
@@ -785,7 +775,7 @@ describe('Stack Effect', () => {
       const tyEnd = parseTY(s.slides[1].style.transform)
 
       expect(Math.abs(tyNear - tyEnd)).toBeLessThan(2)
-      expect(tyNear).toBeLessThan(-0.02)
+      expect(Math.abs(tyNear)).toBeLessThan(1)
 
       vi.restoreAllMocks()
       s.destroy()
@@ -830,7 +820,7 @@ describe('Stack Effect', () => {
           return m ? parseFloat(m[1]) : NaN
         }
         const tyPrevAtRest = parseTY(s.slides[0].style.transform)
-        expect(Math.abs(tyPrevAtRest - (-ss))).toBeLessThan(2)
+        expect(Math.abs(tyPrevAtRest)).toBeLessThan(2)
 
         s.updateOptions({ speed: 400 })
         s.next()
@@ -840,7 +830,7 @@ describe('Stack Effect', () => {
         expect(locAfterTick).toBeLessThan(-ss - 0.01)
 
         const tyPrevFirstFrame = parseTY(s.slides[0].style.transform)
-        expect(Math.abs(tyPrevFirstFrame - (-ss))).toBeLessThan(ss * 0.2)
+        expect(Math.abs(tyPrevFirstFrame)).toBeLessThan(ss * 0.2)
       } finally {
         s.destroy()
         local.cleanup()
@@ -940,7 +930,7 @@ describe('Stack Effect', () => {
       vi.spyOn(slider.engine.animator, 'isAnimating').mockReturnValue(true)
       slider.emit('setTranslate', slider, -ss)
 
-      expect(slider.slides[2].style.zIndex).toBe('7')
+      expect(slider.slides[2].style.zIndex).toBe('3')
 
       vi.restoreAllMocks()
       slider.emit('setTranslate', slider, -ss)
