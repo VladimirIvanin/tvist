@@ -16,7 +16,8 @@ let sliderOutside = null
 onMounted(() => {
   if (defaultRef.value) {
     sliderDefault = new Tvist(defaultRef.value, {
-      perPage: 1,
+      perPage: 3,
+      gap: 10,
       speed: 300,
       arrows: true,
       pagination: { type: 'bullets', clickable: true }
