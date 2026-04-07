@@ -970,7 +970,19 @@ export class Engine {
       ? this.tvist.slides.length - 1
       : this.getEndIndex()
 
-    return this.index.get() < limit
+    if (this.index.get() >= limit) return false
+
+    // В center и autoSize режимах граница определяется только по индексу:
+    // center: translate не совпадает с getMaxScrollPosition
+    // autoSize: несколько индексов могут сходиться к одной translate (clamp к maxScroll)
+    if (this.options.center || this.isAutoSize()) return true
+
+    // Нет осмысленного диапазона (тесты без layout, нулевые размеры) — только индекс
+    if (!this.hasScrollRange()) return true
+
+    // Сверка с фактической позицией: при slideMinWidth / рассинхроне после drag
+    // индекс может быть < limit, а translate уже у упора — стрелка «вперёд» должна быть disabled
+    return this.location.get() > this.getMaxScrollPosition() + 1
   }
 
   /**
@@ -979,7 +991,22 @@ export class Engine {
   canScrollPrev(): boolean {
     if (this.isLocked) return false
     if (this.isLoopEnabled() || this.options.rewind) return true
-    return this.index.get() > 0
+
+    if (this.index.get() > 0) return true
+
+    if (this.options.center || this.isAutoSize()) return false
+
+    if (!this.hasScrollRange()) return false
+
+    return this.location.get() < this.getMinScrollPosition() - 1
+  }
+
+  /**
+   * Есть ли осмысленный диапазон скролла (не нулевые размеры, не тест без layout)
+   */
+  private hasScrollRange(): boolean {
+    const scrollRange = this.getMinScrollPosition() - this.getMaxScrollPosition()
+    return Number.isFinite(scrollRange) && scrollRange > 1
   }
 
   /**

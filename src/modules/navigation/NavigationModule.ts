@@ -50,6 +50,9 @@ export class NavigationModule extends Module {
 
     // Обновляем состояние при изменении слайда
     this.on('slideChangeEnd', () => this.updateArrowsState())
+
+    // После анимации (в т.ч. когда индекс не менялся, но translate дошёл до упора)
+    this.on('transitionEnd', () => this.updateArrowsState())
     
     // Обновляем состояние при lock/unlock (для breakpoints)
     this.on('lock', () => this.updateArrowsState())

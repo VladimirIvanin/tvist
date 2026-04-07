@@ -114,6 +114,9 @@ export class Tvist {
   private resizeHandler?: () => void
   private resizeObserver?: ResizeObserver
 
+  /** Время последнего успешного next/prev (для navThrottleMs) */
+  private _lastNavAt = 0
+
   // Опциональный резолвер индекса (для модулей типа Loop)
   public indexResolver?: (index: number) => number
 
@@ -427,29 +430,45 @@ export class Tvist {
    * Следующий слайд (или страница при perPage > 1)
    */
   next(): this {
-    if (!this._isEnabled || !this._isVisible) return this
-    
-    if (this.engine.canScrollNext()) {
-      // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
-      const step = this.options.slidesPerGroup ?? 1
-      
-      // Просто вызываем scrollBy - LoopModule сам обработает через beforeTransitionStart
-      this.engine.scrollBy(step)
-    }
-    return this
+    return this.navByStep(1)
   }
 
   /**
    * Предыдущий слайд (или страница при perPage > 1)
    */
   prev(): this {
+    return this.navByStep(-1)
+  }
+
+  /**
+   * Монотонное время для navThrottleMs
+   */
+  private monotonicNow(): number {
+    return typeof performance !== 'undefined' && typeof performance.now === 'function'
+      ? performance.now()
+      : Date.now()
+  }
+
+  /**
+   * Общая реализация next/prev.
+   */
+  private navByStep(sign: 1 | -1): this {
     if (!this._isEnabled || !this._isVisible) return this
-    if (this.engine.canScrollPrev()) {
-      // При perPage > 1 листаем на slidesPerGroup слайдов, иначе на perPage
-      const step = this.options.slidesPerGroup ?? 1
-      
-      // Просто вызываем scrollBy - LoopModule сам обработает через beforeTransitionStart
-      this.engine.scrollBy(-step)
+
+    const throttleMs = this.options.navThrottleMs ?? 0
+    if (throttleMs > 0) {
+      const now = this.monotonicNow()
+      if (now - this._lastNavAt < throttleMs) return this
+    }
+
+    const canGo = sign > 0 ? this.engine.canScrollNext() : this.engine.canScrollPrev()
+    if (!canGo) return this
+
+    const step = this.options.slidesPerGroup ?? 1
+    this.engine.scrollBy(step * sign)
+
+    if (throttleMs > 0) {
+      this._lastNavAt = this.monotonicNow()
     }
     return this
   }
