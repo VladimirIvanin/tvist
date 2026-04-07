@@ -35,6 +35,9 @@ export const TVIST_CLASSES = {
   singlePage: `${P}--single-page`,
   nav: `${P}--nav`,
   cube: `${P}--cube`,
+  stack: `${P}--stack`,
+  /** Колода: слайды из потока (absolute), иначе transform не складывает их визуально */
+  stackPile: `${P}--stack-pile`,
 
   scrollbar: `${P}__scrollbar`,
   scrollbarHorizontal: `${P}__scrollbar--horizontal`,

@@ -77,6 +77,8 @@ export default defineConfig({
           { text: 'Visibility', link: '/examples/visibility' },
           { text: 'Fade Effect', link: '/examples/effect-fade' },
           { text: 'Cube Effect', link: '/examples/effect-cube' },
+          { text: 'Stack Effect', link: '/examples/effect-stack' },
+          { text: 'Stack: папки', link: '/examples/stack-folders' },
           { text: 'Vertical', link: '/examples/vertical' },
           { text: 'Drag Free Mode', link: '/examples/drag-free' },
           { text: 'Scroll Control', link: '/examples/scroll-control' },

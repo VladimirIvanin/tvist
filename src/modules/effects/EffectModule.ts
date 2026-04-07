@@ -4,11 +4,15 @@ import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
 import { setFadeEffect } from './fade'
 import { setCubeEffect } from './cube'
+import { setStackEffect, cleanupStackCache } from './stack'
+import { getPeekValueFromOptions } from '../../utils/peek'
 
 export class EffectModule extends Module {
   name = 'effect'
   private slideProgress = new WeakMap<HTMLElement, number>()
   private currentEffect: TvistOptions['effect'] = 'slide'
+  /** Чтобы снять longhand-padding после destroy / смены опций */
+  private stackViewportPaddingApplied = false
   private readonly setTranslateHandler = this.onSetTranslate.bind(this)
 
   constructor(tvist: Tvist, options: TvistOptions) {
@@ -16,7 +20,11 @@ export class EffectModule extends Module {
   }
 
   override shouldBeActive(): boolean {
-    return this.options.effect === 'fade' || this.options.effect === 'cube'
+    return (
+      this.options.effect === 'fade' ||
+      this.options.effect === 'cube' ||
+      this.options.effect === 'stack'
+    )
   }
 
   init(): void {
@@ -42,7 +50,18 @@ export class EffectModule extends Module {
       this.applyCubeRootStyles()
     }
 
+    if (this.options.effect === 'stack') {
+      this.applyStackRootStyles()
+    }
+
     this.tvist.on('setTranslate', this.setTranslateHandler)
+  }
+
+  override onUpdate(): void {
+    if (this.options.effect === 'stack') {
+      this.applyStackViewportPadding()
+      this.syncStackPileClass()
+    }
   }
 
   destroy(): void {
@@ -54,15 +73,22 @@ export class EffectModule extends Module {
   override onOptionsUpdate(): void {
     const nextEffect = this.options.effect ?? 'slide'
 
-    if (nextEffect === this.currentEffect) {
+    if (nextEffect !== this.currentEffect) {
+      this.cleanupEffectStyles(this.currentEffect)
+      this.currentEffect = nextEffect
+
+      if (nextEffect === 'cube') {
+        this.applyCubeRootStyles()
+      }
+
+      if (nextEffect === 'stack') {
+        this.applyStackRootStyles()
+      }
       return
     }
 
-    this.cleanupEffectStyles(this.currentEffect)
-    this.currentEffect = nextEffect
-
-    if (nextEffect === 'cube') {
-      this.applyCubeRootStyles()
+    if (nextEffect === 'stack') {
+      this.syncStackPileClass()
     }
   }
 
@@ -83,8 +109,67 @@ export class EffectModule extends Module {
     })
     
     if (this.options.effect === 'cube') {
-        setCubeEffect(this.tvist, translate, this.options)
+      setCubeEffect(this.tvist, translate, this.options)
     }
+
+    if (this.options.effect === 'stack') {
+      setStackEffect(this.tvist, translate, this.options)
+    }
+  }
+
+  private applyStackRootStyles(): void {
+    this.tvist.root.classList.add(TVIST_CLASSES.stack)
+    this.syncStackPileClass()
+    this.applyStackViewportPadding()
+  }
+
+  private syncStackPileClass(): void {
+    if (this.options.effect !== 'stack') return
+    const usePile = this.options.stackEffect?.stackLayout === 'pile'
+    this.tvist.root.classList.toggle(TVIST_CLASSES.stackPile, usePile)
+    if (usePile) {
+      this.tvist.container.style.width = '100%'
+      this.tvist.container.style.height = '100%'
+    } else {
+      this.tvist.container.style.removeProperty('width')
+      this.tvist.container.style.removeProperty('height')
+    }
+  }
+
+  /**
+   * После `Engine.applyPeek()` (в `update()`), иначе padding трека затирается longhand peek.
+   */
+  private applyStackViewportPadding(): void {
+    const track = this.tvist.track
+    const extra = this.options.stackEffect?.viewportPadding ?? 0
+    if (extra <= 0) {
+      if (this.stackViewportPaddingApplied) {
+        track.style.removeProperty('padding-top')
+        track.style.removeProperty('padding-right')
+        track.style.removeProperty('padding-bottom')
+        track.style.removeProperty('padding-left')
+        track.style.removeProperty('box-sizing')
+        this.stackViewportPaddingApplied = false
+      }
+      return
+    }
+
+    this.stackViewportPaddingApplied = true
+    const o = this.options
+    const sides = ['top', 'right', 'bottom', 'left'] as const
+    for (const side of sides) {
+      const base = getPeekValueFromOptions(o, side)
+      const prop =
+        side === 'top'
+          ? 'paddingTop'
+          : side === 'right'
+            ? 'paddingRight'
+            : side === 'bottom'
+              ? 'paddingBottom'
+              : 'paddingLeft'
+      track.style[prop] = `${base + extra}px`
+    }
+    track.style.boxSizing = 'border-box'
   }
 
   private applyCubeRootStyles(): void {
@@ -106,6 +191,9 @@ export class EffectModule extends Module {
       slide.querySelectorAll(`.${TVIST_CLASSES.block}-slide-shadow-cube`).forEach((shadow) => {
         shadow.remove()
       })
+      slide.querySelectorAll(`.${TVIST_CLASSES.block}-slide-shadow`).forEach((shadow) => {
+        shadow.remove()
+      })
     })
 
     if (effect === 'cube') {
@@ -120,6 +208,21 @@ export class EffectModule extends Module {
       this.tvist.track.style.removeProperty('padding')
       this.tvist.track.style.removeProperty('box-sizing')
       this.tvist.root.classList.remove(TVIST_CLASSES.cube)
+    }
+
+    if (effect === 'stack') {
+      this.tvist.container.style.transform = ''
+      this.tvist.container.style.removeProperty('width')
+      this.tvist.container.style.removeProperty('height')
+      this.tvist.track.style.removeProperty('padding')
+      this.tvist.track.style.removeProperty('padding-top')
+      this.tvist.track.style.removeProperty('padding-right')
+      this.tvist.track.style.removeProperty('padding-bottom')
+      this.tvist.track.style.removeProperty('padding-left')
+      this.tvist.track.style.removeProperty('box-sizing')
+      this.stackViewportPaddingApplied = false
+      this.tvist.root.classList.remove(TVIST_CLASSES.stack, TVIST_CLASSES.stackPile)
+      cleanupStackCache(this.tvist)
     }
   }
 }

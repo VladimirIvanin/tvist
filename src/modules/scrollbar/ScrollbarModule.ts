@@ -146,8 +146,12 @@ export class ScrollbarModule extends Module {
 
     // Перетаскивание ползунка
     if (this.draggable) {
-      this.thumbEl.addEventListener('mousedown', this.handleThumbMouseDown)
-      this.thumbEl.addEventListener('touchstart', this.handleThumbTouchStart, { passive: true })
+      if ('PointerEvent' in window) {
+        this.thumbEl.addEventListener('pointerdown', this.handleThumbPointerDown)
+      } else {
+        this.thumbEl.addEventListener('mousedown', this.handleThumbMouseDown)
+        this.thumbEl.addEventListener('touchstart', this.handleThumbTouchStart, { passive: false })
+      }
     }
 
     // События слайдера
@@ -191,9 +195,43 @@ export class ScrollbarModule extends Module {
   }
 
   /**
+   * Обработчик начала перетаскивания (Pointer API — мышь + тач)
+   */
+  private handleThumbPointerDown = (event: PointerEvent): void => {
+    if (event.button !== 0 && event.pointerType === 'mouse') return
+    // Останавливаем всплытие чтобы DragModule не перехватил событие
+    event.stopPropagation()
+    event.preventDefault()
+    this.startDrag(event.clientX, event.clientY)
+
+    document.addEventListener('pointermove', this.handleThumbPointerMove)
+    document.addEventListener('pointerup', this.handleThumbPointerUp)
+  }
+
+  /**
+   * Обработчик движения (Pointer API)
+   */
+  private handleThumbPointerMove = (event: PointerEvent): void => {
+    if (!this.isDragging) return
+    event.preventDefault()
+    this.updateDrag(event.clientX, event.clientY)
+  }
+
+  /**
+   * Завершить перетаскивание (Pointer API)
+   */
+  private handleThumbPointerUp = (): void => {
+    this.endDrag()
+    document.removeEventListener('pointermove', this.handleThumbPointerMove)
+    document.removeEventListener('pointerup', this.handleThumbPointerUp)
+  }
+
+  /**
    * Обработчик начала перетаскивания (мышь)
    */
   private handleThumbMouseDown = (event: MouseEvent): void => {
+    // Останавливаем всплытие чтобы DragModule не перехватил событие
+    event.stopPropagation()
     event.preventDefault()
     this.startDrag(event.clientX, event.clientY)
 
@@ -209,7 +247,9 @@ export class ScrollbarModule extends Module {
 
     const touch = event.touches[0]
     if (!touch) return
-    
+
+    // Останавливаем всплытие чтобы DragModule не перехватил событие
+    event.stopPropagation()
     this.startDrag(touch.clientX, touch.clientY)
 
     document.addEventListener('touchmove', this.handleThumbTouchMove, { passive: false })
@@ -514,10 +554,13 @@ export class ScrollbarModule extends Module {
     }
 
     if (this.thumbEl) {
+      this.thumbEl.removeEventListener('pointerdown', this.handleThumbPointerDown)
       this.thumbEl.removeEventListener('mousedown', this.handleThumbMouseDown)
       this.thumbEl.removeEventListener('touchstart', this.handleThumbTouchStart)
     }
 
+    document.removeEventListener('pointermove', this.handleThumbPointerMove)
+    document.removeEventListener('pointerup', this.handleThumbPointerUp)
     document.removeEventListener('mousemove', this.handleThumbMouseMove)
     document.removeEventListener('mouseup', this.handleThumbMouseUp)
     document.removeEventListener('touchmove', this.handleThumbTouchMove)
