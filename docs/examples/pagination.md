@@ -362,8 +362,10 @@ pagination: {
 Каждая точка представляет равное количество слайдов. Например, 10 слайдов с лимитом 5 точек: каждая точка = 2 слайда.
 
 <div ref="evenRef" class="tvist-v1 pagination-demo-slider">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide" v-for="i in 10" :key="i">{{i}}</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide" v-for="i in 10" :key="i">{{i}}</div>
+    </div>
   </div>
   <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
   <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
@@ -389,8 +391,10 @@ pagination: {
 Пример: 7 слайдов, лимит 2, стратегия центр → [3, 4] слайда на точку.
 
 <div ref="evenCenterRef" class="tvist-v1 pagination-demo-slider">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide" v-for="i in 7" :key="i">{{i}}</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide" v-for="i in 7" :key="i">{{i}}</div>
+    </div>
   </div>
   <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
   <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
@@ -411,8 +415,10 @@ pagination: {
 Симметричное распределение: крайние точки представляют по одному слайду с каждого края, центральные точки группируют все остальные слайды.
 
 <div ref="centerRef" class="tvist-v1 pagination-demo-slider">
-  <div class="tvist-v1__container">
-    <div class="tvist-v1__slide" v-for="i in 10" :key="i">{{i}}</div>
+  <div class="tvist-v1__track">
+    <div class="tvist-v1__container">
+      <div class="tvist-v1__slide" v-for="i in 10" :key="i">{{i}}</div>
+    </div>
   </div>
   <button class="tvist-v1__arrow--prev" aria-label="Предыдущий"></button>
   <button class="tvist-v1__arrow--next" aria-label="Следующий"></button>
