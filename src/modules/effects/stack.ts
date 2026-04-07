@@ -215,8 +215,11 @@ export function setStackEffect(
       // Активный (progress ≈ 0) уже в 0; остальные тоже в 0 благодаря rebase (translate - translate = 0)
       setTranslate2D(isVertical, 0, '0px', (v) => { tX = v }, (v) => { tY = v })
 
-      // Z-index: активный наверху, предыдущие и следующие под ним
-      slide.style.zIndex = coverStackZIndex(progress, numSlides, zIndexProgressScale)
+      // Z-index для pile: строгий порядок без дублей, чтобы слои не "флипались".
+      // Используем abs(progress) как основную метрику глубины + индекс как tie-breaker.
+      const depthRank = Math.round(Math.min(absProgress, numSlides) * 1000)
+      const tieBreaker = numSlides - i
+      slide.style.zIndex = String(numSlides * 10000 - depthRank * 10 + tieBreaker)
 
       // Декор: rotate, scale, offset — только для не-активных
       if (absProgress > 1e-6) {
@@ -224,7 +227,7 @@ export function setStackEffect(
         tZ = perSlideDepth > 0 ? -perSlideDepth * p : 0
         scale = perSlideScale > 0 ? Math.max(1 - perSlideScale * p, 0.5) : 1
         rotateZ = rotate ? perSlideRotate * p : 0
-        if (perSlideOffset > 0) {
+        if (Math.abs(perSlideOffset) > 1e-6) {
           const delta = perSlideOffset * p
           const out = applyPerSlideOffsetDelta(isVertical, true, delta, tX, tY)
           tX = out.tX
@@ -308,7 +311,7 @@ export function setStackEffect(
       tZ = perSlideDepth > 0 ? -perSlideDepth * absProgress : 0
       scale = perSlideScale > 0 ? Math.max(1 - perSlideScale * absProgress, 0.5) : 1
       rotateZ = rotate ? perSlideRotate * absProgress : 0
-      if (perSlideOffset > 0) {
+      if (Math.abs(perSlideOffset) > 1e-6) {
         const delta = perSlideOffset * absProgress
         const out = applyPerSlideOffsetDelta(isVertical, false, delta, tX, tY)
         tX = out.tX

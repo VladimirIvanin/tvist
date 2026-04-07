@@ -1,7 +1,7 @@
 <template>
-  <ExampleCard title="Stack Effect — горизонтальный" description="Новый слайд выезжает поверх предыдущего">
-    <div class="demo-wrapper">
-      <div ref="sliderEl" class="tvist-v1 tvist-v1--horizontal-stack">
+  <ExampleCard title="Stack Effect — вертикальный" description="Новый слайд выезжает поверх предыдущего (direction: 'vertical')">
+    <div class="demo-wrapper demo-wrapper--vertical-stack">
+      <div ref="sliderEl" class="tvist-v1 tvist-v1--vertical-stack">
         <div class="tvist-v1__track">
           <div class="tvist-v1__container">
             <div class="tvist-v1__slide">1</div>
@@ -14,8 +14,8 @@
       </div>
 
       <div class="controls">
-        <button @click="slider?.prev()">← Назад</button>
-        <button @click="slider?.next()">Вперёд →</button>
+        <button @click="slider?.prev()">↑ Назад</button>
+        <button @click="slider?.next()">Вперёд ↓</button>
       </div>
 
       <div class="options">
@@ -57,34 +57,34 @@
   </ExampleCard>
 
   <ExampleCard
-    title="Stack Effect — вертикальная колода"
-    description="direction: 'vertical', stackLayout: 'pile', uncover + веер (rotate, offset, scale, depth) — как карты в одном слоте"
+    title="Stack Effect — горизонтальная колода"
+    description="direction: 'horizontal', stackLayout: 'pile', cover + веер (rotate, offset, depth) — карты в одном слоте по горизонтали"
   >
-    <div class="demo-wrapper demo-wrapper--vertical-uncover">
-      <div ref="sliderVEl" class="tvist-v1 tvist-v1--vertical-uncover">
+    <div class="demo-wrapper demo-wrapper--horizontal-pile">
+      <div ref="sliderVEl" class="tvist-v1 tvist-v1--horizontal-pile">
         <div class="tvist-v1__track">
           <div class="tvist-v1__container">
             <div
-              v-for="(item, i) in verticalItems"
+              v-for="(item, i) in pileItems"
               :key="i"
-              class="tvist-v1__slide v-uncover-slide"
-              :style="{ '--v-hue': item.hue }"
+              class="tvist-v1__slide pile-slide"
+              :style="{ '--pile-hue': item.hue }"
             >
-              <span class="v-uncover-slide__num">{{ i + 1 }}</span>
-              <span class="v-uncover-slide__label">{{ item.label }}</span>
+              <span class="pile-slide__num">{{ i + 1 }}</span>
+              <span class="pile-slide__label">{{ item.label }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <div class="controls">
-        <button @click="sliderV?.prev()">↑ Назад</button>
-        <button @click="sliderV?.next()">Вперёд ↓</button>
+        <button @click="sliderV?.prev()">← Назад</button>
+        <button @click="sliderV?.next()">Вперёд →</button>
       </div>
 
-      <p class="vertical-uncover-hint">
+      <p class="stack-pile-hint">
         Колода в режиме <code>stackLayout: 'pile'</code> с теми же декоративными опциями, что и «эффект колоды» в документации:
-        <code>peek</code> сверху и по бокам оставляет место под веер и тени.
+        <code>peek</code> слева и справа оставляет место под веер и тени.
       </p>
     </div>
   </ExampleCard>
@@ -130,12 +130,12 @@ const perSlideOffset = ref(0)
 const perSlideScale = ref(0)
 const perSlideDepth = ref(0)
 
-const verticalItems = [
-  { label: 'Верх', hue: 210 },
+const pileItems = [
+  { label: 'Слева', hue: 210 },
   { label: 'Второй', hue: 175 },
   { label: 'Третий', hue: 265 },
   { label: 'Четвёртый', hue: 32 },
-  { label: 'Низ', hue: 340 },
+  { label: 'Справа', hue: 340 },
 ]
 
 function build() {
@@ -156,22 +156,23 @@ function build() {
   })
 }
 
-function buildVertical() {
+function buildHorizontalPile() {
   if (!sliderVEl.value) return
   sliderV.value?.destroy()
   sliderV.value = new Tvist(sliderVEl.value, {
-    direction: 'vertical',
+    direction: 'horizontal',
     effect: 'stack',
     stackEffect: {
-      mode: 'uncover',
+      mode: 'cover',
       stackLayout: 'pile',
       slideShadows: true,
-      rotate: true,
-      perSlideRotate: 2.5,
-      perSlideOffset: 6,
-      perSlideScale: 0,
-      perSlideDepth: 56,
-      viewportPadding: 22,
+      rotate: false,
+      perSlideRotate: 1.5,
+      perSlideOffset: -30,
+      perSlideScale: 0.01,
+      perSlideDepth: 100,
+      zIndexProgressScale: 2,
+      viewportPadding: 40,
     },
     speed: 400,
     loop: true,
@@ -197,7 +198,7 @@ function rebuild() {
 
 onMounted(() => {
   build()
-  buildVertical()
+  buildHorizontalPile()
   buildScrollbar()
 })
 
@@ -227,13 +228,13 @@ onUnmounted(() => {
   height: 360px;
 }
 
-.demo-wrapper--vertical-uncover {
+.demo-wrapper--vertical-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.tvist-v1--vertical-uncover {
+.tvist-v1--vertical-stack {
   width: 100%;
   max-width: 320px;
   height: 420px;
@@ -242,17 +243,55 @@ onUnmounted(() => {
   background: #e2e8f0;
 }
 
-/* Глубина колоды: translateZ на слайдах читается мягче с перспективой трека */
-.tvist-v1--vertical-uncover :deep(.tvist-v1__track) {
-  perspective: 880px;
-}
-
-.tvist-v1--vertical-uncover :deep(.tvist-v1__track),
-.tvist-v1--vertical-uncover :deep(.tvist-v1__container) {
+.tvist-v1--vertical-stack :deep(.tvist-v1__track),
+.tvist-v1--vertical-stack :deep(.tvist-v1__container) {
   height: 100%;
 }
 
-.tvist-v1--vertical-uncover :deep(.tvist-v1__slide) {
+.tvist-v1--vertical-stack :deep(.tvist-v1__slide) {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 72px;
+  font-weight: 800;
+  color: white;
+  border-radius: 16px;
+}
+
+.tvist-v1--vertical-stack :deep(.tvist-v1__slide[data-tvist-slide-index="0"]) { background: linear-gradient(135deg, #667eea, #764ba2); }
+.tvist-v1--vertical-stack :deep(.tvist-v1__slide[data-tvist-slide-index="1"]) { background: linear-gradient(135deg, #f093fb, #f5576c); }
+.tvist-v1--vertical-stack :deep(.tvist-v1__slide[data-tvist-slide-index="2"]) { background: linear-gradient(135deg, #4facfe, #00f2fe); }
+.tvist-v1--vertical-stack :deep(.tvist-v1__slide[data-tvist-slide-index="3"]) { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+.tvist-v1--vertical-stack :deep(.tvist-v1__slide[data-tvist-slide-index="4"]) { background: linear-gradient(135deg, #fa709a, #fee140); }
+
+.demo-wrapper--horizontal-pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tvist-v1--horizontal-pile {
+  width: 100%;
+  max-width: 560px;
+  height: 360px;
+  margin-left: auto;
+  margin-right: auto;
+  background: #e2e8f0;
+  overflow: visible !important;
+}
+
+/* Глубина колоды: translateZ на слайдах читается мягче с перспективой трека */
+.tvist-v1--horizontal-pile :deep(.tvist-v1__track) {
+  perspective: 880px;
+}
+
+.tvist-v1--horizontal-pile :deep(.tvist-v1__track),
+.tvist-v1--horizontal-pile :deep(.tvist-v1__container) {
+  height: 100%;
+}
+
+.tvist-v1--horizontal-pile :deep(.tvist-v1__slide) {
   height: 100%;
   padding: 10px 12px 12px;
   box-sizing: border-box;
@@ -262,7 +301,7 @@ onUnmounted(() => {
   border-radius: 12px;
 }
 
-.v-uncover-slide {
+.pile-slide {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -273,25 +312,25 @@ onUnmounted(() => {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   background: linear-gradient(
     145deg,
-    hsl(var(--v-hue, 210), 62%, 52%) 0%,
-    hsl(var(--v-hue, 210), 55%, 38%) 100%
+    hsl(var(--pile-hue, 210), 62%, 52%) 0%,
+    hsl(var(--pile-hue, 210), 55%, 38%) 100%
   );
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.v-uncover-slide__num {
+.pile-slide__num {
   font-size: 52px;
   line-height: 1;
 }
 
-.v-uncover-slide__label {
+.pile-slide__label {
   font-size: 14px;
   letter-spacing: 0.03em;
   text-transform: uppercase;
   opacity: 0.9;
 }
 
-.vertical-uncover-hint {
+.stack-pile-hint {
   max-width: 420px;
   margin: 0 auto;
   padding: 0 8px;
@@ -301,7 +340,7 @@ onUnmounted(() => {
   text-align: center;
 }
 
-.vertical-uncover-hint code {
+.stack-pile-hint code {
   font-size: 11px;
   background: #eee;
   padding: 2px 5px;
