@@ -57,8 +57,8 @@
   </ExampleCard>
 
   <ExampleCard
-    title="Stack Effect — вертикальный uncover"
-    description="direction: 'vertical', mode: 'uncover', peek.top — сверху виден край стопки (как peek.left у горизонтали)"
+    title="Stack Effect — вертикальная колода"
+    description="direction: 'vertical', stackLayout: 'pile', uncover + веер (rotate, offset, scale, depth) — как карты в одном слоте"
   >
     <div class="demo-wrapper demo-wrapper--vertical-uncover">
       <div ref="sliderVEl" class="tvist-v1 tvist-v1--vertical-uncover">
@@ -83,7 +83,8 @@
       </div>
 
       <p class="vertical-uncover-hint">
-        Базовый вертикальный stack без peek — тот же <code>direction: 'vertical'</code>, что в блоке кода ниже на странице.
+        Колода в режиме <code>stackLayout: 'pile'</code> с теми же декоративными опциями, что и «эффект колоды» в документации:
+        <code>peek</code> сверху и по бокам оставляет место под веер и тени.
       </p>
     </div>
   </ExampleCard>
@@ -141,6 +142,7 @@ function build() {
   if (!sliderEl.value) return
   slider.value = new Tvist(sliderEl.value, {
     effect: 'stack',
+    direction: 'vertical',
     stackEffect: {
       mode: mode.value,
       rotate: rotate.value,
@@ -162,12 +164,15 @@ function buildVertical() {
     effect: 'stack',
     stackEffect: {
       mode: 'uncover',
+      stackLayout: 'pile',
       slideShadows: true,
-      perSlideDepth: 34,
-      perSlideScale: 0.04,
-      rotate: false,
+      rotate: true,
+      perSlideRotate: 2.5,
+      perSlideOffset: 6,
+      perSlideScale: 0,
+      perSlideDepth: 56,
+      viewportPadding: 22,
     },
-    peek: { top: 48 },
     speed: 400,
     loop: true,
   })
@@ -231,10 +236,15 @@ onUnmounted(() => {
 .tvist-v1--vertical-uncover {
   width: 100%;
   max-width: 320px;
-  height: 400px;
+  height: 420px;
   margin-left: auto;
   margin-right: auto;
   background: #e2e8f0;
+}
+
+/* Глубина колоды: translateZ на слайдах читается мягче с перспективой трека */
+.tvist-v1--vertical-uncover :deep(.tvist-v1__track) {
+  perspective: 880px;
 }
 
 .tvist-v1--vertical-uncover :deep(.tvist-v1__track),
