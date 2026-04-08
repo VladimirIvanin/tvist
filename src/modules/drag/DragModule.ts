@@ -20,8 +20,6 @@ import {
 } from '../../core/constants';
 import type { Tvist } from '../../core/Tvist';
 import type { TvistOptions, TvistLongPressDomEventDetail } from '../../core/types';
-import { resolveTrackGapFromOptions } from '../../utils/gridGap';
-
 const DRAG_DEBUG = false;
 const dragLog = (..._args: unknown[]) => {
   if (DRAG_DEBUG) {
@@ -1196,7 +1194,7 @@ export class DragModule extends Module {
     const startIndex = engine.activeIndex;
 
     const slideSize = engine.slideSizeValue;
-    const gap = resolveTrackGapFromOptions(this.options);
+    const gap = engine.gapPxValue;
     const slideWithGap = slideSize + gap;
 
     if (slideWithGap === 0) {

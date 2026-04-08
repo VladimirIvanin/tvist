@@ -2,7 +2,7 @@ import { Module } from '../Module'
 import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
-import { resolveTrackGapFromOptions } from '../../utils/gridGap'
+import { resolveTrackGapCssFromOptions } from '../../utils/gridGap'
 
 /**
  * Grid Module
@@ -346,7 +346,7 @@ export class GridModule extends Module {
   }
 
   private applyInterPageGaps(): void {
-    const trackGap = resolveTrackGapFromOptions(this.options)
+    const trackGapCss = resolveTrackGapCssFromOptions(this.options)
     const isVertical = this.options.direction === 'vertical'
     const slides = this.tvist.slides
 
@@ -354,12 +354,10 @@ export class GridModule extends Module {
       const isLast = i === slides.length - 1
       if (isVertical) {
         slide.style.marginRight = ''
-        slide.style.marginBottom =
-          trackGap > 0 && !isLast ? `${trackGap}px` : ''
+        slide.style.marginBottom = !isLast && trackGapCss ? trackGapCss : ''
       } else {
         slide.style.marginBottom = ''
-        slide.style.marginRight =
-          trackGap > 0 && !isLast ? `${trackGap}px` : ''
+        slide.style.marginRight = !isLast && trackGapCss ? trackGapCss : ''
       }
     })
   }

@@ -9,6 +9,7 @@ import { TVIST_CLASSES } from './constants'
 import type { Tvist } from './Tvist'
 import type { TvistOptions } from './types'
 import { getOuterWidth, getOuterHeight } from '../utils/dom'
+import { gapCssForMargin, resolveGapToPixels } from '../utils/gridGap'
 import { applyPeek, getPeekValue, getPeekValueFromOptions } from '../utils/peek'
 import {
   findDomIndexByRealIndex,
@@ -53,6 +54,13 @@ export class Engine {
   private rootSizeCacheValid = false
   private slideSizesCacheValid = false
 
+  /**
+   * gap из опций, приведённый к px через computed style браузера.
+   * Обновляется в resolveGap() после применения margin к DOM.
+   * Поддерживает rem, em, %, px и любые другие CSS-единицы.
+   */
+  private gapPxResolved = 0
+
   private _isLocked = false
 
   private tvist: Tvist
@@ -69,6 +77,7 @@ export class Engine {
     this.index = new Counter(tvist.slides.length, startIndex, this.isLoopEnabled(), this.calculateCounterEndIndex())
     this.animator = new Animator()
 
+    this.resolveGap()
     this.applyPeek()
     this.calculateSizes()
     this.calculatePositions()
@@ -207,6 +216,43 @@ export class Engine {
   }
 
   /**
+   * Применяет CSS-значение gap к первому слайду и читает computed style в пикселях.
+   * Браузер сам переводит rem/em/% в абсолютные px — поддерживаются любые CSS-единицы.
+   * Должен вызываться после того как слайды уже в DOM.
+   */
+  private resolveGap(): void {
+    const slides = this.tvist.slides
+    if (slides.length === 0) {
+      this.gapPxResolved = 0
+      return
+    }
+    const gapValue = this.options.gap
+    if (!gapValue) {
+      this.gapPxResolved = 0
+      return
+    }
+    const isVertical = this.options.direction === 'vertical'
+    const direction = isVertical ? 'vertical' : 'horizontal'
+    // Применяем gap к первому слайду временно, чтобы браузер вычислил px
+    const firstSlide = slides[0]
+    if (!firstSlide) return
+    const prop = isVertical ? 'marginBottom' : 'marginRight'
+    const cssValue = gapCssForMargin(gapValue)
+    firstSlide.style[prop] = cssValue
+    this.gapPxResolved = resolveGapToPixels(firstSlide, direction)
+    // Сбрасываем временный стиль — applyFixedSize/applyAndMeasureAutoSize установит его правильно
+    firstSlide.style[prop] = ''
+  }
+
+  /**
+   * Публичный геттер gap в пикселях (вычисленный через computed style браузера).
+   * Используется модулями (DragModule, GridModule) для расчётов.
+   */
+  get gapPxValue(): number {
+    return this.gapPxResolved
+  }
+
+  /**
    * Применяет peek к контейнеру слайдов
    */
   applyPeek(): void {
@@ -216,7 +262,7 @@ export class Engine {
     const isVertical = this.options.direction === 'vertical'
     const rootSize = isVertical ? this.cachedRootHeight || getOuterHeight(this.tvist.root)
       : this.cachedRootWidth || getOuterWidth(this.tvist.root)
-    const gap = this.options.gap ?? 0
+    const gap = this.gapPxResolved
     const perPage = this.options.perPage ?? 1
     const slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
     const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : undefined
@@ -277,7 +323,7 @@ export class Engine {
     // размера слайда (как и в applyPeek), чтобы математическая модель
     // соответствовала DOM.
     const rootSize = this.getRootSize()
-    const gap = this.options.gap ?? 0
+    const gap = this.gapPxResolved
     const perPage = this.options.perPage ?? 1
     const slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
     const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : 0
@@ -291,7 +337,7 @@ export class Engine {
   private calculateFixedSlideSize(): void {
     // Только верхнеуровневый gap: межстраничные отступы grid задаёт GridModule в DOM,
     // позиции для grid перезаписываются в fixEnginePositions по offsetLeft.
-    const gap = this.options.gap ?? 0
+    const gap = this.gapPxResolved
     
     if (this.options.slideMinSize && this.options.slideMinSize > 0) {
       const minSize = this.options.slideMinSize
@@ -312,19 +358,19 @@ export class Engine {
   }
 
   private applyAndMeasureAutoSize(isDisabled: boolean): void {
-    const gap = this.options.gap ?? 0
     const isVertical = this.options.direction === 'vertical'
+    const gapCss = gapCssForMargin(this.options.gap)
 
     if (!isDisabled) {
       this.tvist.slides.forEach((slide, i) => {
         slide.style.marginRight = ''
         slide.style.marginBottom = ''
         
-        if (gap > 0 && i !== this.tvist.slides.length - 1) {
+        if (gapCss && i !== this.tvist.slides.length - 1) {
           if (isVertical) {
-            slide.style.marginBottom = `${gap}px`
+            slide.style.marginBottom = gapCss
           } else {
-            slide.style.marginRight = `${gap}px`
+            slide.style.marginRight = gapCss
           }
         }
       })
@@ -346,8 +392,8 @@ export class Engine {
   }
 
   private applyFixedSize(isDisabled: boolean): void {
-    const gap = this.options.gap ?? 0
     const isVertical = this.options.direction === 'vertical'
+    const gapCss = gapCssForMargin(this.options.gap)
 
     if (!isDisabled) {
       this.tvist.slides.forEach((slide, i) => {
@@ -365,11 +411,11 @@ export class Engine {
           }
         }
         
-        if (gap > 0 && i !== this.tvist.slides.length - 1) {
+        if (gapCss && i !== this.tvist.slides.length - 1) {
           if (isVertical) {
-            slide.style.marginBottom = `${gap}px`
+            slide.style.marginBottom = gapCss
           } else {
-            slide.style.marginRight = `${gap}px`
+            slide.style.marginRight = gapCss
           }
         }
       })
@@ -384,7 +430,7 @@ export class Engine {
    */
   private calculatePositions(): void {
     const slides = this.tvist.slides
-    const gap = this.options.gap ?? 0
+    const gap = this.gapPxResolved
 
     this.slidePositions = []
 
@@ -791,6 +837,7 @@ export class Engine {
   update(): void {
     this.invalidateRootSizeCache()
     this.slideSizesCacheValid = false
+    this.resolveGap()
     this.applyPeek()
     this.calculateSizes()
     this.calculatePositions()
