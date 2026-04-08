@@ -12,6 +12,7 @@
 import { Module } from '../Module'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
+import { gapCssForMargin } from '../../utils/gridGap'
 
 export class MarqueeModule extends Module {
   readonly name = 'marquee'
@@ -161,29 +162,26 @@ export class MarqueeModule extends Module {
    * В режиме Marquee нам нужен gap после КАЖДОГО слайда для бесшовного цикла
    */
   private fixLastSlideGap(): void {
-    const gap = this.options.gap ?? 0
-    if (gap <= 0) return
+    const gapCss = gapCssForMargin(this.options.gap)
+    if (!gapCss) return
 
     const slides = this.tvist.slides
     if (slides.length === 0) return
 
     const isHorizontal = this.options.direction !== 'vertical'
-    
+
     // Engine убирает margin у последнего слайда.
     // Нам нужно, чтобы у ВСЕХ слайдов был margin, так как они зациклены.
-    // Мы просто находим последний слайд и принудительно ставим ему margin.
     const lastSlide = slides[slides.length - 1]
     if (!lastSlide) return
 
     if (isHorizontal) {
-      // Проверяем стиль и добавляем, если нет
-      // Engine ставит margin: '' для последнего слайда
       if (!lastSlide.style.marginRight) {
-        lastSlide.style.marginRight = `${gap}px`
+        lastSlide.style.marginRight = gapCss
       }
     } else {
       if (!lastSlide.style.marginBottom) {
-        lastSlide.style.marginBottom = `${gap}px`
+        lastSlide.style.marginBottom = gapCss
       }
     }
   }
@@ -193,7 +191,7 @@ export class MarqueeModule extends Module {
    */
   private calculateTotalSize(): void {
     const isHorizontal = this.options.direction !== 'vertical'
-    const gap = this.options.gap ?? 0
+    const gap = this.tvist.engine.gapPxValue
     const count = this.tvist.slides.length
     if (count === 0) {
       this.totalSize = 0
@@ -282,7 +280,7 @@ export class MarqueeModule extends Module {
   private updatePosition(deltaTime: number): void {
     // Вычисляем смещение
     const distance = this.speed * deltaTime
-    const gap = this.options.gap ?? 0
+    const gap = this.tvist.engine.gapPxValue
 
     // Обновляем позицию в зависимости от направления
     const isReverse = this.direction === 'right' || this.direction === 'down'

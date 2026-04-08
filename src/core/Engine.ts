@@ -216,31 +216,67 @@ export class Engine {
   }
 
   /**
-   * Применяет CSS-значение gap к первому слайду и читает computed style в пикселях.
-   * Браузер сам переводит rem/em/% в абсолютные px — поддерживаются любые CSS-единицы.
-   * Должен вызываться после того как слайды уже в DOM.
+   * Вычисляет gap в пикселях без DOM-мутаций:
+   * - число → уже px
+   * - "16px" → parseFloat
+   * - "1rem" → rootFontSize * n
+   * - "1em"  → parentFontSize * n (font-size трека)
+   * - "50%"  → containerSize * n (размер трека без peek)
+   * - остальное → временный DOM-запрос (один reflow, без мутаций стиля)
    */
   private resolveGap(): void {
-    const slides = this.tvist.slides
-    if (slides.length === 0) {
-      this.gapPxResolved = 0
-      return
-    }
     const gapValue = this.options.gap
     if (!gapValue) {
       this.gapPxResolved = 0
       return
     }
-    const isVertical = this.options.direction === 'vertical'
-    const direction = isVertical ? 'vertical' : 'horizontal'
-    // Применяем gap к первому слайду временно, чтобы браузер вычислил px
+
+    if (typeof gapValue === 'number') {
+      this.gapPxResolved = gapValue
+      return
+    }
+
+    const trimmed = gapValue.trim()
+    const n = parseFloat(trimmed)
+    if (!Number.isFinite(n)) {
+      this.gapPxResolved = 0
+      return
+    }
+
+    if (trimmed.endsWith('px')) {
+      this.gapPxResolved = n
+      return
+    }
+
+    if (trimmed.endsWith('rem')) {
+      const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+      this.gapPxResolved = n * rootFontSize
+      return
+    }
+
+    if (trimmed.endsWith('em')) {
+      const parentFontSize = parseFloat(getComputedStyle(this.tvist.track).fontSize) || 16
+      this.gapPxResolved = n * parentFontSize
+      return
+    }
+
+    if (trimmed.endsWith('%')) {
+      // % от размера контейнера (трека без peek)
+      this.gapPxResolved = (n / 100) * this.containerSize
+      return
+    }
+
+    // vw/vh и прочие редкие единицы — применяем временно и читаем computed style (один reflow)
+    const slides = this.tvist.slides
     const firstSlide = slides[0]
-    if (!firstSlide) return
+    if (!firstSlide) {
+      this.gapPxResolved = 0
+      return
+    }
+    const isVertical = this.options.direction === 'vertical'
     const prop = isVertical ? 'marginBottom' : 'marginRight'
-    const cssValue = gapCssForMargin(gapValue)
-    firstSlide.style[prop] = cssValue
-    this.gapPxResolved = resolveGapToPixels(firstSlide, direction)
-    // Сбрасываем временный стиль — applyFixedSize/applyAndMeasureAutoSize установит его правильно
+    firstSlide.style[prop] = gapCssForMargin(gapValue)
+    this.gapPxResolved = resolveGapToPixels(firstSlide, isVertical ? 'vertical' : 'horizontal')
     firstSlide.style[prop] = ''
   }
 
