@@ -122,6 +122,7 @@ describe('Tvist', () => {
       
       // В root должен быть новый инстанс
       expect(fixture.root.tvistInstance).toBe(slider2)
+      expect(fixture.root.classList.contains(TVIST_CLASSES.destroyed)).toBe(false)
     })
 
     it('should set tvistInstance to null after destroy', () => {

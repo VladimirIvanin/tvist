@@ -51,6 +51,45 @@ describe('Tvist root state classes', () => {
 
       expect(fixture.root.classList.contains(TVIST_CLASSES.destroyed)).toBe(true)
     })
+
+    it('после destroy() новый Tvist на том же root снимает --destroyed', () => {
+      fixture = createSliderFixture({ slidesCount: 2, width: 400 })
+      const first = new Tvist(fixture.root, { perPage: 1 })
+      first.destroy()
+      expect(fixture.root.classList.contains(TVIST_CLASSES.destroyed)).toBe(true)
+
+      const second = new Tvist(fixture.root, { perPage: 1 })
+
+      expect(fixture.root.classList.contains(TVIST_CLASSES.destroyed)).toBe(false)
+      expect(fixture.root.classList.contains(TVIST_CLASSES.created)).toBe(true)
+      expect(fixture.root.tvistInstance).toBe(second)
+
+      second.destroy()
+    })
+
+    it('после destroy() с enabled:false новый инстанс без enabled:false снимает --disabled', () => {
+      fixture = createSliderFixture({ slidesCount: 2, width: 400 })
+      const off = new Tvist(fixture.root, { perPage: 1, enabled: false })
+      expect(fixture.root.classList.contains(TVIST_CLASSES.disabled)).toBe(true)
+      off.destroy()
+
+      const on = new Tvist(fixture.root, { perPage: 1 })
+      expect(fixture.root.classList.contains(TVIST_CLASSES.disabled)).toBe(false)
+
+      on.destroy()
+    })
+
+    it('после destroy() locked-слайдера новый инстанс не наследует --locked', () => {
+      fixture = createSliderFixture({ slidesCount: 3, width: 900 })
+      const locked = new Tvist(fixture.root, { perPage: 3, gap: 0 })
+      expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(true)
+      locked.destroy()
+
+      const scrollable = new Tvist(fixture.root, { perPage: 1, gap: 0 })
+      expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(false)
+
+      scrollable.destroy()
+    })
   })
 
   describe('locked', () => {

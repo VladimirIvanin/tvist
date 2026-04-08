@@ -56,6 +56,23 @@ const DEFAULT_OPTIONS: Partial<TvistOptions> = {
   browserFixes: { firefoxImageDecoding: true },
 }
 
+/**
+ * Модификаторы на root, которые выставляют движок и модули.
+ * При новом `Tvist` на том же элементе и при `clearSliderStyles` снимаются принудительно —
+ * иначе часть классов остаётся после `destroy()` (locked, nav, disabled, stack и т.д.).
+ */
+const TVIST_ROOT_RUNTIME_STATE_CLASSES: readonly string[] = [
+  TVIST_CLASSES.draggable,
+  TVIST_CLASSES.dragging,
+  TVIST_CLASSES.singlePage,
+  TVIST_CLASSES.nav,
+  TVIST_CLASSES.cube,
+  TVIST_CLASSES.stack,
+  TVIST_CLASSES.stackPile,
+  TVIST_CLASSES.locked,
+  TVIST_CLASSES.vertical,
+]
+
 export class Tvist {
   static readonly VERSION = pkg.version ?? '0.0.0'
 
@@ -189,7 +206,21 @@ export class Tvist {
       rootEl.tvistInstance.destroy({ destroyNested: true })
     }
     rootEl.tvistInstance = this
+    Tvist.clearRootStateBeforeMount(root)
     return root
+  }
+
+  /**
+   * Сбрасывает классы состояния предыдущего экземпляра на root перед монтированием нового.
+   * `destroy()` не снимает часть модификаторов (locked, disabled, nav, эффекты и т.д.).
+   */
+  private static clearRootStateBeforeMount(root: HTMLElement): void {
+    root.classList.remove(
+      TVIST_CLASSES.destroyed,
+      TVIST_CLASSES.created,
+      TVIST_CLASSES.disabled,
+      ...TVIST_ROOT_RUNTIME_STATE_CLASSES
+    )
   }
 
   private findTrack(): HTMLElement {
@@ -649,16 +680,8 @@ export class Tvist {
     this.track.style.paddingLeft = ''
     this.track.style.paddingRight = ''
 
-    // Убираем все классы состояния с рута которые вешают модули
-    this.root.classList.remove(
-      TVIST_CLASSES.draggable,
-      TVIST_CLASSES.dragging,
-      TVIST_CLASSES.singlePage,
-      TVIST_CLASSES.nav,
-      TVIST_CLASSES.cube,
-      TVIST_CLASSES.locked,
-      TVIST_CLASSES.vertical
-    )
+    // Убираем все классы состояния с root, которые вешают движок и модули
+    this.root.classList.remove(...TVIST_ROOT_RUNTIME_STATE_CLASSES)
 
     this.slides.forEach(slide => {
       slide.style.width = ''
