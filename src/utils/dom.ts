@@ -192,6 +192,25 @@ export function cloneOptions<T extends Record<string, unknown>>(options: T): T {
     }
   }
 
+  // JSON.stringify опускает функции — восстанавливаем колбэк perPage (корень и breakpoints)
+  const o = options as Record<string, unknown>
+  const c = cloned as Record<string, unknown>
+  if (typeof o.perPage === 'function') {
+    c.perPage = o.perPage
+  }
+  const origBp = o.breakpoints as Record<number, { perPage?: unknown }> | undefined
+  const clBp = c.breakpoints as Record<number, { perPage?: unknown }> | undefined
+  if (origBp && clBp) {
+    for (const key of Object.keys(origBp)) {
+      const nk = Number(key)
+      const ob = origBp[nk]
+      const cb = clBp[nk]
+      if (ob && cb && typeof ob.perPage === 'function') {
+        cb.perPage = ob.perPage
+      }
+    }
+  }
+
   return cloned
 }
 

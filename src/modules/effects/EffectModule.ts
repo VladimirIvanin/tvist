@@ -6,6 +6,7 @@ import { setFadeEffect } from './fade'
 import { setCubeEffect } from './cube'
 import { setStackEffect, cleanupStackCache } from './stack'
 import { getPeekValueFromOptions } from '../../utils/peek'
+import { getOptionsPerPage } from '../../utils/perPage'
 
 export class EffectModule extends Module {
   name = 'effect'
@@ -35,7 +36,7 @@ export class EffectModule extends Module {
     this.currentEffect = this.options.effect
 
     // Effects require perPage: 1
-    if (this.options.perPage !== 1) {
+    if (getOptionsPerPage(this.options) !== 1) {
       if (this.options.debug) {
         console.warn(
           'Tvist: Effects work only with perPage: 1. Automatically setting perPage: 1'

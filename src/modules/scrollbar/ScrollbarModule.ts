@@ -7,6 +7,7 @@ import { Module } from '../Module'
 import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
+import { getOptionsPerPage } from '../../utils/perPage'
 
 interface ScrollbarOptions {
   /** Селектор или элемент для контейнера скроллбара */
@@ -432,7 +433,7 @@ export class ScrollbarModule extends Module {
     if (slideCount <= 1) return
 
     // Вычисляем размер ползунка (пропорционально количеству видимых слайдов)
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     const thumbSizePercent = (perPage / slideCount) * 100
 
     // Получаем текущую позицию из engine для плавного движения

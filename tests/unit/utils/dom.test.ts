@@ -327,6 +327,29 @@ describe('dom utils', () => {
       expect((cloned as typeof options).pagination.container).toBe(paginationEl)
       expect((cloned as typeof options).scrollbar.container).toBe(scrollbarEl)
     })
+
+    it('должен сохранять функцию perPage на корне (JSON её не клонирует)', () => {
+      const perPageFn = (ctx: { containerSize: number }) =>
+        Math.max(1, Math.floor(ctx.containerSize / 400))
+      const options = { gap: 0, perPage: perPageFn }
+      const cloned = cloneOptions(options as Record<string, unknown>)
+
+      expect(cloned.perPage).toBe(perPageFn)
+    })
+
+    it('должен сохранять функцию perPage внутри breakpoints', () => {
+      const bpPerPage = () => 1
+      const options = {
+        perPage: 2,
+        breakpoints: {
+          600: { perPage: bpPerPage },
+        },
+      }
+      const cloned = cloneOptions(options as Record<string, unknown>)
+
+      expect((cloned as typeof options).breakpoints[600].perPage).toBe(bpPerPage)
+      expect((cloned as typeof options).perPage).toBe(2)
+    })
   })
 })
 

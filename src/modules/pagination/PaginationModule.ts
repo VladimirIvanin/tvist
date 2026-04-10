@@ -12,6 +12,7 @@ import { Module } from '../Module'
 import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
+import { getOptionsPerPage } from '../../utils/perPage'
 
 const PAGINATION_DEBUG = false
 const log = (..._args: unknown[]) => {
@@ -66,7 +67,7 @@ export class PaginationModule extends Module {
 
     log('Init', {
       loop: this.options.loop,
-      perPage: this.options.perPage,
+      perPage: getOptionsPerPage(this.options),
       slidesCount: this.tvist.slides.length,
       hasRealIndexGetter: 'realIndex' in this.tvist
     })
@@ -158,7 +159,7 @@ export class PaginationModule extends Module {
    * Ожидаемое количество буллетов при текущих опциях (для проверки, нужен ли полный render)
    */
   private getExpectedBulletCount(): number {
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     const slideCount = this.tvist.originalSlideCount
     const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
     
@@ -175,7 +176,7 @@ export class PaginationModule extends Module {
    * Вычисляет количество страниц с учетом perPage и slidesPerGroup
    */
   private calculatePageCount(): number {
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     const slidesPerGroup = this.options.slidesPerGroup ?? 1
     const slideCount = this.tvist.originalSlideCount
     const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
@@ -541,7 +542,7 @@ export class PaginationModule extends Module {
     this.detachClickHandlers()
 
     // Вычисляем количество страниц с учетом perPage
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     const slideCount = this.tvist.originalSlideCount
     const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
     
@@ -623,7 +624,7 @@ export class PaginationModule extends Module {
     if (!this.container) return
 
     const pagination = this.options.pagination
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     const slideCount = this.tvist.originalSlideCount
     const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
     const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
@@ -652,7 +653,7 @@ export class PaginationModule extends Module {
   private renderProgress(): void {
     if (!this.container) return
 
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     const slideCount = this.tvist.originalSlideCount
     const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
     const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
@@ -680,7 +681,7 @@ export class PaginationModule extends Module {
     const pagination = this.options.pagination
 
     if (typeof pagination === 'object' && pagination?.renderCustom) {
-      const perPage = this.options.perPage ?? 1
+      const perPage = getOptionsPerPage(this.options)
       const slideCount = this.tvist.originalSlideCount
       const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
       const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
@@ -856,7 +857,7 @@ export class PaginationModule extends Module {
     this.progressBarEl ??= this.container?.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`) ?? null
 
     if (this.progressBarEl) {
-      const perPage = this.options.perPage ?? 1
+      const perPage = getOptionsPerPage(this.options)
       const slideCount = this.tvist.originalSlideCount
       const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
       const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
@@ -893,7 +894,7 @@ export class PaginationModule extends Module {
     if (!this.container) return
 
     const pagination = this.options.pagination
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     const slideCount = this.tvist.originalSlideCount
     const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
     const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)
@@ -919,7 +920,7 @@ export class PaginationModule extends Module {
     this.progressBarEl ??= this.container?.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`) ?? null
 
     if (this.progressBarEl) {
-      const perPage = this.options.perPage ?? 1
+      const perPage = getOptionsPerPage(this.options)
       const slideCount = this.tvist.originalSlideCount
       const isLoop = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
       const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage)

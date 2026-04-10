@@ -34,6 +34,8 @@ export type {
   VideoOptions,
   VideoEvent,
   VideoProgressEvent,
+  PerPageContext,
+  PerPageCalculator,
 } from './core/types'
 export type { Module, ModuleConstructor } from './modules/Module'
 

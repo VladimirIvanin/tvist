@@ -18,6 +18,7 @@ export { ScrollControlModule } from './scroll-control'
 export { ScrollbarModule } from './scrollbar'
 export { MarqueeModule } from './marquee'
 export { LazyLoadModule } from './lazyload'
+export { VirtualModule } from './virtual'
 export { VideoModule } from './video'
 export { VisibilityModule } from './visibility'
 

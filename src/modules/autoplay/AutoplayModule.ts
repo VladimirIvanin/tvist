@@ -27,6 +27,7 @@ import { Module } from '../Module'
 import { findSlideByRealIndex } from '../../utils/slideRealIndex'
 import type { Tvist } from '../../core/Tvist'
 import type { AutoplayProgressEvent, TvistOptions, AutoplayOptions } from '../../core/types'
+import { getOptionsPerPage } from '../../utils/perPage'
 
 /** Дефолтные значения для AutoplayOptions */
 const AUTOPLAY_DEFAULTS: Required<AutoplayOptions> = {
@@ -591,7 +592,7 @@ export class AutoplayModule extends Module {
         
         // Запоминаем индекс до навигации
         const indexBefore = this.tvist.activeIndex
-        const slidesPerPage = this.options.perPage ?? 1
+        const slidesPerPage = getOptionsPerPage(this.options)
         const endIndex = Math.max(0, this.tvist.slides.length - slidesPerPage)
         const loopEnabled = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
         const boundaryAttempt = !loopEnabled && !this.options.rewind && indexBefore >= endIndex

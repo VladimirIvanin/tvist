@@ -319,5 +319,65 @@ describe('Engine', () => {
     slider.update()
     expect(slider.options.perPage).toBe(1)
   })
+
+  it('perPage: функция без breakpoints вызывается один раз при повторных update', () => {
+    const fn = vi.fn((ctx) => {
+      expect(ctx.windowWidth).toBeGreaterThanOrEqual(0)
+      expect(ctx.containerSize).toBeGreaterThan(0)
+      expect(ctx.gapPx).toBe(10)
+      expect(ctx.peek.start).toBeDefined()
+      expect(ctx.peek.end).toBeDefined()
+      expect(ctx.slideCount).toBe(5)
+      return Math.max(1, Math.floor(ctx.containerSize / 400))
+    })
+    const slider = new Tvist(root, { perPage: fn, gap: 10 })
+    expect(fn).toHaveBeenCalledTimes(1)
+    expect(slider.options.perPage).toBe(2)
+
+    slider.update()
+    expect(fn).toHaveBeenCalledTimes(1)
+    expect(slider.options.perPage).toBe(2)
+  })
+
+  it('perPage: при непустых breakpoints функция вызывается на каждом update', () => {
+    const fn = vi.fn(() => 2)
+    const slider = new Tvist(root, {
+      perPage: fn,
+      gap: 0,
+      breakpoints: {
+        2000: { gap: 0 },
+      },
+    })
+    const afterInit = fn.mock.calls.length
+    expect(afterInit).toBeGreaterThanOrEqual(1)
+
+    slider.update()
+    expect(fn.mock.calls.length).toBeGreaterThan(afterInit)
+  })
+
+  it('perPage: в vertical контексте containerSize по высоте трека', () => {
+    Object.defineProperty(root, 'offsetHeight', {
+      configurable: true,
+      value: 600,
+    })
+    const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
+    Object.defineProperty(track, 'offsetHeight', {
+      configurable: true,
+      value: 600,
+    })
+
+    const fn = vi.fn((ctx) => {
+      expect(ctx.containerSize).toBe(600)
+      return 1
+    })
+
+    new Tvist(root, {
+      perPage: fn,
+      direction: 'vertical',
+      gap: 0,
+    })
+
+    expect(fn).toHaveBeenCalled()
+  })
 })
 

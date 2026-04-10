@@ -259,7 +259,10 @@ export class SlideStatesModule extends Module {
   private updateActiveClasses(): void {
     const slides = this.tvist.slides
     const activeIndex = this.tvist.activeIndex
-    const activeSlide = slides[activeIndex]
+    const isVirtual = this.tvist.engine.getVirtualLogicalCount() != null
+    const activeSlide = isVirtual
+      ? findSlideByRealIndex(slides, activeIndex)
+      : slides[activeIndex]
 
     if (!activeSlide) return
     
@@ -267,6 +270,29 @@ export class SlideStatesModule extends Module {
     const preloadPromises: Promise<void>[] = []
 
     const len = slides.length
+
+    if (isVirtual) {
+      const activeLogicalIndex = activeIndex
+      const prevTargetIndex = activeLogicalIndex - 1
+      const nextTargetIndex = activeLogicalIndex + 1
+      slides.forEach((slide) => {
+        const attr = slide.getAttribute('data-tvist-slide-index')
+        const currentLogicalIndex = attr !== null ? parseInt(attr, 10) : -1
+        const isActive = currentLogicalIndex === activeLogicalIndex
+        const isPrev = currentLogicalIndex === prevTargetIndex
+        const isNext = currentLogicalIndex === nextTargetIndex
+        this.toggleClass(slide, this.CLASS_ACTIVE, isActive)
+        this.toggleClass(slide, this.CLASS_PREV, isPrev)
+        this.toggleClass(slide, this.CLASS_NEXT, isNext)
+        if (isPrev || isNext) {
+          preloadPromises.push(this.preloadSlideImages(slide))
+        }
+      })
+      if (preloadPromises.length > 0) {
+        Promise.all(preloadPromises).catch(() => undefined)
+      }
+      return
+    }
 
     if (this.isLoopWithClonesEnabled() && len > 0) {
       const prevDom = (activeIndex - 1 + len) % len

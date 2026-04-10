@@ -14,6 +14,7 @@ import type {
   TvistDestroyOptions,
   AutoplayModuleAPI,
   VideoModuleAPI,
+  VirtualSlideAPI,
 } from './types'
 import type { Module, ModuleConstructor } from '../modules/Module'
 import { BreakpointsModule } from '../modules/breakpoints/BreakpointsModule'
@@ -65,6 +66,7 @@ const TVIST_ROOT_RUNTIME_STATE_CLASSES: readonly string[] = [
   TVIST_CLASSES.draggable,
   TVIST_CLASSES.dragging,
   TVIST_CLASSES.singlePage,
+  TVIST_CLASSES.virtual,
   TVIST_CLASSES.nav,
   TVIST_CLASSES.cube,
   TVIST_CLASSES.stack,
@@ -653,6 +655,10 @@ export class Tvist {
     } else {
       Object.assign(this.options, newOptions)
     }
+
+    if (newOptions.perPage !== undefined) {
+      this.engine.syncPerPageDefinitionFromOptions()
+    }
   }
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
@@ -910,6 +916,8 @@ export class Tvist {
    * В режиме loop.withClones не учитывает клонированные слайды по краям.
    */
   get originalSlideCount(): number {
+    const virtualCount = this.engine.getVirtualLogicalCount()
+    if (virtualCount != null) return virtualCount
     this._originalSlideCountCache ??= this._slides.filter(
       (el) => !el.classList.contains(TVIST_CLASSES.slideClone)
     ).length
@@ -919,10 +927,21 @@ export class Tvist {
   /**
    * Общее количество слайдов в DOM (включая клоны).
    * В режиме loop.withClones включает клонированные слайды по краям.
+   * В режиме virtual — логическое число слайдов (как originalSlideCount).
    * Совпадает с originalSlideCount если loop.withClones не используется.
    */
   get slideCount(): number {
+    const virtualCount = this.engine.getVirtualLogicalCount()
+    if (virtualCount != null) return virtualCount
     return this._slides.length
+  }
+
+  /**
+   * Есть ли в опциях непустой объект `breakpoints` (влияет на пересчёт `perPage`-функции).
+   */
+  hasBreakpoints(): boolean {
+    const b = this.options.breakpoints
+    return !!(b && Object.keys(b).length > 0)
   }
 
   /**
@@ -964,6 +983,17 @@ export class Tvist {
     const module = this.modules.get('video') as VideoModuleAPI | undefined
     if (module && typeof module.getVideo === 'function') {
       return module.getVideo()
+    }
+    return undefined
+  }
+
+  /**
+   * Публичное API модуля virtual (если модуль активен)
+   */
+  get virtual(): VirtualSlideAPI | undefined {
+    const module = this.modules.get('virtual') as { getVirtual?: () => VirtualSlideAPI } | undefined
+    if (module && typeof module.getVirtual === 'function') {
+      return module.getVirtual()
     }
     return undefined
   }

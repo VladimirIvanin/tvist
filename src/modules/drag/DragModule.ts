@@ -20,6 +20,7 @@ import {
 } from '../../core/constants';
 import type { Tvist } from '../../core/Tvist';
 import type { TvistOptions, TvistLongPressDomEventDetail } from '../../core/types';
+import { getOptionsPerPage } from '../../utils/perPage';
 const DRAG_DEBUG = false;
 const dragLog = (..._args: unknown[]) => {
   if (DRAG_DEBUG) {
@@ -146,7 +147,7 @@ export class DragModule extends Module {
    */
   private shouldSkipLoopDomReorderDuringDrag(): boolean {
     const slidesCount = this.tvist.slides.length;
-    const perPage = this.options.perPage ?? 1;
+    const perPage = getOptionsPerPage(this.options);
     return slidesCount <= perPage;
   }
 
@@ -193,7 +194,7 @@ export class DragModule extends Module {
    */
   private updateBounds(): void {
     const { engine, slides } = this.tvist;
-    const perPage = this.options.perPage ?? 1;
+    const perPage = getOptionsPerPage(this.options);
 
     if (this.isLoopEnabled || this.isMarqueeActive) {
       this.minPosition = Infinity;

@@ -17,6 +17,7 @@ import {
 } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
+import { getOptionsPerPage } from '../../utils/perPage'
 
 export class NavigationModule extends Module {
   readonly name = 'navigation'
@@ -212,7 +213,7 @@ export class NavigationModule extends Module {
    */
   private calculatePageCount(): number {
     const { slides, options } = this.tvist
-    const perPage = options.perPage ?? 1
+    const perPage = getOptionsPerPage(options)
     const slidesPerGroup = options.slidesPerGroup ?? 1
     const slideCount = slides.length
     const isLoop = options.loop === true || (typeof options.loop === 'object' && options.loop.enabled !== false)

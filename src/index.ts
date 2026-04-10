@@ -33,6 +33,7 @@ import './modules/scroll-control'
 import './modules/scrollbar'
 import './modules/marquee'
 import './modules/lazyload'
+import './modules/virtual'
 import './modules/video'
 
 
@@ -46,6 +47,10 @@ export type {
   VideoEvent,
   VideoProgressEvent,
   NativeLazyAdjacentOptions,
+  PerPageContext,
+  PerPageCalculator,
+  VirtualSlideAPI,
+  VirtualOptions,
 } from './core/types'
 export type { Module, ModuleConstructor } from './modules/Module'
 

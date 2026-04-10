@@ -22,6 +22,7 @@ import { MarqueeModule } from './modules/marquee/MarqueeModule'
 import { GridModule } from './modules/grid/GridModule'
 import { EffectModule } from './modules/effects/EffectModule'
 import { LazyLoadModule } from './modules/lazyload/LazyLoadModule'
+import { VirtualModule } from './modules/virtual/VirtualModule'
 import { SlideStatesModule } from './modules/slide-states/SlideStatesModule'
 import { ScrollControlModule } from './modules/scroll-control/ScrollControlModule'
 import { ThumbsModule } from './modules/thumbs/ThumbsModule'
@@ -36,6 +37,7 @@ const EXTRA_MODULES: [string, ModuleConstructor][] = [
   ['grid', GridModule],
   ['effects', EffectModule],
   ['lazyload', LazyLoadModule],
+  ['virtual', VirtualModule],
   ['slide-states', SlideStatesModule],
   ['scroll-control', ScrollControlModule],
   ['thumbs', ThumbsModule],

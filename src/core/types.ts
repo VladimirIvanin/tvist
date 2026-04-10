@@ -77,6 +77,36 @@ export interface VideoModuleAPI {
 }
 
 /**
+ * Опции виртуальных слайдов (только фиксированный размер слайда, без autoWidth/autoHeight).
+ * Несовместимо с loop, grid, marquee, cube/stack.
+ */
+export interface VirtualOptions<T = unknown> {
+  /**
+   * Данные слайдов. Если не задано при `virtual: true`, массив собирается из текущих узлов
+   * `.tvist-slide` (innerHTML каждого).
+   */
+  slides?: T[]
+  /** Кэшировать отрендеренные DOM-узлы при перестроении окна @default true */
+  cache?: boolean
+  /** Доп. слайды до видимой области */
+  addSlidesBefore?: number
+  /** Доп. слайды после видимой области */
+  addSlidesAfter?: number
+  /** HTML содержимого слайда (внутри оболочки `.tvist-slide`) */
+  renderSlide?: (data: T, index: number) => string
+}
+
+/** Публичное API геттера `tvist.virtual` */
+export interface VirtualSlideAPI {
+  /** Текущее число логических слайдов */
+  getSlideCount(): number
+  /** Пересобрать окно виртуальных слайдов */
+  update(force?: boolean): void
+  /** Заменить массив данных и обновить слайдер */
+  setSlides(slides: unknown[]): void
+}
+
+/**
  * Опции автопрокрутки (объект)
  */
 export interface AutoplayOptions {
@@ -320,6 +350,31 @@ export interface LoopOptions {
 }
 
 /**
+ * Контекст для синхронного расчёта {@link TvistOptions.perPage} функцией.
+ *
+ * `containerSize` — размер вдоль оси скролла (ширина трека при `direction: 'horizontal'`,
+ * высота при `vertical`), как во внутренних расчётах движка.
+ *
+ * `peek.start` / `peek.end` — отступы в px: для горизонтали left/right, для вертикали top/bottom.
+ */
+export interface PerPageContext {
+  /** Текущая ширина окна (`window.innerWidth`, в SSR/тестах без window — 0). */
+  windowWidth: number
+  /** Размер области просмотра по оси скролла (px). */
+  containerSize: number
+  /** Текущий gap в пикселях. */
+  gapPx: number
+  peek: { start: number; end: number }
+  /** Число реальных слайдов (без loop-клонов). */
+  slideCount: number
+}
+
+/**
+ * Синхронно возвращает количество слайдов на странице (целое ≥ 1).
+ */
+export type PerPageCalculator = (ctx: PerPageContext) => number
+
+/**
  * Основные опции слайдера
  */
 export interface TvistOptions {
@@ -327,9 +382,15 @@ export interface TvistOptions {
   
   /**
    * Количество слайдов на странице (видимых одновременно).
+   *
+   * Можно передать функцию: она получает {@link PerPageContext} и должна вернуть число синхронно.
+   * Без `breakpoints` результат вычисляется один раз при инициализации и дальше закрепляется.
+   * При настроенных `breakpoints` функция вызывается заново при каждом пересчёте layout
+   * (в т.ч. при смене брейкпоинта и resize).
+   *
    * @default 1
    */
-  perPage?: number
+  perPage?: number | PerPageCalculator
 
   /**
    * Количество слайдов, пролистываемых за один раз.
@@ -767,18 +828,10 @@ export interface TvistOptions {
   // Virtual
   
   /**
-   * Виртуальные слайды для работы с большими списками
+   * Виртуальные слайды для больших списков (в DOM только окно вокруг активного слайда).
    * @default false
    */
-  virtual?: boolean | {
-    /** Количество дополнительных слайдов до видимой области */
-    addSlidesBefore?: number
-    /** Количество дополнительных слайдов после видимой области */
-    addSlidesAfter?: number
-    /** Функция рендеринга виртуального слайда */
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- virtual slide data is user-defined */
-    renderSlide?: (data: any, index: number) => string
-  }
+  virtual?: boolean | VirtualOptions
   
   // Grid
   

@@ -184,6 +184,8 @@ export class BreakpointsModule extends Module {
     Object.assign(this.tvist.options, newOptions)
     this.tvist.options.breakpoints = breakpoints
 
+    this.tvist.engine.syncPerPageDefinitionFromOptions()
+
     // Синхронизируем модули с новыми опциями (инициализируем новые, уничтожаем деактивированные)
     // Вызываем до enable/disable, чтобы модули были готовы при включении слайдера
     if (shouldBeEnabled) {

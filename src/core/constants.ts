@@ -33,6 +33,8 @@ export const TVIST_CLASSES = {
   created: `${P}--created`,
   destroyed: `${P}--destroyed`,
   singlePage: `${P}--single-page`,
+  /** Виртуальные слайды: в DOM только окно вокруг активного индекса */
+  virtual: `${P}--virtual`,
   nav: `${P}--nav`,
   cube: `${P}--cube`,
   stack: `${P}--stack`,

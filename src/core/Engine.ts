@@ -7,7 +7,7 @@ import { Counter } from './Counter'
 import { Animator, easings, type EasingFunction } from './Animator'
 import { TVIST_CLASSES } from './constants'
 import type { Tvist } from './Tvist'
-import type { TvistOptions } from './types'
+import type { PerPageContext, TvistOptions } from './types'
 import { getOuterWidth, getOuterHeight } from '../utils/dom'
 import { gapCssForMargin, resolveGapToPixels } from '../utils/gridGap'
 import { applyPeek, getPeekValue, getPeekValueFromOptions } from '../utils/peek'
@@ -16,6 +16,7 @@ import {
   findDomIndexByRealIndexForTransition,
   TVIST_SLIDE_INDEX_ATTR,
 } from '../utils/slideRealIndex'
+import { getOptionsPerPage } from '../utils/perPage'
 
 /** Как Splide Scroll: длительность snap после drag = max(|dx|/base, min) */
 const DRAG_SNAP_BASE_VELOCITY_PX_PER_MS = 1.5
@@ -63,8 +64,16 @@ export class Engine {
 
   private _isLocked = false
 
+  /** Логическое число слайдов в режиме virtual (в DOM только окно слайдов). */
+  private virtualLogicalCount: number | null = null
+
   private tvist: Tvist
   private options: TvistOptions
+
+  /** Колбэк perPage из опций (после JSON-клона опций не теряется — см. sync). */
+  private perPageCalculator: ((ctx: PerPageContext) => number) | null = null
+  /** Закэшированный результат функции perPage без breakpoints (один раз при инициализации). */
+  private perPageFrozen: number | null = null
 
   constructor(tvist: Tvist, options: TvistOptions) {
     this.tvist = tvist
@@ -74,10 +83,13 @@ export class Engine {
 
     this.location = new Vector1D(0)
     this.target = new Vector1D(0)
-    this.index = new Counter(tvist.slides.length, startIndex, this.isLoopEnabled(), this.calculateCounterEndIndex())
     this.animator = new Animator()
 
+    this.syncPerPageDefinitionFromOptions()
     this.resolveGap()
+    this.resolvePerPage()
+
+    this.index = new Counter(tvist.slides.length, startIndex, this.isLoopEnabled(), this.calculateCounterEndIndex())
     this.applyPeek()
     this.calculateSizes()
     this.calculatePositions()
@@ -90,10 +102,35 @@ export class Engine {
   }
 
   /**
+   * Число логических слайдов в режиме virtual (`null` — обычный режим).
+   */
+  public getVirtualLogicalCount(): number | null {
+    return this.virtualLogicalCount
+  }
+
+  /**
+   * Включает/выключает виртуальный режим (только через VirtualModule).
+   */
+  public setVirtualLogicalCount(count: number | null): void {
+    this.virtualLogicalCount = count
+    this.updateCounterLimits()
+    this.index.set(this.index.get())
+    this.invalidateScrollCache()
+  }
+
+  private getLogicalSlideCount(): number {
+    if (this.virtualLogicalCount != null) return this.virtualLogicalCount
+    return this.tvist.slides.length
+  }
+
+  /**
    * Возвращает размер слайда по индексу (ширина или высота в зависимости от direction).
    * При autoWidth/autoHeight — измеренный размер из DOM, иначе — общий slideSize.
    */
   public getSlideSize(index: number): number {
+    if (this.virtualLogicalCount != null) {
+      return this.slideSize
+    }
     if (
       this.slideSizes.length > 0 &&
       index >= 0 &&
@@ -302,6 +339,91 @@ export class Engine {
   }
 
   /**
+   * Синхронизирует внутреннее представление perPage-функции с `options.perPage`.
+   * Вызывать после смены опций (updateOptions, брейкпоинт).
+   */
+  syncPerPageDefinitionFromOptions(): void {
+    const p = this.options.perPage
+    if (typeof p === 'function') {
+      this.perPageCalculator = p
+      this.perPageFrozen = null
+    } else {
+      this.perPageCalculator = null
+      this.perPageFrozen = null
+    }
+  }
+
+  /**
+   * Число «реальных» слайдов для колбэка perPage.
+   * Не используем `tvist.originalSlideCount`: при конструировании Engine ссылка `tvist.engine` ещё не выставлена.
+   */
+  private resolvePerPageSlideCount(): number {
+    if (this.virtualLogicalCount != null) {
+      return this.virtualLogicalCount
+    }
+    return this.tvist.slides.filter(
+      (el) => !el.classList.contains(TVIST_CLASSES.slideClone)
+    ).length
+  }
+
+  private buildPerPageContext(): PerPageContext {
+    if (!this.rootSizeCacheValid) {
+      this.updateRootSizeCache()
+    }
+    const isVertical = this.options.direction === 'vertical'
+    const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 0
+    const containerSize = this.getRootSize()
+    const startSide = isVertical ? 'top' : 'left'
+    const endSide = isVertical ? 'bottom' : 'right'
+    let peekStart = getPeekValueFromOptions(this.options, startSide)
+    let peekEnd = getPeekValueFromOptions(this.options, endSide)
+    if (this.options.peek) {
+      if (peekStart === 0) {
+        peekStart = getPeekValue(this.tvist.container, startSide)
+      }
+      if (peekEnd === 0) {
+        peekEnd = getPeekValue(this.tvist.container, endSide)
+      }
+    }
+    return {
+      windowWidth,
+      containerSize,
+      gapPx: this.gapPxResolved,
+      peek: { start: peekStart, end: peekEnd },
+      slideCount: this.resolvePerPageSlideCount(),
+    }
+  }
+
+  private normalizeResolvedPerPage(n: number): number {
+    if (!Number.isFinite(n)) return 1
+    return Math.max(1, Math.floor(n))
+  }
+
+  /**
+   * Превращает perPage-функцию в число для текущего кадра layout.
+   */
+  private resolvePerPage(): void {
+    const hasBreakpoints = this.tvist.hasBreakpoints()
+
+    if (this.perPageCalculator) {
+      if (!hasBreakpoints && this.perPageFrozen !== null) {
+        this.options.perPage = this.perPageFrozen
+        return
+      }
+      const raw = this.perPageCalculator(this.buildPerPageContext())
+      const n = this.normalizeResolvedPerPage(raw)
+      if (!hasBreakpoints) {
+        this.perPageFrozen = n
+      }
+      this.options.perPage = n
+      return
+    }
+
+    const p = this.options.perPage
+    this.options.perPage = typeof p === 'number' ? p : 1
+  }
+
+  /**
    * Применяет peek к контейнеру слайдов
    */
   applyPeek(): void {
@@ -312,7 +434,7 @@ export class Engine {
     const rootSize = isVertical ? this.cachedRootHeight || getOuterHeight(this.tvist.root)
       : this.cachedRootWidth || getOuterWidth(this.tvist.root)
     const gap = this.gapPxResolved
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     const slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
     const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : undefined
 
@@ -373,7 +495,7 @@ export class Engine {
     // соответствовала DOM.
     const rootSize = this.getRootSize()
     const gap = this.gapPxResolved
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     const slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
     const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : 0
 
@@ -396,7 +518,7 @@ export class Engine {
       this.options.perPage = Math.max(1, calculatedPerPage)
     }
 
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     this.slideSize = (this.containerSize - gap * (perPage - 1)) / perPage
     
     if (this.slideSize < 0 || !isFinite(this.slideSize)) {
@@ -478,9 +600,19 @@ export class Engine {
    * Рассчитывает позиции всех слайдов
    */
   private calculatePositions(): void {
-    const slides = this.tvist.slides
     const gap = this.gapPxResolved
 
+    if (this.virtualLogicalCount != null) {
+      const n = this.virtualLogicalCount
+      this.slidePositions = []
+      for (let i = 0; i < n; i++) {
+        this.slidePositions.push(i * (this.slideSize + gap))
+      }
+      this.updateScrollCache()
+      return
+    }
+
+    const slides = this.tvist.slides
     this.slidePositions = []
 
     if (this.slideSizes.length > 0) {
@@ -513,7 +645,7 @@ export class Engine {
     // maxScroll: нижний/правый край последнего слайда совпадает с краем видимой области.
     // Видимая ось = containerSize (root − peekStart − peekEnd), иначе при нижнем/right peek
     // лимит скролла смещается и autoSize + peekTrim дают неверный translate (в т.ч. vertical).
-    const lastIndex = this.tvist.slides.length - 1
+    const lastIndex = this.getLogicalSlideCount() - 1
     if (lastIndex >= 0) {
       const lastPageRight =
         this.getSlidePosition(lastIndex) + this.getSlideSize(lastIndex)
@@ -552,13 +684,13 @@ export class Engine {
    * Вычисляет последний допустимый индекс для скролла
    */
   private getEndIndex(): number {
-    const slideCount = this.tvist.slides.length
+    const slideCount = this.getLogicalSlideCount()
 
     if (this.isLoopEnabled() || this.options.center || this.options.isNavigation || this.isAutoSize()) {
       return slideCount - 1
     }
 
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     return Math.max(0, Math.min(slideCount - perPage, slideCount - 1))
   }
 
@@ -602,8 +734,8 @@ export class Engine {
    * Вычисляет endIndex для Counter на основе текущих опций
    */
   private calculateCounterEndIndex(): number {
-    const slideCount = this.tvist.slides.length
-    const perPage = this.options.perPage ?? 1
+    const slideCount = this.getLogicalSlideCount()
+    const perPage = getOptionsPerPage(this.options)
     return (this.isLoopEnabled() || this.options.isNavigation || this.options.center)
       ? slideCount - 1
       : Math.max(0, slideCount - perPage)
@@ -614,7 +746,7 @@ export class Engine {
    */
   private updateCounterLimits(): void {
     this.index.endIndex = this.calculateCounterEndIndex()
-    this.index.max = this.tvist.slides.length
+    this.index.max = this.getLogicalSlideCount()
   }
 
   /**
@@ -682,12 +814,16 @@ export class Engine {
 
     // eventIndex — realIndex для событий (slideChangeStart, slideChangeEnd и пр.)
     // В loop-режиме normalizedIndex = DOM-позиция, eventIndex = realIndex из data-tvist-slide-index.
+    // В virtual normalizedIndex всегда логический индекс (как realIndex).
     // В обычном режиме они совпадают.
     return {
       requestedIndex: index,
       clampedIndex,
       normalizedIndex,
-      eventIndex: this.getEventIndex(normalizedIndex),
+      eventIndex:
+        this.virtualLogicalCount != null
+          ? normalizedIndex
+          : this.getEventIndex(normalizedIndex),
       indexChanged: normalizedIndex !== previousIndex,
     }
   }
@@ -877,6 +1013,8 @@ export class Engine {
   updateDisabled(): void {
     this.invalidateRootSizeCache()
     this.slideSizesCacheValid = false
+    this.resolveGap()
+    this.resolvePerPage()
     this.calculateSizes(true)
     this.calculatePositions()
     this.updateCounterLimits()
@@ -889,6 +1027,7 @@ export class Engine {
     this.invalidateRootSizeCache()
     this.slideSizesCacheValid = false
     this.resolveGap()
+    this.resolvePerPage()
     this.applyPeek()
     this.calculateSizes()
     this.calculatePositions()
@@ -902,9 +1041,12 @@ export class Engine {
    * Блокировка включается, если весь контент помещается в контейнер и некуда листать.
    */
   public checkLock(isDisabled = false): void {
-    const slideCount = this.tvist.slides.length
-    const perPage = this.options.perPage ?? 1
-    const hasSizes = this.slideSize > 0 || this.slideSizes.length === slideCount
+    const slideCount = this.getLogicalSlideCount()
+    const perPage = getOptionsPerPage(this.options)
+    const hasSizes =
+      this.virtualLogicalCount != null
+        ? this.slideSize > 0
+        : this.slideSize > 0 || this.slideSizes.length === slideCount
 
     // Если размеры ещё не рассчитаны, блокируем просто по количеству слайдов
     if (!hasSizes) {
@@ -956,14 +1098,13 @@ export class Engine {
   }
 
   private getContentSize(): number {
-    const slides = this.tvist.slides
-
-    if (slides.length === 0) return 0
+    const count = this.getLogicalSlideCount()
+    if (count === 0) return 0
 
     let minPos = Infinity
     let maxPos = -Infinity
 
-    for (let i = 0; i < slides.length; i++) {
+    for (let i = 0; i < count; i++) {
       const pos = this.getSlidePosition(i)
       const size = this.getSlideSize(i)
       if (pos < minPos) minPos = pos
@@ -1033,13 +1174,28 @@ export class Engine {
     const result: boolean[] = []
     const THRESHOLD = 1
 
+    const viewportStart = -currentPos
+    const viewportEnd = viewportStart + viewportSize
+
+    if (this.virtualLogicalCount != null) {
+      for (let i = 0; i < slides.length; i++) {
+        const el = slides[i]
+        if (!el) continue
+        const attr = el.getAttribute(TVIST_SLIDE_INDEX_ATTR)
+        const realIdx = attr !== null ? parseInt(attr, 10) : i
+        const slideStart = this.getSlidePosition(realIdx)
+        const slideEnd = slideStart + this.getSlideSize(realIdx)
+        const isVisible =
+          slideStart < viewportEnd - THRESHOLD && slideEnd > viewportStart + THRESHOLD
+        result.push(isVisible)
+      }
+      return result
+    }
+
     for (let i = 0; i < slides.length; i++) {
       // slidePosition — позиция слайда в координатах контента
       // currentPos — отрицательное смещение (translate), поэтому видимая область:
       // от -currentPos до -currentPos + viewportSize
-      const viewportStart = -currentPos
-      const viewportEnd = viewportStart + viewportSize
-
       const slideStart = this.getSlidePosition(i)
       const slideEnd = slideStart + this.getSlideSize(i)
 
@@ -1061,7 +1217,7 @@ export class Engine {
    * Получить количество слайдов
    */
   get slideCount(): number {
-    return this.tvist.slides.length
+    return this.getLogicalSlideCount()
   }
 
   /**
@@ -1072,7 +1228,7 @@ export class Engine {
     if (this.isLoopEnabled() || this.options.rewind) return true
 
     const limit = this.options.isNavigation
-      ? this.tvist.slides.length - 1
+      ? this.getLogicalSlideCount() - 1
       : this.getEndIndex()
 
     if (this.index.get() >= limit) return false

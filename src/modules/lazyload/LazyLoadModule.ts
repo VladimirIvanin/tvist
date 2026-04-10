@@ -14,6 +14,7 @@ import { addClass, removeClass, children } from '../../utils/dom'
 import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
+import { getOptionsPerPage } from '../../utils/perPage'
 
 /**
  * Селектор для поиска изображений с lazy loading
@@ -187,7 +188,7 @@ export class LazyLoadModule extends Module {
    */
   private check(): void {
     const activeIndex = this.tvist.activeIndex
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
 
     // Вычисляем диапазон слайдов для загрузки
     const distance = perPage * (this.preloadPrevNext + 1) - 1

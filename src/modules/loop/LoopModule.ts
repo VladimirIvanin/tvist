@@ -9,6 +9,7 @@ import { Module } from '../Module'
 import { TVIST_CLASSES } from '../../core/constants'
 import type { TvistOptions } from '../../core/types'
 import { findDomIndexByRealIndex } from '../../utils/slideRealIndex'
+import { getOptionsPerPage } from '../../utils/perPage'
 
 interface LoopFixParams {
   slideRealIndex?: number
@@ -228,7 +229,7 @@ export class LoopModule extends Module {
   }
 
   private getSlidesPerView(bothDirections: boolean): number {
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     let slidesPerView = typeof perPage === 'number' ? perPage : 1
     if (bothDirections && slidesPerView % 2 === 0) {
       slidesPerView += 1
@@ -427,7 +428,7 @@ export class LoopModule extends Module {
 
     if (originalCount === 0) return
 
-    const perPage = this.options.perPage ?? 1
+    const perPage = getOptionsPerPage(this.options)
     const slidesPerGroup = this.options.slidesPerGroup ?? 1
     const base = typeof perPage === 'number' ? perPage : 1
     const needed = Math.max(base, slidesPerGroup)
