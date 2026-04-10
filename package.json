@@ -1,6 +1,6 @@
 {
   "name": "tvist",
-  "version": "1.16.5",
+  "version": "1.16.6",
   "description": "Слайдер с широким API для современного веба",
   "type": "module",
   "main": "./dist/tvist.cjs.js",
@@ -26,7 +26,7 @@
     "dev": "vite --config vite.sandbox.config.ts",
     "dev:watch": "concurrently \"npm run dev\" \"npm run typecheck -- --watch\"",
     "build": "tsc && vite build",
-    "build:browser": "tsc && vite build --config vite.browser.config.ts",
+    "build:browser": "tsc && vite build --config vite.browser.config.ts && npm run build:browser:split",
     "build:browser:split": "tsc && tsx scripts/build-browser-split.ts",
     "build:watch": "tsc --watch",
     "docs:dev": "vitepress dev docs",
