@@ -1028,18 +1028,15 @@ export class Tvist {
    * @param target - целевой экземпляр для синхронизации
    */
   sync(target: Tvist): this {
-    // 1. Когда скроллится этот слайдер -> скроллим целевой
+    // Всегда вызываем scrollTo: индекс может совпадать, а translate — нет
+    // (autoHeight/autoWidth, resize, внешний сброс). Движок сам пропустит анимацию,
+    // если позиция уже совпадает с целью (|Δ| ≤ 0.5px).
     this.on('slideChangeStart', (index: number) => {
-      if (target.activeIndex !== index) {
-        target.scrollTo(index)
-      }
+      target.scrollTo(index)
     })
 
-    // 2. Когда скроллится целевой -> скроллим этот
     target.on('slideChangeStart', (index: number) => {
-      if (this.activeIndex !== index) {
-        this.scrollTo(index)
-      }
+      this.scrollTo(index)
     })
 
     return this

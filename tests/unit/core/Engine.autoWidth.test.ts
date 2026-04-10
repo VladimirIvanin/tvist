@@ -91,6 +91,67 @@ describe('Engine - autoWidth / autoHeight', () => {
     })
   }
 
+  /** Вертикальный autoHeight + нижний peek; размер трека фиксирован для happy-dom. */
+  function createVerticalAutoHeightWithBottomPeek(
+    slideHeights: number[],
+    opts: { gap: number; trackOuterHeight: number; peekBottom: number }
+  ) {
+    root = document.createElement('div')
+    root.className = TVIST_CLASSES.block
+    root.style.width = '200px'
+
+    const track = document.createElement('div')
+    track.className = TVIST_CLASSES.track
+
+    container = document.createElement('div')
+    container.className = TVIST_CLASSES.container
+
+    slides = slideHeights.map((_, i) => {
+      const slide = document.createElement('div')
+      slide.className = TVIST_CLASSES.slide
+      slide.textContent = `Slide ${i + 1}`
+      container.appendChild(slide)
+      return slide
+    })
+
+    track.appendChild(container)
+    root.appendChild(track)
+    document.body.appendChild(root)
+
+    Object.defineProperty(root, 'offsetWidth', { configurable: true, value: 200 })
+    Object.defineProperty(track, 'offsetWidth', { configurable: true, value: 200 })
+    Object.defineProperty(track, 'offsetHeight', {
+      configurable: true,
+      value: opts.trackOuterHeight,
+    })
+    Object.defineProperty(track, 'clientHeight', {
+      configurable: true,
+      value: opts.trackOuterHeight,
+    })
+
+    slides.forEach((slide, i) => {
+      Object.defineProperty(slide, 'offsetWidth', { configurable: true, value: 200 })
+      Object.defineProperty(slide, 'offsetHeight', {
+        configurable: true,
+        value: slideHeights[i],
+      })
+    })
+
+    return new Tvist(root, {
+      direction: 'vertical',
+      autoHeight: true,
+      gap: opts.gap,
+      peek: { bottom: opts.peekBottom },
+      perPage: 1,
+      speed: 0,
+    })
+  }
+
+  function parseTranslateY(transform: string): number {
+    const m = transform.match(/translate3d\([^,]+,\s*(-?\d+\.?\d*)px/)
+    return m ? parseFloat(m[1]) : NaN
+  }
+
   afterEach(() => {
     if (root?.parentNode) {
       document.body.removeChild(root)
@@ -236,6 +297,30 @@ describe('Engine - autoWidth / autoHeight', () => {
 
       const transform = slider.container.style.transform
       expect(transform).toContain('translate3d(0,')
+    })
+
+    it('vertical autoHeight + bottom peek: prev/scrollTo uses correct Y (maxScroll uses containerSize)', () => {
+      const gap = 8
+      const slideHeights = [120, 120, 120, 120, 120]
+      const trackOuterHeight = 400
+      const peekBottom = 50
+      const slider = createVerticalAutoHeightWithBottomPeek(slideHeights, {
+        gap,
+        trackOuterHeight,
+        peekBottom,
+      })
+
+      // Целевой translate без «самопроверки» через getScrollPositionForIndex (тот же clamp).
+      const translateForSlideTop = (i: number) => -slider.engine.getSlidePosition(i)
+
+      slider.scrollTo(2, true)
+      expect(slider.activeIndex).toBe(2)
+      expect(parseTranslateY(slider.container.style.transform)).toBe(translateForSlideTop(2))
+
+      slider.scrollTo(3, true)
+      slider.prev()
+      expect(slider.activeIndex).toBe(2)
+      expect(parseTranslateY(slider.container.style.transform)).toBe(translateForSlideTop(2))
     })
   })
 

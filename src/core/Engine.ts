@@ -497,12 +497,14 @@ export class Engine {
     // minScroll: используем peekStart (уже вычислен в calculateSizes)
     this.cachedMinScroll = -this.peekStart
 
-    // maxScroll: rootSize - peekStart - lastPageRight
+    // maxScroll: нижний/правый край последнего слайда совпадает с краем видимой области.
+    // Видимая ось = containerSize (root − peekStart − peekEnd), иначе при нижнем/right peek
+    // лимит скролла смещается и autoSize + peekTrim дают неверный translate (в т.ч. vertical).
     const lastIndex = this.tvist.slides.length - 1
     if (lastIndex >= 0) {
       const lastPageRight =
         this.getSlidePosition(lastIndex) + this.getSlideSize(lastIndex)
-      this.cachedMaxScroll = this.cachedRootSize - this.peekStart - lastPageRight
+      this.cachedMaxScroll = this.containerSize - lastPageRight
     } else {
       this.cachedMaxScroll = 0
     }
