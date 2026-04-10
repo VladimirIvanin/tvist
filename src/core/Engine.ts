@@ -216,12 +216,26 @@ export class Engine {
   }
 
   /**
+   * База для gap в процентах при переводе в px.
+   * По CSS margin/padding в % для любой стороны считаются от **ширины** содержащего блока,
+   * в т.ч. margin-top/bottom. Gap задаётся margin по оси скролла, поэтому для vertical
+   * нельзя умножать % на высоту viewport (containerSize).
+   */
+  private getMarginPercentageBasePx(): number {
+    for (const el of [this.tvist.root, this.tvist.track, this.tvist.container]) {
+      const w = getOuterWidth(el)
+      if (w > 0) return w
+    }
+    return this.containerSize
+  }
+
+  /**
    * Вычисляет gap в пикселях без DOM-мутаций:
    * - число → уже px
    * - "16px" → parseFloat
    * - "1rem" → rootFontSize * n
    * - "1em"  → parentFontSize * n (font-size трека)
-   * - "50%"  → containerSize * n (размер трека без peek)
+   * - "50%"  → ширина root/track/container * n (как margin % в CSS)
    * - остальное → временный DOM-запрос (один reflow, без мутаций стиля)
    */
   private resolveGap(): void {
@@ -261,8 +275,7 @@ export class Engine {
     }
 
     if (trimmed.endsWith('%')) {
-      // % от размера контейнера (трека без peek)
-      this.gapPxResolved = (n / 100) * this.containerSize
+      this.gapPxResolved = (n / 100) * this.getMarginPercentageBasePx()
       return
     }
 

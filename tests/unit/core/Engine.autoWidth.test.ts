@@ -288,6 +288,13 @@ describe('Engine - autoWidth / autoHeight', () => {
       expect(slider.engine.getSlidePosition(2)).toBe(100 + gap + 180 + gap)
     })
 
+    it('should resolve vertical gap % from track/root width (CSS margin % base), not viewport height', () => {
+      const slider = createSliderWithAutoHeight([100, 100], { gap: '10%' })
+      // root width 400px (фикстура), высота 500 — 10% gap должен быть 40px, не 50px
+      expect(slider.engine.gapPxValue).toBe(40)
+      expect(slider.engine.getSlidePosition(1)).toBe(100 + 40)
+    })
+
     it('should scroll vertically with autoHeight', () => {
       const slideHeights = [100, 180, 140]
       const slider = createSliderWithAutoHeight(slideHeights)
