@@ -41,6 +41,20 @@ describe('getSlidesInTvistRoot', () => {
     expect(getSlidesInTvistRoot(container, root)).toEqual([a, b, c])
   })
 
+  it('исключает слайды с display: none (внешний CSS / layout)', () => {
+    const { root, container } = makeRootWithContainer()
+    const a = document.createElement('div')
+    a.className = TVIST_CLASSES.slide
+    const b = document.createElement('div')
+    b.className = TVIST_CLASSES.slide
+    b.style.display = 'none'
+    const c = document.createElement('div')
+    c.className = TVIST_CLASSES.slide
+    container.append(a, b, c)
+
+    expect(getSlidesInTvistRoot(container, root)).toEqual([a, c])
+  })
+
   it('исключает слайды внутри одного вложенного блока', () => {
     const { root, container } = makeRootWithContainer()
 
