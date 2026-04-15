@@ -1,14 +1,21 @@
 import type { TvistOptions } from '../core/types'
 
 /**
- * Преобразует значение gap в CSS-строку для margin.
+ * Преобразует число или CSS-строку в CSS-значение для свойств width/height/margin и т.п.
  * Число → `${n}px`, строка передаётся как есть (rem, em, %, px и т.д.).
- * Пустое/нулевое значение → пустая строка (margin не устанавливается).
+ * Пустое/нулевое значение → пустая строка.
  */
-export function gapCssForMargin(value: string | number | undefined): string {
+export function toCssValue(value: string | number | undefined): string {
   if (value === undefined || value === 0 || value === '') return ''
   if (typeof value === 'number') return `${value}px`
   return value
+}
+
+/**
+ * @deprecated Используй `toCssValue`.
+ */
+export function gapCssForMargin(value: string | number | undefined): string {
+  return toCssValue(value)
 }
 
 /**

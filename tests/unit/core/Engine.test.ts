@@ -319,5 +319,34 @@ describe('Engine', () => {
     slider.update()
     expect(slider.options.perPage).toBe(1)
   })
+
+  it('должен считать perPage и slideSize по fixedWidth (горизонталь)', () => {
+    const slider = new Tvist(root, {
+      perPage: 1,
+      gap: 0,
+      fixedWidth: 200,
+    })
+    expect(slider.options.perPage).toBe(5)
+    expect(slider.engine.slideSizeValue).toBe(200)
+  })
+
+  it('должен учитывать gap при fixedWidth', () => {
+    const slider = new Tvist(root, {
+      perPage: 1,
+      gap: 20,
+      fixedWidth: 300,
+    })
+    expect(slider.options.perPage).toBe(3)
+    expect(slider.engine.slideSizeValue).toBe(300)
+  })
+
+  it('не должен применять slideMinSize при активном fixedWidth', () => {
+    const slider = new Tvist(root, {
+      slideMinSize: 50,
+      gap: 0,
+      fixedWidth: 300,
+    })
+    expect(slider.options.perPage).toBe(3)
+  })
 })
 

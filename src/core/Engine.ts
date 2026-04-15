@@ -9,7 +9,8 @@ import { TVIST_CLASSES } from './constants'
 import type { Tvist } from './Tvist'
 import type { TvistOptions } from './types'
 import { getOuterWidth, getOuterHeight } from '../utils/dom'
-import { gapCssForMargin, resolveGapToPixels } from '../utils/gridGap'
+import { toCssValue, gapCssForMargin, resolveGapToPixels } from '../utils/gridGap'
+import { resolveCssLengthToPixels } from '../utils/cssLength'
 import { applyPeek, getPeekValue, getPeekValueFromOptions } from '../utils/peek'
 import {
   findDomIndexByRealIndex,
@@ -54,6 +55,10 @@ export class Engine {
   private rootSizeCacheValid = false
   private slideSizesCacheValid = false
 
+  /** Размеры fixedWidth / fixedHeight в px после resolveFixedDimensionsEarly() */
+  private fixedWidthPxResolved = 0
+  private fixedHeightPxResolved = 0
+
   /**
    * gap из опций, приведённый к px через computed style браузера.
    * Обновляется в resolveGap() после применения margin к DOM.
@@ -78,6 +83,7 @@ export class Engine {
     this.animator = new Animator()
 
     this.resolveGap()
+    this.resolveFixedDimensionsEarly()
     this.applyPeek()
     this.calculateSizes()
     this.calculatePositions()
@@ -229,6 +235,72 @@ export class Engine {
     return this.containerSize
   }
 
+  /** База для height в процентах (fixedHeight и т.п.) */
+  private getVerticalPercentageBasePx(): number {
+    for (const el of [this.tvist.root, this.tvist.track, this.tvist.container]) {
+      const h = getOuterHeight(el)
+      if (h > 0) return h
+    }
+    return this.containerSize
+  }
+
+  private isFixedDimensionOption(value: number | string | undefined): value is number | string {
+    if (value === undefined || value === '' || value === 0) return false
+    if (typeof value === 'number') return value > 0
+    return true
+  }
+
+  /** Переводит опцию fixedWidth/fixedHeight в px. Число → как есть, строка → через CSS-резолюцию. */
+  private resolveFixedDimensionPx(
+    value: number | string,
+    axis: 'width' | 'height',
+    probe: HTMLElement,
+    percentBasePx: number
+  ): number {
+    if (typeof value === 'number') return value
+    return resolveCssLengthToPixels(value, axis, { probe, percentBasePx })
+  }
+
+  /**
+   * Измеряет fixedWidth / fixedHeight в px до applyPeek (для лимита peek и perPage).
+   */
+  private resolveFixedDimensionsEarly(): void {
+    this.fixedWidthPxResolved = 0
+    this.fixedHeightPxResolved = 0
+    const slide = this.tvist.slides[0]
+    if (!slide) return
+
+    const { fixedWidth: fw, fixedHeight: fh } = this.options
+
+    if (this.isFixedDimensionOption(fw)) {
+      this.fixedWidthPxResolved = this.resolveFixedDimensionPx(
+        fw, 'width', slide, this.getMarginPercentageBasePx()
+      )
+    }
+
+    if (this.isFixedDimensionOption(fh)) {
+      this.fixedHeightPxResolved = this.resolveFixedDimensionPx(
+        fh, 'height', slide, this.getVerticalPercentageBasePx()
+      )
+    }
+  }
+
+  /** Базовый размер слайда для лимита peek (50%) и updatePeekValues */
+  private getSlideBaseSizeForPeekLayout(rootSize: number): number {
+    const isVertical = this.options.direction === 'vertical'
+    const gap = this.gapPxResolved
+    const perPage = this.options.perPage ?? 1
+
+    if (!isVertical && this.fixedWidthPxResolved > 0 && this.isFixedDimensionOption(this.options.fixedWidth)) {
+      return this.fixedWidthPxResolved
+    }
+    if (isVertical && this.fixedHeightPxResolved > 0 && this.isFixedDimensionOption(this.options.fixedHeight)) {
+      return this.fixedHeightPxResolved
+    }
+
+    return (rootSize - gap * (perPage - 1)) / perPage
+  }
+
   /**
    * Вычисляет gap в пикселях без DOM-мутаций:
    * - число → уже px
@@ -311,9 +383,7 @@ export class Engine {
     const isVertical = this.options.direction === 'vertical'
     const rootSize = isVertical ? this.cachedRootHeight || getOuterHeight(this.tvist.root)
       : this.cachedRootWidth || getOuterWidth(this.tvist.root)
-    const gap = this.gapPxResolved
-    const perPage = this.options.perPage ?? 1
-    const slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
+    const slideBaseSize = this.getSlideBaseSizeForPeekLayout(rootSize)
     const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : undefined
 
     applyPeek(this.tvist.track, this.options, maxPeek)
@@ -348,7 +418,16 @@ export class Engine {
 
   private isAutoSize(): boolean {
     const isVertical = this.options.direction === 'vertical'
-    return isVertical ? this.options.autoHeight === true : this.options.autoWidth === true
+    if (isVertical) {
+      if (this.isFixedDimensionOption(this.options.fixedHeight)) {
+        return false
+      }
+      return this.options.autoHeight === true
+    }
+    if (this.isFixedDimensionOption(this.options.fixedWidth)) {
+      return false
+    }
+    return this.options.autoWidth === true
   }
 
   private updatePeekValues(isDisabled: boolean): void {
@@ -372,9 +451,7 @@ export class Engine {
     // размера слайда (как и в applyPeek), чтобы математическая модель
     // соответствовала DOM.
     const rootSize = this.getRootSize()
-    const gap = this.gapPxResolved
-    const perPage = this.options.perPage ?? 1
-    const slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
+    const slideBaseSize = this.getSlideBaseSizeForPeekLayout(rootSize)
     const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : 0
 
     if (maxPeek > 0) {
@@ -387,22 +464,32 @@ export class Engine {
     // Только верхнеуровневый gap: межстраничные отступы grid задаёт GridModule в DOM,
     // позиции для grid перезаписываются в fixEnginePositions по offsetLeft.
     const gap = this.gapPxResolved
-    
-    if (this.options.slideMinSize && this.options.slideMinSize > 0) {
-      const minSize = this.options.slideMinSize
-      const calculatedPerPage = Math.floor(
-        (this.containerSize + gap) / (minSize + gap)
+    const isVertical = this.options.direction === 'vertical'
+
+    // Фиксированный размер по основной оси: fixedWidth для горизонтали, fixedHeight для вертикали.
+    const fixedPx = isVertical ? this.fixedHeightPxResolved : this.fixedWidthPxResolved
+
+    if (!fixedPx && this.options.slideMinSize) {
+      this.options.perPage = Math.max(
+        1,
+        Math.floor((this.containerSize + gap) / (this.options.slideMinSize + gap))
       )
-      this.options.perPage = Math.max(1, calculatedPerPage)
+    }
+
+    if (fixedPx > 0) {
+      this.options.perPage = Math.max(1, Math.floor((this.containerSize + gap) / (fixedPx + gap)))
+      this.slideSize = fixedPx
+      this.slideSizes = []
+      return
     }
 
     const perPage = this.options.perPage ?? 1
     this.slideSize = (this.containerSize - gap * (perPage - 1)) / perPage
-    
+
     if (this.slideSize < 0 || !isFinite(this.slideSize)) {
       this.slideSize = 0
     }
-    
+
     this.slideSizes = []
   }
 
@@ -442,7 +529,13 @@ export class Engine {
 
   private applyFixedSize(isDisabled: boolean): void {
     const isVertical = this.options.direction === 'vertical'
-    const gapCss = gapCssForMargin(this.options.gap)
+    const gapCss = toCssValue(this.options.gap)
+
+    // CSS-значения по основной и поперечной осям.
+    // Основная ось: fixedWidth для горизонтали, fixedHeight для вертикали.
+    // Поперечная ось: fixedHeight для горизонтали, fixedWidth для вертикали.
+    const primaryCss = toCssValue(isVertical ? this.options.fixedHeight : this.options.fixedWidth)
+    const crossCss = toCssValue(isVertical ? this.options.fixedWidth : this.options.fixedHeight)
 
     if (!isDisabled) {
       this.tvist.slides.forEach((slide, i) => {
@@ -452,14 +545,20 @@ export class Engine {
         slide.style.marginBottom = ''
 
         if (this.slideSize > 0) {
+          const primarySizeCss = primaryCss || `${this.slideSize}px`
           if (isVertical) {
-            slide.style.height = `${this.slideSize}px`
-            slide.style.width = '100%'
+            slide.style.height = primarySizeCss
           } else {
-            slide.style.width = `${this.slideSize}px`
+            slide.style.width = primarySizeCss
           }
         }
-        
+
+        if (isVertical) {
+          slide.style.width = crossCss || '100%'
+        } else if (crossCss) {
+          slide.style.height = crossCss
+        }
+
         if (gapCss && i !== this.tvist.slides.length - 1) {
           if (isVertical) {
             slide.style.marginBottom = gapCss
@@ -469,7 +568,7 @@ export class Engine {
         }
       })
     }
-    
+
     this.slideSizes = []
     this.slideSizesCacheValid = false
   }
@@ -889,6 +988,7 @@ export class Engine {
     this.invalidateRootSizeCache()
     this.slideSizesCacheValid = false
     this.resolveGap()
+    this.resolveFixedDimensionsEarly()
     this.applyPeek()
     this.calculateSizes()
     this.calculatePositions()

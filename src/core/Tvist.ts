@@ -575,6 +575,8 @@ export class Tvist {
     const needsRecalculation = 
       newOptions.perPage !== undefined ||
       newOptions.slideMinSize !== undefined ||
+      newOptions.fixedWidth !== undefined ||
+      newOptions.fixedHeight !== undefined ||
       newOptions.gap !== undefined ||
       newOptions.peek !== undefined ||
       newOptions.peekTrim !== undefined ||

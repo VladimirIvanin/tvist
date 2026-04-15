@@ -66,6 +66,7 @@ export default defineConfig({
           { text: 'Peek', link: '/examples/peek' },
           { text: 'Center', link: '/examples/center' },
           { text: 'Auto Width/Height', link: '/examples/auto-width' },
+          { text: 'Фиксированный размер слайда', link: '/examples/fixed-size' },
           { text: 'Responsive', link: '/examples/responsive' },
           { text: 'Карточки товаров', link: '/examples/product-cards' },
           { text: 'Update Options', link: '/examples/update-options' },
