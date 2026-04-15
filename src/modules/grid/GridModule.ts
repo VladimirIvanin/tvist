@@ -82,7 +82,12 @@ export class GridModule extends Module {
       return `d:${JSON.stringify(grid.dimensions)}:${gapFingerprint}`
     }
 
-    return `f:${String(grid.rows ?? '')}:${String(grid.cols ?? '')}:${gapFingerprint}`
+    const fixed = this.effectiveFixedRowsCols()
+    if (!fixed) {
+      return `f:::${gapFingerprint}`
+    }
+
+    return `f:${String(fixed.rows)}:${String(fixed.cols)}:${gapFingerprint}`
   }
 
   private gapFingerprintForStructureKey(
@@ -104,12 +109,40 @@ export class GridModule extends Module {
 
   public override shouldBeActive(): boolean {
     const { grid } = this.options
-    return !!grid && (!!grid.rows || !!grid.cols || (!!grid.dimensions && grid.dimensions.length > 0))
+    if (!grid) return false
+    if (grid.dimensions && grid.dimensions.length > 0) return true
+    const r = grid.rows
+    const c = grid.cols
+    const hasRows = typeof r === 'number' && Number.isFinite(r) && r > 0
+    const hasCols = typeof c === 'number' && Number.isFinite(c) && c > 0
+    return hasRows || hasCols
   }
 
   private hasDimensions(): boolean {
     const { grid } = this.options
     return !!(grid?.dimensions && grid.dimensions.length > 0)
+  }
+
+  /**
+   * Для fixed-сетки без `dimensions`: если задана только одна ось, вторая по умолчанию 1
+   * (одна колонка при только `rows`, одна строка при только `cols`), иначе контейнер
+   * очищался бы в `buildGrid()` без последующей сборки.
+   */
+  private effectiveFixedRowsCols(): { rows: number; cols: number } | null {
+    const { grid } = this.options
+    if (!grid || this.hasDimensions()) return null
+
+    const r = grid.rows
+    const c = grid.cols
+    const hasRows = typeof r === 'number' && Number.isFinite(r) && r > 0
+    const hasCols = typeof c === 'number' && Number.isFinite(c) && c > 0
+
+    if (!hasRows && !hasCols) return null
+
+    return {
+      rows: hasRows ? r : 1,
+      cols: hasCols ? c : 1,
+    }
   }
 
   /**
@@ -192,10 +225,10 @@ export class GridModule extends Module {
   }
 
   private buildFixedGrid(): void {
-    const { grid } = this.options
-    if (!grid?.rows || !grid?.cols) return
+    const fixed = this.effectiveFixedRowsCols()
+    if (!fixed) return
 
-    const { rows, cols } = grid
+    const { rows, cols } = fixed
     const cellsPerPage = rows * cols
     const pageCount = Math.ceil(this.originalSlides.length / cellsPerPage)
 

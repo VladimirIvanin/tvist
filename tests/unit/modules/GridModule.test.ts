@@ -39,6 +39,37 @@ describe('GridModule', () => {
   }
 
   describe('Fixed Grid (rows + cols)', () => {
+    it('при только rows подставляет cols = 1 (как splide-extension-grid defaults)', () => {
+      createSlides(4)
+
+      slider = new Tvist(container, {
+        grid: { rows: 2 },
+      })
+
+      const page = container.querySelector(`.${TVIST_CLASSES.slideGridPage}`)
+      const rows = page?.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
+      expect(rows).toHaveLength(2)
+      rows?.forEach(row => {
+        expect(row.querySelectorAll(`.${TVIST_CLASSES.gridCol}`)).toHaveLength(1)
+      })
+    })
+
+    it('при только cols подставляет rows = 1', () => {
+      createSlides(6)
+
+      slider = new Tvist(container, {
+        grid: { cols: 3 },
+      })
+
+      const pages = container.querySelectorAll(`.${TVIST_CLASSES.slideGridPage}`)
+      expect(pages).toHaveLength(2)
+      pages.forEach(page => {
+        const rows = page.querySelectorAll(`.${TVIST_CLASSES.gridRow}`)
+        expect(rows).toHaveLength(1)
+        expect(rows[0]?.querySelectorAll(`.${TVIST_CLASSES.gridCol}`)).toHaveLength(3)
+      })
+    })
+
     it('должен создавать страницы с фиксированной сеткой 2×2', () => {
       createSlides(8)
 
@@ -408,6 +439,35 @@ describe('GridModule', () => {
       const slides = container.querySelectorAll(`.${TVIST_CLASSES.slide}`)
       expect(slides).toHaveLength(4)
       expect(slides[0]?.classList.contains(TVIST_CLASSES.gridItem)).toBe(false)
+    })
+
+    it('после destroy контейнер трека не пустой и слайды не удаляются из DOM (те же узлы)', () => {
+      createSlides(4)
+      const trackContainer = container.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
+      const slidesBefore = Array.from(
+        trackContainer.querySelectorAll<HTMLElement>(`.${TVIST_CLASSES.slide}`)
+      )
+      const textsBefore = slidesBefore.map(el => el.textContent)
+
+      slider = new Tvist(container, {
+        grid: { rows: 2, cols: 2 },
+      })
+
+      slider.destroy()
+
+      expect(trackContainer.childElementCount).toBeGreaterThan(0)
+      expect(trackContainer.textContent?.trim().length ?? 0).toBeGreaterThan(0)
+
+      expect(slidesBefore).toHaveLength(4)
+      slidesBefore.forEach((node, i) => {
+        expect(document.contains(node)).toBe(true)
+        expect(node.parentElement).toBe(trackContainer)
+        expect(node.textContent).toBe(textsBefore[i])
+        expect(node.classList.contains(TVIST_CLASSES.slide)).toBe(true)
+        expect(node.classList.contains(TVIST_CLASSES.gridItem)).toBe(false)
+      })
+
+      expect(trackContainer.querySelectorAll(`.${TVIST_CLASSES.slide}`)).toHaveLength(4)
     })
 
     it('должен корректно пересоздавать grid при update', () => {
