@@ -8,19 +8,39 @@
   position: relative;
   width: 100%;
   visibility: hidden;
-  
-  // Performance: изолируем layout перерасчёты внутри слайдера от остальной страницы
-  // Изменения внутри слайдера не затрагивают layout страницы
-  contain: layout;
-  
+
+  // Изолируем layout И inline-size слайдера от родителя.
+  //
+  // Без `inline-size` containment в grid/flex-родителях с `min-width: auto`
+  // у grid-item (по умолчанию) max-content родителя разрешается по
+  // содержимому слайдера, а содержимое — это контейнер с flex-слайдами,
+  // ширина которых задаётся нами как inline style. Получается положительная
+  // обратная связь: мы пишем slide.style.width → min-content родителя растёт
+  // → grid-колонка тянется → track растёт → ResizeObserver вызывает update
+  // → slideSize пересчитывается от уже большего track — и так по кругу
+  // (ширина слайда улетает в миллионы пикселей при `center: justify` и др.).
+  //
+  // `contain: inline-size` делает inline-size элемента независимой от
+  // содержимого (intrinsic inline-size = 0 для родителя), что разрывает цикл.
+  contain: inline-size layout style;
+
+  // Fallback для браузеров без `inline-size` containment:
+  // `min-width: 0` отключает `min-width: auto` для flex/grid-item,
+  // если `.tvist-v1` сама является таким элементом.
+  min-width: 0;
+
   &--created {
     visibility: visible;
   }
-  
+
   &__track {
     overflow: hidden;
     position: relative;
     width: 100%;
+
+    // Дублируем на track на случай, если пользователь применит `contain`
+    // где-то выше/ниже или `contain: inline-size` окажется недоступен.
+    min-width: 0;
   }
   
   &__container {

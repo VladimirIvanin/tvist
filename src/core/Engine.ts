@@ -408,10 +408,28 @@ export class Engine {
       return
     }
 
+    const isAutoSize = this.isAutoSize()
+
+    // ⚠️ Сбрасываем размеры слайдов ДО измерения track.
+    //
+    // Иначе в grid/flex-родителях без `min-width: 0` слайды со style.width
+    // из прошлого прогона увеличивают intrinsic-размер контейнера, контейнер
+    // тянет track (overflow:hidden не всегда обрезает intrinsic sizing),
+    // ResizeObserver видит рост, зовёт update — и calculateFixedSlideSize
+    // считает всё большие и большие значения. Итог — ширина слайда и
+    // translate3d уходят в миллионы пикселей при center: { justify: true }
+    // и других лейаутах. См. tests/integration/center-justify-feedback.test.ts.
+    //
+    // Сброс делаем только в fixed-size режиме: в autoSize размеры слайдов
+    // задаёт пользователь/контент, сбрасывать их нельзя.
+    if (!isDisabled && !isAutoSize) {
+      this.resetSlideStylesForMeasurement()
+      this.invalidateRootSizeCache()
+      this.trackSizeCacheValid = false
+    }
+
     this.updatePeekValues(isDisabled)
     this.containerSize = this.getRootSize() - this.peekStart - this.peekEnd
-
-    const isAutoSize = this.isAutoSize()
 
     if (isAutoSize) {
       this.slideSize = 0
@@ -419,6 +437,25 @@ export class Engine {
     } else {
       this.calculateFixedSlideSize()
       this.applyFixedSize(isDisabled)
+    }
+  }
+
+
+  /**
+   * Сбрасывает inline-размеры и margin по основной оси у всех слайдов.
+   * Нужно вызывать перед измерением track/root, чтобы предыдущий прогон
+   * calculateSizes не «раздувал» intrinsic-размер родителя.
+   */
+  private resetSlideStylesForMeasurement(): void {
+    const isVertical = this.options.direction === 'vertical'
+    for (const slide of this.tvist.slides) {
+      if (isVertical) {
+        slide.style.height = ''
+        slide.style.marginBottom = ''
+      } else {
+        slide.style.width = ''
+        slide.style.marginRight = ''
+      }
     }
   }
 
