@@ -50,9 +50,9 @@ export class Engine {
   private cachedRootSize = 0
   private scrollCacheValid = false
 
-  private cachedRootWidth = 0
-  private cachedRootHeight = 0
-  private rootSizeCacheValid = false
+  private cachedTrackWidth = 0
+  private cachedTrackHeight = 0
+  private trackSizeCacheValid = false
   private slideSizesCacheValid = false
 
   /** Размеры fixedWidth / fixedHeight в px после resolveFixedDimensionsEarly() */
@@ -210,28 +210,28 @@ export class Engine {
   /**
    * Обновляет кеш размера track элемента (viewport слайдера)
    */
-  private updateRootSizeCache(): void {
-    this.cachedRootWidth = getOuterWidth(this.tvist.track)
-    this.cachedRootHeight = getOuterHeight(this.tvist.track)
-    this.rootSizeCacheValid = true
+  private updateTrackSizeCache(): void {
+    this.cachedTrackWidth = getOuterWidth(this.tvist.track)
+    this.cachedTrackHeight = getOuterHeight(this.tvist.track)
+    this.trackSizeCacheValid = true
   }
 
   /**
    * Получает размер root элемента (с кешированием)
    */
   private getRootSize(): number {
-    if (!this.rootSizeCacheValid) {
-      this.updateRootSizeCache()
+    if (!this.trackSizeCacheValid) {
+      this.updateTrackSizeCache()
     }
     const isVertical = this.options.direction === 'vertical'
-    return isVertical ? this.cachedRootHeight : this.cachedRootWidth
+    return isVertical ? this.cachedTrackHeight : this.cachedTrackWidth
   }
 
   /**
    * Инвалидирует кеш размера root элемента
    */
   private invalidateRootSizeCache(): void {
-    this.rootSizeCacheValid = false
+    this.trackSizeCacheValid = false
   }
 
   /**
@@ -394,8 +394,8 @@ export class Engine {
     // Базовый размер считаем по root без учёта peek:
     // slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
     const isVertical = this.options.direction === 'vertical'
-    const rootSize = isVertical ? this.cachedRootHeight || getOuterHeight(this.tvist.root)
-      : this.cachedRootWidth || getOuterWidth(this.tvist.root)
+    const rootSize = isVertical ? this.cachedTrackHeight || getOuterHeight(this.tvist.root)
+      : this.cachedTrackWidth || getOuterWidth(this.tvist.root)
     const slideBaseSize = this.getSlideBaseSizeForPeekLayout(rootSize)
     const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : undefined
 
