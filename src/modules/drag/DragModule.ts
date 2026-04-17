@@ -198,7 +198,7 @@ export class DragModule extends Module {
     if (this.isLoopEnabled || this.isMarqueeActive) {
       this.minPosition = Infinity;
       this.maxPosition = -Infinity;
-    } else if (this.options.center) {
+    } else if (this.tvist.engine.isCenterActive()) {
       this.minPosition = engine.getScrollPositionForIndex(0);
       this.maxPosition = engine.getScrollPositionForIndex(slides.length - 1);
     } else {
@@ -214,7 +214,7 @@ export class DragModule extends Module {
         minPosition: this.minPosition,
         maxPosition: this.maxPosition,
         loop: this.isLoopEnabled,
-        center: this.options.center,
+        center: this.tvist.engine.isCenterActive(),
         peekTrim: this.options.peekTrim !== false,
         slidesCount: slides.length,
         perPage,
@@ -818,7 +818,7 @@ export class DragModule extends Module {
       return newPosition;
     }
 
-    if (this.options.center && !this.isLoopEnabled) {
+    if (this.tvist.engine.isCenterActive() && !this.isLoopEnabled) {
       const basePosition = -this.tvist.engine.getSlidePosition(this.startIndex);
       const centerOffset = this.tvist.engine.getCenterOffset(this.startIndex);
       const newPosition = basePosition + centerOffset + distance;

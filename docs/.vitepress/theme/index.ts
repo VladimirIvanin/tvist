@@ -22,6 +22,7 @@ import CenterBasicExample from './examples/CenterBasicExample.vue'
 import CenterPerPage2Example from './examples/CenterPerPage2Example.vue'
 import CenterPerPage4Example from './examples/CenterPerPage4Example.vue'
 import CenterLoopExample from './examples/CenterLoopExample.vue'
+import CenterJustifyLockedExample from './examples/CenterJustifyLockedExample.vue'
 
 // Grid examples
 import GridExample from './examples/GridExample.vue'
@@ -65,6 +66,7 @@ export default {
     app.component('CenterPerPage2Example', CenterPerPage2Example)
     app.component('CenterPerPage4Example', CenterPerPage4Example)
     app.component('CenterLoopExample', CenterLoopExample)
+    app.component('CenterJustifyLockedExample', CenterJustifyLockedExample)
 
     // Grid examples
     app.component('GridExample', GridExample)

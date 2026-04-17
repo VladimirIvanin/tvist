@@ -115,6 +115,37 @@ new Tvist('.tvist', {
 })
 ```
 
+## Justify в lock-режиме
+
+`center: { justify: true }` не центрирует активный слайд. Вместо этого слайды
+выравниваются по центру только когда слайдер находится в `locked` состоянии.
+Как только `lock` спадает, слайдер возвращается к обычному поведению.
+
+<ExampleCard title="Center justify при locked" description="Выравнивание по центру только в lock-режиме">
+  <CenterJustifyLockedExample />
+</ExampleCard>
+
+```js
+new Tvist('.tvist', {
+  perPage: 3,
+  gap: 16,
+  center: { justify: true },
+  loop: false,
+})
+```
+
+Если нужно объединить оба режима (обычное center + justify при lock), используйте:
+
+```js
+new Tvist('.tvist', {
+  perPage: 3,
+  center: {
+    active: true,
+    justify: true,
+  },
+})
+```
+
 ## Как это работает
 
 ### Логика центрирования
@@ -210,10 +241,15 @@ new Tvist('.tvist', {
 ```ts
 interface TvistOptions {
   /**
-   * Центрирование активного слайда
+   * Центрирование:
+   * - true: центрирование активного слайда
+   * - объект: отдельные флаги active/justify
    * @default false
    */
-  center?: boolean
+  center?: boolean | {
+    active?: boolean
+    justify?: boolean
+  }
 }
 ```
 
@@ -249,7 +285,7 @@ tvist.scrollTo(5)   // К конкретному слайду
 ### Активный слайд не по центру
 
 Проверьте, что:
-- `center: true` указан в опциях
+- `center: true` или `center: { active: true }` указан в опциях
 - Контейнер имеет достаточную ширину для `perPage` слайдов
 - CSS не переопределяет позиционирование
 

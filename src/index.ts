@@ -39,6 +39,7 @@ import './modules/video'
 // Types
 export type {
   TvistOptions,
+  CenterOptions,
   TvistDestroyOptions,
   TvistLongPressDomEventDetail,
   AutoplayOptions,

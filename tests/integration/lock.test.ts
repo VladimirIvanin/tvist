@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '../../src/core/Tvist'
-import { createSliderFixture, waitForAnimation } from '../fixtures'
+import { createSliderFixture, resizeSlider, waitForAnimation } from '../fixtures'
 import '../../src/modules/drag'
 import '../../src/modules/grid'
 import '../../src/modules/loop'
@@ -102,6 +102,67 @@ describe('Lock functionality', () => {
 
     // Проверяем что драг не начался (isDragging должно быть false)
     expect(dragModule.isDragging).toBe(false)
+  })
+
+  it('should clear only translate3d when locked after breakpoint change', () => {
+    window.innerWidth = 700
+    fixture = createSliderFixture({
+      slidesCount: 3,
+      width: 700
+    })
+
+    const slider = new Tvist(fixture.root, {
+      fixedWidth: 289,
+      fixedHeight: 163,
+      gap: 36,
+      drag: false,
+      isNavigation: true,
+      pagination: false,
+      arrows: false,
+      rewind: true,
+      breakpoints: {
+        768: {
+          arrows: false,
+          fixedWidth: 224,
+          fixedHeight: 126,
+          gap: 16,
+          drag: true,
+        },
+      },
+    })
+
+    slider.container.style.margin = '0 auto'
+    slider.container.style.width = 'max-content'
+
+    expect(slider.engine.isLocked).toBe(false)
+    slider.scrollTo(1, true)
+    expect(slider.container.style.transform).toContain('translate3d')
+
+    resizeSlider(fixture.root, 1200)
+    Object.defineProperty(fixture.track, 'offsetWidth', {
+      configurable: true,
+      value: 1200
+    })
+    Object.defineProperty(fixture.track, 'clientWidth', {
+      configurable: true,
+      value: 1200
+    })
+    Object.defineProperty(fixture.container, 'offsetWidth', {
+      configurable: true,
+      value: 1200
+    })
+    Object.defineProperty(fixture.container, 'clientWidth', {
+      configurable: true,
+      value: 1200
+    })
+
+    window.innerWidth = 1000
+    slider.update()
+
+    expect(slider.engine.isLocked).toBe(true)
+    expect(slider.container.style.transform).toBe('')
+    expect(slider.container.style.margin).toBe('0px auto')
+    expect(slider.container.style.width).toBe('max-content')
   })
 
   it('should not lock when loop with clones and fill is enabled even if originals fit', () => {

@@ -44,7 +44,7 @@ export class LoopModule extends Module {
     this.isInitialized = true
 
     const initialRealIndex = this.options.start ?? 0
-    const bothDirections = this.options.center ?? false
+    const bothDirections = this.tvist.engine.isCenterActive()
 
     this.loopFix({
       slideRealIndex: initialRealIndex,
@@ -126,7 +126,7 @@ export class LoopModule extends Module {
     const slides = this.tvist.slides
     const container = this.tvist.container
     const slidesCount = slides.length
-    const bothDirections = this.options.center ?? false
+    const bothDirections = this.tvist.engine.isCenterActive()
 
     const loopedSlides = this.computeLoopedSlides(bothDirections)
     this.loopedSlides = loopedSlides

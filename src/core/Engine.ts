@@ -111,11 +111,24 @@ export class Engine {
     return this.slideSize
   }
 
+  public isCenterActive(): boolean {
+    const c = this.options.center
+    if (!c) return false
+    if (c === true) return true
+    return c.active ?? false
+  }
+
+  public isCenterJustify(): boolean {
+    const c = this.options.center
+    if (!c || c === true) return false
+    return c.justify ?? false
+  }
+
   /**
    * Вычисляет offset для центрирования
    */
   public getCenterOffset(index: number): number {
-    if (!this.options.center) return 0
+    if (!this.isCenterActive()) return 0
 
     if (!this.scrollCacheValid) this.updateScrollCache()
     const rootSize = this.cachedRootSize
@@ -160,7 +173,7 @@ export class Engine {
     const centerOffset = this.getCenterOffset(index)
 
     if (this.isLoopEnabled()) {
-      if (this.options.center || this.isLoopWithClonesEnabled()) {
+      if (this.isCenterActive() || this.isLoopWithClonesEnabled()) {
         const pos = basePosition + centerOffset
         return pos === 0 ? 0 : pos
       }
@@ -172,7 +185,7 @@ export class Engine {
       return clamped === 0 ? 0 : clamped
     }
 
-    if (this.options.center) {
+    if (this.isCenterActive()) {
       const pos = basePosition + centerOffset
       return pos === 0 ? 0 : pos
     }
@@ -653,7 +666,7 @@ export class Engine {
   private getEndIndex(): number {
     const slideCount = this.tvist.slides.length
 
-    if (this.isLoopEnabled() || this.options.center || this.options.isNavigation || this.isAutoSize()) {
+    if (this.isLoopEnabled() || this.isCenterActive() || this.options.isNavigation || this.isAutoSize()) {
       return slideCount - 1
     }
 
@@ -703,7 +716,7 @@ export class Engine {
   private calculateCounterEndIndex(): number {
     const slideCount = this.tvist.slides.length
     const perPage = this.options.perPage ?? 1
-    return (this.isLoopEnabled() || this.options.isNavigation || this.options.center)
+    return (this.isLoopEnabled() || this.options.isNavigation || this.isCenterActive())
       ? slideCount - 1
       : Math.max(0, slideCount - perPage)
   }
@@ -763,7 +776,7 @@ export class Engine {
 
   private resolveTargetIndex(index: number, endIndex: number, previousIndex: number): ScrollContext {
     const loopEnabled = this.isLoopEnabled()
-    let clampedIndex = loopEnabled || this.options.isNavigation || this.options.center
+    let clampedIndex = loopEnabled || this.options.isNavigation || this.isCenterActive()
       ? index
       : Math.max(0, Math.min(index, endIndex))
 
@@ -833,7 +846,7 @@ export class Engine {
 
   /** При навигации применяем ограничения (но не для center режима) */
   private clampTargetPosition(position: number, endIndex: number): number {
-    if (!this.options.isNavigation || this.isLoopEnabled() || this.options.center) {
+    if (!this.options.isNavigation || this.isLoopEnabled() || this.isCenterActive()) {
       return position
     }
     const peekTrim = this.options.peekTrim !== false
@@ -959,6 +972,24 @@ export class Engine {
    */
   applyTransform(): void {
     const container = this.tvist.container
+    if (this._isLocked) {
+      if (this.isCenterJustify()) {
+        if (!this.scrollCacheValid) this.updateScrollCache()
+        const offset = Math.max(0, (this.cachedRootSize - this.getContentSize()) / 2)
+        if (this.options.direction === 'vertical') {
+          container.style.transform = `translate3d(0, ${offset}px, 0)`
+        } else {
+          container.style.transform = `translate3d(${offset}px, 0, 0)`
+        }
+        this.tvist.emit('setTranslate', this.tvist, offset)
+      } else {
+        container.style.transform = ''
+        this.tvist.emit('setTranslate', this.tvist, 0)
+      }
+      this.emitProgress()
+      return
+    }
+
     const rawPos = this.location.get()
     const pos = this.options.roundLengths === false ? rawPos : Math.round(rawPos)
 
@@ -1180,7 +1211,7 @@ export class Engine {
     // В center и autoSize режимах граница определяется только по индексу:
     // center: translate не совпадает с getMaxScrollPosition
     // autoSize: несколько индексов могут сходиться к одной translate (clamp к maxScroll)
-    if (this.options.center || this.isAutoSize()) return true
+    if (this.isCenterActive() || this.isAutoSize()) return true
 
     // Нет осмысленного диапазона (тесты без layout, нулевые размеры) — только индекс
     if (!this.hasScrollRange()) return true
@@ -1199,7 +1230,7 @@ export class Engine {
 
     if (this.index.get() > 0) return true
 
-    if (this.options.center || this.isAutoSize()) return false
+    if (this.isCenterActive() || this.isAutoSize()) return false
 
     if (!this.hasScrollRange()) return false
 

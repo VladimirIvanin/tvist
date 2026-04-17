@@ -322,6 +322,13 @@ export interface LoopOptions {
 /**
  * Основные опции слайдера
  */
+export interface CenterOptions {
+  /** Центрирует активный слайд в viewport (аналог center: true) */
+  active?: boolean
+  /** Центрирует все слайды визуально когда locked (justify-content: center) */
+  justify?: boolean
+}
+
 export interface TvistOptions {
   // Базовые настройки
   
@@ -434,10 +441,14 @@ export interface TvistOptions {
   direction?: 'horizontal' | 'vertical'
 
   /**
-   * Центрирование активного слайда. При true активный слайд будет находиться по центру контейнера.
+   * Центрирование слайдов.
+   * - `true` — центрирует активный слайд в viewport (режим "active").
+   * - Объект `{ active?, justify? }` — тонкая настройка:
+   *   - `active: true` — центрирует активный слайд (аналог `center: true`)
+   *   - `justify: true` — визуально центрирует все слайды когда locked (как `justify-content: center`)
    * @default false
    */
-  center?: boolean
+  center?: boolean | CenterOptions
   
   /**
    * Режим отладки: вывод предупреждений в консоль (arrows not found, container not found и т.д.)

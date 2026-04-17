@@ -29,6 +29,7 @@ import './modules/breakpoints'
 // Types
 export type {
   TvistOptions,
+  CenterOptions,
   TvistLongPressDomEventDetail,
   AutoplayOptions,
   VideoOptions,
