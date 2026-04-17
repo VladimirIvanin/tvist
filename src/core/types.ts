@@ -791,22 +791,6 @@ export interface TvistOptions {
    */
   isNavigation?: boolean
   
-  // Virtual
-  
-  /**
-   * Виртуальные слайды для работы с большими списками
-   * @default false
-   */
-  virtual?: boolean | {
-    /** Количество дополнительных слайдов до видимой области */
-    addSlidesBefore?: number
-    /** Количество дополнительных слайдов после видимой области */
-    addSlidesAfter?: number
-    /** Функция рендеринга виртуального слайда */
-    /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- virtual slide data is user-defined */
-    renderSlide?: (data: any, index: number) => string
-  }
-  
   // Grid
   
   /**
