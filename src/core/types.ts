@@ -9,8 +9,6 @@ import type { Tvist } from './Tvist'
  */
 declare module './Tvist' {
   interface Tvist {
-    /** Логический индекс текущего слайда (для loop режима) */
-    realIndex?: number
     /** Направление прокрутки (внутреннее, для beforeTransitionStart) */
     _scrollDirection?: 'next' | 'prev'
   }

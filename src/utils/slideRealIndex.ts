@@ -57,6 +57,7 @@ export function findDomIndexByRealIndexForTransition(
       matches.push(i)
     }
   }
+
   if (matches.length === 0) return -1
   if (matches.length === 1) {
     const singleMatch = matches[0]

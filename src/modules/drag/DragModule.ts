@@ -159,6 +159,7 @@ export class DragModule extends Module {
     if (this.isDragging) {
       const before = this.startPosition;
       this.startPosition = this.tvist.engine.location.get();
+      this.startIndex = this.tvist.engine.index.get();
       dragLog('onLoopFix (during drag)', {
         activeIndex: this.tvist.engine.index.get(),
         realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
@@ -933,14 +934,16 @@ export class DragModule extends Module {
     const loopFix = loopModule.fix.bind(loopModule);
 
     const viewportSize = this.tvist.engine.containerSizeValue;
+    const peek = this.tvist.engine.getPeek();
 
     // Нет «страниц» для прокрутки (все слайды в одном perPage) — перестановки не нужны.
     // Раньше отсекали slidesCount <= perPage + 1, из‑за чего при 2 слайдах и perPage 1
     // loopFix вызывался только после mouseup.
     if (!this.isMarqueeActive && this.shouldSkipLoopDomReorderDuringDrag()) return;
 
-    const vpStart = -currentPosition;
-    const vpEnd = vpStart + viewportSize;
+    // Видимая область включает peek
+    const vpStart = -currentPosition - peek.start;
+    const vpEnd = -currentPosition + viewportSize + peek.end;
 
     const slides = this.tvist.slides;
     if (slides.length === 0) return;

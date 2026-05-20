@@ -372,12 +372,11 @@ describe('Lock functionality', () => {
     expect(slider.engine.isLocked).toBe(false)
   })
 
-  it('should lock small loop slider when scroll range is too small (all small slides almost fully visible)', () => {
+  it('should NOT lock small loop slider even when scroll range is too small', () => {
     // Кейс с маленькими слайдами и loop:
     // slidesCount: 4, perPage: 3, gap: 32, peek ~100, width ~450-500.
-    // Все 4 слайда почти одновременно влезают в viewport, и реальный диапазон
-    // скролла меньше "осмысленного" шага — с точки зрения пользователя
-    // пролистывать фактически некуда, слайдер должен считаться заблокированным.
+    // Слайдер в loop-режиме не должен блокироваться, иначе ломается DOM-перестановка
+    // и появляются пустые пространства (дыры).
     fixture = createSliderFixture({
       slidesCount: 4,
       width: 480,
@@ -395,7 +394,7 @@ describe('Lock functionality', () => {
     // Форсируем перерасчёт после применения peek и gap
     slider.update()
 
-    expect(slider.engine.isLocked).toBe(true)
+    expect(slider.engine.isLocked).toBe(false)
   })
 
   it('should not lock loop slider with peek when last slide is only partially visible', () => {
@@ -418,11 +417,9 @@ describe('Lock functionality', () => {
       speed: 0,
     })
 
-    // После изменения эвристики smallLoopCarousel возможно,
-    // что такой слайдер считается "слишком маленьким" и
-    // блокируется. Важно лишь, чтобы cube/fade/withClones
-    // работали корректно — отдельные тесты это покрывают.
-    expect(slider.engine.isLocked).toBeTypeOf('boolean')
+    // После исправления эвристики smallLoopCarousel такой слайдер НЕ блокируется,
+    // что позволяет LoopModule корректно переставлять слайды и избегать дыр.
+    expect(slider.engine.isLocked).toBe(false)
   })
 
   // loop.withClones: prev с первого слайда не должен прыгать на «дальний» клон

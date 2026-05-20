@@ -128,7 +128,9 @@ export class Engine {
    * Вычисляет offset для центрирования
    */
   public getCenterOffset(index: number): number {
-    if (!this.isCenterActive()) return 0
+    if (!this.isCenterActive() && !this.isLoopWithClonesEnabled()) {
+      return 0
+    }
 
     if (!this.scrollCacheValid) this.updateScrollCache()
     const rootSize = this.cachedRootSize
@@ -157,12 +159,22 @@ export class Engine {
 
   private isLoopWithClonesEnabled(): boolean {
     const l = this.options.loop
-    return (
+    if (
       typeof l === 'object' &&
       l !== null &&
       l.withClones === true &&
       l.enabled !== false
-    )
+    ) {
+      return true
+    }
+    
+    // Если LoopModule динамически включил клоны (например, мало слайдов),
+    // первый слайд будет клоном.
+    if (this.tvist.slides.length > 0 && this.tvist.slides[0]?.classList.contains(TVIST_CLASSES.slideClone)) {
+      return true
+    }
+    
+    return false
   }
 
   /**
@@ -178,11 +190,7 @@ export class Engine {
         return pos === 0 ? 0 : pos
       }
 
-      // Ограничиваем позицию чтобы viewport не выходил за пределы контента
-      // (важно при небольшом количестве слайдов с peek, иначе появляются "дыры").
-      if (!this.scrollCacheValid) this.updateScrollCache()
-      const clamped = Math.max(this.cachedMaxScroll, Math.min(this.cachedMinScroll, basePosition))
-      return clamped === 0 ? 0 : clamped
+      return basePosition === 0 ? 0 : basePosition
     }
 
     if (this.isCenterActive()) {
@@ -490,10 +498,10 @@ export class Engine {
 
     if (this.options.peek && !isDisabled) {
       if (this.peekStart === 0) {
-        this.peekStart = getPeekValue(this.tvist.container, startSide)
+        this.peekStart = getPeekValue(this.tvist.track, startSide)
       }
       if (this.peekEnd === 0) {
-        this.peekEnd = getPeekValue(this.tvist.container, endSide)
+        this.peekEnd = getPeekValue(this.tvist.track, endSide)
       }
     }
 
@@ -659,14 +667,13 @@ export class Engine {
     // minScroll: используем peekStart (уже вычислен в calculateSizes)
     this.cachedMinScroll = -this.peekStart
 
-    // maxScroll: нижний/правый край последнего слайда совпадает с краем видимой области.
-    // Видимая ось = containerSize (root − peekStart − peekEnd), иначе при нижнем/right peek
-    // лимит скролла смещается и autoSize + peekTrim дают неверный translate (в т.ч. vertical).
+    // maxScroll: правый/нижний край последнего слайда совпадает с краем root (без дыры справа/снизу).
+    // Для этого используем cachedRootSize, а не containerSize, чтобы перекрыть peekEnd.
     const lastIndex = this.tvist.slides.length - 1
     if (lastIndex >= 0) {
       const lastPageRight =
         this.getSlidePosition(lastIndex) + this.getSlideSize(lastIndex)
-      this.cachedMaxScroll = this.containerSize - lastPageRight
+      this.cachedMaxScroll = this.cachedRootSize - this.peekStart - lastPageRight
     } else {
       this.cachedMaxScroll = 0
     }
@@ -1083,27 +1090,18 @@ export class Engine {
     const contentFits = this.getContentSize() <= this.containerSize + 1
 
     if (this.isLoopEnabled()) {
-      const smallLoopCarousel = slideCount <= perPage + 1
+      const loopOpts = this.options.loop
+      const withClonesAndFill =
+        typeof loopOpts === 'object' &&
+        loopOpts !== null &&
+        loopOpts.withClones === true
 
-      if (!smallLoopCarousel) {
-        this.setLocked(contentFits, isDisabled)
+      if (!withClonesAndFill && contentFits) {
+        this.setLocked(true, isDisabled)
         return
       }
 
-      // Для малого loop: дополнительно проверяем, достаточен ли диапазон скролла.
-      // Если он меньше 60% размера слайда, листать "некуда" с точки зрения пользователя.
-      let shouldLock = contentFits
-
-      if (!shouldLock) {
-        const scrollRange = Math.abs(this.getMinScrollPosition() - this.getMaxScrollPosition())
-        const MIN_MEANINGFUL_SCROLL = this.getSlideSize(0) * 0.6
-
-        if (scrollRange < MIN_MEANINGFUL_SCROLL) {
-          shouldLock = true
-        }
-      }
-
-      this.setLocked(shouldLock, isDisabled)
+      this.setLocked(false, isDisabled)
       return
     }
 
@@ -1185,6 +1183,13 @@ export class Engine {
    */
   get containerSizeValue(): number {
     return this.containerSize
+  }
+
+  /**
+   * Получить значения peek (start, end)
+   */
+  public getPeek(): { start: number; end: number } {
+    return { start: this.peekStart, end: this.peekEnd }
   }
 
   /**

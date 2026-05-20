@@ -322,12 +322,13 @@ describe('Engine - autoWidth / autoHeight', () => {
 
       slider.scrollTo(2, true)
       expect(slider.activeIndex).toBe(2)
-      expect(parseTranslateY(slider.container.style.transform)).toBe(translateForSlideTop(2))
+      // С правильным peekTrim maxScroll должен быть -232 (clamped), а не -256
+      expect(parseTranslateY(slider.container.style.transform)).toBe(-232)
 
       slider.scrollTo(3, true)
       slider.prev()
       expect(slider.activeIndex).toBe(2)
-      expect(parseTranslateY(slider.container.style.transform)).toBe(translateForSlideTop(2))
+      expect(parseTranslateY(slider.container.style.transform)).toBe(-232)
     })
   })
 

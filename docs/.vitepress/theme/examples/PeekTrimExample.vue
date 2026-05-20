@@ -30,10 +30,10 @@
       </div>
     </div>
     <div class="section">
-      <div class="section-title">С loop — peek тоже применяется (виден зазор соседних слайдов)</div>
+      <div class="section-title">С loop — peekTrim игнорируется (всегда виден зазор соседних слайдов)</div>
       <div class="row">
         <div class="col">
-          <div class="label">loop: true, peek: 40</div>
+          <div class="label">loop: true, peek: 40, peekTrim: true</div>
           <div ref="sliderLoopRef" class="tvist-v1">
             <div class="tvist-v1__track">
               <div class="tvist-v1__container">
@@ -45,7 +45,7 @@
           </div>
         </div>
         <div class="col">
-          <div class="label">loop: true, peek: 60, perPage: 2</div>
+          <div class="label">loop: true, peek: 60, perPage: 2, peekTrim: false</div>
           <div ref="sliderLoopPerPageRef" class="tvist-v1">
             <div class="tvist-v1__track">
               <div class="tvist-v1__container">
@@ -98,7 +98,8 @@ onMounted(() => {
   if (sliderLoopRef.value) {
     sliderLoop = new Tvist(sliderLoopRef.value, {
       ...commonOptions,
-      loop: true
+      loop: true,
+      peekTrim: true
     })
   }
   if (sliderLoopPerPageRef.value) {
@@ -107,6 +108,7 @@ onMounted(() => {
       perPage: 2,
       gap: 16,
       loop: true,
+      peekTrim: false,
       arrows: true,
       pagination: true
     })

@@ -28,12 +28,17 @@ export class LoopModule extends Module {
 
   private isInitialized = false
 
+  private _withClones = false
+  private _clonesPerSide = 0
+
   init(): void {
-    const { enabled: loopEnabled, withClones } = this.getLoopConfig()
+    const config = this.getLoopConfig()
+    const loopEnabled = config.enabled
+    this._withClones = config.withClones
 
     if (!loopEnabled || this.isInitialized) return
 
-    if (withClones) {
+    if (this._withClones) {
       this.createClones()
       this.tvist.engine.update()
     }
@@ -44,11 +49,12 @@ export class LoopModule extends Module {
     this.isInitialized = true
 
     const initialRealIndex = this.options.start ?? 0
-    const bothDirections = this.tvist.engine.isCenterActive()
+    const bothDirections = this.tvist.engine.isCenterActive() || this.options.peek !== undefined
+    const hasPeek = this.options.peek !== undefined
 
     this.loopFix({
       slideRealIndex: initialRealIndex,
-      direction: bothDirections ? undefined : 'next',
+      direction: (bothDirections || hasPeek) ? undefined : 'next',
       initial: true,
     })
 
@@ -113,7 +119,8 @@ export class LoopModule extends Module {
       initial = false,
     } = params
 
-    const { enabled: loopEnabled, withClones } = this.getLoopConfig()
+    const loopEnabled = this.getLoopConfig().enabled
+    const withClones = this._withClones
     if (!loopEnabled) return this.tvist.engine.index.get()
 
     this.emit('beforeLoopFix')
@@ -121,17 +128,22 @@ export class LoopModule extends Module {
     const slides = this.tvist.slides
     const container = this.tvist.container
     const slidesCount = slides.length
-    const bothDirections = this.tvist.engine.isCenterActive()
+    const bothDirections = this.tvist.engine.isCenterActive() || this.options.peek !== undefined
 
     const loopedSlides = this.computeLoopedSlides(bothDirections)
     this.loopedSlides = loopedSlides
 
     const slidesPerView = this.getSlidesPerView(bothDirections)
 
-    if (slidesCount < slidesPerView + loopedSlides) {
+    let requiredSlides = slidesPerView + loopedSlides
+    if (bothDirections) {
+      requiredSlides += Math.floor(slidesPerView / 2)
+    }
+
+    if (slidesCount < requiredSlides) {
       console.warn(
         '[Tvist Loop] Warning: Not enough slides for loop mode. Need at least',
-        slidesPerView + loopedSlides,
+        requiredSlides,
         'slides, but have',
         slidesCount
       )
@@ -150,11 +162,15 @@ export class LoopModule extends Module {
       activeIndex +
       (bothDirections && typeof setTranslate === 'undefined' ? -slidesPerView / 2 + 0.5 : 0)
 
-    const prependIndexes = !withClones && isPrev
+    const hasPeek = this.options.peek !== undefined
+    const needsPrepend = isPrev || hasPeek
+    const needsAppend = isNext || hasPeek
+
+    const prependIndexes = !withClones && needsPrepend
       ? this.preparePrependIndexes(activeColIndexWithShift, loopedSlides, slidesCount)
       : []
 
-    const appendIndexes = !withClones && isNext && prependIndexes.length === 0
+    const appendIndexes = !withClones && needsAppend && prependIndexes.length === 0
       ? this.prepareAppendIndexes(activeColIndexWithShift, slidesPerView, loopedSlides, slidesCount)
       : []
 
@@ -188,16 +204,18 @@ export class LoopModule extends Module {
       this.tvist.engine.target.set(targetBeforeUpdate)
     }
 
+    const actualNewIndex = this.tvist.engine.index.get()
+
     if (prependIndexes.length > 0) {
       this.correctPositionAfterRearrange(
         activeIndex,
-        activeIndex + Math.ceil(prependIndexes.length),
+        actualNewIndex,
         oldSlidePositions
       )
     } else if (appendIndexes.length > 0) {
       this.correctPositionAfterRearrange(
         activeIndex,
-        activeIndex - appendIndexes.length,
+        actualNewIndex,
         oldSlidePositions
       )
     }
@@ -234,16 +252,17 @@ export class LoopModule extends Module {
   private computeLoopedSlides(bothDirections: boolean): number {
     const slidesPerView = this.getSlidesPerView(bothDirections)
     const slidesPerGroup = this.options.slidesPerGroup ?? 1
+    const hasPeek = this.options.peek !== undefined
 
-    let loopedSlides = bothDirections
-      ? Math.max(slidesPerGroup, Math.ceil(slidesPerView / 2))
-      : Math.max(slidesPerGroup, slidesPerView)
+    let loopedSlides = bothDirections || hasPeek
+      ? Math.max(slidesPerGroup, Math.ceil(slidesPerView / 2) + (hasPeek ? 1 : 0))
+      : Math.max(slidesPerGroup, slidesPerView + (hasPeek ? 1 : 0))
 
     if (loopedSlides % slidesPerGroup !== 0) {
       loopedSlides += slidesPerGroup - (loopedSlides % slidesPerGroup)
     }
 
-    return loopedSlides
+    return Math.max(loopedSlides, hasPeek ? 2 : 1)
   }
 
   private preparePrependIndexes(
@@ -254,7 +273,9 @@ export class LoopModule extends Module {
     if (activeColIndexWithShift >= loopedSlides) return []
 
     const slidesPerGroup = this.options.slidesPerGroup ?? 1
-    const slidesPrepended = Math.max(loopedSlides - activeColIndexWithShift, slidesPerGroup)
+    const calculatedPrepended = Math.max(loopedSlides - activeColIndexWithShift, slidesPerGroup)
+    const slidesPrepended = Math.min(calculatedPrepended, slidesCount - 1)
+    
     const indexes: number[] = []
     for (let i = 0; i < slidesPrepended; i++) {
       indexes.push(slidesCount - (i % slidesCount) - 1)
@@ -271,10 +292,9 @@ export class LoopModule extends Module {
     if (activeColIndexWithShift + slidesPerView <= slidesCount - loopedSlides) return []
 
     const slidesPerGroup = this.options.slidesPerGroup ?? 1
-    const slidesAppended = Math.max(
-      activeColIndexWithShift - (slidesCount - loopedSlides * 2),
-      slidesPerGroup
-    )
+    const calculatedAppended = Math.max(activeColIndexWithShift - (slidesCount - loopedSlides * 2), slidesPerGroup)
+    const slidesAppended = Math.min(calculatedAppended, slidesCount - 1)
+    
     const indexes: number[] = []
     for (let i = 0; i < slidesAppended; i++) {
       indexes.push(i % slidesCount)
@@ -315,7 +335,7 @@ export class LoopModule extends Module {
     slidesPerView: number,
     slidesCount: number
   ): void {
-    const safeZone = slidesPerView
+    const safeZone = this._clonesPerSide > 0 ? this._clonesPerSide : slidesPerView
     if (activeIndex >= safeZone && activeIndex < slidesCount - safeZone) return
 
     const currentRealIndex = this.tvist.realIndex
@@ -381,13 +401,34 @@ export class LoopModule extends Module {
   private getLoopConfig(): { enabled: boolean; withClones: boolean } {
     const raw = this.options.loop
 
-    if (raw === true) return { enabled: true, withClones: false }
+    let enabled = false
+    let withClones = false
 
-    if (typeof raw === 'object' && raw !== null) {
-      return { enabled: raw.enabled !== false, withClones: raw.withClones === true }
+    if (raw === true) {
+      enabled = true
+      withClones = false
+    } else if (typeof raw === 'object' && raw !== null) {
+      enabled = raw.enabled !== false
+      withClones = raw.withClones === true
     }
 
-    return { enabled: false, withClones: false }
+    if (enabled && !withClones) {
+      const slidesCount = this.tvist.slides.length
+      const bothDirections = this.tvist.engine.isCenterActive() || this.options.peek !== undefined
+      const slidesPerView = this.getSlidesPerView(bothDirections)
+      const loopedSlides = this.computeLoopedSlides(bothDirections)
+      
+      let requiredSlides = slidesPerView + loopedSlides
+      if (bothDirections) {
+        requiredSlides += Math.floor(slidesPerView / 2)
+      }
+      
+      if (slidesCount > slidesPerView && slidesCount < requiredSlides) {
+        withClones = true
+      }
+    }
+
+    return { enabled, withClones }
   }
 
   /**
@@ -403,8 +444,12 @@ export class LoopModule extends Module {
     const perPage = this.options.perPage ?? 1
     const slidesPerGroup = this.options.slidesPerGroup ?? 1
     const base = typeof perPage === 'number' ? perPage : 1
-    const needed = Math.max(base, slidesPerGroup)
+    
+    // Добавляем +1 к base, так как peek может показывать часть следующего слайда,
+    // и нам нужен запасной клон, чтобы не было "дыры" во время анимации.
+    const needed = Math.max(base + 1, slidesPerGroup)
     const clonesPerSide = Math.ceil(needed / originalCount) * originalCount
+    this._clonesPerSide = clonesPerSide
 
     for (let i = 0; i < clonesPerSide; i++) {
       const original = slides[i % originalCount]

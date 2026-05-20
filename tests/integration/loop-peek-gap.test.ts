@@ -37,7 +37,7 @@ describe('Loop + peek + perPage:3 — no right gap with 4 slides', () => {
     fixture.cleanup()
   })
 
-  it('should not create right gap on initial layout', () => {
+  it('should not create right gap on initial layout or after scrolling', async () => {
     slider = new Tvist(fixture.root, {
       perPage: 3,
       gap: 32,
@@ -46,31 +46,42 @@ describe('Loop + peek + perPage:3 — no right gap with 4 slides', () => {
       speed: 0
     })
 
-    // viewport в координатах контента: [vpLeft, vpRight]
-    const location = slider.engine.location.get()
-    const viewportSize = slider.engine.containerSizeValue
+    const checkGaps = () => {
+      const location = slider!.engine.location.get()
+      const viewportSize = slider!.engine.containerSizeValue
 
-    const vpLeft = -location
-    const vpRight = vpLeft + viewportSize
+      const vpLeft = -location
+      const vpRight = vpLeft + viewportSize
 
-    // Крайние позиции контента по всем слайдам
-    let contentLeft = Infinity
-    let contentRight = -Infinity
+      let contentLeft = Infinity
+      let contentRight = -Infinity
 
-    for (let i = 0; i < slider.slides.length; i++) {
-      const pos = slider.engine.getSlidePosition(i)
-      const size = slider.engine.getSlideSize(i)
-      if (pos < contentLeft) contentLeft = pos
-      if (pos + size > contentRight) contentRight = pos + size
+      for (let i = 0; i < slider!.slides.length; i++) {
+        const pos = slider!.engine.getSlidePosition(i)
+        const size = slider!.engine.getSlideSize(i)
+        if (pos < contentLeft) contentLeft = pos
+        if (pos + size > contentRight) contentRight = pos + size
+      }
+
+      const leftGap = Math.max(0, contentLeft - vpLeft)
+      const rightGap = Math.max(0, vpRight - contentRight)
+
+      return { leftGap, rightGap }
     }
 
-    const leftGap = Math.max(0, contentLeft - vpLeft)
-    const rightGap = Math.max(0, vpRight - contentRight)
+    // Проверяем начальное состояние
+    let gaps = checkGaps()
+    expect(gaps.rightGap).toBeLessThan(5)
+    expect(gaps.leftGap + gaps.rightGap).toBeLessThan(5)
 
-    // Важная проверка: справа не должно быть заметного зазора
-    expect(rightGap).toBeLessThan(5)
-    // И в целом viewport должен быть покрыт слайдами
-    expect(leftGap + rightGap).toBeLessThan(5)
+    // Листаем вперед 10 раз и проверяем дыры на каждом шаге
+    for (let i = 0; i < 10; i++) {
+      slider.next()
+      await new Promise(r => setTimeout(r, 50)) // ждем завершения (speed: 0, так что быстро)
+      gaps = checkGaps()
+      expect(gaps.rightGap).toBeLessThan(5)
+      expect(gaps.leftGap + gaps.rightGap).toBeLessThan(5)
+    }
   })
 })
 
