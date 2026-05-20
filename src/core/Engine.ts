@@ -128,7 +128,7 @@ export class Engine {
    * Вычисляет offset для центрирования
    */
   public getCenterOffset(index: number): number {
-    if (!this.isCenterActive() && !this.isLoopWithClonesEnabled()) {
+    if (!this.isCenterActive()) {
       return 0
     }
 
@@ -185,7 +185,7 @@ export class Engine {
     const centerOffset = this.getCenterOffset(index)
 
     if (this.isLoopEnabled()) {
-      if (this.isCenterActive() || this.isLoopWithClonesEnabled()) {
+      if (this.isCenterActive()) {
         const pos = basePosition + centerOffset
         return pos === 0 ? 0 : pos
       }
