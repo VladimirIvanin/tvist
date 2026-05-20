@@ -191,7 +191,7 @@ export class ScrollbarModule extends Module {
     const targetIndex = Math.round(percent * (slideCount - 1))
 
     // Переходим к слайду
-    this.tvist.scrollTo(targetIndex)
+    this.tvist.engine.scrollTo(targetIndex)
   }
 
   /**
@@ -403,7 +403,7 @@ export class ScrollbarModule extends Module {
     }
     
     // Плавный переход к ближайшему слайду
-    this.tvist.scrollTo(closestIndex)
+    this.tvist.engine.scrollTo(closestIndex)
   }
 
   /**

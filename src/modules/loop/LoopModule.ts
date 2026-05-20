@@ -55,11 +55,6 @@ export class LoopModule extends Module {
     this.on('beforeTransitionStart', (data: { index: number; direction: 'next' | 'prev' }) => {
       this.loopFix({ direction: data.direction })
     })
-
-    Object.defineProperty(this.tvist, 'realIndex', {
-      get: () => this.getRealIndex(),
-      configurable: true,
-    })
   }
 
   override onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
@@ -100,7 +95,7 @@ export class LoopModule extends Module {
       location: this.tvist.engine.location.get(),
       target: this.tvist.engine.target.get(),
       activeIndex: this.tvist.engine.index.get(),
-      realIndex: this.getRealIndex(),
+      realIndex: this.tvist.realIndex,
       transform: this.tvist.container.style.transform,
       slidesOrder: slides.map(s => s.getAttribute('data-tvist-slide-index') ?? '?'),
       slidesText: slides.map(s => s.textContent?.trim() || '?'),
@@ -323,7 +318,7 @@ export class LoopModule extends Module {
     const safeZone = slidesPerView
     if (activeIndex >= safeZone && activeIndex < slidesCount - safeZone) return
 
-    const currentRealIndex = this.getRealIndex()
+    const currentRealIndex = this.tvist.realIndex
     const targetDomIndex = findDomIndexByRealIndex(this.tvist.slides, currentRealIndex, {
       preferNonClone: true,
     })
@@ -353,29 +348,12 @@ export class LoopModule extends Module {
     this.tvist.engine.applyTransform()
   }
 
-  private getRealIndex(): number {
-    const slides = this.tvist.slides
-    const activeIndex = this.tvist.engine.index.get()
-
-    if (activeIndex < 0 || activeIndex >= slides.length) return 0
-
-    const activeSlide = slides[activeIndex]
-    if (!activeSlide) return 0
-
-    const realIndexAttr = activeSlide.getAttribute('data-tvist-slide-index')
-    if (realIndexAttr) {
-      return parseInt(realIndexAttr, 10)
-    }
-
-    return activeIndex
-  }
-
   override destroy(): void {
     if (!this.isInitialized) return
 
     const slides = this.tvist.slides
     const container = this.tvist.container
-    const realIndex = this.getRealIndex()
+    const realIndex = this.tvist.realIndex
 
     const newSlidesOrder: (HTMLElement | undefined)[] = []
     slides.forEach(slideEl => {
@@ -396,11 +374,6 @@ export class LoopModule extends Module {
     this.tvist.updateSlidesList()
     this.tvist.update()
     this.tvist.scrollTo(realIndex, true)
-
-    if (Object.getOwnPropertyDescriptor(this.tvist, 'realIndex')) {
-      const tvistAny = this.tvist as unknown as Record<string, unknown>
-      delete tvistAny.realIndex
-    }
 
     this.isInitialized = false
   }

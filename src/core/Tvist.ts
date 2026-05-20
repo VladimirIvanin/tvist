@@ -19,6 +19,7 @@ import type { Module, ModuleConstructor } from '../modules/Module'
 import { BreakpointsModule } from '../modules/breakpoints/BreakpointsModule'
 import { throttle } from './Animator'
 import { applyInitialBreakpoint } from '../utils/breakpoints'
+import { findDomIndexByRealIndex } from '../utils/slideRealIndex'
 
 /** Root-элемент слайдера с опциональной ссылкой на инстанс (для переиспользования одного root) */
 export interface TvistRootElement extends HTMLElement {
@@ -134,8 +135,8 @@ export class Tvist {
   /** Время последнего успешного next/prev (для navThrottleMs) */
   private _lastNavAt = 0
 
-  // Опциональный резолвер индекса (для модулей типа Loop)
-  public indexResolver?: (index: number) => number
+    // Опциональный резолвер индекса (для модулей типа Loop)
+  // УДАЛЕНО: public indexResolver?: (index: number) => number
 
   // Состояние включения/выключения слайдера
   private _isEnabled = true
@@ -506,12 +507,24 @@ export class Tvist {
 
   /**
    * Переход к слайду по индексу
-   * @param index - индекс слайда (0-based)
+   * @param index - логический индекс слайда (realIndex)
    * @param instant - мгновенный переход без анимации
    */
   scrollTo(index: number, instant = false): this {
     if (!this._isEnabled || !this._isVisible) return this
-    const targetIndex = this.indexResolver ? this.indexResolver(index) : index
+    
+    let targetIndex = index
+    const loopOpt = this.options.loop
+    const isLoop = loopOpt === true || (typeof loopOpt === 'object' && loopOpt.enabled !== false)
+    
+    if (isLoop) {
+      const withClones = typeof loopOpt === 'object' && loopOpt.withClones === true
+      const domIndex = findDomIndexByRealIndex(this.slides, index, { preferNonClone: withClones })
+      if (domIndex !== -1) {
+        targetIndex = domIndex
+      }
+    }
+    
     this.engine.scrollTo(targetIndex, instant)
     return this
   }
@@ -932,6 +945,25 @@ export class Tvist {
    */
   get activeIndex(): number {
     return this.engine.activeIndex
+  }
+
+  /**
+   * Получить текущий логический индекс слайда (с учётом loop)
+   */
+  get realIndex(): number {
+    const activeIndex = this.activeIndex
+    if (activeIndex < 0 || activeIndex >= this.slides.length) return 0
+
+    const activeSlide = this.slides[activeIndex]
+    if (!activeSlide) return 0
+
+    const realIndexAttr = activeSlide.getAttribute('data-tvist-slide-index')
+    if (realIndexAttr !== null && realIndexAttr !== '') {
+      const parsed = parseInt(realIndexAttr, 10)
+      if (!isNaN(parsed)) return parsed
+    }
+
+    return activeIndex
   }
 
   /**

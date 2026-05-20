@@ -449,48 +449,9 @@ export class PaginationModule extends Module {
    * В loop режиме используем realIndex, иначе activeIndex
    */
   private getCurrentSlideIndex(): number {
-    const activeIndex = this.tvist.activeIndex
-    
-    if (!(this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
-      return activeIndex
-    }
-    
-    // В loop режиме всегда пытаемся получить realIndex
-    // Сначала проверяем геттер (если LoopModule установил его)
-    const hasRealIndexGetter = 'realIndex' in this.tvist
-    const realIndexFromGetter = hasRealIndexGetter ? this.tvist.realIndex : undefined
-    
-    // Если геттер вернул число, используем его
-    if (typeof realIndexFromGetter === 'number') {
-      return realIndexFromGetter
-    }
-    
-    // Fallback: вычисляем realIndex из data-tvist-slide-index
-    const activeSlide = this.tvist.slides[activeIndex]
-    if (activeSlide) {
-      const dataIndex = activeSlide.getAttribute('data-tvist-slide-index')
-      if (dataIndex !== null && dataIndex !== '') {
-        const calculatedRealIndex = parseInt(dataIndex, 10)
-        if (!isNaN(calculatedRealIndex)) {
-          log('getCurrentSlideIndex (calculated from data-attr)', {
-            activeIndex,
-            calculatedRealIndex,
-            hasGetter: hasRealIndexGetter,
-            getterValue: realIndexFromGetter
-          })
-          return calculatedRealIndex
-        }
-      }
-    }
-    
-    // Последний fallback: activeIndex
-    log('getCurrentSlideIndex (fallback to activeIndex)', {
-      activeIndex,
-      hasGetter: hasRealIndexGetter,
-      getterValue: realIndexFromGetter,
-      slideHasDataAttr: activeSlide?.hasAttribute('data-tvist-slide-index')
-    })
-    return activeIndex
+    const loopOpt = this.options.loop
+    const isLoop = loopOpt === true || (typeof loopOpt === 'object' && loopOpt.enabled !== false)
+    return isLoop ? this.tvist.realIndex : this.tvist.activeIndex
   }
 
   /**

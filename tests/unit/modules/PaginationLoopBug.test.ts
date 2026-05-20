@@ -63,33 +63,33 @@ describe('PaginationModule - Loop Bug Investigation', () => {
     expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
     // Первый цикл
-    slider.scrollTo(1, true)
+    slider.scrollTo(1)
     recordState('First cycle: 0->1')
     expect(slider.realIndex).toBe(1)
     expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
-    slider.scrollTo(2, true)
+    slider.scrollTo(2)
     recordState('First cycle: 1->2')
     expect(slider.realIndex).toBe(2)
     expect(bullets[2].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
-    slider.scrollTo(0, true)
+    slider.scrollTo(0)
     recordState('First cycle: 2->0 (loop)')
     expect(slider.realIndex).toBe(0)
     expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
     // Второй цикл
-    slider.scrollTo(1, true)
+    slider.scrollTo(1)
     recordState('Second cycle: 0->1')
     expect(slider.realIndex).toBe(1)
     expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
-    slider.scrollTo(2, true)
+    slider.scrollTo(2)
     recordState('Second cycle: 1->2')
     expect(slider.realIndex).toBe(2)
     expect(bullets[2].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
-    slider.scrollTo(0, true)
+    slider.scrollTo(0)
     recordState('Second cycle: 2->0 (loop)')
     expect(slider.realIndex).toBe(0)
     expect(bullets[0].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
@@ -131,7 +131,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
 
     // Проходим два полных цикла
     for (let cycle = 1; cycle <= 2; cycle++) {
-      slider.scrollTo(1, true)
+      slider.scrollTo(1)
       console.log(`Cycle ${cycle}, Step 1:`, getSlideOrder())
       console.log(`  activeIndex=${slider.activeIndex}, realIndex=${slider.realIndex}`)
       
@@ -139,7 +139,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
       let dataIndex = activeSlide?.getAttribute('data-tvist-slide-index')
       expect(dataIndex).toBe(String(slider.realIndex))
 
-      slider.scrollTo(2, true)
+      slider.scrollTo(2)
       console.log(`Cycle ${cycle}, Step 2:`, getSlideOrder())
       console.log(`  activeIndex=${slider.activeIndex}, realIndex=${slider.realIndex}`)
       
@@ -147,7 +147,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
       dataIndex = activeSlide?.getAttribute('data-tvist-slide-index')
       expect(dataIndex).toBe(String(slider.realIndex))
 
-      slider.scrollTo(0, true)
+      slider.scrollTo(0)
       console.log(`Cycle ${cycle}, Step 3:`, getSlideOrder())
       console.log(`  activeIndex=${slider.activeIndex}, realIndex=${slider.realIndex}`)
       
@@ -183,12 +183,12 @@ describe('PaginationModule - Loop Bug Investigation', () => {
     const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
 
     // Проходим полный первый цикл
-    slider.scrollTo(1, true)
-    slider.scrollTo(2, true)
-    slider.scrollTo(0, true)
+    slider.scrollTo(1)
+    slider.scrollTo(2)
+    slider.scrollTo(0)
 
     // Теперь на втором цикле, переходим к слайду 1
-    slider.scrollTo(1, true)
+    slider.scrollTo(1)
 
     console.log('Before drag: activeIndex=', slider.activeIndex, 'realIndex=', slider.realIndex)
     expect(slider.realIndex).toBe(1)
@@ -243,12 +243,12 @@ describe('PaginationModule - Loop Bug Investigation', () => {
     const paginationModule = slider.getModule('pagination') as any
 
     // Проходим полный первый цикл
-    slider.scrollTo(1, true)
-    slider.scrollTo(2, true)
-    slider.scrollTo(0, true)
+    slider.scrollTo(1)
+    slider.scrollTo(2)
+    slider.scrollTo(0)
 
     // Второй цикл - переходим к слайду 1
-    slider.scrollTo(1, true)
+    slider.scrollTo(1)
 
     console.log('Second cycle, slide 1:')
     console.log('  activeIndex=', slider.activeIndex)
