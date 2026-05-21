@@ -137,6 +137,7 @@ export class AutoplayModule extends Module {
   }
 
   override destroy(): void {
+    this.stopped = true
     this.stop()
     this.clearDragEndTimeout()
     this.clearTransitionByAutoplayFallback()
@@ -292,6 +293,7 @@ export class AutoplayModule extends Module {
     // иначе таймер может вызвать next() во время/сразу после драга (rewind к 0)
     // и перебить snap к нужному слайду — пагинация тогда расходится с кадром
     this.on('dragStart', () => {
+      if (this.stopped) return
       this.isDragging = true
       this.clearDragEndTimeout()
       
@@ -306,6 +308,7 @@ export class AutoplayModule extends Module {
     // dragEnd: запускаем fallback таймаут на случай если transitionEnd не сработает
     // (например, если snap вернул на тот же слайд и indexChanged === false)
     this.on('dragEnd', () => {
+      if (this.stopped) return
       if (!this.isDragging) return
       
       const speed = this.options.speed ?? 300
@@ -321,6 +324,7 @@ export class AutoplayModule extends Module {
     // и next() может сработать во время или сразу после snap,
     // что приводит к багу с пагинацией (activeBullet != activeIndex).
     this.on('transitionEnd', () => {
+      if (this.stopped) return
       // НЕ сбрасываем transitionByAutoplay здесь!
       // transitionEnd срабатывает РАНЬШЕ slideChangeEnd (см. Engine.ts:650-653),
       // поэтому если сбросить флаг здесь, slideChangeEnd всегда увидит его как false.
@@ -344,6 +348,7 @@ export class AutoplayModule extends Module {
     //   чтобы новый слайд показывался полное время delay, а не остаток от предыдущего счётчика
     // - при autoplay-переходах не трогаем таймер, чтобы не ломать рекурсивный цикл run()
     this.on('slideChangeEnd', (index: number) => {
+      if (this.stopped) return
       const byAutoplay = this.transitionByAutoplay
       const now = performance.now()
       if (byAutoplay && this.lastAutoplayNextAt !== null) {
@@ -500,11 +505,13 @@ export class AutoplayModule extends Module {
    */
   private attachHoverEvents(): void {
     this.mouseEnterHandler = () => {
+      if (this.stopped) return
       this.pause()
       // Только hover: VideoModule синхронизирует HTML-video (не путать с pause() от drag/вкладки)
       this.emit('autoplayHoverPause')
     }
     this.mouseLeaveHandler = () => {
+      if (this.stopped) return
       this.resume()
       this.emit('autoplayHoverResume')
     }
@@ -533,6 +540,7 @@ export class AutoplayModule extends Module {
    */
   private attachVisibilityEvents(): void {
     this.visibilityChangeHandler = () => {
+      if (this.stopped) return
       if (document.visibilityState === 'hidden') {
         this.pausedByVisibility = true
         this.pause()
