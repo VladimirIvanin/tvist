@@ -931,12 +931,24 @@ export class Engine {
     const travel = Math.abs(currentLocation - targetPosition)
     let duration = defaultSpeed
     let easingFn: EasingFunction = easings.easeOutQuad
-    if (afterDragSnap) {
+
+    // Определяем, является ли этот скролл rewind-переходом
+    const isRewind =
+      this.options.rewind &&
+      !this.isLoopEnabled() &&
+      ctx.indexChanged &&
+      ((ctx.requestedIndex > endIndex && ctx.normalizedIndex === 0) ||
+        (ctx.requestedIndex < 0 && ctx.normalizedIndex === endIndex))
+
+    if (afterDragSnap && !isRewind) {
       duration = Math.max(
         travel / DRAG_SNAP_BASE_VELOCITY_PX_PER_MS,
         DRAG_SNAP_MIN_DURATION_MS
       )
       easingFn = easings.easeOutQuart
+    } else if (isRewind) {
+      duration = this.options.speed ?? 300
+      easingFn = easings.easeOutQuad
     }
 
     if (needsAnimation) {
