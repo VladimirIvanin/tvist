@@ -375,15 +375,27 @@ export class LoopModule extends Module {
     const container = this.tvist.container
     const realIndex = this.tvist.realIndex
 
+    if (this._withClones) {
+      // Удаляем все клоны
+      slides.forEach(slideEl => {
+        if (slideEl.classList.contains(TVIST_CLASSES.slideClone)) {
+          slideEl.remove()
+        }
+      })
+      // Обновляем список слайдов, чтобы дальше работать только с оригиналами
+      this.tvist.updateSlidesList()
+    }
+
+    const currentSlides = this.tvist.slides
     const newSlidesOrder: (HTMLElement | undefined)[] = []
-    slides.forEach(slideEl => {
+    currentSlides.forEach(slideEl => {
       const indexAttr = slideEl.getAttribute('data-tvist-slide-index')
       if (indexAttr) {
         newSlidesOrder[parseInt(indexAttr, 10)] = slideEl
       }
     })
 
-    slides.forEach(slideEl => slideEl.removeAttribute('data-tvist-slide-index'))
+    currentSlides.forEach(slideEl => slideEl.removeAttribute('data-tvist-slide-index'))
 
     const fragment = document.createDocumentFragment()
     newSlidesOrder.forEach(slideEl => {
