@@ -912,6 +912,14 @@ export interface TvistOptions {
    */
   enabled?: boolean
   
+  /**
+   * Синхронизировать ли слайдеры при перетаскивании (drag).
+   * Если false, то при перетаскивании одного слайдера другой не будет переключаться,
+   * синхронизация сработает только при клике или переключении стрелками.
+   * @default true
+   */
+  syncOnDrag?: boolean
+  
   // Обработчики событий
   
   /**
@@ -933,9 +941,9 @@ export interface TvistOptions {
     /** Перед сменой слайда */
     beforeSlideChange?: (index: number) => void
     /** Начало смены слайда (старт анимации) */
-    slideChangeStart?: (index: number) => void
+    slideChangeStart?: (index: number, data?: { isDrag?: boolean }) => void
     /** Смена слайда завершена (после анимации) */
-    slideChangeEnd?: (index: number) => void
+    slideChangeEnd?: (index: number, data?: { isDrag?: boolean }) => void
     /** Перед началом анимации перехода (для loop fix) */
     beforeTransitionStart?: (data: { index: number; direction: 'next' | 'prev' }) => void
     /** Начало анимации перехода */

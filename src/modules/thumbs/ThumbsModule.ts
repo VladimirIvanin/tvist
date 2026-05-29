@@ -36,8 +36,15 @@ export class ThumbsModule extends Module {
           // Вызываем событие
           this.tvist.emit('navigation:click', index)
           
-          // Переходим к слайду
-          this.tvist.scrollTo(index)
+          if (index === this.tvist.activeIndex) {
+            // Если индекс совпадает с текущим, но классы не обновлены (например, после drag с syncOnDrag: false),
+            // принудительно обновляем классы и эмитим slideChangeStart для синхронизации с главным слайдером.
+            updateClasses(index);
+            this.tvist.emit('slideChangeStart', index);
+          } else {
+            // Переходим к слайду
+            this.tvist.scrollTo(index)
+          }
         }
       }
       
@@ -50,7 +57,9 @@ export class ThumbsModule extends Module {
     }
     
     // 2. Обновление классов при изменении слайда
-    const updateClasses = (index: number) => {
+    const updateClasses = (index: number, data?: { isDrag?: boolean }) => {
+      if (this.options.syncOnDrag === false && data?.isDrag) return;
+      
       slides.forEach((slide, i) => {
         if (i === index) {
           slide.classList.add(activeClass)

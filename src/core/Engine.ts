@@ -929,7 +929,7 @@ export class Engine {
 
     if (ctx.indexChanged) {
       this.tvist.emit('transitionStart', ctx.eventIndex)
-      this.tvist.emit('slideChangeStart', ctx.eventIndex)
+      this.tvist.emit('slideChangeStart', ctx.eventIndex, { isDrag: afterDragSnap })
     }
 
     // Проверяем, нужна ли анимация для корректировки позиции
@@ -975,7 +975,7 @@ export class Engine {
           this.tvist.emit('transitionEnd', ctx.eventIndex)
 
           if (ctx.indexChanged) {
-            this.tvist.emit('slideChangeEnd', ctx.eventIndex)
+            this.tvist.emit('slideChangeEnd', ctx.eventIndex, { isDrag: afterDragSnap })
             this.emitReachEdge(ctx, endIndex)
           }
         },
@@ -989,7 +989,7 @@ export class Engine {
         this.tvist.emit('transitionEnd', ctx.eventIndex)
 
         if (ctx.indexChanged) {
-          this.tvist.emit('slideChangeEnd', ctx.eventIndex)
+          this.tvist.emit('slideChangeEnd', ctx.eventIndex, { isDrag: afterDragSnap })
           this.emitReachEdge(ctx, endIndex)
         }
       })

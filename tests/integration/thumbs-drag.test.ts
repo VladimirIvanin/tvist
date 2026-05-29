@@ -162,4 +162,88 @@ describe('ThumbsModule + DragModule Integration', () => {
     expect(thumbSlider.activeIndex).toBe(4)
     expect(mainSlider.activeIndex).toBe(4)
   })
+
+  describe('syncOnDrag: false', () => {
+    let mainFixtureSync: SliderFixture
+    let thumbFixtureSync: SliderFixture
+    let mainSliderSync: Tvist
+    let thumbSliderSync: Tvist
+
+    beforeEach(() => {
+      mainFixtureSync = createSliderFixture({
+        slidesCount: 5,
+        width: 600,
+        height: 400,
+        id: 'main-slider-sync'
+      })
+      thumbFixtureSync = createSliderFixture({
+        slidesCount: 5,
+        width: 600,
+        height: 100,
+        id: 'thumb-slider-sync'
+      })
+
+      mainSliderSync = new Tvist(mainFixtureSync.root, {
+        perPage: 1,
+        drag: true
+      })
+
+      thumbSliderSync = new Tvist(thumbFixtureSync.root, {
+        perPage: 3,
+        isNavigation: true,
+        drag: true,
+        syncOnDrag: false
+      })
+
+      mainSliderSync.sync(thumbSliderSync)
+    })
+
+    afterEach(() => {
+      mainSliderSync?.destroy()
+      thumbSliderSync?.destroy()
+      mainFixtureSync?.cleanup()
+      thumbFixtureSync?.cleanup()
+    })
+
+    it('длинный свайп в thumbSlider НЕ должен менять основной слайд, если syncOnDrag: false', async () => {
+      // Переходим к последнему слайду
+      mainSliderSync.scrollTo(4, true)
+      thumbSliderSync.scrollTo(4, true)
+      
+      expect(mainSliderSync.activeIndex).toBe(4)
+      expect(thumbSliderSync.activeIndex).toBe(4)
+      
+      // Эмулируем длинный свайп в thumbSlider (150px вправо)
+      await simulateDrag({
+        element: thumbSliderSync.root,
+        startX: 100,
+        startY: 50,
+        deltaX: 150,
+        steps: 5,
+        type: 'touch'
+      })
+      
+      await waitForAnimation(1100)
+      
+      // thumbSlider должен перейти к предыдущему слайду
+      expect(thumbSliderSync.activeIndex).toBe(3)
+      // Основной слайдер должен остаться на месте
+      expect(mainSliderSync.activeIndex).toBe(4)
+    })
+
+    it('клики по thumbSlider ДОЛЖНЫ менять основной слайд, даже если syncOnDrag: false', async () => {
+      expect(mainSliderSync.activeIndex).toBe(0)
+      expect(thumbSliderSync.activeIndex).toBe(0)
+      
+      const slideToClick = thumbSliderSync.slides[2]
+      if (!slideToClick) throw new Error('Slide not found')
+      
+      slideToClick.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+      
+      await waitForAnimation(400)
+      
+      expect(thumbSliderSync.activeIndex).toBe(2)
+      expect(mainSliderSync.activeIndex).toBe(2)
+    })
+  })
 })

@@ -50,6 +50,7 @@ const thumbSlider = new Tvist('.thumb-slider', {
   perPage: 4,
   gap: 10,
   isNavigation: true,
+  syncOnDrag: false, // Отключаем синхронизацию при перетаскивании
   pagination: false,
   arrows: true
 });

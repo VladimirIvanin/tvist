@@ -1066,11 +1066,13 @@ export class Tvist {
     // Всегда вызываем scrollTo: индекс может совпадать, а translate — нет
     // (autoHeight/autoWidth, resize, внешний сброс). Движок сам пропустит анимацию,
     // если позиция уже совпадает с целью (|Δ| ≤ 0.5px).
-    this.on('slideChangeStart', (index: number) => {
+    this.on('slideChangeStart', (index: number, data?: { isDrag?: boolean }) => {
+      if (this.options.syncOnDrag === false && data?.isDrag) return;
       target.scrollTo(index)
     })
 
-    target.on('slideChangeStart', (index: number) => {
+    target.on('slideChangeStart', (index: number, data?: { isDrag?: boolean }) => {
+      if (target.options.syncOnDrag === false && data?.isDrag) return;
       this.scrollTo(index)
     })
 
