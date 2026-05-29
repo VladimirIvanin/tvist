@@ -794,7 +794,7 @@ export class Engine {
   scrollTo(index: number, instant = false, afterDragSnap = false): void {
     const endIndex = this.getEndIndex()
     const previousIndex = this.index.get()
-    const ctx = this.resolveTargetIndex(index, endIndex, previousIndex)
+    const ctx = this.resolveTargetIndex(index, endIndex, previousIndex, afterDragSnap)
 
     if (ctx.indexChanged && !instant) {
       this.handleBeforeTransition(ctx, previousIndex)
@@ -818,13 +818,21 @@ export class Engine {
     }
   }
 
-  private resolveTargetIndex(index: number, endIndex: number, previousIndex: number): ScrollContext {
+  private resolveTargetIndex(
+    index: number,
+    endIndex: number,
+    previousIndex: number,
+    afterDragSnap = false
+  ): ScrollContext {
     const loopEnabled = this.isLoopEnabled()
     let clampedIndex = loopEnabled || this.options.isNavigation || this.isCenterActive()
       ? index
       : Math.max(0, Math.min(index, endIndex))
 
-    if (this.options.rewind && !loopEnabled) {
+    const rewindAllowed =
+      this.options.rewind && !loopEnabled && (!afterDragSnap || this.options.rewindByDrag)
+
+    if (rewindAllowed) {
       if (index > endIndex) {
         clampedIndex = 0
       } else if (index < 0) {
@@ -935,6 +943,7 @@ export class Engine {
     // Определяем, является ли этот скролл rewind-переходом
     const isRewind =
       this.options.rewind &&
+      (!afterDragSnap || this.options.rewindByDrag) &&
       !this.isLoopEnabled() &&
       ctx.indexChanged &&
       ((ctx.requestedIndex > endIndex && ctx.normalizedIndex === 0) ||

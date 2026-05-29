@@ -22,6 +22,7 @@ describe('Drag rewind duration', () => {
   it('should use default speed (not drag distance based) when rewinding via drag', async () => {
     slider = new Tvist(fixture.root, {
       rewind: true,
+      rewindByDrag: true,
       speed: 300,
       drag: true
     })

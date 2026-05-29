@@ -344,6 +344,12 @@
       "description": "Автоматически возвращаться к первому слайду после достижения последнего (работает без loop) Применяется к навигации, autoplay и другим способам перехода между слайдами"
     },
     {
+      "name": "rewindByDrag",
+      "type": "boolean",
+      "default": "false",
+      "description": "Разрешить перемотку карусели перетаскиванием, если включён rewind"
+    },
+    {
       "name": "lazy",
       "type": "boolean | boolean",
       "default": "false",

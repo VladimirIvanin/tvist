@@ -50,6 +50,7 @@ const DEFAULT_OPTIONS: Partial<TvistOptions> = {
   drag: true,
   start: 0,
   loop: false,
+  rewindByDrag: false,
   enabled: true,
   preventClicks: true,
   preventClicksPropagation: true,

@@ -659,6 +659,12 @@ export interface TvistOptions {
    * @default false
    */
   rewind?: boolean
+
+  /**
+   * Разрешить перемотку карусели перетаскиванием, если включён `rewind`.
+   * @default false
+   */
+  rewindByDrag?: boolean
   
   // Lazy loading
   
