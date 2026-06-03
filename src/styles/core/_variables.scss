@@ -11,12 +11,15 @@ $tvist-block: 'tvist-v1' !default;
   // Отступы
   --#{$tvist-block}-gap: 0px;
 
-  // Стрелки навигации
-  --#{$tvist-block}-arrow-size: 40px;
+  --#{$tvist-block}-arrow-size: 2em;
+  --#{$tvist-block}-arrow-icon-size: 1.2em;
+  --#{$tvist-block}-arrow-offset: 1em;
   --#{$tvist-block}-arrow-color: #000;
-  --#{$tvist-block}-arrow-bg: rgba(255, 255, 255, 0.9);
-  --#{$tvist-block}-arrow-hover-bg: rgba(255, 255, 255, 1);
+  --#{$tvist-block}-arrow-bg: #ccc;
+  --#{$tvist-block}-arrow-opacity: 0.7;
+  --#{$tvist-block}-arrow-opacity-hover: 0.9;
   --#{$tvist-block}-arrow-disabled-opacity: 0.3;
+  --#{$tvist-block}-arrow-focus-color: #0bf;
 
   // Пагинация
   --#{$tvist-block}-pagination-bottom: 10px;
@@ -39,7 +42,7 @@ $tvist-block: 'tvist-v1' !default;
   --#{$tvist-block}-progress-active-color: #000;
 
   // Z-indexes
-  --#{$tvist-block}-z-arrows: 10;
+  --#{$tvist-block}-z-arrows: 1;
   --#{$tvist-block}-z-pagination: 10;
 }
 

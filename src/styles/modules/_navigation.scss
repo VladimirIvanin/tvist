@@ -8,71 +8,68 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  z-index: 10;
+  z-index: var(--#{$tvist-block}-z-arrows, 1);
 
-  // Размеры (область нажатия)
-  width: var(--#{$tvist-block}-arrow-size, 40px);
-  height: var(--#{$tvist-block}-arrow-size, 40px);
+  width: var(--#{$tvist-block}-arrow-size, 2em);
+  height: var(--#{$tvist-block}-arrow-size, 2em);
 
-  // Только стрелка, без фона
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
-  color: var(--#{$tvist-block}-arrow-color, #333);
-  border: none;
+  background: var(--#{$tvist-block}-arrow-bg, #ccc);
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  color: var(--#{$tvist-block}-arrow-color, #000);
   cursor: pointer;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  opacity: var(--#{$tvist-block}-arrow-opacity, 0.7);
 
-  // Hover эффект
   &:hover:not(:disabled) {
-    color: var(--#{$tvist-block}-arrow-hover-color, #000);
-    opacity: 0.8;
+    opacity: var(--#{$tvist-block}-arrow-opacity-hover, 0.9);
   }
 
-  // Активное состояние
-  &:active:not(:disabled) {
-    opacity: 0.6;
-  }
-
-  // Disabled состояние (БЭМ модификатор)
   &:disabled,
   &--disabled {
-    opacity: 0.3;
+    opacity: var(--#{$tvist-block}-arrow-disabled-opacity, 0.3);
     cursor: not-allowed;
     pointer-events: none;
   }
 
-  // Hidden состояние (БЭМ модификатор)
+  &:focus-visible {
+    outline: 3px solid var(--#{$tvist-block}-arrow-focus-color, #0bf);
+    outline-offset: 3px;
+  }
+
   &--hidden {
     display: none !important;
   }
 
-  // Позиционирование
   &--prev {
-    left: var(--#{$tvist-block}-arrow-offset, 10px);
+    left: var(--#{$tvist-block}-arrow-offset, 1em);
   }
 
   &--next {
-    right: var(--#{$tvist-block}-arrow-offset, 10px);
+    right: var(--#{$tvist-block}-arrow-offset, 1em);
+  }
+
+  svg {
+    fill: currentColor;
+    width: var(--#{$tvist-block}-arrow-icon-size, 1.2em);
+    height: var(--#{$tvist-block}-arrow-icon-size, 1.2em);
+    pointer-events: none;
   }
 }
 
-// Стили для SVG иконки
+// Стили для SVG иконки (класс на svg из constants.ts)
 .#{$tvist-block}__arrow-icon {
-  width: var(--#{$tvist-block}-arrow-icon-size, 16px);
-  height: var(--#{$tvist-block}-arrow-icon-size, 16px);
   object-fit: contain;
   transform-origin: center;
-  fill: currentColor;
-  pointer-events: none;
 }
 
-// Адаптивность
+// Адаптивность (Tvist-специфичное уменьшение на мобильных)
 @media (max-width: 768px) {
   .#{$tvist-block}__arrow {
     --#{$tvist-block}-arrow-size: 32px;
     --#{$tvist-block}-arrow-offset: 5px;
   }
 }
-
