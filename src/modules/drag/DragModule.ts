@@ -916,7 +916,7 @@ export class DragModule extends Module {
 
   private isFocusableElement(element: HTMLElement): boolean {
     const focusableSelectors =
-      this.options.focusableElements ?? 'input, textarea, select, button, a[href], [tabindex]';
+      this.options.focusableElements ?? 'input, textarea, select, [tabindex]';
 
     return element.matches(focusableSelectors);
   }
