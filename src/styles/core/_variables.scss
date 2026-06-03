@@ -22,27 +22,25 @@ $tvist-block: 'tvist-v1' !default;
   --#{$tvist-block}-arrow-focus-color: #0bf;
 
   // Пагинация
-  --#{$tvist-block}-pagination-bottom: 10px;
-  --#{$tvist-block}-pagination-gap: 8px;
-  --#{$tvist-block}-pagination-color: #000;
-  --#{$tvist-block}-pagination-color-active: #007aff;
+  --#{$tvist-block}-pagination-bottom: 0.5em;
   --#{$tvist-block}-bullet-size: 8px;
-  --#{$tvist-block}-bullet-active-width: 8px;
-  --#{$tvist-block}-bullet-spacing: 6px;
-  --#{$tvist-block}-bullet-color: rgba(0, 0, 0, 0.3);
-  --#{$tvist-block}-bullet-hover-color: rgba(0, 0, 0, 0.5);
-  --#{$tvist-block}-bullet-active-color: #000;
-  --#{$tvist-block}-bullet-active-radius: 50%;
+  --#{$tvist-block}-bullet-spacing: 3px;
+  --#{$tvist-block}-bullet-color: #ccc;
+  --#{$tvist-block}-bullet-opacity: 0.7;
+  --#{$tvist-block}-bullet-opacity-hover: 0.9;
+  --#{$tvist-block}-bullet-active-color: #fff;
+  --#{$tvist-block}-bullet-active-scale: 1.4;
+  --#{$tvist-block}-bullet-focus-color: #0bf;
   --#{$tvist-block}-fraction-size: 14px;
   --#{$tvist-block}-fraction-color: #000;
   --#{$tvist-block}-progress-width: 200px;
-  --#{$tvist-block}-progress-height: 4px;
+  --#{$tvist-block}-progress-height: 3px;
   --#{$tvist-block}-progress-bg: rgba(0, 0, 0, 0.1);
   --#{$tvist-block}-progress-radius: 2px;
-  --#{$tvist-block}-progress-active-color: #000;
+  --#{$tvist-block}-progress-active-color: #ccc;
 
   // Z-indexes
   --#{$tvist-block}-z-arrows: 1;
-  --#{$tvist-block}-z-pagination: 10;
+  --#{$tvist-block}-z-pagination: 1;
 }
 

@@ -66,7 +66,7 @@
   transform-origin: center;
 }
 
-// Адаптивность (Tvist-специфичное уменьшение на мобильных)
+// Адаптивность
 @media (max-width: 768px) {
   .#{$tvist-block}__arrow {
     --#{$tvist-block}-arrow-size: 32px;
