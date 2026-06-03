@@ -168,11 +168,5 @@
       pointer-events: none;
     }
   }
-  
-  // Состояние disabled
-  &--disabled {
-    pointer-events: none;
-    opacity: 0.6;
-  }
 }
 
