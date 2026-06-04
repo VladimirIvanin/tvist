@@ -164,9 +164,9 @@ describe('ScrollbarModule', () => {
       const left = parseFloat(thumbEl?.style.left || '0')
       expect(left).toBe(0)
       
-      // Transform не должен использоваться (или должен быть 'none')
+      // Позиция задаётся через left/top, transform не задаётся
       const transform = thumbEl?.style.transform
-      expect(transform).toBe('none')
+      expect(transform).toBeFalsy()
     })
 
     it('должен плавно перемещаться во время анимации перехода', async () => {
@@ -230,8 +230,9 @@ describe('ScrollbarModule', () => {
       const top = parseFloat(thumbEl?.style.top || '0')
       expect(top).toBe(0)
       
+      // Позиция задаётся через top, transform не задаётся
       const transform = thumbEl?.style.transform
-      expect(transform).toBe('none')
+      expect(transform).toBeFalsy()
     })
   })
 

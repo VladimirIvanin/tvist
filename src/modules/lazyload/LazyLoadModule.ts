@@ -176,16 +176,19 @@ export class LazyLoadModule extends Module {
    * Настройка событий
    */
   private setupEvents(): void {
-    // Проверяем изображения при прокрутке, смене слайда
-    this.on('scroll', () => this.check())
+    const scrollHandler = () => this.check()
+    this.on('scroll', scrollHandler)
     this.on('slideChangeStart', () => this.check())
     this.on('slideChangeEnd', () => this.check())
   }
 
   /**
-   * Проверка и загрузка изображений в зоне видимости
+   * Проверка и загрузка изображений в зоне видимости.
+   * Ранний выход, если очередь пуста — не нагружает RAF-цикл.
    */
   private check(): void {
+    if (this.entries.length === 0) return
+
     const activeIndex = this.tvist.activeIndex
     const perPage = this.options.perPage ?? 1
 
@@ -195,15 +198,12 @@ export class LazyLoadModule extends Module {
     // Фильтруем entries и загружаем нужные
     this.entries = this.entries.filter(entry => {
       const [, slideIndex] = entry
-      
-      // Проверяем, находится ли слайд в зоне загрузки
-      const inRange = this.isWithinRange(slideIndex, activeIndex, distance)
-      
-      if (inRange) {
+
+      if (this.isWithinRange(slideIndex, activeIndex, distance)) {
         this.load(entry)
         return false // Удаляем из очереди
       }
-      
+
       return true // Оставляем в очереди
     })
   }

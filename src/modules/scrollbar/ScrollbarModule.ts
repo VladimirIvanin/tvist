@@ -46,6 +46,10 @@ export class ScrollbarModule extends Module {
   private dragStartScroll = 0
   private hideTimer?: number
 
+  // Мемоизация: последние применённые значения для пропуска лишних DOM-записей
+  private _lastPositionPercent = -1
+  private _lastThumbSizePercent = -1
+
   constructor(tvist: Tvist, options: TvistOptions) {
     super(tvist, options)
 
@@ -421,47 +425,67 @@ export class ScrollbarModule extends Module {
   }
 
   /**
-   * Обновить позицию и размер скроллбара
+   * Обновить позицию и размер скроллбара.
+   * Разделяет обновление размера (редко меняется) и позиции (каждый кадр).
+   * Мемоизирует оба значения: DOM не трогается, если ничего не изменилось.
    */
   private updateScrollbar(): void {
     if (!this.thumbEl || !this.trackEl) return
 
     const isVertical = this.options.direction === 'vertical'
     const slideCount = this.tvist.slides.length
-    
+
     if (slideCount <= 1) return
 
-    // Вычисляем размер ползунка (пропорционально количеству видимых слайдов)
+    // Размер ползунка — меняется только при resize / смене perPage
     const perPage = this.options.perPage ?? 1
     const thumbSizePercent = (perPage / slideCount) * 100
 
-    // Получаем текущую позицию из engine для плавного движения
+    // Текущая позиция
     const currentPosition = Math.abs(this.tvist.engine.location.get())
     const lastSlidePosition = Math.abs(this.tvist.engine.getSlidePosition(slideCount - 1))
-    
-    // Вычисляем процент прогресса (0-1) с учетом реальной позиции скролла
     const progress = lastSlidePosition > 0 ? currentPosition / lastSlidePosition : 0
-    
-    // Вычисляем доступный диапазон для движения ползунка (с учётом его размера)
     const availableRange = 100 - thumbSizePercent
-    
-    // Позиция ползунка в процентах (от 0 до availableRange)
-    const positionPercent = Math.max(0, Math.min(availableRange, progress * availableRange))
+    // Округляем до 0.1% — на кадрах с субпиксельным движением это nochange
+    const positionPercent = Math.round(
+      Math.max(0, Math.min(availableRange, progress * availableRange)) * 10
+    ) / 10
 
-    // Применяем стили
+    const sizeChanged = thumbSizePercent !== this._lastThumbSizePercent
+    const posChanged = positionPercent !== this._lastPositionPercent
+
+    if (!sizeChanged && !posChanged) return
+
     if (isVertical) {
-      this.thumbEl.style.height = `${thumbSizePercent}%`
-      this.thumbEl.style.width = '100%'
-      this.thumbEl.style.top = `${positionPercent}%`
-      this.thumbEl.style.left = '0'
-      this.thumbEl.style.transform = 'none'
+      if (sizeChanged) {
+        this.thumbEl.style.height = `${thumbSizePercent}%`
+        this.thumbEl.style.width = '100%'
+        this.thumbEl.style.left = '0'
+      }
+      if (posChanged) {
+        this.thumbEl.style.top = `${positionPercent}%`
+      }
     } else {
-      this.thumbEl.style.width = `${thumbSizePercent}%`
-      this.thumbEl.style.height = '100%'
-      this.thumbEl.style.left = `${positionPercent}%`
-      this.thumbEl.style.top = '0'
-      this.thumbEl.style.transform = 'none'
+      if (sizeChanged) {
+        this.thumbEl.style.width = `${thumbSizePercent}%`
+        this.thumbEl.style.height = '100%'
+        this.thumbEl.style.top = '0'
+      }
+      if (posChanged) {
+        this.thumbEl.style.left = `${positionPercent}%`
+      }
     }
+
+    if (sizeChanged) this._lastThumbSizePercent = thumbSizePercent
+    if (posChanged) this._lastPositionPercent = positionPercent
+  }
+
+  /**
+   * Инвалидирует кеш скроллбара — вызывать при resize или смене опций.
+   */
+  private invalidateScrollbarCache(): void {
+    this._lastPositionPercent = -1
+    this._lastThumbSizePercent = -1
   }
 
   /**
@@ -494,6 +518,7 @@ export class ScrollbarModule extends Module {
    * Хук обновления
    */
   override onUpdate(): void {
+    this.invalidateScrollbarCache()
     this.updateScrollbar()
   }
 
@@ -538,6 +563,7 @@ export class ScrollbarModule extends Module {
         this.scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarHidden)
       }
 
+      this.invalidateScrollbarCache()
       this.updateScrollbar()
     }
   }

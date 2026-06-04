@@ -51,6 +51,9 @@ export class Engine {
   private trackSizeCacheValid = false
   private slideSizesCacheValid = false
 
+  /** Последняя позиция, записанная в style.transform (после roundLengths). */
+  private _lastAppliedTransformPos: number | null = null
+
   /** Размеры fixedWidth / fixedHeight в px после resolveFixedDimensionsEarly() */
   private fixedWidthPxResolved = 0
   private fixedHeightPxResolved = 0
@@ -1050,7 +1053,10 @@ export class Engine {
   }
 
   /**
-   * Применяет transform к контейнеру
+   * Применяет transform к контейнеру.
+   * Мемоизирует последнюю применённую позицию: если округлённое значение не
+   * изменилось, пропускает запись style.transform и все события (scroll/setTranslate/progress).
+   * Это убирает лишние DOM-записи и обработчики на кадрах без визуального сдвига.
    */
   applyTransform(): void {
     const container = this.tvist.container
@@ -1058,22 +1064,31 @@ export class Engine {
       if (this.isCenterJustify()) {
         if (!this.scrollCacheValid) this.updateScrollCache()
         const offset = Math.max(0, (this.cachedRootSize - this.getContentSize()) / 2)
-        if (this.options.direction === 'vertical') {
-          container.style.transform = `translate3d(0, ${offset}px, 0)`
-        } else {
-          container.style.transform = `translate3d(${offset}px, 0, 0)`
+        if (this._lastAppliedTransformPos !== offset) {
+          if (this.options.direction === 'vertical') {
+            container.style.transform = `translate3d(0, ${offset}px, 0)`
+          } else {
+            container.style.transform = `translate3d(${offset}px, 0, 0)`
+          }
+          this._lastAppliedTransformPos = offset
+          this.tvist.emit('setTranslate', this.tvist, offset)
+          this.emitProgress()
         }
-        this.tvist.emit('setTranslate', this.tvist, offset)
       } else {
-        container.style.transform = ''
-        this.tvist.emit('setTranslate', this.tvist, 0)
+        if (this._lastAppliedTransformPos !== 0) {
+          container.style.transform = ''
+          this._lastAppliedTransformPos = 0
+          this.tvist.emit('setTranslate', this.tvist, 0)
+          this.emitProgress()
+        }
       }
-      this.emitProgress()
       return
     }
 
     const rawPos = this.location.get()
     const pos = this.options.roundLengths === false ? rawPos : Math.round(rawPos)
+
+    if (pos === this._lastAppliedTransformPos) return
 
     if (this.options.direction === 'vertical') {
       container.style.transform = `translate3d(0, ${pos}px, 0)`
@@ -1081,6 +1096,7 @@ export class Engine {
       container.style.transform = `translate3d(${pos}px, 0, 0)`
     }
 
+    this._lastAppliedTransformPos = pos
     this.tvist.emit('setTranslate', this.tvist, pos)
     this.emitProgress()
   }
@@ -1100,6 +1116,9 @@ export class Engine {
   update(): void {
     this.invalidateRootSizeCache()
     this.slideSizesCacheValid = false
+    // После пересчёта layout позиция контейнера должна быть применена заново,
+    // даже если округлённое значение совпадает с кешированным.
+    this._lastAppliedTransformPos = null
     this.resolveGap()
     this.resolveFixedDimensionsEarly()
     this.applyPeek()
@@ -1330,5 +1349,6 @@ export class Engine {
    */
   destroy(): void {
     this.animator.stop()
+    this._lastAppliedTransformPos = null
   }
 }
