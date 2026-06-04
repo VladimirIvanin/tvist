@@ -6,16 +6,18 @@
 
 .#{$tvist-block}__pagination {
   position: absolute;
-  bottom: var(--#{$tvist-block}-pagination-bottom, 0.5em);
-  left: 0;
-  right: 0;
-  padding: 0 1em;
-  z-index: var(--#{$tvist-block}-z-pagination, 1);
+  width: 95%;
+  bottom: var(--#{$tvist-block}-pagination-bottom, 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
 
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--#{$tvist-block}-pagination-gap, 8px);
   margin: 0;
+  padding: 0;
 
   &--hidden {
     display: none !important;
@@ -24,7 +26,6 @@
   .#{$tvist-block}__bullet {
     width: var(--#{$tvist-block}-bullet-size, 8px);
     height: var(--#{$tvist-block}-bullet-size, 8px);
-    margin: var(--#{$tvist-block}-bullet-spacing, 3px);
     border: 0;
     padding: 0;
     border-radius: 50%;

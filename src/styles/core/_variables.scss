@@ -22,9 +22,9 @@ $tvist-block: 'tvist-v1' !default;
   --#{$tvist-block}-arrow-focus-color: #0bf;
 
   // Пагинация
-  --#{$tvist-block}-pagination-bottom: 0.5em;
+  --#{$tvist-block}-pagination-bottom: 10px;
+  --#{$tvist-block}-pagination-gap: 8px;
   --#{$tvist-block}-bullet-size: 8px;
-  --#{$tvist-block}-bullet-spacing: 3px;
   --#{$tvist-block}-bullet-color: #ccc;
   --#{$tvist-block}-bullet-opacity: 0.7;
   --#{$tvist-block}-bullet-opacity-hover: 0.9;
@@ -41,6 +41,6 @@ $tvist-block: 'tvist-v1' !default;
 
   // Z-indexes
   --#{$tvist-block}-z-arrows: 1;
-  --#{$tvist-block}-z-pagination: 1;
+  --#{$tvist-block}-z-pagination: 10;
 }
 
