@@ -249,11 +249,11 @@ describe('Autoplay + Pagination + Loop integration', () => {
 
     // Переход 0 -> 1
     vi.advanceTimersByTime(1000)
-    expect(slideChangedSpy).toHaveBeenLastCalledWith(1)
+    expect(slideChangedSpy).toHaveBeenLastCalledWith(1, { isDrag: false })
 
     // Переход 1 -> 2
     vi.advanceTimersByTime(1000)
-    expect(slideChangedSpy).toHaveBeenLastCalledWith(2)
+    expect(slideChangedSpy).toHaveBeenLastCalledWith(2, { isDrag: false })
 
     // Переход 2 -> 0 (loop)
     // Здесь может быть баг - событие может приходить с неправильным индексом

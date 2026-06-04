@@ -18,10 +18,6 @@ import {
   TVIST_SLIDE_INDEX_ATTR,
 } from '../utils/slideRealIndex'
 
-/** Как Splide Scroll: длительность snap после drag = max(|dx|/base, min) */
-const DRAG_SNAP_BASE_VELOCITY_PX_PER_MS = 1.5
-const DRAG_SNAP_MIN_DURATION_MS = 800
-
 /** Контекст для передачи между подметодами scrollTo */
 interface ScrollContext {
   requestedIndex: number
@@ -814,7 +810,7 @@ export class Engine {
    * Переход к слайду
    * @param index - индекс целевого слайда
    * @param instant - мгновенный переход без анимации
-   * @param afterDragSnap - смягчённый snap после отпускания (длительность от расстояния, как Splide)
+   * @param afterDragSnap - snap после отпускания при drag (длительность = speed, easing easeOutCubic)
    */
   scrollTo(index: number, instant = false, afterDragSnap = false): void {
     const endIndex = this.getEndIndex()
@@ -961,7 +957,6 @@ export class Engine {
     const currentLocation = this.location.get()
     const needsAnimation = Math.abs(currentLocation - targetPosition) > 0.5
 
-    const travel = Math.abs(currentLocation - targetPosition)
     let duration = defaultSpeed
     let easingFn: EasingFunction = easings.easeOutQuad
 
@@ -975,11 +970,8 @@ export class Engine {
         (ctx.requestedIndex < 0 && ctx.normalizedIndex === endIndex))
 
     if (afterDragSnap && !isRewind) {
-      duration = Math.max(
-        travel / DRAG_SNAP_BASE_VELOCITY_PX_PER_MS,
-        DRAG_SNAP_MIN_DURATION_MS
-      )
-      easingFn = easings.easeOutQuart
+      duration = this.options.speed ?? 300
+      easingFn = easings.easeOutCubic
     } else if (isRewind) {
       duration = this.options.speed ?? 300
       easingFn = easings.easeOutQuad

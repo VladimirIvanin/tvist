@@ -54,4 +54,28 @@ describe('Drag rewind duration', () => {
     const durationArg = animateSpy.mock.calls[0][2]
     expect(durationArg).toBe(300)
   })
+
+  it('should use speed for snap duration after drag (not distance-based minimum)', async () => {
+    slider = new Tvist(fixture.root, {
+      speed: 400,
+      drag: true,
+    })
+
+    const animateSpy = vi.spyOn(slider.engine.animator, 'animate')
+    animateSpy.mockClear()
+
+    await simulateDrag({
+      element: fixture.root,
+      startX: 500,
+      deltaX: -300,
+      steps: 10,
+      duration: 100,
+    })
+
+    await new Promise((resolve) => setTimeout(resolve, 50))
+
+    expect(animateSpy).toHaveBeenCalled()
+    const durationArg = animateSpy.mock.calls[0]?.[2]
+    expect(durationArg).toBe(400)
+  })
 })
