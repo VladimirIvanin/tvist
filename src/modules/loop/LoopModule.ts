@@ -49,7 +49,7 @@ export class LoopModule extends Module {
     this.isInitialized = true
 
     const initialRealIndex = this.options.start ?? 0
-    const bothDirections = this.tvist.engine.isCenterActive() || this.options.peek !== undefined
+    const bothDirections = this.tvist.engine.isCenterMode() || this.options.peek !== undefined
     const hasPeek = this.options.peek !== undefined
 
     this.loopFix({
@@ -128,7 +128,7 @@ export class LoopModule extends Module {
     const slides = this.tvist.slides
     const container = this.tvist.container
     const slidesCount = slides.length
-    const bothDirections = this.tvist.engine.isCenterActive() || this.options.peek !== undefined
+    const bothDirections = this.tvist.engine.isCenterMode() || this.options.peek !== undefined
 
     const loopedSlides = this.computeLoopedSlides(bothDirections)
     this.loopedSlides = loopedSlides
@@ -426,7 +426,7 @@ export class LoopModule extends Module {
 
     if (enabled && !withClones) {
       const slidesCount = this.tvist.slides.length
-      const bothDirections = this.tvist.engine.isCenterActive() || this.options.peek !== undefined
+      const bothDirections = this.tvist.engine.isCenterMode() || this.options.peek !== undefined
       const slidesPerView = this.getSlidesPerView(bothDirections)
       const loopedSlides = this.computeLoopedSlides(bothDirections)
       

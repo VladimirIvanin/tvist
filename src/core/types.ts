@@ -323,6 +323,11 @@ export interface LoopOptions {
 export interface CenterOptions {
   /** Центрирует активный слайд в viewport (аналог center: true) */
   active?: boolean
+  /**
+   * Центрирует активный слайд, когда есть место; у краёв обрезает позицию
+   * (аналог Splide `focus: 'center'` + `trimSpace: true`).
+   */
+  focus?: boolean
   /** Центрирует все слайды визуально когда locked (justify-content: center) */
   justify?: boolean
 }
@@ -441,8 +446,9 @@ export interface TvistOptions {
   /**
    * Центрирование слайдов.
    * - `true` — центрирует активный слайд в viewport (режим "active").
-   * - Объект `{ active?, justify? }` — тонкая настройка:
-   *   - `active: true` — центрирует активный слайд (аналог `center: true`)
+   * - Объект `{ active?, focus?, justify? }` — тонкая настройка:
+   *   - `active: true` — центрирует активный слайд всегда, включая края (аналог `center: true`)
+   *   - `focus: true` — центрирует активный слайд, когда возможно; у краёв без пустот (как Splide focus:center)
    *   - `justify: true` — визуально центрирует все слайды когда locked (как `justify-content: center`)
    * @default false
    */

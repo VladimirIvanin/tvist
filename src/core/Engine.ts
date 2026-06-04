@@ -118,6 +118,17 @@ export class Engine {
     return c.active ?? false
   }
 
+  public isCenterFocus(): boolean {
+    const c = this.options.center
+    if (!c || c === true) return false
+    return c.focus ?? false
+  }
+
+  /** Режим центрирования активного слайда (strict active или focus с trim у краёв). */
+  public isCenterMode(): boolean {
+    return this.isCenterActive() || this.isCenterFocus()
+  }
+
   public isCenterJustify(): boolean {
     const c = this.options.center
     if (!c || c === true) return false
@@ -128,7 +139,7 @@ export class Engine {
    * Вычисляет offset для центрирования
    */
   public getCenterOffset(index: number): number {
-    if (!this.isCenterActive()) {
+    if (!this.isCenterMode()) {
       return 0
     }
 
@@ -136,6 +147,15 @@ export class Engine {
     const rootSize = this.cachedRootSize
     const size = this.getSlideSize(index)
     return (rootSize - this.peekStart - this.peekEnd - size) / 2
+  }
+
+  /**
+   * Ограничивает позицию скролла для center.focus (trim у краёв, как Splide trimSpace).
+   */
+  public clampCenterPosition(position: number): number {
+    const minPos = this.getMinScrollPosition()
+    const maxPos = this.getMaxScrollPosition()
+    return Math.max(maxPos, Math.min(minPos, position))
   }
 
   /**
@@ -185,12 +205,17 @@ export class Engine {
     const centerOffset = this.getCenterOffset(index)
 
     if (this.isLoopEnabled()) {
-      if (this.isCenterActive()) {
+      if (this.isCenterMode()) {
         const pos = basePosition + centerOffset
         return pos === 0 ? 0 : pos
       }
 
       return basePosition === 0 ? 0 : basePosition
+    }
+
+    if (this.isCenterFocus()) {
+      const pos = this.clampCenterPosition(basePosition + centerOffset)
+      return pos === 0 ? 0 : pos
     }
 
     if (this.isCenterActive()) {
@@ -665,7 +690,7 @@ export class Engine {
     this.cachedRootSize = this.getRootSize()
 
     // minScroll: используем peekStart (уже вычислен в calculateSizes)
-    this.cachedMinScroll = -this.peekStart
+    this.cachedMinScroll = this.peekStart === 0 ? 0 : -this.peekStart
 
     // maxScroll: правый/нижний край последнего слайда совпадает с краем root (без дыры справа/снизу).
     // Для этого используем cachedRootSize, а не containerSize, чтобы перекрыть peekEnd.
@@ -710,7 +735,7 @@ export class Engine {
   private getEndIndex(): number {
     const slideCount = this.tvist.slides.length
 
-    if (this.isLoopEnabled() || this.isCenterActive() || this.options.isNavigation || this.isAutoSize()) {
+    if (this.isLoopEnabled() || this.isCenterMode() || this.options.isNavigation || this.isAutoSize()) {
       return slideCount - 1
     }
 
@@ -760,7 +785,7 @@ export class Engine {
   private calculateCounterEndIndex(): number {
     const slideCount = this.tvist.slides.length
     const perPage = this.options.perPage ?? 1
-    return (this.isLoopEnabled() || this.options.isNavigation || this.isCenterActive())
+    return (this.isLoopEnabled() || this.options.isNavigation || this.isCenterMode())
       ? slideCount - 1
       : Math.max(0, slideCount - perPage)
   }
@@ -825,7 +850,7 @@ export class Engine {
     afterDragSnap = false
   ): ScrollContext {
     const loopEnabled = this.isLoopEnabled()
-    let clampedIndex = loopEnabled || this.options.isNavigation || this.isCenterActive()
+    let clampedIndex = loopEnabled || this.options.isNavigation || this.isCenterMode()
       ? index
       : Math.max(0, Math.min(index, endIndex))
 
@@ -898,7 +923,7 @@ export class Engine {
 
   /** При навигации применяем ограничения (но не для center режима) */
   private clampTargetPosition(position: number, endIndex: number): number {
-    if (!this.options.isNavigation || this.isLoopEnabled() || this.isCenterActive()) {
+    if (!this.options.isNavigation || this.isLoopEnabled() || this.isCenterMode()) {
       return position
     }
     const peekTrim = this.options.peekTrim !== false
@@ -1274,7 +1299,7 @@ export class Engine {
     // В center и autoSize режимах граница определяется только по индексу:
     // center: translate не совпадает с getMaxScrollPosition
     // autoSize: несколько индексов могут сходиться к одной translate (clamp к maxScroll)
-    if (this.isCenterActive() || this.isAutoSize()) return true
+    if (this.isCenterMode() || this.isAutoSize()) return true
 
     // Нет осмысленного диапазона (тесты без layout, нулевые размеры) — только индекс
     if (!this.hasScrollRange()) return true
@@ -1293,7 +1318,7 @@ export class Engine {
 
     if (this.index.get() > 0) return true
 
-    if (this.isCenterActive() || this.isAutoSize()) return false
+    if (this.isCenterMode() || this.isAutoSize()) return false
 
     if (!this.hasScrollRange()) return false
 
