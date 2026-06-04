@@ -24,16 +24,16 @@ pnpm add tvist
 
 Браузерная сборка лежит в репозитории в каталоге **`browser-build/`** (не в `dist/` на npm). Подключение через CDN — **jsDelivr (GitHub)** или **raw.githubusercontent.com**.
 
-`@latest` в jsDelivr соответствует **последнему релизу на GitHub**; для фиксированной версии укажите тег (например `v1.14.4`). Острие ветки `main`: замените `@latest` на `@main`.
+`@latest` в jsDelivr соответствует **последнему релизу на GitHub**; для фиксированной версии укажите тег (например `{{TVIST_VERSION_TAG}}`). Острие ветки `main`: замените `@latest` на `@main`.
 
 ```html
 <!-- jsDelivr — последний релиз GitHub -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css">
 <script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
 
-<!-- Закрепить версию (пример тега v1.14.4) -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@v1.14.4/browser-build/tvist.css">
-<script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@v1.14.4/browser-build/tvist.min.js"></script>
+<!-- Закрепить версию (текущая {{TVIST_VERSION_TAG}}) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@{{TVIST_VERSION_TAG}}/browser-build/tvist.css">
+<script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@{{TVIST_VERSION_TAG}}/browser-build/tvist.min.js"></script>
 ```
 
 После загрузки скрипта доступен глобальный конструктор **`TvistV1`**:

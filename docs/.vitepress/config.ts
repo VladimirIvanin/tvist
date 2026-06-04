@@ -1,16 +1,43 @@
 import { defineConfig } from 'vitepress'
+import type MarkdownIt from 'markdown-it'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { version, versionTag } from './package-version'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+
+function injectPackageVersion(md: MarkdownIt): void {
+  md.core.ruler.before('normalize', 'tvist-package-version', (state) => {
+    state.src = state.src
+      .replace(/\{\{TVIST_VERSION\}\}/g, version)
+      .replace(/\{\{TVIST_VERSION_TAG\}\}/g, versionTag)
+  })
+}
 
 export default defineConfig({
   title: "Tvist",
   description: "Слайдер с широким API для современного веба",
   lang: 'ru-RU',
   base: '/tvist/',
-  
+
+  markdown: {
+    config: injectPackageVersion,
+  },
+
+  transformPageData(pageData) {
+    if (pageData.relativePath !== 'index.md') return
+    const hero = pageData.frontmatter.hero
+    if (!hero || typeof hero !== 'object') return
+    const tagline = typeof hero.tagline === 'string' ? hero.tagline : ''
+    if (tagline.includes(`v${version}`)) return
+    hero.tagline = tagline ? `${tagline} · v${version}` : `v${version}`
+  },
+
   vite: {
+    define: {
+      __TVIST_VERSION__: JSON.stringify(version),
+      __TVIST_VERSION_TAG__: JSON.stringify(versionTag),
+    },
     resolve: {
       dedupe: ['vue'],
       alias: {

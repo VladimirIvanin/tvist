@@ -113,9 +113,9 @@
     },
     {
       "name": "center",
-      "type": "boolean",
+      "type": "boolean | CenterOptions",
       "default": "false",
-      "description": "Центрирование активного слайда. При true активный слайд будет находиться по центру контейнера."
+      "description": "Центрирование слайдов. - `true` — центрирует активный слайд в viewport (режим \"active\"). - Объект `{ active?, focus?, justify? }` — тонкая настройка: - `active: true` — центрирует активный слайд всегда, включая края (аналог `center: true`) - `focus: true` — центрирует активный слайд, когда возможно; у краёв без пустот (как Splide focus:center) - `justify: true` — визуально центрирует все слайды когда locked (как `justify-content: center`)"
     },
     {
       "name": "debug",
@@ -347,7 +347,7 @@
       "name": "rewindByDrag",
       "type": "boolean",
       "default": "false",
-      "description": "Разрешить перемотку карусели перетаскиванием, если включён rewind"
+      "description": "Разрешить перемотку карусели перетаскиванием, если включён `rewind`."
     },
     {
       "name": "lazy",
@@ -544,34 +544,6 @@
       "description": "Если true, слайдер будет вести себя как навигация (клики по слайдам делают их активными). Используется для создания thumbnail-слайдеров"
     },
     {
-      "name": "virtual",
-      "type": "boolean | boolean",
-      "default": "false",
-      "description": "Виртуальные слайды для работы с большими списками",
-      "nested": [
-        {
-          "name": "virtual",
-          "type": "boolean | {",
-          "description": ""
-        },
-        {
-          "name": "addSlidesBefore",
-          "type": "number",
-          "description": ""
-        },
-        {
-          "name": "addSlidesAfter",
-          "type": "number",
-          "description": ""
-        },
-        {
-          "name": "renderSlide",
-          "type": "(data: any, index: number) => string",
-          "description": ""
-        }
-      ]
-    },
-    {
       "name": "grid",
       "type": "object",
       "default": "undefined",
@@ -585,12 +557,12 @@
         {
           "name": "rows",
           "type": "number",
-          "description": ""
+          "description": "Количество рядов. Если задан только `cols`, по умолчанию 1 (как splide-extension-grid: rows 1, cols 1)."
         },
         {
           "name": "cols",
           "type": "number",
-          "description": ""
+          "description": "Количество колонок. Если задан только `rows`, по умолчанию 1."
         },
         {
           "name": "gap",
@@ -755,6 +727,12 @@
       "description": "Включить/выключить слайдер. При false слайдер не инициализируется (статичный контент)"
     },
     {
+      "name": "syncOnDrag",
+      "type": "boolean",
+      "default": "true",
+      "description": "Синхронизировать ли слайдеры при перетаскивании (drag). Если false, то при перетаскивании одного слайдера другой не будет переключаться, синхронизация сработает только при клике или переключении стрелками."
+    },
+    {
       "name": "on",
       "type": "object",
       "default": "undefined",
@@ -802,12 +780,12 @@
         },
         {
           "name": "slideChangeStart",
-          "type": "(index: number) => void",
+          "type": "(index: number, data?: { isDrag?: boolean }) => void",
           "description": ""
         },
         {
           "name": "slideChangeEnd",
-          "type": "(index: number) => void",
+          "type": "(index: number, data?: { isDrag?: boolean }) => void",
           "description": ""
         },
         {
