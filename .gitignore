@@ -14,6 +14,9 @@ build/
 # Testing
 coverage/
 .nyc_output/
+test-results/
+playwright-report/
+blob-report/
 
 # Environment
 .env

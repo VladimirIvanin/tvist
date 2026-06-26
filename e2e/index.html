@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tvist E2E</title>
+  <link rel="stylesheet" href="./style.scss">
+</head>
+<body>
+  <main class="e2e-page">
+    <h1>Tvist E2E Fixtures</h1>
+
+    <section class="e2e-section" data-testid="section-basic">
+      <h2>Basic slider</h2>
+      <div data-testid="slider-basic" class="tvist-v1">
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">Slide 1</div>
+            <div class="tvist-v1__slide">Slide 2</div>
+            <div class="tvist-v1__slide">Slide 3</div>
+            <div class="tvist-v1__slide">Slide 4</div>
+            <div class="tvist-v1__slide">Slide 5</div>
+          </div>
+        </div>
+        <div class="tvist-v1__arrows">
+          <button type="button" class="tvist-v1__arrow tvist-v1__arrow--prev" aria-label="Previous slide"></button>
+          <button type="button" class="tvist-v1__arrow tvist-v1__arrow--next" aria-label="Next slide"></button>
+        </div>
+        <div class="tvist-v1__pagination"></div>
+      </div>
+      <p class="e2e-status">
+        Index: <span data-testid="basic-real-index">0</span>
+      </p>
+    </section>
+
+    <section class="e2e-section" data-testid="section-loop">
+      <h2>Loop slider</h2>
+      <div data-testid="slider-loop" class="tvist-v1">
+        <div class="tvist-v1__track">
+          <div class="tvist-v1__container">
+            <div class="tvist-v1__slide">A</div>
+            <div class="tvist-v1__slide">B</div>
+            <div class="tvist-v1__slide">C</div>
+          </div>
+        </div>
+        <div class="tvist-v1__arrows">
+          <button type="button" class="tvist-v1__arrow tvist-v1__arrow--prev" aria-label="Previous slide"></button>
+          <button type="button" class="tvist-v1__arrow tvist-v1__arrow--next" aria-label="Next slide"></button>
+        </div>
+      </div>
+      <p class="e2e-status">
+        Index: <span data-testid="loop-real-index">0</span>
+      </p>
+    </section>
+  </main>
+
+  <script type="module" src="./fixtures.ts"></script>
+</body>
+</html>
