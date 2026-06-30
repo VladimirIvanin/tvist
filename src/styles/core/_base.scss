@@ -9,7 +9,7 @@
   width: 100%;
   visibility: hidden;
 
-  // Изолируем layout И inline-size слайдера от родителя.
+  // Изолируем inline-size слайдера от родителя.
   //
   // Без `inline-size` containment в grid/flex-родителях с `min-width: auto`
   // у grid-item (по умолчанию) max-content родителя разрешается по
@@ -22,7 +22,10 @@
   //
   // `contain: inline-size` делает inline-size элемента независимой от
   // содержимого (intrinsic inline-size = 0 для родителя), что разрывает цикл.
-  contain: inline-size layout style;
+  //
+  // `layout` намеренно не на корне: он создаёт stacking context и ломает
+  // z-index у pagination/arrows (siblings track). Layout-изоляция — на __container.
+  contain: inline-size style;
 
   // Fallback для браузеров без `inline-size` containment:
   // `min-width: 0` отключает `min-width: auto` для flex/grid-item,
