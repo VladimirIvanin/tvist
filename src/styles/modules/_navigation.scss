@@ -60,6 +60,26 @@
   }
 }
 
+// Вертикальный слайдер: стрелки сверху и снизу по центру
+.#{$tvist-block}--vertical {
+  .#{$tvist-block}__arrow {
+    left: 50%;
+    right: auto;
+    top: auto;
+    transform: translateX(-50%);
+
+    &--prev {
+      top: var(--#{$tvist-block}-arrow-offset, 1em);
+      bottom: auto;
+    }
+
+    &--next {
+      top: auto;
+      bottom: var(--#{$tvist-block}-arrow-offset, 1em);
+    }
+  }
+}
+
 // Стили для SVG иконки (класс на svg из constants.ts)
 .#{$tvist-block}__arrow-icon {
   object-fit: contain;
