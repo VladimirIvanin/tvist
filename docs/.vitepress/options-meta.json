@@ -157,13 +157,13 @@
       "name": "flickPower",
       "type": "number",
       "default": "600",
-      "description": "Сила инерции (flick power). Множитель для скорости при расчёте дистанции momentum scroll"
+      "description": "Сила инерции (flick power). Множитель скорости для momentum scroll (drag: 'free') и snap после свайпа в обычном режиме (drag: true)"
     },
     {
       "name": "flickMaxPages",
       "type": "number",
       "default": "1",
-      "description": "Максимальное количество страниц для flick в обычном режиме"
+      "description": "Максимальное количество viewport-ширин инерции за один flick в обычном режиме drag: true"
     },
     {
       "name": "focusableElements",

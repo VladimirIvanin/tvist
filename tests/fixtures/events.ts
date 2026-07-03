@@ -102,6 +102,8 @@ export interface DragSequenceConfig {
   deltaX: number
   deltaY?: number
   steps?: number
+  /** Общая длительность move-фазы в мс (по умолчанию steps × 10) */
+  duration?: number
   type?: 'mouse' | 'touch' | 'pointer'
 }
 
@@ -126,8 +128,11 @@ export async function simulateDrag(config: DragSequenceConfig): Promise<void> {
     deltaX,
     deltaY = 0,
     steps = 5,
+    duration,
     type = 'mouse',
   } = config
+
+  const stepDelay = (duration ?? steps * 10) / steps
 
   // Start
   let startEvent: Event
@@ -156,7 +161,7 @@ export async function simulateDrag(config: DragSequenceConfig): Promise<void> {
   const stepY = deltaY / steps
 
   for (let i = 1; i <= steps; i++) {
-    await new Promise(resolve => setTimeout(resolve, 10))
+    await new Promise(resolve => setTimeout(resolve, stepDelay))
 
     const currentX = startX + stepX * i
     const currentY = startY + stepY * i

@@ -495,13 +495,14 @@ export interface TvistOptions {
   freeSnap?: boolean
   
   /**
-   * Сила инерции (flick power). Множитель для скорости при расчёте дистанции momentum scroll
+   * Сила инерции (flick power). Множитель скорости при расчёте дистанции
+   * momentum scroll и snap после drag в обычном режиме (`drag: true`)
    * @default 600
    */
   flickPower?: number
   
   /**
-   * Максимальное количество страниц для flick в обычном режиме
+   * Максимальное количество страниц (viewport) для flick в обычном режиме
    * @default 1
    */
   flickMaxPages?: number

@@ -1161,7 +1161,7 @@ export class DragModule extends Module {
     if (isFreeSnap) {
       this.snapToNearestSlide(_velocity);
     } else {
-      this.snapWithThreshold();
+      this.snapWithThreshold(_velocity);
     }
   }
 
@@ -1195,7 +1195,7 @@ export class DragModule extends Module {
     engine.scrollTo(nearestIndex, false, true);
   }
 
-  private snapWithThreshold(): void {
+  private snapWithThreshold(velocity: number): void {
     const { engine } = this.tvist;
     const startIndex = engine.activeIndex;
 
@@ -1213,13 +1213,22 @@ export class DragModule extends Module {
     const dragDistance = isHorizontal ? this.currentX - this.startX : this.currentY - this.startY;
 
     const threshold = Math.max(slideSize * 0.2, 80);
-    const exactSlidesMoved = -dragDistance / slideWithGap;
+    const flickPower = this.options.flickPower ?? 600;
+    const flickMaxPages = this.options.flickMaxPages ?? 1;
+    const maxFlickDistance = engine.containerSizeValue * flickMaxPages;
+    const flickDistance =
+      Math.sign(velocity) * Math.min(Math.abs(velocity) * flickPower, maxFlickDistance);
+    const projectedDistance = dragDistance + flickDistance;
+
+    const exactSlidesMoved = -projectedDistance / slideWithGap;
     let slidesMoved = Math.round(exactSlidesMoved);
 
-    if (Math.abs(dragDistance) < threshold) {
-      slidesMoved = 0;
-    } else if (slidesMoved === 0) {
-      slidesMoved = dragDistance > 0 ? -1 : 1;
+    if (slidesMoved === 0) {
+      if (Math.abs(dragDistance) < threshold) {
+        slidesMoved = 0;
+      } else {
+        slidesMoved = dragDistance > 0 ? -1 : 1;
+      }
     }
 
     dragLog('snapWithThreshold', {
@@ -1227,6 +1236,9 @@ export class DragModule extends Module {
       startIndexFromEngine: this.startIndex,
       slidesMoved,
       dragDistance,
+      velocity,
+      flickDistance,
+      projectedDistance,
       currentLocation: engine.location.get(),
       startPosition: this.startPosition,
       threshold,

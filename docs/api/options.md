@@ -30,8 +30,8 @@
 - `dragSpeed` — множитель скорости перетаскивания
 - `rubberband` — эффект резинки на краях
 - `freeSnap` — snap к слайдам в режиме `drag: 'free'`
-- `flickPower` — сила инерции (множитель для momentum scroll)
-- `flickMaxPages` — максимум страниц за один flick
+- `flickPower` — сила инерции: множитель скорости для momentum scroll (`drag: 'free'`) и snap после свайпа в обычном режиме (`drag: true`)
+- `flickMaxPages` — максимум viewport-ширин инерции за один flick (ограничивает дальность перелистывания)
 - `focusableElements` — CSS-селектор элементов, сохраняющих фокус при перетаскивании
 - `preventClicks` — блокировать клики по слайдам во время перетаскивания
 - `preventClicksPropagation` — не всплывать клику во время анимации

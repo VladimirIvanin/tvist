@@ -172,12 +172,13 @@ describe('DragModule', () => {
     it('НЕ должен переключать слайд если драг меньше threshold', async () => {
       const initialIndex = slider.activeIndex
 
-      // Маленький drag (40px - меньше threshold)
+      // Маленький медленный drag (40px — меньше threshold, без флика)
       await simulateDrag({
         element: fixture.container,
         startX: 200,
         deltaX: -40,
-        steps: 3,
+        steps: 5,
+        duration: 400,
       })
 
       await waitForAnimation(300)
@@ -186,15 +187,33 @@ describe('DragModule', () => {
       expect(slider.activeIndex).toBe(initialIndex)
     })
 
+    it('должен переключить слайд при быстром коротком свайпе (флик)', async () => {
+      const initialIndex = slider.activeIndex
+
+      // Короткий быстрый drag (50px — меньше threshold, но с высокой velocity)
+      await simulateDrag({
+        element: fixture.container,
+        startX: 200,
+        deltaX: -50,
+        steps: 2,
+        duration: 60,
+      })
+
+      await waitForAnimation(300)
+
+      expect(slider.activeIndex).toBe(initialIndex + 1)
+    })
+
     it('должен переключить слайд если драг больше threshold', async () => {
       const initialIndex = slider.activeIndex
 
-      // Большой drag (150px - больше threshold)
+      // Большой медленный drag (150px — больше threshold)
       await simulateDrag({
         element: fixture.container,
         startX: 200,
         deltaX: -150,
         steps: 5,
+        duration: 400,
       })
 
       await waitForAnimation(300)
