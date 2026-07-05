@@ -104,6 +104,8 @@ export interface DragSequenceConfig {
   steps?: number
   /** Общая длительность move-фазы в мс (по умолчанию steps × 10) */
   duration?: number
+  /** Пауза перед pointerup/touchend (мс), чтобы velocity = 0 при snap по расстоянию */
+  releaseDelay?: number
   type?: 'mouse' | 'touch' | 'pointer'
 }
 
@@ -129,6 +131,7 @@ export async function simulateDrag(config: DragSequenceConfig): Promise<void> {
     deltaY = 0,
     steps = 5,
     duration,
+    releaseDelay,
     type = 'mouse',
   } = config
 
@@ -185,6 +188,10 @@ export async function simulateDrag(config: DragSequenceConfig): Promise<void> {
     }
 
     document.dispatchEvent(moveEvent)
+  }
+
+  if (releaseDelay) {
+    await new Promise(resolve => setTimeout(resolve, releaseDelay))
   }
 
   // End

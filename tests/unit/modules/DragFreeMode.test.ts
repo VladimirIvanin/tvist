@@ -439,7 +439,7 @@ describe('DragModule Free Mode', () => {
         startX: 200,
         deltaX: -100,
         steps: 3,
-        duration: 100,
+        duration: 500,
       })
 
       await waitForAnimation(400)
@@ -465,7 +465,7 @@ describe('DragModule Free Mode', () => {
         startX: 200,
         deltaX: -100,
         steps: 3,
-        duration: 100,
+        duration: 500,
       })
 
       await waitForAnimation(400)

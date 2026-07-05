@@ -91,7 +91,8 @@ async function startContinuousDrag(
   root: HTMLElement,
   startX: number,
   totalDeltaX: number,
-  steps: number
+  steps: number,
+  stepDelayMs = 5
 ): Promise<() => Promise<void>> {
   root.dispatchEvent(
     new PointerEvent('pointerdown', {
@@ -114,7 +115,7 @@ async function startContinuousDrag(
         cancelable: true,
       })
     )
-    await new Promise((r) => setTimeout(r, 5))
+    await new Promise((r) => setTimeout(r, stepDelayMs))
   }
 
   const finalX = startX + totalDeltaX
@@ -138,12 +139,16 @@ async function completeDrag(
   root: HTMLElement,
   startX: number,
   totalDeltaX: number,
-  steps: number = 10
+  steps: number = 10,
+  stepDelayMs = 5
 ): Promise<void> {
-  const endDrag = await startContinuousDrag(root, startX, totalDeltaX, steps)
+  const endDrag = await startContinuousDrag(root, startX, totalDeltaX, steps, stepDelayMs)
   await endDrag()
   await new Promise((r) => setTimeout(r, 50))
 }
+
+/** Задержка между move для коротких drag без флика (~400–500ms на жест) */
+const SLOW_DRAG_STEP_MS = 50
 
 // =============================================================================
 // Тесты
@@ -853,7 +858,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       })
 
       // Первый короткий drag вправо (50px < threshold 80px)
-      await completeDrag(fixture.root, 400, 50, 10)
+      await completeDrag(fixture.root, 400, 50, 10, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
 
       const realIndexAfterFirst = slider.realIndex
@@ -868,7 +873,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       expect(realIndexAfterFirst).toBe(initialRealIndex)
 
       // Второй короткий drag вправо (50px < threshold 80px)
-      await completeDrag(fixture.root, 400, 50, 10)
+      await completeDrag(fixture.root, 400, 50, 10, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
 
       const realIndexAfterSecond = slider.realIndex
@@ -904,13 +909,13 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       const initialRealIndex = slider.realIndex
 
       // Первый: drag вправо 50px (< threshold)
-      await completeDrag(fixture.root, 400, 50, 10)
+      await completeDrag(fixture.root, 400, 50, 10, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
 
       expect(slider.realIndex).toBe(initialRealIndex)
 
       // Второй: drag влево 50px (< threshold)
-      await completeDrag(fixture.root, 400, -50, 10)
+      await completeDrag(fixture.root, 400, -50, 10, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
 
       const finalRealIndex = slider.realIndex
@@ -947,7 +952,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
 
       for (let i = 1; i <= 3; i++) {
         // Короткий drag 40px вправо (< threshold 80px)
-        await completeDrag(fixture.root, 400, 40, 8)
+        await completeDrag(fixture.root, 400, 40, 8, SLOW_DRAG_STEP_MS)
         await new Promise((r) => setTimeout(r, 500))
 
         const realIdx = slider.realIndex
@@ -1000,7 +1005,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       const initialSlidesCount = slider.slides.length
 
       // Короткий drag вправо 40px (< threshold)
-      await completeDrag(smallFixture.root, 400, 40, 8)
+      await completeDrag(smallFixture.root, 400, 40, 8, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
 
       expect(slider.realIndex).toBe(initialRealIndex)
@@ -1021,7 +1026,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       const initialRealIndex = slider.realIndex
 
       // Короткий drag влево 40px (< threshold)
-      await completeDrag(smallFixture.root, 400, -40, 8)
+      await completeDrag(smallFixture.root, 400, -40, 8, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
 
       expect(slider.realIndex).toBe(initialRealIndex)
@@ -1041,7 +1046,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
         .join(',')
 
       // Короткий drag вправо (< threshold) → snap обратно
-      await completeDrag(smallFixture.root, 400, 40, 8)
+      await completeDrag(smallFixture.root, 400, 40, 8, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
 
       const orderAfterDrag1 = slider.slides
@@ -1049,7 +1054,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
         .join(',')
 
       // Второй короткий drag вправо → snap обратно
-      await completeDrag(smallFixture.root, 400, 40, 8)
+      await completeDrag(smallFixture.root, 400, 40, 8, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
 
       const orderAfterDrag2 = slider.slides
@@ -1077,7 +1082,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       const initialRealIndex = slider.realIndex
 
       for (let i = 1; i <= 5; i++) {
-        await completeDrag(smallFixture.root, 400, 40, 8)
+        await completeDrag(smallFixture.root, 400, 40, 8, SLOW_DRAG_STEP_MS)
         await new Promise((r) => setTimeout(r, 500))
 
         const realIdx = slider.realIndex
@@ -1107,22 +1112,22 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       const initialRealIndex = slider.realIndex
 
       // Вправо
-      await completeDrag(smallFixture.root, 400, 40, 8)
+      await completeDrag(smallFixture.root, 400, 40, 8, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
       expect(slider.realIndex).toBe(initialRealIndex)
 
       // Влево
-      await completeDrag(smallFixture.root, 400, -40, 8)
+      await completeDrag(smallFixture.root, 400, -40, 8, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
       expect(slider.realIndex).toBe(initialRealIndex)
 
       // Вправо
-      await completeDrag(smallFixture.root, 400, 40, 8)
+      await completeDrag(smallFixture.root, 400, 40, 8, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
       expect(slider.realIndex).toBe(initialRealIndex)
 
       // Влево
-      await completeDrag(smallFixture.root, 400, -40, 8)
+      await completeDrag(smallFixture.root, 400, -40, 8, SLOW_DRAG_STEP_MS)
       await new Promise((r) => setTimeout(r, 500))
       expect(slider.realIndex).toBe(initialRealIndex)
 

@@ -243,7 +243,7 @@ describe('LoopModule + DragModule Integration', () => {
 
       const initialRealIndex = slider.realIndex
 
-      await simulateDrag({ element: fixture.root, startX: 500, deltaX: -300, steps: 15 })
+      await simulateDrag({ element: fixture.root, startX: 500, deltaX: -300, steps: 15, duration: 400 })
       await new Promise(resolve => setTimeout(resolve, 50))
 
       const expectedRealIndex = (initialRealIndex + 1) % 5
@@ -257,7 +257,7 @@ describe('LoopModule + DragModule Integration', () => {
       await new Promise(resolve => setTimeout(resolve, 20))
       const initialRealIndex = slider.realIndex
 
-      await simulateDrag({ element: fixture.root, startX: 500, deltaX: 300, steps: 15 })
+      await simulateDrag({ element: fixture.root, startX: 500, deltaX: 300, steps: 15, duration: 400 })
       await new Promise(resolve => setTimeout(resolve, 50))
 
       const expectedRealIndex = (initialRealIndex - 1 + 5) % 5
@@ -300,6 +300,9 @@ describe('LoopModule + DragModule Integration', () => {
         document.dispatchEvent(createPointerOrMouseEvent('move', { clientX: startX - i * 50, clientY: y }))
       }
 
+      // Пауза перед отпусканием: velocity = 0, snap только по расстоянию
+      await new Promise((resolve) => setTimeout(resolve, 250))
+
       expect(eventsBeforeUp).toBeGreaterThan(0)
 
       pointerUp = true
@@ -327,6 +330,9 @@ describe('LoopModule + DragModule Integration', () => {
         await new Promise((resolve) => setTimeout(resolve, 5))
         document.dispatchEvent(createPointerOrMouseEvent('move', { clientX: startX - i * 55, clientY: y }))
       }
+
+      // Пауза перед отпусканием: velocity = 0, snap только по расстоянию
+      await new Promise((resolve) => setTimeout(resolve, 250))
 
       document.dispatchEvent(createPointerOrMouseEvent('up', { clientX: startX - 660, clientY: y }))
       await new Promise((resolve) => setTimeout(resolve, 50))

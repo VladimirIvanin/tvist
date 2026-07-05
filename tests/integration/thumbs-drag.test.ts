@@ -112,6 +112,8 @@ describe('ThumbsModule + DragModule Integration', () => {
       startY: 50,
       deltaX: 150,
       steps: 5,
+      duration: 400,
+      releaseDelay: 250,
       type: 'touch'
     })
     
@@ -220,6 +222,8 @@ describe('ThumbsModule + DragModule Integration', () => {
         startY: 50,
         deltaX: 150,
         steps: 5,
+        duration: 400,
+        releaseDelay: 250,
         type: 'touch'
       })
       
