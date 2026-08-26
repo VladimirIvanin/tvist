@@ -304,6 +304,71 @@ describe('AutoplayModule', () => {
     })
   })
 
+  describe('Pause on focus', () => {
+    it('should remain paused after manual navigation until focus leaves the slider', () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
+          </div>
+          <button class="next">Next</button>
+        </div>
+        <button class="outside">Outside</button>
+      `
+
+      const root = container.querySelector<HTMLElement>(`.${TVIST_CLASSES.block}`)!
+      const next = container.querySelector<HTMLButtonElement>('.next')!
+      const outside = container.querySelector<HTMLButtonElement>('.outside')!
+      const slider = new Tvist(root, { autoplay: 1000, loop: false, speed: 0 })
+
+      next.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      slider.next()
+      expect(slider.activeIndex).toBe(1)
+
+      vi.advanceTimersByTime(2000)
+      expect(slider.activeIndex).toBe(1)
+
+      next.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: outside }))
+      vi.advanceTimersByTime(1000)
+      expect(slider.activeIndex).toBe(2)
+
+      slider.destroy()
+    })
+
+    it('should keep autoplay running when pauseOnFocus is false', () => {
+      container.innerHTML = `
+        <div class="${TVIST_CLASSES.block}">
+          <div class="${TVIST_CLASSES.track}">
+            <div class="${TVIST_CLASSES.container}">
+              <div class="${TVIST_CLASSES.slide}">1</div>
+              <div class="${TVIST_CLASSES.slide}">2</div>
+              <div class="${TVIST_CLASSES.slide}">3</div>
+            </div>
+          </div>
+          <button class="next">Next</button>
+        </div>
+      `
+
+      const root = container.querySelector<HTMLElement>(`.${TVIST_CLASSES.block}`)!
+      const next = container.querySelector<HTMLButtonElement>('.next')!
+      const slider = new Tvist(root, {
+        autoplay: { delay: 1000, pauseOnFocus: false },
+        loop: false,
+        speed: 0,
+      })
+
+      next.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      vi.advanceTimersByTime(1000)
+      expect(slider.activeIndex).toBe(1)
+
+      slider.destroy()
+    })
+  })
+
   describe('Public API', () => {
     it('should expose autoplay control methods', () => {
       container.innerHTML = `

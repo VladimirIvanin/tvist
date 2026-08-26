@@ -32,6 +32,7 @@ import type { AutoplayProgressEvent, TvistOptions, AutoplayOptions } from '../..
 const AUTOPLAY_DEFAULTS: Required<AutoplayOptions> = {
   delay: 3000,
   pauseOnHover: true,
+  pauseOnFocus: true,
   pauseOnInteraction: true,
   disableOnInteraction: false,
   waitForVideo: false,
@@ -56,6 +57,7 @@ function normalizeAutoplay(raw: TvistOptions['autoplay']): Required<AutoplayOpti
   return {
     delay: raw.delay ?? AUTOPLAY_DEFAULTS.delay,
     pauseOnHover: raw.pauseOnHover ?? AUTOPLAY_DEFAULTS.pauseOnHover,
+    pauseOnFocus: raw.pauseOnFocus ?? AUTOPLAY_DEFAULTS.pauseOnFocus,
     pauseOnInteraction: raw.pauseOnInteraction ?? AUTOPLAY_DEFAULTS.pauseOnInteraction,
     disableOnInteraction: raw.disableOnInteraction ?? AUTOPLAY_DEFAULTS.disableOnInteraction,
     waitForVideo: raw.waitForVideo ?? AUTOPLAY_DEFAULTS.waitForVideo,
@@ -74,7 +76,11 @@ export class AutoplayModule extends Module {
 
   private mouseEnterHandler?: () => void
   private mouseLeaveHandler?: () => void
+  private focusInHandler?: () => void
+  private focusOutHandler?: (event: FocusEvent) => void
   private visibilityChangeHandler?: () => void
+  private pausedByHover = false
+  private pausedByFocus = false
 
   // Флаг для отслеживания состояния drag
   private isDragging = false
@@ -144,6 +150,7 @@ export class AutoplayModule extends Module {
     this.clearBoundaryCheckTimeout()
     this.stopProgressTracking()
     this.detachHoverEvents()
+    this.detachFocusEvents()
     this.detachVisibilityEvents()
     this.detachVideoEndedListener()
     this.detachVideoProgressListener()
@@ -178,6 +185,7 @@ export class AutoplayModule extends Module {
       else if (wasActive && !isNowActive) {
         this.stop()
         this.detachHoverEvents()
+        this.detachFocusEvents()
         this.detachVisibilityEvents()
         this.detachVideoEndedListener()
         this.detachVideoProgressListener()
@@ -187,8 +195,12 @@ export class AutoplayModule extends Module {
       else if (wasActive && isNowActive && this.config) {
         // Переинициализируем hover events при изменении pauseOnHover
         this.detachHoverEvents()
+        this.detachFocusEvents()
         if (this.config.pauseOnHover) {
           this.attachHoverEvents()
+        }
+        if (this.config.pauseOnFocus) {
+          this.attachFocusEvents()
         }
         
         // Если waitForVideo был отключен, сбрасываем связанные флаги
@@ -272,7 +284,7 @@ export class AutoplayModule extends Module {
     this.timeLeft = null
     this.progressStartOffset = 0
 
-    if (!this.config?.disableOnInteraction && !this.stopped && this.paused) {
+    if (!this.config?.disableOnInteraction && !this.stopped && this.paused && !this.hasPassivePauseReason()) {
       this.resume()
     }
   }
@@ -285,6 +297,9 @@ export class AutoplayModule extends Module {
 
     if (this.config.pauseOnHover) {
       this.attachHoverEvents()
+    }
+    if (this.config.pauseOnFocus) {
+      this.attachFocusEvents()
     }
 
     this.attachVideoProgressBridge()
@@ -338,7 +353,7 @@ export class AutoplayModule extends Module {
       }
       
       // Для обычной навигации (не drag) — resume если на паузе
-      if (!this.config?.disableOnInteraction && !this.stopped && this.paused) {
+      if (!this.config?.disableOnInteraction && !this.stopped && this.paused && !this.hasPassivePauseReason()) {
         this.resume()
       }
     })
@@ -506,13 +521,15 @@ export class AutoplayModule extends Module {
   private attachHoverEvents(): void {
     this.mouseEnterHandler = () => {
       if (this.stopped) return
+      this.pausedByHover = true
       this.pause()
       // Только hover: VideoModule синхронизирует HTML-video (не путать с pause() от drag/вкладки)
       this.emit('autoplayHoverPause')
     }
     this.mouseLeaveHandler = () => {
       if (this.stopped) return
-      this.resume()
+      this.pausedByHover = false
+      if (!this.hasPassivePauseReason()) this.resume()
       this.emit('autoplayHoverResume')
     }
 
@@ -532,6 +549,42 @@ export class AutoplayModule extends Module {
       this.tvist.root.removeEventListener('mouseleave', this.mouseLeaveHandler)
       this.mouseLeaveHandler = undefined
     }
+    this.pausedByHover = false
+  }
+
+  /** Пауза при фокусе */
+  private attachFocusEvents(): void {
+    this.focusInHandler = () => {
+      if (this.stopped) return
+      this.pausedByFocus = true
+      this.pause()
+    }
+    this.focusOutHandler = (event: FocusEvent) => {
+      const nextTarget = event.relatedTarget
+      if (nextTarget instanceof Node && this.tvist.root.contains(nextTarget)) return
+
+      this.pausedByFocus = false
+      if (!this.stopped && !this.hasPassivePauseReason()) this.resume()
+    }
+
+    this.tvist.root.addEventListener('focusin', this.focusInHandler)
+    this.tvist.root.addEventListener('focusout', this.focusOutHandler)
+  }
+
+  private detachFocusEvents(): void {
+    if (this.focusInHandler) {
+      this.tvist.root.removeEventListener('focusin', this.focusInHandler)
+      this.focusInHandler = undefined
+    }
+    if (this.focusOutHandler) {
+      this.tvist.root.removeEventListener('focusout', this.focusOutHandler)
+      this.focusOutHandler = undefined
+    }
+    this.pausedByFocus = false
+  }
+
+  private hasPassivePauseReason(): boolean {
+    return this.pausedByHover || this.pausedByFocus
   }
 
   /**

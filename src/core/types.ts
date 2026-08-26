@@ -91,6 +91,12 @@ export interface AutoplayOptions {
   pauseOnHover?: boolean
 
   /**
+   * Ставить автопрокрутку на паузу, пока фокус находится внутри слайдера
+   * @default true
+   */
+  pauseOnFocus?: boolean
+
+  /**
    * Ставить автопрокрутку на паузу при любом взаимодействии (drag, click)
    * @default true
    */
@@ -603,7 +609,7 @@ export interface TvistOptions {
    * - `false` — выключена (по умолчанию)
    * - `true` — включена с задержкой 3000мс и дефолтными настройками
    * - `number` — включена с указанной задержкой в миллисекундах
-   * - `AutoplayOptions` — полный контроль: delay, pauseOnHover, pauseOnInteraction, disableOnInteraction, waitForVideo
+   * - `AutoplayOptions` — полный контроль: delay, pauseOnHover, pauseOnFocus, pauseOnInteraction, disableOnInteraction, waitForVideo
    * @default false
    */
   autoplay?: boolean | number | AutoplayOptions
@@ -1014,4 +1020,3 @@ export interface TvistOptions {
     [key: string]: ((...args: any[]) => void) | undefined
   }
 }
-
