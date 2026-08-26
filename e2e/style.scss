@@ -1,7 +1,10 @@
-@import '../src/styles/tvist.scss';
+@use '../src/styles/tvist.scss';
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
   padding: 2rem;
   background: #f5f5f5;
   color: #333;

@@ -42,9 +42,18 @@ test.describe('Basic slider', () => {
     const box = await track.boundingBox();
     expect(box).not.toBeNull();
 
-    await page.mouse.move(box!.x + box!.width * 0.8, box!.y + box!.height / 2);
+    const startX = box!.x + box!.width * 0.8;
+    const endX = box!.x + box!.width * 0.2;
+    const y = box!.y + box!.height / 2;
+    const steps = 10;
+
+    await page.mouse.move(startX, y);
     await page.mouse.down();
-    await page.mouse.move(box!.x + box!.width * 0.2, box!.y + box!.height / 2, { steps: 10 });
+    for (let step = 1; step <= steps; step += 1) {
+      const progress = step / steps;
+      await page.mouse.move(startX + (endX - startX) * progress, y);
+      await page.waitForTimeout(16);
+    }
     await page.mouse.up();
 
     await waitForRealIndex(page, 'basic-real-index', 1);
