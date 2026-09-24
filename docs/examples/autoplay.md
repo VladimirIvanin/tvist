@@ -4,13 +4,8 @@
 
 ## Базовый пример
 
-<script setup>
-import AutoplayBasicExample from '../.vitepress/theme/examples/AutoplayBasicExample.vue'
-import AutoplayRewindExample from '../.vitepress/theme/examples/AutoplayRewindExample.vue'
-import AutoplayLoopExample from '../.vitepress/theme/examples/AutoplayLoopExample.vue'
-</script>
 
-<AutoplayBasicExample />
+<Demo id="autoplay" />
 
 ```js
 const slider = new Tvist('.tvist-v1', {
@@ -26,7 +21,7 @@ const slider = new Tvist('.tvist-v1', {
 
 Бесконечная прокрутка: при `loop: true` после последнего слайда плавно переходим к первому без «перемотки».
 
-<AutoplayLoopExample />
+<Demo id="autoplay-loop" />
 
 ```js
 const slider = new Tvist('.tvist-v1', {
@@ -41,7 +36,7 @@ const slider = new Tvist('.tvist-v1', {
 
 Когда достигнут последний слайд, автоматически возвращаемся к первому. Работает без режима `loop`.
 
-<AutoplayRewindExample />
+<Demo id="autoplay-rewind" />
 
 ```js
 const slider = new Tvist('.tvist-v1', {

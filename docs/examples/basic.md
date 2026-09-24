@@ -2,11 +2,8 @@
 
 Базовый пример использования слайдера.
 
-<script setup>
-import BasicExample from '../.vitepress/theme/examples/BasicExample.vue'
-</script>
 
-<BasicExample />
+<Demo id="basic" />
 
 ## Код примера
 

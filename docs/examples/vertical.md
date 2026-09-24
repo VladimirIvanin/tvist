@@ -2,14 +2,10 @@
 
 Примеры использования вертикальной ориентации.
 
-<script setup>
-import VerticalExample from '../.vitepress/theme/examples/VerticalExample.vue'
-import VerticalThumbsExample from '../.vitepress/theme/examples/VerticalThumbsExample.vue'
-</script>
 
 ## 1. Простой вертикальный слайдер
 
-<VerticalExample />
+<Demo id="vertical" />
 
 **Код:**
 ```javascript
@@ -26,7 +22,7 @@ const slider = new Tvist('.tvist', {
 Сложный кейс: вертикальная лента миниатюр слева синхронизирована с основным горизонтальным слайдером.
 У миниатюр включен `slideMinSize` для адаптивности.
 
-<VerticalThumbsExample />
+<Demo id="vertical-thumbs" />
 
 **Код:**
 ```javascript

@@ -1,0 +1,21 @@
+/** Полная сборка для обычного браузерного <script>. */
+import './styles/tvist.scss'
+
+import './modules/drag'
+import './modules/navigation'
+import './modules/pagination'
+import './modules/autoplay'
+import './modules/breakpoints'
+import './modules/loop'
+import './modules/slide-states'
+import './modules/thumbs'
+import './modules/effects'
+import './modules/grid'
+import './modules/scroll-control'
+import './modules/scrollbar'
+import './modules/marquee'
+import './modules/lazyload'
+import './modules/video'
+import './modules/visibility'
+
+export { Tvist as default } from './core/Tvist'

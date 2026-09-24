@@ -1,0 +1,3 @@
+.tvist-v1 { position: relative; width: 100%; min-width: 0; }
+.tvist-v1__slide { height: 270px; overflow: hidden; border-radius: 12px; background: #dbe2e4; }
+.tvist-v1__slide img { width: 100%; height: 100%; object-fit: cover; }

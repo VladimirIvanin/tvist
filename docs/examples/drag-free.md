@@ -2,9 +2,6 @@
 
 Режим свободного перетаскивания позволяет прокручивать слайдер без привязки к позициям слайдов, как обычный скролл.
 
-<script setup>
-import DragFreeDocExample from '../.vitepress/theme/examples/DragFreeDocExample.vue'
-</script>
 
 ## Основные возможности
 
@@ -29,7 +26,7 @@ import DragFreeDocExample from '../.vitepress/theme/examples/DragFreeDocExample.
 
 ## Интерактивная демонстрация
 
-<DragFreeDocExample />
+<Demo id="drag-free" />
 
 ## Базовый пример
 

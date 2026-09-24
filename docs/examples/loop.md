@@ -2,25 +2,20 @@
 
 Бесконечная прокрутка с клонами.
 
-<script setup>
-import LoopExample from '../.vitepress/theme/examples/LoopExample.vue'
-import LoopPeekGapExample from '../.vitepress/theme/examples/LoopPeekGapExample.vue'
-import LoopClonesExample from '../.vitepress/theme/examples/LoopClonesExample.vue'
-</script>
 
-<LoopExample />
+<Demo id="loop" />
 
 ## Loop с объектной конфигурацией и клонами
 
 Живой пример с использованием нового синтаксиса:
 
-<LoopClonesExample />
+<Demo id="loop-clones" />
 
 ## Loop + perPage: 1 с изображениями
 
 Бесконечная прокрутка по одному слайду с картинками, без зазора между слайдами:
 
-<LoopImagesExample />
+<Demo id="loop-images" />
 
 ## Loop + perPage: 3, peek 120, 4 слайда
 
@@ -28,7 +23,7 @@ import LoopClonesExample from '../.vitepress/theme/examples/LoopClonesExample.vu
 Слайдер в loop-режиме **не должен давать «дыру» справа** — даже если
 слайдов меньше, чем рекомендуется для бесконечной прокрутки.
 
-<LoopPeekGapExample />
+<Demo id="loop-peek-gap" />
 
 ```js
 new Tvist('.tvist', {

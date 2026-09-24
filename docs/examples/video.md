@@ -2,13 +2,10 @@
 
 Управление видео (`<video>` и iframe YouTube/Vimeo) внутри слайдов.
 
-<script setup>
-import VideoDocExample from '../.vitepress/theme/examples/VideoDocExample.vue'
-</script>
 
 ## Интерактивный пример
 
-<VideoDocExample />
+<Demo id="video" />
 
 ## Базовое использование
 

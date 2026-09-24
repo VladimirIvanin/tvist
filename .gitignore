@@ -48,5 +48,7 @@ temp/
 # VitePress
 docs/.vitepress/dist
 docs/.vitepress/cache
+docs/.generated/
+docs/dist/
 
 browser-build/stats.html

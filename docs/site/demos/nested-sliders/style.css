@@ -1,0 +1,9 @@
+.tvist-v1 { position: relative; width: 100%; min-width: 0; }
+.parent-slider > .tvist-v1__track > .tvist-v1__container > .tvist-v1__slide { min-height: 270px; border-radius: 12px; background: #425b80; color: white; }
+.parent-slider > .tvist-v1__track > .tvist-v1__container > .tvist-v1__slide[data-tvist-slide-index="1"] { background: #a9584f; }
+.parent-slider > .tvist-v1__track > .tvist-v1__container > .tvist-v1__slide[data-tvist-slide-index="2"] { background: #718566; }
+.slide-content { padding: 22px; font: 600 1.4rem/1.3 system-ui, sans-serif; }
+.child-slider { margin-top: 18px; }
+.child-slider .tvist-v1__slide { height: 135px; display: grid; place-items: center; border-radius: 9px; background: #e8eef1; color: #263a4b; font: 600 2.5rem/1 system-ui, sans-serif; }
+.child-slider .tvist-v1__slide[data-tvist-slide-index="1"] { background: #d6ebe5; }
+.child-slider .tvist-v1__slide[data-tvist-slide-index="2"] { background: #f3e4d3; }

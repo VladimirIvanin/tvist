@@ -2,11 +2,8 @@
 
 Плавный переход через прозрачность (Cross-fade).
 
-<script setup>
-import FadeExample from '../.vitepress/theme/examples/FadeExample.vue'
-</script>
 
-<FadeExample />
+<Demo id="effect-fade" />
 
 ## Код примера
 

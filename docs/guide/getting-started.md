@@ -30,10 +30,10 @@
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css">
-<script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
 ```
 
-После загрузки скрипта доступен глобальный конструктор **`TvistV1`** — его используют примеры ниже.
+После загрузки скрипта доступен глобальный конструктор **`TvistV1`** — его используют примеры ниже. При подключении с `defer` запускайте код инициализации после `DOMContentLoaded`, как в полном HTML-примере ниже. Для карусели без autoplay и других специальных модулей можно заменить полный файл на `tvist.standard.min.js`.
 
 ## JavaScript
 
@@ -195,23 +195,25 @@ console.log(slider.slides.length); // Количество слайдов
     <div class="tvist-pagination"></div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.standard.min.js"></script>
   <script>
-    var slider = new TvistV1('.tvist-v1', {
-      perPage: 1,
-      gap: 20,
-      arrows: {
-        next: '.tvist-button-next',
-        prev: '.tvist-button-prev'
-      },
-      pagination: {
-        container: '.tvist-pagination',
-        clickable: true
-      }
-    });
+    document.addEventListener('DOMContentLoaded', function () {
+      var slider = new TvistV1('.tvist-v1', {
+        perPage: 1,
+        gap: 20,
+        arrows: {
+          next: '.tvist-button-next',
+          prev: '.tvist-button-prev'
+        },
+        pagination: {
+          container: '.tvist-pagination',
+          clickable: true
+        }
+      });
 
-    slider.on('slideChangeStart', function () {
-      console.log('Активный слайд:', slider.activeIndex);
+      slider.on('slideChangeStart', function () {
+        console.log('Активный слайд:', slider.activeIndex);
+      });
     });
   </script>
 </body>

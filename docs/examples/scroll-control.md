@@ -15,7 +15,7 @@ const slider = new Tvist('.tvist', {
 
 ## Горизонтальный слайдер
 
-<ScrollControlDocExample show="horizontal" />
+<Demo id="scroll-control" />
 
 **Код:**
 ```javascript
@@ -27,7 +27,7 @@ const slider = new Tvist('.tvist', {
 
 ## Вертикальный слайдер
 
-<ScrollControlDocExample show="vertical" />
+<Demo id="scroll-control-vertical" />
 
 **Код:**
 ```javascript

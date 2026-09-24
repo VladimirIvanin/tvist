@@ -112,25 +112,17 @@ slider['modules'].get('breakpoints')?.['checkBreakpoints']()
 ## Документация
 
 ### Структура документации
-- `docs/` - VitePress документация
-- `docs/examples/` - примеры использования в Markdown
-- `docs/.vitepress/theme/examples/` - интерактивные Vue компоненты примеров
+- `docs/` - Markdown-материалы и статический сайт на Vite
+- `docs/site/` - дизайн, конструктор и исходники живых примеров
+- `docs/site/demos/<id>/` - `markup.html`, `style.css`, `script.js`; этот же код показывается для копирования
+- `scripts/build-docs.ts` - генерация HTML-страниц; результат в игнорируемой `docs/.generated/`
 
 ### Добавление нового примера в навигацию
 При создании нового модуля или примера необходимо:
 
 1. Создать файл документации: `docs/examples/название.md`
-2. Создать интерактивный компонент (опционально): `docs/.vitepress/theme/examples/НазваниеDocExample.vue`
-3. **Добавить в навигацию** в файле `docs/.vitepress/config.ts`:
-   ```typescript
-   {
-     text: 'Примеры',
-     items: [
-       // ... существующие примеры
-       { text: 'Название', link: '/examples/название' },
-     ]
-   }
-   ```
+2. Создать `docs/site/demos/название/{markup.html,style.css,script.js}`.
+3. Добавить запись с тем же `id` в `docs/site/demos.json`. Каталог и ссылка на страницу появятся при сборке.
 
 ### Порядок примеров в навигации
 Примеры располагаются в логическом порядке:

@@ -6,13 +6,10 @@
 - `waitForVideo: true` — для HTML `<video>` переход по окончанию ролика
 - `reachEnd` — сигнал закрыть модалку или переключить внешний контейнер
 
-<script setup>
-import StoriesDocExample from '../.vitepress/theme/examples/StoriesDocExample.vue'
-</script>
 
 ## Интерактивный пример
 
-<StoriesDocExample />
+<Demo id="stories" />
 
 ## Базовая конфигурация
 

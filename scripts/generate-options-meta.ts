@@ -278,7 +278,7 @@ function parseTypesFile(filePath: string): OptionsMeta {
  */
 function main() {
   const typesPath = path.join(__dirname, '..', 'src', 'core', 'types.ts')
-  const outputPath = path.join(__dirname, '..', 'docs', '.vitepress', 'options-meta.json')
+  const outputPath = path.join(__dirname, '..', 'docs', 'site', 'options-meta.json')
   
   console.log('🔍 Парсинг типов из:', typesPath)
   

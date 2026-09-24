@@ -11,7 +11,7 @@ description: Примеры использования peek — показ ча�
 
 Одинаковый peek с обеих сторон:
 
-<PeekBasicExample />
+<Demo id="peek" />
 
 ```js
 import Tvist from 'tvist'
@@ -27,7 +27,7 @@ new Tvist('.tvist', {
 
 Можно использовать CSS единицы измерения:
 
-<PeekPercentExample />
+<Demo id="peek-percent" />
 
 ```js
 new Tvist('.tvist', {
@@ -40,7 +40,7 @@ new Tvist('.tvist', {
 
 Разные значения для левой и правой стороны:
 
-<PeekAsymmetricExample />
+<Demo id="peek-asymmetric" />
 
 ```js
 new Tvist('.tvist', {
@@ -56,7 +56,7 @@ new Tvist('.tvist', {
 
 Peek работает вместе с `perPage`:
 
-<PeekPerPageExample />
+<Demo id="peek-perpage" />
 
 ```js
 new Tvist('.tvist', {
@@ -70,7 +70,7 @@ new Tvist('.tvist', {
 
 Для вертикального слайдера используйте `top` и `bottom`:
 
-<PeekVerticalExample />
+<Demo id="peek-vertical" />
 
 ```js
 new Tvist('.tvist', {
@@ -87,7 +87,7 @@ new Tvist('.tvist', {
 
 Peek можно изменять на разных breakpoints:
 
-<PeekBreakpointsExample />
+<Demo id="peek-breakpoints" />
 
 ```js
 new Tvist('.tvist', {
@@ -111,7 +111,7 @@ new Tvist('.tvist', {
 
 **Peek** создаёт видимый зазор для предыдущих и следующих слайдов. **Peek trim** — отрезание: при `peekTrim: true` (по умолчанию) концовка прижимается к краю, без дыры справа; в начале зазор (peek) остаётся. Сравните:
 
-<PeekTrimExample />
+<Demo id="peek-trim" />
 
 ```js
 // peekTrim: true — конец прижат к краю
@@ -125,7 +125,7 @@ new Tvist('.tvist', { peek: 40, perPage: 1, peekTrim: false })
 
 Можно комбинировать разные единицы измерения:
 
-<PeekMixedUnitsExample />
+<Demo id="peek-mixed-units" />
 
 ```js
 new Tvist('.tvist', {

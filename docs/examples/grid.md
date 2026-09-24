@@ -3,7 +3,7 @@
 Tvist позволяет располагать слайды в виде сетки (Grid). Это удобно для создания галерей или списков карточек.
 
 <div class="example-card">
-<GridExample />
+<Demo id="grid" />
 </div>
 
 ## Использование
@@ -30,7 +30,7 @@ new Tvist('.slider', {
 Слайды последовательно распределяются по этим страницам. Массив применяется циклически.
 
 <div class="example-card">
-<GridDimensionsExample />
+<Demo id="grid-dimensions" />
 </div>
 
 ```js
@@ -63,8 +63,3 @@ new Tvist('.slider', {
 - В фиксированной сетке (только `rows` и `cols`) все страницы имеют одинаковый размер
 - В режиме `dimensions` каждая страница может иметь свой размер
 - Массив `dimensions` применяется циклически к страницам
-
-<script setup>
-import GridExample from '../.vitepress/theme/examples/GridExample.vue'
-import GridDimensionsExample from '../.vitepress/theme/examples/GridDimensionsExample.vue'
-</script>

@@ -56,10 +56,9 @@
 - `autoWidth` / `autoHeight` — размер слайдов по содержимому
 - `loop` — бесконечная прокрутка (`true` | `false` | `'auto'`)
 - `rewind` — возврат к первому слайду после последнего (без loop)
-- `effect` — эффект перехода (`slide` | `fade` | `cube` | `card`)
+- `effect` — эффект перехода (`slide` | `fade` | `cube` | `stack`)
 - `fadeEffect` — настройки fade (например `crossFade`)
 - `cubeEffect` — настройки cube (`slideShadows`, `shadow`, `shadowOffset`, `shadowScale`, `perspective`, `perspectiveOriginY`, `viewportPadding`)
-- `virtual` — виртуальные слайды (объект с `addSlidesBefore`, `addSlidesAfter`, `renderSlide`)
 - `grid` — сетка (объект с `rows`, `cols`, `gap`, `dimensions`)
 - `marquee` — бегущая строка (`true` | объект с `speed`, `direction`, `pauseOnHover`)
 

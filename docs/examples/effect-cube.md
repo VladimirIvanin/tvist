@@ -2,11 +2,8 @@
 
 3D трансформация в виде куба.
 
-<script setup>
-import CubeExample from '../.vitepress/theme/examples/CubeExample.vue'
-</script>
 
-<CubeExample />
+<Demo id="effect-cube" />
 
 ## Код примера
 

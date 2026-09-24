@@ -2,15 +2,12 @@
 
 Метод `updateOptions()` позволяет изменять настройки слайдера на лету без необходимости пересоздания экземпляра. 
 
-<script setup>
-import UpdateOptionsExample from '../.vitepress/theme/examples/UpdateOptionsExample.vue'
-</script>
 
 ## Интерактивная демонстрация
 
 Попробуйте изменять параметры в реальном времени и наблюдайте за изменениями слайдера:
 
-<UpdateOptionsExample />
+<Demo id="update-options" />
 
 ## Описание метода
 

@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { OPTIONAL_BROWSER_MODULES } from './src/browser/moduleNames';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
@@ -71,13 +72,13 @@ const commonCss = {
  */
 const coreOutro = `(function(){try{var g=typeof window!=='undefined'?window:typeof globalThis!=='undefined'?globalThis:this;if(g.${umdName}&&g.${umdName}.default)g.${umdName}=g.${umdName}.default;}catch(e){}})();`;
 
-/** Полный бандл (как раньше): tvist.min.js + tvist.css */
+/** Полный бандл: только конструктор в публичном UMD-экспорте. */
 const fullBuildConfig = defineConfig({
   build: {
     outDir: 'browser-build',
     emptyOutDir: true,
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      entry: resolve(__dirname, 'src/index.browser-full.ts'),
       name: umdName,
       formats: ['umd'],
       fileName: () => 'tvist.min.js',
@@ -145,6 +146,41 @@ const coreSplitConfig = defineConfig({
   css: commonCss,
 });
 
+/** Обычная карусель одним файлом: core + навигация + пагинация + классы слайдов. */
+const standardBuildConfig = defineConfig({
+  build: {
+    outDir: 'browser-build',
+    emptyOutDir: false,
+    lib: {
+      entry: resolve(__dirname, 'src/index.browser-standard.ts'),
+      name: umdName,
+      formats: ['umd'],
+      fileName: () => 'tvist.standard.min.js',
+    },
+    rollupOptions: {
+      plugins: [bannerFirstPlugin([
+        resolve(__dirname, 'browser-build/tvist.standard.min.js'),
+      ])],
+      output: {
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'style.css') return 'tvist.css';
+          return assetInfo.name || '';
+        },
+        exports: 'named',
+        outro: coreOutro,
+      },
+    },
+    minify: 'terser',
+    terserOptions,
+    sourcemap: false,
+    target: 'es2020',
+    cssCodeSplit: false,
+    reportCompressedSize: true,
+  },
+  resolve: commonResolve,
+  css: commonCss,
+});
+
 /** Modules-бандл: tvist.modules.min.js (без CSS) */
 const modulesSplitConfig = defineConfig({
   build: {
@@ -178,12 +214,44 @@ const modulesSplitConfig = defineConfig({
   css: commonCss,
 });
 
-// Экспортируем конфигурацию.
-// При запуске через --config выбираем нужный вариант через переменную окружения BUILD_TARGET.
-// По умолчанию — полный бандл.
+const moduleNames = new Set<string>(OPTIONAL_BROWSER_MODULES);
+
+/** Отдельный IIFE-файл для одного модуля. */
 const target = process.env.BUILD_TARGET;
+const moduleName = target?.startsWith('module:') ? target.slice('module:'.length) : undefined;
+if (moduleName && !moduleNames.has(moduleName)) {
+  throw new Error(`Unknown browser module: ${moduleName}`);
+}
+
+const singleModuleConfig = moduleName ? defineConfig({
+  build: {
+    outDir: 'browser-build',
+    emptyOutDir: false,
+    lib: {
+      entry: resolve(__dirname, `src/browser/modules/${moduleName}.ts`),
+      name: `${umdName}Module`,
+      formats: ['iife'],
+      fileName: () => `modules/${moduleName}.min.js`,
+    },
+    rollupOptions: {
+      plugins: [bannerFirstPlugin([
+        resolve(__dirname, `browser-build/modules/${moduleName}.min.js`),
+      ])],
+    },
+    minify: 'terser',
+    terserOptions,
+    sourcemap: false,
+    target: 'es2020',
+    cssCodeSplit: false,
+    reportCompressedSize: true,
+  },
+  resolve: commonResolve,
+}) : undefined;
+
 export default target === 'core'
   ? coreSplitConfig
+  : target === 'standard'
+    ? standardBuildConfig
   : target === 'modules'
     ? modulesSplitConfig
-    : fullBuildConfig;
+    : singleModuleConfig ?? fullBuildConfig;

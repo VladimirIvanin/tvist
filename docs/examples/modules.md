@@ -2,14 +2,10 @@
 
 Демонстрация различных модулей Tvist.
 
-<script setup>
-import DragNavigationExample from '../.vitepress/theme/examples/DragNavigationExample.vue'
-import AutoplayExample from '../.vitepress/theme/examples/AutoplayExample.vue'
-</script>
 
 ## 1. Drag + Navigation
 
-<DragNavigationExample />
+<Demo id="modules" />
 
 **Код:**
 ```javascript
@@ -25,7 +21,7 @@ const slider = new Tvist('.tvist', {
 
 ## 2. Autoplay + Pagination
 
-<AutoplayExample />
+<Demo id="modules-autoplay" />
 
 **Код:**
 ```javascript

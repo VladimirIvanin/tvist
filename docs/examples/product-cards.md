@@ -2,11 +2,8 @@
 
 Практический пример адаптивного поведения: на десктопе карточки отображаются статичной сеткой, на мобильных устройствах автоматически превращаются в интерактивный слайдер.
 
-<script setup>
-import ProductCardsExample from '../.vitepress/theme/examples/ProductCardsExample.vue'
-</script>
 
-<ProductCardsExample />
+<Demo id="product-cards" />
 
 ## Описание
 

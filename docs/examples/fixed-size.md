@@ -2,11 +2,8 @@
 
 Опции **`fixedWidth`** и **`fixedHeight`** задают размер слайда числом (пиксели) или CSS-строкой (`'12rem'`, `'30%'` и т.д.).
 
-<script setup>
-import FixedSizeExample from '../.vitepress/theme/examples/FixedSizeExample.vue'
-</script>
 
-<FixedSizeExample detailsLink="./fixed-size" />
+<Demo id="fixed-size" />
 
 ## Поведение
 

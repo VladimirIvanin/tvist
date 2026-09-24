@@ -2,11 +2,8 @@
 
 Адаптивный слайдер с автоматической подстройкой под разные размеры экрана.
 
-<script setup>
-import ResponsiveExample from '../.vitepress/theme/examples/ResponsiveExample.vue'
-</script>
 
-<ResponsiveExample />
+<Demo id="responsive" />
 
 ## Container-first
 

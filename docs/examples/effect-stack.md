@@ -2,11 +2,8 @@
 
 Новый слайд наезжает на предыдущий — эффект стопки карт. На корень вешается модификатор `tvist-v1--stack`; при `stackLayout: 'pile'` дополнительно `tvist-v1--stack-pile` (слайды в одном слоте вьюпорта).
 
-<script setup>
-import StackExample from '../.vitepress/theme/examples/StackExample.vue'
-</script>
 
-<StackExample />
+<Demo id="effect-stack" />
 
 На интерактивной странице три демо:
 

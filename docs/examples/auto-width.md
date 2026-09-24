@@ -15,12 +15,8 @@
 - CSS-классов,
 - содержимого (например, изображения).
 
-<script setup>
-import AutoWidthExample from '../.vitepress/theme/examples/AutoWidthExample.vue'
-import AutoHeightExample from '../.vitepress/theme/examples/AutoHeightExample.vue'
-</script>
 
-<AutoWidthExample detailsLink="./auto-width" />
+<Demo id="auto-width" />
 
 ### Код примера (Auto Width)
 
@@ -55,7 +51,7 @@ new Tvist('.tvist-v1', {
 
 При `direction: 'vertical'` и `autoHeight: true` слайдер **не задаёт** слайдам высоту. Высота определяется вашими стилями или контентом.
 
-<AutoHeightExample detailsLink="./auto-width" />
+<Demo id="auto-height" />
 
 ### Код примера (Auto Height)
 

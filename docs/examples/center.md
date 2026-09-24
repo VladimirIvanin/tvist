@@ -11,9 +11,7 @@
 
 ## Базовый пример
 
-<ExampleCard title="Базовое центрирование" description="perPage: 3, center: true">
-  <CenterBasicExample />
-</ExampleCard>
+<Demo id="center" />
 
 ```js
 new Tvist('.tvist', {
@@ -28,9 +26,7 @@ new Tvist('.tvist', {
 
 Когда `perPage: 2` и `center: true`, активный слайд находится по центру, а половинки предыдущего и следующего слайдов видны по бокам.
 
-<ExampleCard title="Center с perPage: 2" description="Активный слайд по центру, половинки по бокам">
-  <CenterPerPage2Example />
-</ExampleCard>
+<Demo id="center-perpage2" />
 
 ```js
 new Tvist('.tvist', {
@@ -45,9 +41,7 @@ new Tvist('.tvist', {
 
 При `perPage: 4` видны активный, предыдущий, следующий и кусочки других слайдов.
 
-<ExampleCard title="Center с perPage: 4" description="Множественные видимые слайды с активным по центру">
-  <CenterPerPage4Example />
-</ExampleCard>
+<Demo id="center-perpage4" />
 
 ```js
 new Tvist('.tvist', {
@@ -102,9 +96,7 @@ new Tvist('.tvist', {
 
 Комбинация `center: true` и `loop: true` позволяет создать бесконечную карусель с активным элементом по центру.
 
-<ExampleCard title="Center с Loop" description="Бесконечная прокрутка с центрированием">
-  <CenterLoopExample />
-</ExampleCard>
+<Demo id="center-loop" />
 
 ```js
 new Tvist('.tvist', {
@@ -126,9 +118,7 @@ new Tvist('.tvist', {
 | `center: true` | всегда по центру | по центру |
 | `center: { focus: true }` | прижат к краю, без пустот | по центру, если хватает места |
 
-<ExampleCard title="Center focus" description="Центрирование активного слайда с trim у краёв">
-  <CenterFocusExample />
-</ExampleCard>
+<Demo id="center-focus" />
 
 ```js
 new Tvist('.tvist', {
@@ -146,9 +136,7 @@ new Tvist('.tvist', {
 выравниваются по центру только когда слайдер находится в `locked` состоянии.
 Как только `lock` спадает, слайдер возвращается к обычному поведению.
 
-<ExampleCard title="Center justify при locked" description="Выравнивание по центру только в lock-режиме">
-  <CenterJustifyLockedExample />
-</ExampleCard>
+<Demo id="center-locked" />
 
 ```js
 new Tvist('.tvist', {

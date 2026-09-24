@@ -2,11 +2,8 @@
 
 Когда весь контент помещается в видимую область и листать некуда, слайдер автоматически переходит в состояние **lock**: отключаются стрелки, не срабатывает перетаскивание, на корневой элемент вешается класс `tvist-v1--locked`. В режиме `loop: true` блокировка не применяется.
 
-<script setup>
-import LockExample from '../.vitepress/theme/examples/LockExample.vue'
-</script>
 
-<LockExample />
+<Demo id="lock" />
 
 ## Когда срабатывает lock
 

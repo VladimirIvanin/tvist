@@ -2,9 +2,6 @@
 
 Модуль `Marquee` реализует режим бегущей строки с непрерывной прокруткой контента.
 
-<script setup>
-import MarqueeDocExample from '../.vitepress/theme/examples/MarqueeDocExample.vue'
-</script>
 
 ## Основные возможности
 
@@ -17,7 +14,7 @@ import MarqueeDocExample from '../.vitepress/theme/examples/MarqueeDocExample.vu
 
 ## Интерактивная демонстрация
 
-<MarqueeDocExample />
+<Demo id="marquee" />
 
 ## Базовый пример
 

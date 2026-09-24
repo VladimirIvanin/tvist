@@ -1,0 +1,7 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { font-family: system-ui, sans-serif; padding: 22px; background: #eae7df; color: #27302e; }
+:root[data-theme="dark"] body { background: #303735; color: #f2f1ea; }
+button { cursor: pointer; }
+.demo-action { margin-top: 18px; border: 1px solid #27302e; border-radius: 4px; background: #fff; color: #27302e; padding: 10px 16px; }
+.preview-error { color: #a83c32; }

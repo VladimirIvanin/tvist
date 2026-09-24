@@ -2,11 +2,8 @@
 
 Синхронизация с галереей превью (Thumbs).
 
-<script setup>
-import ThumbsExample from '../.vitepress/theme/examples/ThumbsExample.vue'
-</script>
 
-<ThumbsExample />
+<Demo id="thumbs" />
 
 ## Код примера
 

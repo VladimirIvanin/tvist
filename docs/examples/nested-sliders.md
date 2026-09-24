@@ -3,7 +3,7 @@
 Можно инициализировать второй экземпляр `Tvist` на отдельном root-элементе внутри слайда внешнего слайдера. Список слайдов и атрибут `data-tvist-slide-index` строятся **только для элементов, чей ближайший предок с классом блока (`tvist-v1`) совпадает с root этого экземпляра** — слайды внутри вложенного блока в родитель не попадают. Модуль **drag** у родителя не реагирует на жесты, начатые во вложенном блоке (ближайший к цели `.tvist-v1` получает приоритет).
 
 <div class="example-card">
-<NestedSlidersExample />
+<Demo id="nested-sliders" />
 </div>
 
 ## Разметка
@@ -46,7 +46,3 @@ nested.destroy()
 // или одним вызовом с каскадом:
 parent.destroy({ destroyNested: true })
 ```
-
-<script setup>
-import NestedSlidersExample from '../.vitepress/theme/examples/NestedSlidersExample.vue'
-</script>

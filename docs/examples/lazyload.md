@@ -257,8 +257,5 @@ LazyLoad отлично работает с:
 
 ## Интерактивный пример
 
-<script setup>
-import LazyLoadDocExample from '../.vitepress/theme/examples/LazyLoadDocExample.vue'
-</script>
 
-<LazyLoadDocExample />
+<Demo id="lazyload" />

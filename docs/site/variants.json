@@ -1,0 +1,226 @@
+[
+  {
+    "id": "peek-percent",
+    "title": "Процентные края",
+    "category": "Дополнительно",
+    "description": "Процентные края",
+    "page": "peek"
+  },
+  {
+    "id": "peek-asymmetric",
+    "title": "Разные отступы",
+    "category": "Дополнительно",
+    "description": "Разные отступы",
+    "page": "peek"
+  },
+  {
+    "id": "peek-perpage",
+    "title": "Peek и несколько слайдов",
+    "category": "Дополнительно",
+    "description": "Peek и несколько слайдов",
+    "page": "peek"
+  },
+  {
+    "id": "peek-vertical",
+    "title": "Вертикальный peek",
+    "category": "Дополнительно",
+    "description": "Вертикальный peek",
+    "page": "peek"
+  },
+  {
+    "id": "peek-breakpoints",
+    "title": "Адаптивный peek",
+    "category": "Дополнительно",
+    "description": "Адаптивный peek",
+    "page": "peek"
+  },
+  {
+    "id": "peek-trim",
+    "title": "Peek с прижатием края",
+    "category": "Дополнительно",
+    "description": "Peek с прижатием края",
+    "page": "peek"
+  },
+  {
+    "id": "peek-mixed-units",
+    "title": "Смешанные единицы",
+    "category": "Дополнительно",
+    "description": "Смешанные единицы",
+    "page": "peek"
+  },
+  {
+    "id": "center-perpage2",
+    "title": "Center с двумя слайдами",
+    "category": "Дополнительно",
+    "description": "Center с двумя слайдами",
+    "page": "center"
+  },
+  {
+    "id": "center-perpage4",
+    "title": "Center с четырьмя слайдами",
+    "category": "Дополнительно",
+    "description": "Center с четырьмя слайдами",
+    "page": "center"
+  },
+  {
+    "id": "center-loop",
+    "title": "Center и loop",
+    "category": "Дополнительно",
+    "description": "Center и loop",
+    "page": "center"
+  },
+  {
+    "id": "center-focus",
+    "title": "Center focus",
+    "category": "Дополнительно",
+    "description": "Center focus",
+    "page": "center"
+  },
+  {
+    "id": "center-locked",
+    "title": "Center justify при lock",
+    "category": "Дополнительно",
+    "description": "Center justify при lock",
+    "page": "center"
+  },
+  {
+    "id": "autoplay-loop",
+    "title": "Autoplay с loop",
+    "category": "Дополнительно",
+    "description": "Autoplay с loop",
+    "page": "autoplay"
+  },
+  {
+    "id": "autoplay-rewind",
+    "title": "Autoplay с rewind",
+    "category": "Дополнительно",
+    "description": "Autoplay с rewind",
+    "page": "autoplay"
+  },
+  {
+    "id": "loop-clones",
+    "title": "Loop с клонами",
+    "category": "Дополнительно",
+    "description": "Loop с клонами",
+    "page": "loop"
+  },
+  {
+    "id": "loop-images",
+    "title": "Loop с изображениями",
+    "category": "Дополнительно",
+    "description": "Loop с изображениями",
+    "page": "loop"
+  },
+  {
+    "id": "loop-peek-gap",
+    "title": "Loop, peek и gap",
+    "category": "Дополнительно",
+    "description": "Loop, peek и gap",
+    "page": "loop"
+  },
+  {
+    "id": "auto-height",
+    "title": "Высота по содержимому",
+    "category": "Дополнительно",
+    "description": "Высота по содержимому",
+    "page": "auto-width"
+  },
+  {
+    "id": "visibility-marquee",
+    "title": "Marquee с учётом видимости",
+    "category": "Дополнительно",
+    "description": "Marquee с учётом видимости",
+    "page": "visibility"
+  },
+  {
+    "id": "vertical-thumbs",
+    "title": "Вертикальные миниатюры",
+    "category": "Дополнительно",
+    "description": "Вертикальные миниатюры",
+    "page": "thumbs"
+  },
+  {
+    "id": "grid-dimensions",
+    "title": "Сетка разных размеров",
+    "category": "Дополнительно",
+    "description": "Сетка разных размеров",
+    "page": "grid"
+  },
+  {
+    "id": "modules-autoplay",
+    "title": "Autoplay с пагинацией",
+    "category": "Дополнительно",
+    "description": "Autoplay с пагинацией",
+    "page": "modules"
+  },
+  {
+    "id": "scroll-control-vertical",
+    "title": "Колёсико и вертикальный слайдер",
+    "category": "Дополнительно",
+    "description": "Колёсико и вертикальный слайдер",
+    "page": "scroll-control"
+  },
+  {
+    "id": "navigation-outside",
+    "title": "Навигация вне слайдера",
+    "category": "Дополнительно",
+    "description": "Навигация вне слайдера",
+    "page": "navigation"
+  },
+  {
+    "id": "pagination-fraction",
+    "title": "Пагинация дробью",
+    "category": "Дополнительно",
+    "description": "Пагинация дробью",
+    "page": "pagination"
+  },
+  {
+    "id": "pagination-progress",
+    "title": "Пагинация прогрессом",
+    "category": "Дополнительно",
+    "description": "Пагинация прогрессом",
+    "page": "pagination"
+  },
+  {
+    "id": "pagination-custom",
+    "title": "Кастомная пагинация",
+    "category": "Дополнительно",
+    "description": "Кастомная пагинация",
+    "page": "pagination"
+  },
+  {
+    "id": "pagination-even",
+    "title": "Ограничение точек",
+    "category": "Дополнительно",
+    "description": "Ограничение точек",
+    "page": "pagination"
+  },
+  {
+    "id": "pagination-even-center",
+    "title": "Остаток по центру",
+    "category": "Дополнительно",
+    "description": "Остаток по центру",
+    "page": "pagination"
+  },
+  {
+    "id": "pagination-center",
+    "title": "Центральная стратегия",
+    "category": "Дополнительно",
+    "description": "Центральная стратегия",
+    "page": "pagination"
+  },
+  {
+    "id": "scrollbar-vertical",
+    "title": "Вертикальный скроллбар",
+    "category": "Дополнительно",
+    "description": "Вертикальный скроллбар",
+    "page": "scrollbar"
+  },
+  {
+    "id": "scrollbar-hidden",
+    "title": "Скрывающийся скроллбар",
+    "category": "Дополнительно",
+    "description": "Скрывающийся скроллбар",
+    "page": "scrollbar"
+  }
+]

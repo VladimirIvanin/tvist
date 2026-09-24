@@ -2,11 +2,8 @@
 
 Демонстрация опции `perPage` для отображения нескольких слайдов одновременно.
 
-<script setup>
-import PerPageExample from '../.vitepress/theme/examples/PerPageExample.vue'
-</script>
 
-<PerPageExample />
+<Demo id="perpage" />
 
 ## Описание
 

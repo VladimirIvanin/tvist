@@ -45,18 +45,14 @@ interface VisibilityOptions {
 
 ## Примеры использования
 
-<script setup>
-import VisibilityAutoplayExample from '../.vitepress/theme/examples/VisibilityAutoplayExample.vue'
-import VisibilityMarqueeExample from '../.vitepress/theme/examples/VisibilityMarqueeExample.vue'
-</script>
 
 ### С Autoplay
 
-<VisibilityAutoplayExample />
+<Demo id="visibility" />
 
 ### С Marquee
 
-<VisibilityMarqueeExample />
+<Demo id="visibility-marquee" />
 
 ## Как это работает
 
