@@ -60,7 +60,7 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
         duration: 100,
       })
 
-      await waitForAnimation(500)
+      await waitForAnimation(2200)
 
       // Должны остаться на слайде 0 или перейти к слайду 1,
       // но проверим что позиция точно на одном из слайдов
@@ -84,7 +84,7 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
         duration: 200, // Медленный = малая velocity
       })
 
-      await waitForAnimation(600)
+      await waitForAnimation(2200)
 
       const finalIndex = slider.activeIndex
       
@@ -112,7 +112,7 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
         duration: 80, // Средняя скорость
       })
 
-      await waitForAnimation(800)
+      await waitForAnimation(2200)
 
       const finalIndex = slider.activeIndex
       
@@ -139,7 +139,7 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
         duration: 30, // Очень быстро
       })
 
-      await waitForAnimation(800)
+      await waitForAnimation(2200)
 
       const finalIndex = slider.activeIndex
       
@@ -167,7 +167,7 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
         duration: 100,
       })
 
-      await waitForAnimation(600)
+      await waitForAnimation(2200)
 
       const freeIndex = freeSlider.activeIndex
       const freePosition = freeSlider.engine.location.get()
@@ -275,7 +275,7 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
         duration: 50,
       })
 
-      await waitForAnimation(600)
+      await waitForAnimation(2200)
 
       const finalIndex = slider.activeIndex
       const finalPosition = slider.engine.location.get()

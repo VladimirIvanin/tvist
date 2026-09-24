@@ -1099,7 +1099,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
         // Нет пустот
         expect(coverage.hasGaps).toBe(false)
       }
-    })
+    }, 10000)
 
     it('чередование drag вправо/влево — realIndex стабилен', async () => {
       slider = new Tvist(smallFixture.root, {

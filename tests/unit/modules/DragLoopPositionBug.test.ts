@@ -194,7 +194,7 @@ describe('DragModule + LoopModule: position preservation on drag start', () => {
     expect(updateSpy).not.toHaveBeenCalled()
   })
 
-  it('should call update() when loopFix performs rearrangement', () => {
+  it('should recalculate cached positions without a full update when loopFix rearranges slides', () => {
     // Создаем слайдер с достаточным количеством слайдов для loop
     const bigFixture = createSliderFixture({ slidesCount: 10, width: 800 })
     const bigRoot = bigFixture.root
@@ -226,13 +226,14 @@ describe('DragModule + LoopModule: position preservation on drag start', () => {
     slider.scrollTo(loopedSlides - 1, true)
     
     const updateSpy = vi.spyOn(slider, 'update')
+    const reorderSpy = vi.spyOn(slider.engine, 'updateAfterReorder')
     
     // Вызываем loopFix с direction: 'prev'
     // Это должно вызвать prepend слайдов
     loopModule.fix({ direction: 'prev' })
 
-    // update() ДОЛЖЕН вызваться, так как DOM изменился
-    expect(updateSpy).toHaveBeenCalled()
+    expect(reorderSpy).toHaveBeenCalled()
+    expect(updateSpy).not.toHaveBeenCalled()
     
     bigFixture.cleanup()
   })

@@ -110,6 +110,9 @@ export class LoopModule extends Module {
   }
 
   private loopFix(params: LoopFixParams = {}): number {
+    if (this.tvist.engine.animator.isAnimating()) {
+      this.tvist.engine.animator.stop()
+    }
     const {
       slideRealIndex,
       slideTo = true,
@@ -183,9 +186,6 @@ export class LoopModule extends Module {
 
     this.applyDomRearrangement(container, slides, isPrev, isNext, prependIndexes, appendIndexes)
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    container.offsetLeft
-
     this.tvist.updateSlidesList()
 
     if (slideTo) {
@@ -197,11 +197,16 @@ export class LoopModule extends Module {
     }
 
     if (prependIndexes.length > 0 || appendIndexes.length > 0) {
-      const locationBeforeUpdate = this.tvist.engine.location.get()
-      const targetBeforeUpdate = this.tvist.engine.target.get()
-      this.tvist.update()
-      this.tvist.engine.location.set(locationBeforeUpdate)
-      this.tvist.engine.target.set(targetBeforeUpdate)
+      if (this.options.grid) {
+        // GridModule задаёт позиции по offsetLeft и требует своего onUpdate.
+        const locationBeforeUpdate = this.tvist.engine.location.get()
+        const targetBeforeUpdate = this.tvist.engine.target.get()
+        this.tvist.update()
+        this.tvist.engine.location.set(locationBeforeUpdate)
+        this.tvist.engine.target.set(targetBeforeUpdate)
+      } else {
+        this.tvist.engine.updateAfterReorder(slides)
+      }
     }
 
     const actualNewIndex = this.tvist.engine.index.get()

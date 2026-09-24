@@ -264,6 +264,7 @@ export class ScrollbarModule extends Module {
    * Начать перетаскивание
    */
   private startDrag(clientX: number, clientY: number): void {
+    this.tvist.engine.animator.stop()
     this.isDragging = true
     this.dragStartX = clientX
     this.dragStartY = clientY

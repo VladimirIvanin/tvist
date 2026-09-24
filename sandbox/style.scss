@@ -65,3 +65,30 @@ h1 {
 .info {
   font-family: monospace;
 }
+
+.swipe-comparison {
+  margin-bottom: 2rem;
+
+  .tvist-v1, .splide {
+    width: 100%;
+    height: 220px;
+    margin-bottom: 1rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .splide__track, .splide__list { height: 100%; }
+  .tvist-v1__slide, .splide__slide {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    background: #1976d2;
+  }
+  .tvist-v1__slide[data-tvist-slide-index='1'],
+  .tvist-v1__slide[data-tvist-slide-index='3'],
+  .splide__slide.comparison-alt { background: #d26939; }
+}

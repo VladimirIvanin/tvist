@@ -559,6 +559,22 @@ export class Tvist {
    * @param newOptions - новые опции для применения
    */
   updateOptions(newOptions: Partial<TvistOptions>): this {
+    const needsRecalculation =
+      newOptions.perPage !== undefined ||
+      newOptions.slideMinSize !== undefined ||
+      newOptions.fixedWidth !== undefined ||
+      newOptions.fixedHeight !== undefined ||
+      newOptions.gap !== undefined ||
+      newOptions.peek !== undefined ||
+      newOptions.peekTrim !== undefined ||
+      newOptions.direction !== undefined ||
+      newOptions.center !== undefined ||
+      newOptions.breakpoints !== undefined ||
+      newOptions.breakpointsBase !== undefined
+    if (needsRecalculation || newOptions.roundLengths !== undefined ||
+      (newOptions.effect !== undefined && newOptions.effect !== this.options.effect)) {
+      this.engine.animator.stop()
+    }
     const oldOptions = { ...this.options }
     
     // Обработка изменения breakpoints
@@ -586,19 +602,6 @@ export class Tvist {
     }
 
     // Пересчитываем размеры и позиции при изменении ключевых опций
-    const needsRecalculation = 
-      newOptions.perPage !== undefined ||
-      newOptions.slideMinSize !== undefined ||
-      newOptions.fixedWidth !== undefined ||
-      newOptions.fixedHeight !== undefined ||
-      newOptions.gap !== undefined ||
-      newOptions.peek !== undefined ||
-      newOptions.peekTrim !== undefined ||
-      newOptions.direction !== undefined ||
-      newOptions.center !== undefined ||
-      newOptions.breakpoints !== undefined ||
-      newOptions.breakpointsBase !== undefined
-
     const needsTransformReapply = newOptions.roundLengths !== undefined
 
     if (needsRecalculation && this._isEnabled) {
@@ -722,6 +725,7 @@ export class Tvist {
   disable(): this {
     if (!this._isEnabled) return this
 
+    this.engine.animator.stop()
     this._isEnabled = false
     this._manualEnabledChange = true // Отмечаем ручное изменение
     this._isTogglingEnabled = true // Предотвращаем применение брейкпоинтов
@@ -1013,7 +1017,15 @@ export class Tvist {
     if (this._isDestroyed) return this
     this.invokeCatchUpForNewListener(event, handler)
     this.events.on(event, handler)
+    if (event === 'scroll' || event === 'setTranslate' || event === 'progress') {
+      this.engine?.ensureTransitionUpdates()
+    }
     return this
+  }
+
+  /** Нужны ли подписчикам промежуточные значения CSS-перехода. */
+  hasPositionListeners(): boolean {
+    return this.events.hasPositionListeners()
   }
 
   /**
@@ -1055,6 +1067,9 @@ export class Tvist {
       return this
     }
     this.events.once(event, handler)
+    if (event === 'scroll' || event === 'setTranslate' || event === 'progress') {
+      this.engine?.ensureTransitionUpdates()
+    }
     return this
   }
 

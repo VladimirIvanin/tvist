@@ -30,8 +30,8 @@ export class MarqueeModule extends Module {
   /** Текущая позиция прокрутки */
   private currentPosition = 0
 
-  /** Кеш размеров слайдов для оптимизации RAF цикла */
-  private cachedSlideSizes: number[] = []
+  /** Размер привязан к элементу, поэтому перестановка слайдов не инвалидирует кеш. */
+  private cachedSlideSizes = new WeakMap<HTMLElement, number>()
 
   private mouseEnterHandler?: () => void
   private mouseLeaveHandler?: () => void
@@ -41,13 +41,10 @@ export class MarqueeModule extends Module {
 
     // Определяем параметры
     const marquee = this.options.marquee
-    if (typeof marquee === 'object') {
-      this.speed = marquee.speed ?? 50 // по умолчанию 50px/s
-      this.direction = marquee.direction ?? this.getDefaultDirection()
-    } else {
-      this.speed = 50
-      this.direction = this.getDefaultDirection()
-    }
+    this.speed = typeof marquee === 'object' ? marquee.speed ?? 50 : 50
+    this.direction = typeof marquee === 'object'
+      ? marquee.direction ?? this.getDefaultDirection()
+      : this.getDefaultDirection()
   }
 
   /**
@@ -168,22 +165,12 @@ export class MarqueeModule extends Module {
     const slides = this.tvist.slides
     if (slides.length === 0) return
 
-    const isHorizontal = this.options.direction !== 'vertical'
-
     // Engine убирает margin у последнего слайда.
     // Нам нужно, чтобы у ВСЕХ слайдов был margin, так как они зациклены.
     const lastSlide = slides[slides.length - 1]
     if (!lastSlide) return
-
-    if (isHorizontal) {
-      if (!lastSlide.style.marginRight) {
-        lastSlide.style.marginRight = gapCss
-      }
-    } else {
-      if (!lastSlide.style.marginBottom) {
-        lastSlide.style.marginBottom = gapCss
-      }
-    }
+    const property = this.options.direction === 'vertical' ? 'marginBottom' : 'marginRight'
+    if (!lastSlide.style[property]) lastSlide.style[property] = gapCss
   }
 
   /**
@@ -195,17 +182,16 @@ export class MarqueeModule extends Module {
     const count = this.tvist.slides.length
     if (count === 0) {
       this.totalSize = 0
-      this.cachedSlideSizes = []
+      this.cachedSlideSizes = new WeakMap()
       return
     }
     
-    // Кешируем размеры ВСЕХ слайдов для использования в RAF цикле
-    this.cachedSlideSizes = this.tvist.slides.map(slide =>
-      isHorizontal ? slide.offsetWidth : slide.offsetHeight
-    )
-    
-    // Вычисляем общий размер из кеша
-    this.totalSize = this.cachedSlideSizes.reduce((sum, size) => sum + size + gap, 0)
+    this.cachedSlideSizes = new WeakMap()
+    this.totalSize = this.tvist.slides.reduce((sum, slide) => {
+      const size = isHorizontal ? slide.offsetWidth : slide.offsetHeight
+      this.cachedSlideSizes.set(slide, size)
+      return sum + size + gap
+    }, 0)
   }
 
   /**
@@ -278,91 +264,26 @@ export class MarqueeModule extends Module {
    * Обновляет позицию прокрутки
    */
   private updatePosition(deltaTime: number): void {
-    // Вычисляем смещение
-    const distance = this.speed * deltaTime
     const gap = this.tvist.engine.gapPxValue
-
-    // Обновляем позицию в зависимости от направления
     const isReverse = this.direction === 'right' || this.direction === 'down'
-    
-    if (isReverse) {
-      // Для right/down: уменьшаем позицию
-      this.currentPosition -= distance
-      
-      // Если ушли в минус (появилась пустота слева/сверху), переносим последний слайд в начало
-      // Проверяем наличие слайдов перед входом в цикл
-      let slides = this.tvist.slides
-      
-      while (this.currentPosition <= 0 && slides.length > 0) {
-        const lastSlide = slides[slides.length - 1]
-        // Безопасность: если слайда нет, выходим
-        if (!lastSlide) break
+    this.currentPosition += (isReverse ? -1 : 1) * this.speed * deltaTime
 
-        // Используем кешированный размер вместо чтения offsetWidth/Height
-        const slideIndex = slides.length - 1
-        const slideSize = this.cachedSlideSizes[slideIndex] ?? 0
-        const totalSlideSize = slideSize + gap
-        
-        // Безопасность: предотвращаем бесконечный цикл при нулевом размере
-        if (totalSlideSize <= 0) break
+    while (this.tvist.slides.length > 0) {
+      const index = isReverse ? this.tvist.slides.length - 1 : 0
+      const slide = this.tvist.slides[index]
+      const size = (slide ? this.cachedSlideSizes.get(slide) ?? 0 : 0) + gap
+      if (!slide || size <= 0) break
+      if (isReverse ? this.currentPosition > 0 : this.currentPosition < size) break
 
-        // Переносим последний слайд в начало
-        this.tvist.container.prepend(lastSlide)
-        this.tvist.updateSlidesList()
-        
-        // Обновляем кеш: перемещаем последний размер в начало
-        const lastSize = this.cachedSlideSizes.pop()
-        if (lastSize !== undefined) {
-          this.cachedSlideSizes.unshift(lastSize)
-        }
-        
-        // Обновляем список слайдов для следующей итерации
-        slides = this.tvist.slides
-
-        // Корректируем позицию
-        this.currentPosition += totalSlideSize
+      if (isReverse) {
+        this.tvist.container.prepend(slide)
+      } else {
+        this.tvist.container.appendChild(slide)
       }
-
-    } else {
-      // Для left/up: увеличиваем позицию
-      this.currentPosition += distance
-
-      // Если первый слайд ушёл за пределы видимости (currentPosition >= width), переносим его в конец
-      let slides = this.tvist.slides
-      let firstSlide = slides[0]
-
-      while (firstSlide) {
-        // Используем кешированный размер вместо чтения offsetWidth/Height
-        const slideSize = this.cachedSlideSizes[0] ?? 0
-        const totalSlideSize = slideSize + gap
-        
-        // Безопасность: предотвращаем бесконечный цикл при нулевом размере
-        if (totalSlideSize <= 0) break
-
-        // Если текущая позиция меньше размера слайда, значит слайд ещё виден частично
-        // и переносить его (и последующие) рано
-        if (this.currentPosition < totalSlideSize) break
-
-        // Переносим первый слайд в конец
-        this.tvist.container.appendChild(firstSlide)
-        this.tvist.updateSlidesList()
-        
-        // Обновляем кеш: перемещаем первый размер в конец
-        const firstSize = this.cachedSlideSizes.shift()
-        if (firstSize !== undefined) {
-          this.cachedSlideSizes.push(firstSize)
-        }
-        
-        // Обновляем ссылку на (новый) первый слайд и список для следующей итерации
-        slides = this.tvist.slides
-        firstSlide = slides[0]
-
-        // Корректируем позицию
-        this.currentPosition -= totalSlideSize
-      }
+      this.tvist.updateSlidesList()
+      this.currentPosition += isReverse ? size : -size
     }
 
-    // Применяем transform
     this.applyTransform()
   }
 

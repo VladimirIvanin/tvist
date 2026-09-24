@@ -4,6 +4,7 @@
  */
 export class Vector1D {
   private value: number
+  private reader?: () => number
 
   constructor(initialValue: number) {
     this.value = initialValue
@@ -21,7 +22,12 @@ export class Vector1D {
    * Получает текущее значение
    */
   get(): number {
-    return this.value
+    return this.reader?.() ?? this.value
+  }
+
+  /** Временный источник отображаемой позиции во время CSS-перехода. */
+  setReader(reader?: () => number): void {
+    this.reader = reader
   }
 
   /**
@@ -75,4 +81,3 @@ export class Vector1D {
     return new Vector1D(this.value)
   }
 }
-

@@ -214,7 +214,7 @@ describe('DragModule Free Mode', () => {
       })
 
       // Ждём momentum + snap
-      await waitForAnimation(800)
+      await waitForAnimation(2200)
 
       const finalIndex = slider.activeIndex
 
@@ -240,7 +240,7 @@ describe('DragModule Free Mode', () => {
         duration: 100,
       })
 
-      await waitForAnimation(500)
+      await waitForAnimation(2200)
 
       const finalIndex = slider.activeIndex
 

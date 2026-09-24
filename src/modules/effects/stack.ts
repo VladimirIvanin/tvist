@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
@@ -18,23 +19,19 @@ function scaleStackTranslate(translate: number, restForActive: number, ratio: nu
 
 /**
  * translate (px) для режима cover — единственный эталон геометрии stack.
- * @param usePileLayout — при `stackLayout: 'pile'` ожидающие (`progress > 0`) делят текущий `translate`
- *   с активным (колода в одном «слоте» вьюпорта), а не `-slidePosition` следующего на рельсе.
  */
 function coverStackTranslatePx(
   progress: number,
   slidePosition: number,
   translate: number,
   slideSize: number,
-  usePileLayout: boolean,
   restForActive: number,
   slideTravelRatio: number
 ): number {
   if (progress > -1 && progress <= 0) {
     return scaleStackTranslate(translate, restForActive, slideTravelRatio)
   }
-  if (progress <= -1) return usePileLayout ? translate : -slideSize
-  if (usePileLayout) return translate
+  if (progress <= -1) return -slideSize
   return -slidePosition
 }
 
@@ -48,13 +45,12 @@ function uncoverTransitionTranslatePx(
   translate: number,
   slideSize: number,
   restForActive: number,
-  slideTravelRatio: number,
-  usePileLayout: boolean
+  slideTravelRatio: number
 ): number {
   // track: −slidePosition фиксирует «нижнюю» карту в координатах рельса.
   // pile: та же идея в локали вьюпорта — сырой translate + rebase даёт 0 на экране для любого индекса.
-  if (progress > -1 && progress <= 0) return usePileLayout ? translate : -slidePosition
-  if (progress <= -1) return usePileLayout ? translate : -slideSize
+  if (progress > -1 && progress <= 0) return -slidePosition
+  if (progress <= -1) return -slideSize
   return scaleStackTranslate(translate, restForActive, slideTravelRatio)
 }
 
@@ -79,26 +75,6 @@ function uncoverTransitionZIndex(progress: number, numSlides: number, zIndexProg
   }
   if (p > -1) return String(numSlides - Math.abs(Math.round(p)))
   return '0'
-}
-
-function applyPerSlideOffsetDelta(
-  isVertical: boolean,
-  crossAxisOnly: boolean,
-  delta: number,
-  tX: string,
-  tY: string
-): { tX: string; tY: string } {
-  const px = (s: string) => parseFloat(s) || 0
-  if (crossAxisOnly) {
-    if (isVertical) {
-      return { tX: `${px(tX) + delta}px`, tY: tY }
-    }
-    return { tX: tX, tY: `${px(tY) + delta}px` }
-  }
-  return {
-    tX: `${px(tX) + delta}px`,
-    tY: `${px(tY) + delta}px`,
-  }
 }
 
 function getCachedSlides(tvist: Tvist): HTMLElement[] {
@@ -165,7 +141,7 @@ export function setStackEffect(
    */
   const uncoverInTransition = mode === 'uncover' && (movingNext || movingPrev)
 
-  const logStack = options.debug === true
+  const logStack = import.meta.env.DEV && options.debug === true
   const scrollAxisLabel = isVertical ? 'y' : 'x'
 
   const slidePositionActive = engine.getSlidePosition(engine.activeIndex)
@@ -197,8 +173,8 @@ export function setStackEffect(
   slidesList.forEach((slide, i) => {
     const slidePosition = tvist.engine.getSlidePosition(i)
 
-    let tX = '0px'
-    let tY = '0px'
+    let tX = 0
+    let tY = 0
     let tZ = 0
     let scale = 1
     let rotateZ = 0
@@ -213,7 +189,6 @@ export function setStackEffect(
 
       // Позиция по оси прокрутки: все слайды фиксированы в точке 0 viewport (колода)
       // Активный (progress ≈ 0) уже в 0; остальные тоже в 0 благодаря rebase (translate - translate = 0)
-      setTranslate2D(isVertical, 0, '0px', (v) => { tX = v }, (v) => { tY = v })
 
       // Z-index для pile: строгий порядок без дублей, чтобы слои не "флипались".
       // Используем abs(progress) как основную метрику глубины + индекс как tie-breaker.
@@ -229,23 +204,21 @@ export function setStackEffect(
         rotateZ = rotate ? perSlideRotate * p : 0
         if (Math.abs(perSlideOffset) > 1e-6) {
           const delta = perSlideOffset * p
-          const out = applyPerSlideOffsetDelta(isVertical, true, delta, tX, tY)
-          tX = out.tX
-          tY = out.tY
+          if (isVertical) tX += delta
+          else tY += delta
         }
       }
 
-      slide.style.transform = `translate3d(${tX}, ${tY}, ${tZ}px) rotateZ(${rotateZ}deg) scale(${scale})`
+      slide.style.transform = `translate3d(${tX}px, ${tY}px, ${tZ}px) rotateZ(${rotateZ}deg) scale(${scale})`
       slide.style.visibility = absProgress > numSlides ? 'hidden' : ''
 
       if (logStack) {
-        const px = (s: string) => parseFloat(s) || 0
         debugSlides.push({
           i,
           progress,
           zIndex: slide.style.zIndex,
-          tXpx: px(tX),
-          tYpx: px(tY),
+          tXpx: tX,
+          tYpx: tY,
           rotateZ,
           scale,
           transform: slide.style.transform,
@@ -266,46 +239,21 @@ export function setStackEffect(
     let rawAlong = 0
     let uncoverPinned: boolean | undefined
 
-    if (mode === 'cover') {
-      const tCover = coverStackTranslatePx(
-        progress,
-        slidePosition,
-        translate,
-        slideSize,
-        false,
-        restForActive,
-        slideTravelRatio
-      )
-      rawAlong = tCover
-      setTranslate2D(isVertical, tCover, '0px', (v) => { tX = v }, (v) => { tY = v })
-      slide.style.zIndex = coverStackZIndex(progress, numSlides, zIndexProgressScale)
-    } else {
+    if (mode === 'uncover') {
       uncoverPinned = uncoverInTransition && progress > -1 && progress <= 0
-      const tUncover = uncoverInTransition
-        ? uncoverTransitionTranslatePx(
-            progress,
-            slidePosition,
-            translate,
-            slideSize,
-            restForActive,
-            slideTravelRatio,
-            false
-          )
-        : coverStackTranslatePx(
-            progress,
-            slidePosition,
-            translate,
-            slideSize,
-            false,
-            restForActive,
-            slideTravelRatio
-          )
-      rawAlong = tUncover
-      setTranslate2D(isVertical, tUncover, '0px', (v) => { tX = v }, (v) => { tY = v })
-      slide.style.zIndex = uncoverInTransition
-        ? uncoverTransitionZIndex(progress, numSlides, zIndexProgressScale)
-        : coverStackZIndex(progress, numSlides, zIndexProgressScale)
     }
+    rawAlong = uncoverInTransition
+      ? uncoverTransitionTranslatePx(
+          progress, slidePosition, translate, slideSize, restForActive, slideTravelRatio
+        )
+      : coverStackTranslatePx(
+          progress, slidePosition, translate, slideSize, restForActive, slideTravelRatio
+        )
+    if (isVertical) tY = rawAlong
+    else tX = rawAlong
+    slide.style.zIndex = uncoverInTransition
+      ? uncoverTransitionZIndex(progress, numSlides, zIndexProgressScale)
+      : coverStackZIndex(progress, numSlides, zIndexProgressScale)
 
     if (progress < 0) {
       tZ = perSlideDepth > 0 ? -perSlideDepth * absProgress : 0
@@ -313,17 +261,15 @@ export function setStackEffect(
       rotateZ = rotate ? perSlideRotate * absProgress : 0
       if (Math.abs(perSlideOffset) > 1e-6) {
         const delta = perSlideOffset * absProgress
-        const out = applyPerSlideOffsetDelta(isVertical, false, delta, tX, tY)
-        tX = out.tX
-        tY = out.tY
+        tX += delta
+        tY += delta
       }
     }
 
-    slide.style.transform = `translate3d(${tX}, ${tY}, ${tZ}px) rotateZ(${rotateZ}deg) scale(${scale})`
+    slide.style.transform = `translate3d(${tX}px, ${tY}px, ${tZ}px) rotateZ(${rotateZ}deg) scale(${scale})`
     slide.style.visibility = absProgress > numSlides ? 'hidden' : ''
 
     if (logStack) {
-      const px = (s: string) => parseFloat(s) || 0
       const progressZone = progress <= -1 ? '<=-1' : progress <= 0 ? '(-1,0]' : '>0'
       debugSlides.push({
         i,
@@ -333,8 +279,8 @@ export function setStackEffect(
         rawAlong,
         uncoverPinned: mode === 'uncover' ? uncoverPinned : undefined,
         zIndex: slide.style.zIndex,
-        tXpx: px(tX),
-        tYpx: px(tY),
+        tXpx: tX,
+        tYpx: tY,
         rotateZ,
         scale,
         transform: slide.style.transform,
@@ -385,22 +331,6 @@ export function setStackEffect(
       slideTravelRatio,
       slides: debugSlides,
     })
-  }
-}
-
-function setTranslate2D(
-  isVertical: boolean,
-  px: number,
-  zero: string,
-  setX: (v: string) => void,
-  setY: (v: string) => void
-): void {
-  if (isVertical) {
-    setX(zero)
-    setY(`${px}px`)
-  } else {
-    setX(`${px}px`)
-    setY(zero)
   }
 }
 

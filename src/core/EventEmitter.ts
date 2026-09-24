@@ -131,6 +131,13 @@ export class EventEmitter {
     const handlers = this.listeners.get(event)
     return handlers ? handlers.size : 0
   }
+
+  /** Есть ли получатели промежуточной позиции перехода. */
+  hasPositionListeners(): boolean {
+    return this.anyListeners.size > 0 ||
+      this.listenerCount('scroll') > 0 ||
+      this.listenerCount('setTranslate') > 0 ||
+      this.listenerCount('progress') > 0
+  }
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
-

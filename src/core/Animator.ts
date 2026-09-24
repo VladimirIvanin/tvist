@@ -23,6 +23,14 @@ export class Animator {
   private animationId: number | null = null
   private startTime = 0
   private isRunning = false
+  private externalIsAnimating?: () => boolean
+  private externalStop?: () => void
+
+  /** Подключить переход, которым управляет браузер, к прежнему состоянию Animator. */
+  setExternalController(isAnimating: () => boolean, stop: () => void): void {
+    this.externalIsAnimating = isAnimating
+    this.externalStop = stop
+  }
 
   /**
    * Запустить анимацию
@@ -84,6 +92,7 @@ export class Animator {
    * Остановить текущую анимацию
    */
   stop(): void {
+    this.externalStop?.()
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId)
       this.animationId = null
@@ -96,7 +105,7 @@ export class Animator {
    * Проверить, выполняется ли анимация
    */
   isAnimating(): boolean {
-    return this.isRunning
+    return this.isRunning || this.externalIsAnimating?.() === true
   }
 }
 
@@ -134,4 +143,3 @@ export function throttle<Args extends unknown[]>(
     }
   }
 }
-

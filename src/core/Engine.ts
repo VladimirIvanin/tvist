@@ -53,6 +53,10 @@ export class Engine {
 
   /** Последняя позиция, записанная в style.transform (после roundLengths). */
   private _lastAppliedTransformPos: number | null = null
+  private cssTransitionActive = false
+  private transitionRaf: number | null = null
+  private transitionTimer: number | null = null
+  private transitionToken = 0
 
   /** Размеры fixedWidth / fixedHeight в px после resolveFixedDimensionsEarly() */
   private fixedWidthPxResolved = 0
@@ -80,6 +84,10 @@ export class Engine {
     this.target = new Vector1D(0)
     this.index = new Counter(tvist.slides.length, startIndex, this.isLoopEnabled(), this.calculateCounterEndIndex())
     this.animator = new Animator()
+    this.animator.setExternalController(
+      () => this.cssTransitionActive,
+      () => this.stopCssTransition()
+    )
 
     this.resolveGap()
     this.resolveFixedDimensionsEarly()
@@ -816,6 +824,8 @@ export class Engine {
    * @param afterDragSnap - snap после отпускания при drag (длительность = speed, easing easeOutCubic)
    */
   scrollTo(index: number, instant = false, afterDragSnap = false): void {
+    this.animator.stop()
+    const token = ++this.transitionToken
     const endIndex = this.getEndIndex()
     const previousIndex = this.index.get()
     const ctx = this.resolveTargetIndex(index, endIndex, previousIndex, afterDragSnap)
@@ -838,7 +848,7 @@ export class Engine {
     if (instant) {
       this.performInstantScroll(targetPosition, ctx, endIndex)
     } else {
-      this.performAnimatedScroll(targetPosition, ctx, endIndex, afterDragSnap)
+      this.performAnimatedScroll(targetPosition, ctx, endIndex, afterDragSnap, token)
     }
   }
 
@@ -946,7 +956,8 @@ export class Engine {
     targetPosition: number,
     ctx: ScrollContext,
     endIndex: number,
-    afterDragSnap: boolean
+    afterDragSnap: boolean,
+    token: number
   ): void {
     this.target.set(targetPosition)
     const defaultSpeed = this.options.speed ?? 300
@@ -980,40 +991,144 @@ export class Engine {
       easingFn = easings.easeOutQuad
     }
 
-    if (needsAnimation) {
-      this.animator.animate(
-        currentLocation,
-        targetPosition,
-        duration,
-        (value) => {
-          this.location.set(value)
-          this.applyTransform()
-          this.tvist.emit('scroll')
-        },
-        () => {
-          // transitionEnd эмитим всегда по завершении анимации
-          this.tvist.emit('transitionEnd', ctx.eventIndex)
+    const complete = () => {
+      if (token !== this.transitionToken) return
+      this.tvist.emit('transitionEnd', ctx.eventIndex)
+      if (ctx.indexChanged) {
+        this.tvist.emit('slideChangeEnd', ctx.eventIndex, { isDrag: afterDragSnap })
+        this.emitReachEdge(ctx, endIndex)
+      }
+    }
 
-          if (ctx.indexChanged) {
-            this.tvist.emit('slideChangeEnd', ctx.eventIndex, { isDrag: afterDragSnap })
-            this.emitReachEdge(ctx, endIndex)
-          }
-        },
-        easingFn
-      )
+    if (needsAnimation && duration > 0) {
+      if ((this.options.effect ?? 'slide') === 'slide') {
+        this.startCssTransition(currentLocation, targetPosition, duration, easingFn, token, complete)
+      } else {
+        this.animator.animate(
+          currentLocation, targetPosition, duration,
+          (value) => {
+            this.location.set(value)
+            this.applyTransform()
+            this.tvist.emit('scroll')
+          },
+          complete, easingFn
+        )
+      }
     } else {
+      if (needsAnimation) {
+        this.location.set(targetPosition)
+        this.applyTransform()
+        this.tvist.emit('scroll')
+        complete()
+        return
+      }
       // Позиция уже корректна (needsAnimation=false); microtask чтобы событие было
       // асинхронным как после анимации. Эмитируем transitionEnd всегда, slideChangeEnd
       // — только если индекс изменился (например, drag довёл до граничной позиции).
-      void Promise.resolve().then(() => {
-        this.tvist.emit('transitionEnd', ctx.eventIndex)
-
-        if (ctx.indexChanged) {
-          this.tvist.emit('slideChangeEnd', ctx.eventIndex, { isDrag: afterDragSnap })
-          this.emitReachEdge(ctx, endIndex)
-        }
-      })
+      void Promise.resolve().then(complete)
     }
+  }
+
+  private startCssTransition(
+    from: number,
+    to: number,
+    duration: number,
+    easing: EasingFunction,
+    token: number,
+    complete: () => void
+  ): void {
+    const container = this.tvist.container
+    const start = performance.now()
+    this.cssTransitionActive = true
+    this.location.setReader(() =>
+      from + (to - from) * easing(Math.min((performance.now() - start) / duration, 1))
+    )
+    const bezier = easing === easings.easeOutCubic
+      ? 'cubic-bezier(0.333333, 1, 0.666667, 1)'
+      : 'cubic-bezier(0.333333, 0.666667, 0.666667, 1)'
+    container.style.transition = `transform ${duration}ms ${bezier}`
+    this.writeTransform(to)
+
+    const finish = () => {
+      if (token !== this.transitionToken || !this.cssTransitionActive) return
+      if (!container.isConnected) {
+        this.stopCssTransition(false)
+        return
+      }
+      this.stopCssTransition(false)
+      this.location.set(to)
+      this.emitPositionUpdates()
+      complete()
+    }
+    this.onTransitionEnd = (event: TransitionEvent) => {
+      if (event.target === container && event.propertyName === 'transform') finish()
+    }
+    container.addEventListener('transitionend', this.onTransitionEnd)
+    this.transitionTimer = window.setTimeout(finish, duration)
+    this.ensureTransitionUpdates()
+  }
+
+  private onTransitionEnd?: (event: TransitionEvent) => void
+
+  /** Запускает чтение позиции только пока промежуточные значения кому-то нужны. */
+  ensureTransitionUpdates(): void {
+    if (!this.cssTransitionActive || this.transitionRaf !== null || !this.tvist.hasPositionListeners()) return
+    this.transitionRaf = requestAnimationFrame(() => {
+      this.transitionRaf = null
+      if (!this.cssTransitionActive) return
+      this.emitPositionUpdates()
+      this.ensureTransitionUpdates()
+    })
+  }
+
+  private emitPositionUpdates(): void {
+    const position = this.location.get()
+    this.tvist.emit('setTranslate', this.tvist, position)
+    this.emitProgress()
+    this.tvist.emit('scroll')
+  }
+
+  private readRenderedPosition(): number {
+    try {
+      const transform = getComputedStyle(this.tvist.container).transform
+      if (transform.startsWith('matrix')) {
+        const matrix = new DOMMatrixReadOnly(transform)
+        return this.options.direction === 'vertical' ? matrix.m42 : matrix.m41
+      }
+    } catch {
+      // happy-dom не вычисляет матрицу CSS-перехода.
+    }
+    return this.location.get()
+  }
+
+  private stopCssTransition(freeze = true): void {
+    if (!this.cssTransitionActive) return
+    const position = freeze ? this.readRenderedPosition() : this.target.get()
+    this.cssTransitionActive = false
+    this.location.setReader()
+    if (this.transitionRaf !== null && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(this.transitionRaf)
+    }
+    if (this.transitionTimer !== null) clearTimeout(this.transitionTimer)
+    this.transitionRaf = null
+    this.transitionTimer = null
+    if (this.onTransitionEnd) this.tvist.container.removeEventListener('transitionend', this.onTransitionEnd)
+    this.onTransitionEnd = undefined
+    this.tvist.container.style.transition = ''
+    this.location.set(position)
+    if (freeze) this.writeTransform(position)
+  }
+
+  private writeTransform(position: number): void {
+    const pos = this.options.roundLengths === false ? position : Math.round(position)
+    this.setTransformPosition(pos)
+  }
+
+  private setTransformPosition(pos: number): void {
+    this.tvist.container.style.transform = this.options.direction === 'vertical'
+      ? `translate3d(0, ${pos}px, 0)`
+      : `translate3d(${pos}px, 0, 0)`
+    this._lastAppliedTransformPos = pos
   }
 
   /** Прогресс прокрутки 0..1 (только при !loop) */
@@ -1065,12 +1180,7 @@ export class Engine {
         if (!this.scrollCacheValid) this.updateScrollCache()
         const offset = Math.max(0, (this.cachedRootSize - this.getContentSize()) / 2)
         if (this._lastAppliedTransformPos !== offset) {
-          if (this.options.direction === 'vertical') {
-            container.style.transform = `translate3d(0, ${offset}px, 0)`
-          } else {
-            container.style.transform = `translate3d(${offset}px, 0, 0)`
-          }
-          this._lastAppliedTransformPos = offset
+          this.setTransformPosition(offset)
           this.tvist.emit('setTranslate', this.tvist, offset)
           this.emitProgress()
         }
@@ -1090,13 +1200,7 @@ export class Engine {
 
     if (pos === this._lastAppliedTransformPos) return
 
-    if (this.options.direction === 'vertical') {
-      container.style.transform = `translate3d(0, ${pos}px, 0)`
-    } else {
-      container.style.transform = `translate3d(${pos}px, 0, 0)`
-    }
-
-    this._lastAppliedTransformPos = pos
+    this.setTransformPosition(pos)
     this.tvist.emit('setTranslate', this.tvist, pos)
     this.emitProgress()
   }
@@ -1114,6 +1218,7 @@ export class Engine {
 
   /** Пересчёт размеров и позиций (resize) */
   update(): void {
+    this.animator.stop()
     this.invalidateRootSizeCache()
     this.slideSizesCacheValid = false
     // После пересчёта layout позиция контейнера должна быть применена заново,
@@ -1127,6 +1232,23 @@ export class Engine {
     this.updateCounterLimits()
     this.checkLock()
     this.syncPositionToIndex()
+  }
+
+  /** Пересчитать позиции после перестановки тех же DOM-слайдов без повторного измерения. */
+  updateAfterReorder(previousSlides: readonly HTMLElement[]): void {
+    if (this.isAutoSize()) {
+      const sizes = new Map(previousSlides.map((slide, index) => [slide, this.slideSizes[index] ?? 0]))
+      const gap = gapCssForMargin(this.options.gap)
+      const vertical = this.options.direction === 'vertical'
+      this.slideSizes = this.tvist.slides.map((slide, index) => {
+        slide.style[vertical ? 'marginBottom' : 'marginRight'] =
+          index === this.tvist.slides.length - 1 ? '' : gap
+        return sizes.get(slide) ?? 0
+      })
+    }
+    this.calculatePositions()
+    this.updateCounterLimits()
+    this.checkLock()
   }
 
   /**

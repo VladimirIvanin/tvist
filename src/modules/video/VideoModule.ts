@@ -40,8 +40,6 @@ interface VideoEntry {
 
 /** Запись об iframe на слайде */
 interface IframeEntry {
-  slideIndex: number
-  slide: HTMLElement
   iframe: HTMLIFrameElement
   /** Оригинальный src (без autoplay параметров) */
   originalSrc: string
@@ -54,15 +52,11 @@ function normalizeVideoOptions(raw: TvistOptions['video']): Required<VideoOption
   if (raw === false || raw === undefined) return null
   if (raw === true) return { ...VIDEO_DEFAULTS }
 
-  return {
-    autoplay: raw.autoplay ?? VIDEO_DEFAULTS.autoplay,
-    muted: raw.muted ?? VIDEO_DEFAULTS.muted,
-    loop: raw.loop ?? VIDEO_DEFAULTS.loop,
-    playsinline: raw.playsinline ?? VIDEO_DEFAULTS.playsinline,
-    pauseOnLeave: raw.pauseOnLeave ?? VIDEO_DEFAULTS.pauseOnLeave,
-    resetOnLeave: raw.resetOnLeave ?? VIDEO_DEFAULTS.resetOnLeave,
-    pauseOnHold: raw.pauseOnHold ?? VIDEO_DEFAULTS.pauseOnHold,
+  const options = { ...VIDEO_DEFAULTS }
+  for (const key of Object.keys(VIDEO_DEFAULTS) as (keyof VideoOptions)[]) {
+    options[key] = raw[key] ?? VIDEO_DEFAULTS[key]
   }
+  return options
 }
 
 function isHoldToPauseEnabled(raw: TvistOptions['holdToPause']): boolean {
@@ -75,18 +69,6 @@ function isHoldToPauseEnabled(raw: TvistOptions['holdToPause']): boolean {
 
 const YOUTUBE_REGEX = /(?:youtube\.com\/embed\/|youtube-nocookie\.com\/embed\/)/i
 const VIMEO_REGEX = /player\.vimeo\.com\/video\//i
-
-function isYouTubeUrl(src: string): boolean {
-  return YOUTUBE_REGEX.test(src)
-}
-
-function isVimeoUrl(src: string): boolean {
-  return VIMEO_REGEX.test(src)
-}
-
-function isVideoIframe(src: string): boolean {
-  return isYouTubeUrl(src) || isVimeoUrl(src)
-}
 
 /**
  * Добавить/обновить GET-параметры в URL iframe
@@ -127,16 +109,9 @@ function buildAutoplayParams(provider: 'youtube' | 'vimeo', muted: boolean): Rec
   }
 }
 
-function buildStopParams(provider: 'youtube' | 'vimeo'): Record<string, string> {
-  if (provider === 'youtube') {
-    return { autoplay: '0' }
-  }
-  return { autoplay: '0' }
-}
-
 function getProvider(src: string): 'youtube' | 'vimeo' | null {
-  if (isYouTubeUrl(src)) return 'youtube'
-  if (isVimeoUrl(src)) return 'vimeo'
+  if (YOUTUBE_REGEX.test(src)) return 'youtube'
+  if (VIMEO_REGEX.test(src)) return 'vimeo'
   return null
 }
 
@@ -151,9 +126,6 @@ export class VideoModule extends Module {
 
   /** Глобальное состояние mute */
   private muted = true
-
-  /** Текущий активный Promise от play() — для предотвращения race condition */
-  private activePlayPromise: Promise<void> | null = null
 
   /** RAF id для videoProgress */
   private progressRAF: number | null = null
@@ -299,8 +271,8 @@ export class VideoModule extends Module {
       const iframe = slide.querySelector('iframe')
       if (iframe) {
         const src = iframe.getAttribute('src') ?? iframe.getAttribute('data-src') ?? ''
-        if (isVideoIframe(src)) {
-          this.registerIframe(registrationIndex, slide, iframe, src)
+        if (getProvider(src)) {
+          this.registerIframe(registrationIndex, iframe, src)
         }
       }
     })
@@ -344,7 +316,7 @@ export class VideoModule extends Module {
   /**
    * Зарегистрировать iframe
    */
-  private registerIframe(index: number, slide: HTMLElement, iframe: HTMLIFrameElement, src: string): void {
+  private registerIframe(index: number, iframe: HTMLIFrameElement, src: string): void {
     // Добавляем allow="autoplay" для корректной работы
     const currentAllow = iframe.getAttribute('allow') ?? ''
     if (!currentAllow.includes('autoplay')) {
@@ -353,8 +325,6 @@ export class VideoModule extends Module {
 
     // Сохраняем оригинальный src (без наших параметров)
     this.iframes.set(index, {
-      slideIndex: index,
-      slide,
       iframe,
       originalSrc: src,
     })
@@ -388,6 +358,10 @@ export class VideoModule extends Module {
    */
   private setupVideoListeners(entry: VideoEntry): void {
     const { video, slide, slideIndex } = entry
+    const emitVideoEvent = (name: string) => {
+      const payload: VideoEvent = { slide, video, index: slideIndex }
+      this.emit(name, payload)
+    }
 
     const addHandler = (event: string, handler: EventListener) => {
       video.addEventListener(event, handler)
@@ -396,29 +370,25 @@ export class VideoModule extends Module {
 
     // loadedmetadata — видео готово
     addHandler('loadedmetadata', () => {
-      const payload: VideoEvent = { slide, video, index: slideIndex }
-      this.emit('videoReady', payload)
+      emitVideoEvent('videoReady')
     })
 
     // play
     addHandler('play', () => {
-      const payload: VideoEvent = { slide, video, index: slideIndex }
-      this.emit('videoPlay', payload)
+      emitVideoEvent('videoPlay')
       // Запускаем плавное отслеживание прогресса
       this.startProgressTracking(video, slide, slideIndex)
     })
 
     // pause
     addHandler('pause', () => {
-      const payload: VideoEvent = { slide, video, index: slideIndex }
-      this.emit('videoPause', payload)
+      emitVideoEvent('videoPause')
       this.stopProgressTracking()
     })
 
     // ended
     addHandler('ended', () => {
-      const payload: VideoEvent = { slide, video, index: slideIndex }
-      this.emit('videoEnded', payload)
+      emitVideoEvent('videoEnded')
       this.stopProgressTracking()
     })
 
@@ -427,18 +397,19 @@ export class VideoModule extends Module {
       // Если видео воспроизводится, прогресс обновляется через RAF для плавности
       if (!video.paused && !video.ended) return
 
-      if (video.duration && isFinite(video.duration)) {
-        const payload: VideoProgressEvent = {
-          slide,
-          video,
-          index: slideIndex,
-          progress: video.currentTime / video.duration,
-          currentTime: video.currentTime,
-          duration: video.duration,
-        }
-        this.emit('videoProgress', payload)
-      }
+      this.emitVideoProgress(video, slide, slideIndex)
     })
+  }
+
+  private emitVideoProgress(video: HTMLVideoElement, slide: HTMLElement, index: number): void {
+    if (!video.duration || !isFinite(video.duration)) return
+    const payload: VideoProgressEvent = {
+      slide, video, index,
+      progress: video.currentTime / video.duration,
+      currentTime: video.currentTime,
+      duration: video.duration,
+    }
+    this.emit('videoProgress', payload)
   }
 
   /**
@@ -471,7 +442,7 @@ export class VideoModule extends Module {
     // iframe
     const iframeEntry = this.iframes.get(realIndex)
     if (iframeEntry && this.config.autoplay) {
-      this.activateIframe(iframeEntry)
+      this.setIframeAutoplay(iframeEntry, true)
     }
   }
 
@@ -495,7 +466,7 @@ export class VideoModule extends Module {
     // iframe
     const iframeEntry = this.iframes.get(realIndex)
     if (iframeEntry) {
-      this.deactivateIframe(iframeEntry)
+      this.setIframeAutoplay(iframeEntry, false)
     }
 
     this.stopProgressTracking()
@@ -510,7 +481,7 @@ export class VideoModule extends Module {
       this.safeResetVideoTime(entry.video)
     })
     this.iframes.forEach(entry => {
-      this.deactivateIframe(entry)
+      this.setIframeAutoplay(entry, false)
     })
     this.stopProgressTracking()
   }
@@ -533,25 +504,13 @@ export class VideoModule extends Module {
    * Безопасно воспроизвести видео с обработкой:
    * - readyState (ожидание canplay если не загружено)
    * - Promise rejection (AbortError при быстром pause())
-   * - Race condition (отмена предыдущего play)
    */
   private safePlay(video: HTMLVideoElement): void {
     video.muted = this.muted
 
     const doPlay = () => {
-      const playPromise = video.play()
-      this.activePlayPromise = playPromise
-
-      playPromise
-        .then(() => {
-          if (this.activePlayPromise === playPromise) {
-            this.activePlayPromise = null
-          }
-        })
+      video.play()
         .catch((error: DOMException) => {
-          if (this.activePlayPromise === playPromise) {
-            this.activePlayPromise = null
-          }
           if (error.name !== 'AbortError') {
             console.warn('Tvist VideoModule: playback failed:', error.message)
           }
@@ -562,50 +521,24 @@ export class VideoModule extends Module {
       doPlay()
     } else {
       video.load()
+      const readyEvents = ['canplay', 'canplaythrough', 'loadeddata', 'loadedmetadata']
       const onReady = () => {
-        video.removeEventListener('canplay', onReady)
-        video.removeEventListener('canplaythrough', onReady)
-        video.removeEventListener('loadeddata', onReady)
-        video.removeEventListener('loadedmetadata', onReady)
+        readyEvents.forEach(event => video.removeEventListener(event, onReady))
         requestAnimationFrame(doPlay)
       }
-      video.addEventListener('canplay', onReady)
-      video.addEventListener('canplaythrough', onReady)
-      video.addEventListener('loadeddata', onReady)
-      video.addEventListener('loadedmetadata', onReady)
+      readyEvents.forEach(event => video.addEventListener(event, onReady))
     }
   }
 
   // ==================== iframe управление ====================
 
-  /**
-   * Активировать iframe (добавить autoplay GET-параметры)
-   */
-  private activateIframe(entry: IframeEntry): void {
+  /** Переключить autoplay iframe через GET-параметры. */
+  private setIframeAutoplay(entry: IframeEntry, enabled: boolean): void {
     const provider = getProvider(entry.originalSrc)
     if (!provider) return
-
-    const params = buildAutoplayParams(provider, this.muted)
-    const newSrc = setIframeParams(entry.originalSrc, params)
-
-    if (entry.iframe.src !== newSrc) {
-      entry.iframe.src = newSrc
-    }
-  }
-
-  /**
-   * Деактивировать iframe (убрать autoplay)
-   */
-  private deactivateIframe(entry: IframeEntry): void {
-    const provider = getProvider(entry.originalSrc)
-    if (!provider) return
-
-    const params = buildStopParams(provider)
-    const newSrc = setIframeParams(entry.originalSrc, params)
-
-    if (entry.iframe.src !== newSrc) {
-      entry.iframe.src = newSrc
-    }
+    const params = enabled ? buildAutoplayParams(provider, this.muted) : { autoplay: '0' }
+    const src = setIframeParams(entry.originalSrc, params)
+    if (entry.iframe.src !== src) entry.iframe.src = src
   }
 
   // ==================== Прогресс ====================
@@ -623,17 +556,7 @@ export class VideoModule extends Module {
         return
       }
 
-      if (video.duration && isFinite(video.duration)) {
-        const payload: VideoProgressEvent = {
-          slide,
-          video,
-          index,
-          progress: video.currentTime / video.duration,
-          currentTime: video.currentTime,
-          duration: video.duration,
-        }
-        this.emit('videoProgress', payload)
-      }
+      this.emitVideoProgress(video, slide, index)
 
       this.progressRAF = requestAnimationFrame(tick)
     }
@@ -652,6 +575,10 @@ export class VideoModule extends Module {
   }
 
   // ==================== Visibility ====================
+
+  private getActiveVideo(): HTMLVideoElement | undefined {
+    return this.videos.get(this.tvist.realIndex ?? this.tvist.activeIndex)?.video
+  }
 
   /**
    * Настроить обработчики видимости (viewport + вкладка)
@@ -705,12 +632,10 @@ export class VideoModule extends Module {
    */
   private onAutoplayHoverPause = (): void => {
     if (!this.config) return
-    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
-    const entry = this.videos.get(realIndex)
-    if (!entry) return
-    if (!entry.video.paused) {
+    const video = this.getActiveVideo()
+    if (video && !video.paused) {
       this.pausedByAutoplayHover = true
-      entry.video.pause()
+      video.pause()
     }
   }
 
@@ -718,11 +643,8 @@ export class VideoModule extends Module {
     if (!this.pausedByAutoplayHover) return
     this.pausedByAutoplayHover = false
     if (!this.config?.autoplay) return
-    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
-    const entry = this.videos.get(realIndex)
-    if (entry?.video.paused) {
-      this.safePlay(entry.video)
-    }
+    const video = this.getActiveVideo()
+    if (video?.paused) this.safePlay(video)
   }
 
   /**
@@ -732,11 +654,8 @@ export class VideoModule extends Module {
     if (this.pausedByVisibility) return
     this.pausedByVisibility = true
 
-    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
-    const entry = this.videos.get(realIndex)
-    if (entry && !entry.video.paused) {
-      entry.video.pause()
-    }
+    const video = this.getActiveVideo()
+    if (video && !video.paused) video.pause()
   }
 
   /**
@@ -749,11 +668,8 @@ export class VideoModule extends Module {
 
     if (!this.config?.autoplay) return
 
-    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
-    const entry = this.videos.get(realIndex)
-    if (entry?.video.paused) {
-      this.safePlay(entry.video)
-    }
+    const video = this.getActiveVideo()
+    if (video?.paused) this.safePlay(video)
   }
 
   // ==================== Публичное API ====================
@@ -819,12 +735,10 @@ export class VideoModule extends Module {
    */
   pauseActiveForHold(): void {
     if (!this.config?.pauseOnHold) return
-    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
-    const entry = this.videos.get(realIndex)
-    if (!entry) return
-    if (!entry.video.paused) {
+    const video = this.getActiveVideo()
+    if (video && !video.paused) {
       this.pausedByHold = true
-      entry.video.pause()
+      video.pause()
     }
   }
 
@@ -835,11 +749,8 @@ export class VideoModule extends Module {
     if (!this.config?.pauseOnHold || !this.pausedByHold) return
     this.pausedByHold = false
     if (!this.config.autoplay) return
-    const realIndex = this.tvist.realIndex ?? this.tvist.activeIndex
-    const entry = this.videos.get(realIndex)
-    if (entry?.video.paused) {
-      this.safePlay(entry.video)
-    }
+    const video = this.getActiveVideo()
+    if (video?.paused) this.safePlay(video)
   }
 
   /**

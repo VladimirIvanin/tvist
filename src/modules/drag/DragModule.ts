@@ -238,63 +238,41 @@ export class DragModule extends Module {
     }
   }
 
-  private attachEvents(): void {
+  private manageRootEvents(action: 'add' | 'remove'): void {
     const { root } = this.tvist;
 
     if ('PointerEvent' in window) {
-      root.addEventListener('pointerdown', this.onPointerDown);
+      this.manageEvents(action, root, [{ event: 'pointerdown', handler: this.onPointerDown }]);
     } else {
-      root.addEventListener('touchstart', this.onPointerDown, { passive: true });
-      root.addEventListener('mousedown', this.onPointerDown);
+      this.manageEvents(action, root, [
+        { event: 'touchstart', handler: this.onPointerDown, options: { passive: true } },
+        { event: 'mousedown', handler: this.onPointerDown },
+      ]);
     }
 
-    root.addEventListener('dragstart', this.onDragStart);
-    root.classList.add(TVIST_CLASSES.draggable);
+    this.manageEvents(action, root, [{ event: 'dragstart', handler: this.onDragStart }]);
+    root.classList.toggle(TVIST_CLASSES.draggable, action === 'add');
+  }
+
+  private attachEvents(): void {
+    this.manageRootEvents('add');
   }
 
   private detachEvents(): void {
-    const { root } = this.tvist;
-
-    if ('PointerEvent' in window) {
-      root.removeEventListener('pointerdown', this.onPointerDown);
-    } else {
-      root.removeEventListener('touchstart', this.onPointerDown);
-      root.removeEventListener('mousedown', this.onPointerDown);
-    }
-
-    root.removeEventListener('dragstart', this.onDragStart);
-    root.classList.remove(TVIST_CLASSES.draggable);
-    this.removeDocumentEvents();
+    this.manageRootEvents('remove');
+    this.manageDocumentEvents('remove');
   }
 
-  private addDocumentEvents(): void {
+  private manageDocumentEvents(action: 'add' | 'remove'): void {
     if ('PointerEvent' in window) {
-      this.manageEvents('add', document, [
+      this.manageEvents(action, document, [
         { event: 'pointermove', handler: this.onPointerMove },
         { event: 'pointerup', handler: this.onPointerUp },
         { event: 'pointercancel', handler: this.onPointerUp },
       ]);
     } else {
-      this.manageEvents('add', document, [
+      this.manageEvents(action, document, [
         { event: 'touchmove', handler: this.onPointerMove, options: { passive: false } },
-        { event: 'touchend', handler: this.onPointerUp },
-        { event: 'touchcancel', handler: this.onPointerUp },
-        { event: 'mousemove', handler: this.onPointerMove },
-        { event: 'mouseup', handler: this.onPointerUp },
-      ]);
-    }
-  }
-
-  private removeDocumentEvents(): void {
-    if ('PointerEvent' in window) {
-      this.manageEvents('remove', document, [
-        { event: 'pointermove', handler: this.onPointerMove },
-        { event: 'pointerup', handler: this.onPointerUp },
-        { event: 'pointercancel', handler: this.onPointerUp },
-      ]);
-    } else {
-      this.manageEvents('remove', document, [
-        { event: 'touchmove', handler: this.onPointerMove },
         { event: 'touchend', handler: this.onPointerUp },
         { event: 'touchcancel', handler: this.onPointerUp },
         { event: 'mousemove', handler: this.onPointerMove },
@@ -620,7 +598,7 @@ export class DragModule extends Module {
 
     this.stopMomentum();
     this.tvist.engine.animator.stop();
-    this.addDocumentEvents();
+    this.manageDocumentEvents('add');
   };
 
   private onPointerMove = (e: TouchEvent | MouseEvent | PointerEvent): void => {
@@ -901,7 +879,7 @@ export class DragModule extends Module {
 
     this.wasAnimating = false;
     this.animationTarget = null;
-    this.removeDocumentEvents();
+    this.manageDocumentEvents('remove');
   };
 
   private getPointerPosition(
@@ -1118,12 +1096,18 @@ export class DragModule extends Module {
 
     const flickPower = this.options.flickPower ?? 600;
     let velocity = (initialVelocity * flickPower) / 60;
+    const frameMs = 1000 / 60;
+    let lastFrameTime = performance.now() - frameMs;
 
-    const animate = (): void => {
-      velocity *= this.FRICTION;
+    const animate = (timestamp: number): void => {
+      const frames = Math.min(Math.max(timestamp - lastFrameTime, 0), 100) / frameMs;
+      lastFrameTime = timestamp;
+      const decay = Math.pow(this.FRICTION, frames);
+      const distance = velocity * this.FRICTION * (1 - decay) / (1 - this.FRICTION);
+      velocity *= decay;
 
       const currentPos = this.tvist.engine.location.get();
-      let newPosition = currentPos + velocity;
+      let newPosition = currentPos + distance;
 
       let hitBoundary = false;
       if (!this.isLoopEnabled) {
@@ -1152,7 +1136,7 @@ export class DragModule extends Module {
       }
     };
 
-    animate();
+    animate(performance.now());
   }
 
   private snapToNearest(_velocity: number): void {

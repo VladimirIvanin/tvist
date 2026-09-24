@@ -35,13 +35,18 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
+        passes: 5,
+        ecma: 2020,
+        toplevel: true,
         drop_console: true,
         drop_debugger: true,
         pure_funcs: ['console.log', 'console.debug'],
       },
       format: {
         comments: false,
+        ecma: 2020,
       },
+      mangle: { toplevel: true },
     },
     sourcemap: true,
     target: 'es2020',

@@ -27,12 +27,9 @@ describe('Drag rewind duration', () => {
       drag: true
     })
 
-    const animateSpy = vi.spyOn(slider.engine.animator, 'animate')
-
     // Go to last slide
     slider.scrollTo(4, true)
     expect(slider.engine.activeIndex).toBe(4)
-    animateSpy.mockClear()
 
     // Drag forward (deltaX < 0 is next) past the last slide
     // Drag forward (deltaX < 0 is next) past the last slide
@@ -48,11 +45,7 @@ describe('Drag rewind duration', () => {
     await new Promise(resolve => setTimeout(resolve, 50))
 
     expect(slider.engine.activeIndex).toBe(0)
-    expect(animateSpy).toHaveBeenCalled()
-    
-    // The duration is the 3rd argument to animate
-    const durationArg = animateSpy.mock.calls[0][2]
-    expect(durationArg).toBe(300)
+    expect(slider.container.style.transition).toContain('transform 300ms')
   })
 
   it('should use speed for snap duration after drag (not distance-based minimum)', async () => {
@@ -60,9 +53,6 @@ describe('Drag rewind duration', () => {
       speed: 400,
       drag: true,
     })
-
-    const animateSpy = vi.spyOn(slider.engine.animator, 'animate')
-    animateSpy.mockClear()
 
     await simulateDrag({
       element: fixture.root,
@@ -74,8 +64,6 @@ describe('Drag rewind duration', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 50))
 
-    expect(animateSpy).toHaveBeenCalled()
-    const durationArg = animateSpy.mock.calls[0]?.[2]
-    expect(durationArg).toBe(400)
+    expect(slider.container.style.transition).toContain('transform 400ms')
   })
 })
