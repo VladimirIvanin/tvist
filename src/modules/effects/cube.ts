@@ -98,8 +98,8 @@ export function setCubeEffect(
         // Reset any margin that might be set by the engine
         // Moved to _cube.scss with !important
         
-        // Fix for content clipping issues:
-        // Ensure 3D context is preserved for children (content + shadows)
+        // Flatten the face's content and shadows into one plane to prevent
+        // Chrome from showing them through adjacent faces during rotation.
         // Moved to _cube.scss
 
         // Set origin to center (standard rotation around own axis)

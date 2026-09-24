@@ -24,7 +24,8 @@
     margin: 0 !important;
     pointer-events: none;
     backface-visibility: hidden;
-    transform-style: preserve-3d;
+    // Paint content and shadows together on the face to avoid Chrome showing through it.
+    transform-style: flat;
     z-index: 1;
     visibility: hidden;
     transform-origin: 50% 50% !important;
