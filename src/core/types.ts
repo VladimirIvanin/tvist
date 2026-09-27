@@ -508,7 +508,8 @@ export interface TvistOptions {
   flickPower?: number
   
   /**
-   * Максимальное количество страниц (viewport) для flick в обычном режиме
+   * Максимальное количество слайдов для короткого flick в обычном режиме.
+   * Длинное перетаскивание может пройти больше слайдов.
    * @default 1
    */
   flickMaxPages?: number

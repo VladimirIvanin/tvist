@@ -163,7 +163,7 @@
       "name": "flickMaxPages",
       "type": "number",
       "default": "1",
-      "description": "Максимальное количество страниц (viewport) для flick в обычном режиме"
+      "description": "Максимальное количество слайдов для короткого flick в обычном режиме. Длинное перетаскивание может пройти больше слайдов."
     },
     {
       "name": "focusableElements",

@@ -1193,8 +1193,9 @@ export class DragModule extends Module {
       return;
     }
 
-    const isHorizontal = this.options.direction !== 'vertical';
-    const dragDistance = isHorizontal ? this.currentX - this.startX : this.currentY - this.startY;
+    // Первый move только запускает drag, а loopFix может перебазировать начало.
+    // Для snap важен путь, который действительно прошёл трек с последней базы.
+    const dragDistance = engine.location.get() - this.startPosition;
 
     const threshold = Math.max(slideSize * 0.2, 80);
     const flickPower = this.options.flickPower ?? 600;
@@ -1206,6 +1207,15 @@ export class DragModule extends Module {
 
     const exactSlidesMoved = -projectedDistance / slideWithGap;
     let slidesMoved = Math.round(exactSlidesMoved);
+
+    // Один короткий flick должен переключать максимум на один слайд по умолчанию,
+    // даже когда в viewport видно несколько слайдов. Длинный drag сохраняет
+    // возможность пройти столько слайдов, сколько пользователь протащил сам.
+    const maxSlidesMoved = Math.max(
+      Math.ceil(Math.abs(dragDistance) / slideWithGap),
+      Math.ceil(flickMaxPages)
+    );
+    slidesMoved = Math.sign(slidesMoved) * Math.min(Math.abs(slidesMoved), maxSlidesMoved);
 
     if (slidesMoved === 0) {
       if (Math.abs(dragDistance) < threshold) {

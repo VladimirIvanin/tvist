@@ -212,9 +212,9 @@ function home(): string {
   <a class="button button-secondary" href="${base}examples-list.html">Смотреть примеры <span>→</span></a></div></div>
   <div class="hero-demo"><div class="hero-demo-top"><span>01 / 03</span><span>Перетащите или нажмите стрелку ↗</span></div>
   <div class="tvist-v1 hero-slider" aria-label="Галерея Tvist"><div class="tvist-v1__track"><div class="tvist-v1__container">
-  <div class="tvist-v1__slide"><img src="${base}assets/abstract-1.webp" alt="Абстрактная синяя лента" width="1200" height="800" fetchpriority="high"></div>
-  <div class="tvist-v1__slide"><img src="${base}assets/abstract-2.webp" alt="Абстрактная композиция из цветного стекла" width="1200" height="800"></div>
-  <div class="tvist-v1__slide"><img src="${base}assets/abstract-3.webp" alt="Абстрактная композиция с призмами" width="1200" height="800"></div>
+  <div class="tvist-v1__slide"><img src="assets/abstract-1.webp" alt="Абстрактная синяя лента" width="1200" height="800" fetchpriority="high"></div>
+  <div class="tvist-v1__slide"><img src="assets/abstract-2.webp" alt="Абстрактная композиция из цветного стекла" width="1200" height="800"></div>
+  <div class="tvist-v1__slide"><img src="assets/abstract-3.webp" alt="Абстрактная композиция с призмами" width="1200" height="800"></div>
   </div></div></div><div class="hero-demo-bottom"><span>Настоящий Tvist в действии</span><div><button type="button" data-hero-prev aria-label="Предыдущий слайд">←</button><button type="button" data-hero-next aria-label="Следующий слайд">→</button></div></div></div></section>
   <section class="feature-band page-wrap"><p>От одной карточки до бесконечной ленты.<br>Вся механика под вашим контролем.</p><div><span>01 / Drag</span><span>02 / Loop</span><span>03 / Responsive</span><span>04 / Modules</span></div></section>
   <section class="home-links page-wrap"><span class="eyebrow">Начните здесь</span><div class="home-link-grid">

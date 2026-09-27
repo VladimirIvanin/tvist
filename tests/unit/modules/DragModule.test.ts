@@ -169,6 +169,76 @@ describe('DragModule', () => {
   })
 
   describe('Snap после отпускания', () => {
+    it('короткий быстрый drag при perPage 3 перелистывает один слайд', async () => {
+      slider.destroy()
+      fixture.cleanup()
+      fixture = createSliderFixture({ slidesCount: 10, width: 600, height: 400 })
+      slider = new Tvist(fixture.root, { drag: true, perPage: 3, gap: 20, speed: 0 })
+
+      await simulateDrag({
+        element: fixture.container,
+        startX: 300,
+        deltaX: -100,
+        steps: 2,
+        duration: 80,
+      })
+
+      expect(slider.activeIndex).toBe(1)
+    })
+
+    it('не считает первый pointermove перемещением, если трек ещё не сдвинулся', async () => {
+      await simulateDrag({
+        element: fixture.container,
+        startX: 300,
+        deltaX: -150,
+        steps: 1,
+        releaseDelay: 220,
+      })
+
+      expect(slider.activeIndex).toBe(0)
+    })
+
+    it('длинный медленный drag может пройти несколько слайдов', async () => {
+      slider.destroy()
+      fixture.cleanup()
+      fixture = createSliderFixture({ slidesCount: 10, width: 600, height: 400 })
+      slider = new Tvist(fixture.root, { drag: true, perPage: 3, gap: 20, speed: 0 })
+
+      await simulateDrag({
+        element: fixture.container,
+        startX: 550,
+        deltaX: -500,
+        steps: 10,
+        duration: 400,
+        releaseDelay: 220,
+      })
+
+      expect(slider.activeIndex).toBe(2)
+    })
+
+    it('flickMaxPages 2 разрешает короткому flick два шага', async () => {
+      slider.destroy()
+      fixture.cleanup()
+      fixture = createSliderFixture({ slidesCount: 10, width: 600, height: 400 })
+      slider = new Tvist(fixture.root, {
+        drag: true,
+        perPage: 3,
+        gap: 20,
+        flickMaxPages: 2,
+        speed: 0,
+      })
+
+      await simulateDrag({
+        element: fixture.container,
+        startX: 300,
+        deltaX: -100,
+        steps: 2,
+        duration: 80,
+      })
+
+      expect(slider.activeIndex).toBe(2)
+    })
+
     it('НЕ должен переключать слайд если драг меньше threshold', async () => {
       const initialIndex = slider.activeIndex
 
@@ -1248,4 +1318,3 @@ describe('DragModule — holdToPause: pointerdown не всплывает к р�
     vi.useRealTimers()
   })
 })
-
