@@ -162,7 +162,7 @@ const nav = [
 ]
 
 function shell(title: string, body: string, current: string, script = 'main.ts'): string {
-  const navHtml = nav.map((item) => `<a href="${base + item.link}" ${current === item.link ? 'aria-current="page"' : ''}>${item.text}</a>`).join('')
+  const navHtml = nav.map((item) => `<a href="${base + item.link}" ${current === item.link || (item.link === 'examples-list.html' && current.startsWith('examples/')) ? 'aria-current="page"' : ''}>${item.text}</a>`).join('')
   const depth = current.split('/').length - 1
   const src = '../'.repeat(depth + 1) + `site/${script}`
   return `<!doctype html>
@@ -229,9 +229,25 @@ function home(): string {
 function catalog(): string {
   const cards = demos.map((d, i) => `<a class="catalog-card" href="${base}examples/${d.id}.html" data-search="${escapeHtml((d.title + ' ' + d.category + ' ' + d.id).toLowerCase())}"><small>${String(i + 1).padStart(2, '0')} / ${escapeHtml(d.category)}</small><span class="catalog-visual" data-visual="${i % 4}"><b>${String(i + 1).padStart(2, '0')}</b></span><h2>${escapeHtml(d.title)}</h2><p>${escapeHtml(d.description)}</p><span class="catalog-arrow">Открыть пример ↗</span></a>`).join('')
   const categories = [...new Set(demos.map((d) => d.category))]
-  return `<section class="page-intro page-wrap"><span class="eyebrow">Практика / ${demos.length} примеров</span><h1>Посмотрите,<br><em>как это работает.</em></h1><p>Каждая демонстрация работает в браузере. Откройте пример, попробуйте и скопируйте HTML, CSS и JavaScript.</p></section>
-  <section class="catalog-controls page-wrap"><label for="example-search">Поиск по примерам</label><input id="example-search" name="example-search" type="search" placeholder="Например, loop или карточки…" autocomplete="off"><div class="category-filters" role="group" aria-label="Категории"><button type="button" class="is-active" data-filter="all">Все</button>${categories.map((c) => `<button type="button" data-filter="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join('')}</div></section>
-  <section class="catalog-grid page-wrap" aria-live="polite">${cards}</section><p class="empty-state page-wrap" hidden>Ничего не найдено. Попробуйте другой запрос.</p>`
+  return examplesLayout('examples-list.html', `<header class="examples-intro"><div class="examples-intro-heading"><h1>Примеры</h1><span class="eyebrow">${demos.length} демонстраций</span></div><p>Попробуйте слайдеры и скопируйте готовый HTML, CSS и JavaScript.</p></header>
+  <section class="catalog-controls"><label for="example-search">Поиск по примерам</label><input id="example-search" name="example-search" type="search" placeholder="Например, loop или карточки…" autocomplete="off"><div class="category-filters" role="group" aria-label="Категории"><button type="button" class="is-active" data-filter="all">Все</button>${categories.map((c) => `<button type="button" data-filter="${escapeHtml(c)}">${escapeHtml(c)}</button>`).join('')}</div></section>
+  <section class="catalog-grid" aria-live="polite">${cards}</section><p class="empty-state" hidden>Ничего не найдено. Попробуйте другой запрос.</p>`)
+}
+
+function examplesLayout(current: string, content: string): string {
+  const categories = [...new Set(demos.map((demo) => demo.category))]
+  const groups = categories.map((category, index) => {
+    const links = demos.filter((demo) => demo.category === category).map((demo) => {
+      const route = `examples/${demo.id}.html`
+      return `<li><a href="${base + route}" ${current === route ? 'aria-current="page"' : ''}>${escapeHtml(demo.title)}</a></li>`
+    }).join('')
+    return `<section class="examples-nav-group" aria-labelledby="examples-category-${index}"><h2 id="examples-category-${index}">${escapeHtml(category)}</h2><ul>${links}</ul></section>`
+  }).join('')
+  return `<div class="examples-shell page-wrap"><aside class="examples-sidebar">
+  <span class="eyebrow examples-sidebar-title">Примеры</span>
+  <button class="examples-menu-toggle" type="button" aria-expanded="false" aria-controls="examples-nav"><span>Выбрать пример</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+  <nav class="examples-nav" id="examples-nav" aria-label="Навигация по примерам"><a class="examples-nav-all" href="${base}examples-list.html" ${current === 'examples-list.html' ? 'aria-current="page"' : ''}>Все примеры <span>${demos.length}</span></a>${groups}</nav>
+  </aside><div class="examples-content">${content}</div></div>`
 }
 
 function main(): void {
@@ -263,7 +279,7 @@ function main(): void {
     const raw = renderMarkdown(source, rel, isExample)
     const hasInlineDemos = isExample && (/<Demo\s+id=/.test(source) || /<[A-Z][A-Za-z0-9]*Example\b[^>]*\/>/.test(source) || /<div\s+ref=/.test(source))
     const content = isExample
-      ? `<div class="doc-shell page-wrap"><aside class="doc-side"><span class="eyebrow">Примеры</span><a href="${base}examples-list.html">← Все примеры</a></aside><article class="doc-content"><div class="doc-title"><span class="eyebrow">Пример / ${escapeHtml(demoById.get(id)?.category || 'Tvist')}</span><h1>${escapeHtml(heading)}</h1></div>${hasInlineDemos ? '' : demoCard(id)}<div class="markdown-body">${raw}</div></article></div>`
+      ? examplesLayout(rel, `<article class="doc-content"><div class="doc-title"><span class="eyebrow">${escapeHtml(demoById.get(id)?.category || 'Tvist')}</span><h1>${escapeHtml(heading)}</h1></div>${hasInlineDemos ? '' : demoCard(id)}<div class="markdown-body">${raw}</div></article>`)
       : `<div class="doc-shell page-wrap"><aside class="doc-side"><span class="eyebrow">${section === 'api' ? 'Справочник' : 'Руководство'}</span><a href="${base}guide/getting-started.html">Быстрый старт</a><a href="${base}api/options.html">Опции</a><a href="${base}api/methods.html">Методы</a><a href="${base}api/events.html">События</a></aside><article class="doc-content markdown-body">${raw}</article></div>`
     writePage(rel, shell(heading, content, rel))
   }

@@ -32,6 +32,38 @@ menu?.addEventListener('click', () => {
   document.querySelector('.site-nav')?.classList.toggle('is-open', !expanded)
 })
 
+const examplesNav = document.querySelector<HTMLElement>('.examples-nav')
+const examplesMenu = document.querySelector<HTMLButtonElement>('.examples-menu-toggle')
+if (examplesNav && examplesMenu) {
+  const revealCurrentExample = () => {
+    const current = examplesNav.querySelector<HTMLElement>('[aria-current="page"]')
+    if (!current || !examplesNav.clientHeight) return
+    const navBounds = examplesNav.getBoundingClientRect()
+    const linkBounds = current.getBoundingClientRect()
+    if (linkBounds.top < navBounds.top || linkBounds.bottom > navBounds.bottom) {
+      examplesNav.scrollTop += linkBounds.top - navBounds.top - examplesNav.clientHeight / 2 + linkBounds.height / 2
+    }
+  }
+  examplesNav.scrollTop = Number(sessionStorage.getItem('tvist-examples-scroll')) || 0
+  revealCurrentExample()
+  window.addEventListener('pagehide', () => {
+    if (examplesNav.clientHeight) sessionStorage.setItem('tvist-examples-scroll', String(examplesNav.scrollTop))
+  })
+  examplesMenu.addEventListener('click', () => {
+    const expanded = examplesMenu.getAttribute('aria-expanded') !== 'true'
+    examplesMenu.setAttribute('aria-expanded', String(expanded))
+    examplesNav.classList.toggle('is-open', expanded)
+    if (expanded) revealCurrentExample()
+  })
+  examplesNav.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && examplesMenu.getAttribute('aria-expanded') === 'true') {
+      examplesMenu.setAttribute('aria-expanded', 'false')
+      examplesNav.classList.remove('is-open')
+      examplesMenu.focus()
+    }
+  })
+}
+
 const hero = document.querySelector<HTMLElement>('.hero-slider')
 if (hero) {
   const slider = new Tvist(hero, { perPage: 1, gap: 0, drag: true, loop: true })

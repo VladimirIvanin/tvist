@@ -60,12 +60,12 @@ const slideLabels = ['01', '02', '03', '04', '05', '06']
 const numberedSlides = slideLabels.map((text) => `      <div class="tvist-v1__slide">${text}</div>`).join('\n')
 const cardSlides = slideLabels.map((text, index) => `      <div class="tvist-v1__slide"><article class="product-card"><div class="product-card__art" aria-hidden="true">${text}</div><h3>Объект ${text}</h3><p>${(index + 1) * 1200} ₽</p></article></div>`).join('\n')
 const storySlides = slideLabels.map((text) => `      <div class="tvist-v1__slide"><div class="story-card"><small>История ${text} / 06</small><strong>Момент, который хочется сохранить.</strong><span>Листайте дальше →</span></div></div>`).join('\n')
-const oneSlider = (className = '', slides = numberedSlides) => `<div class="tvist-v1${className ? ' ' + className : ''}">
+const oneSlider = (className = '', slides = numberedSlides, navigation = '') => `<div class="tvist-v1${className ? ' ' + className : ''}">
   <div class="tvist-v1__track">
     <div class="tvist-v1__container">
 ${slides}
     </div>
-  </div>
+  </div>${navigation ? '\n' + navigation : ''}
 </div>`
 const baseCss = `.tvist-v1 { width: 100%; min-width: 0; }
 .tvist-v1__slide { height: 280px; display: grid; place-items: center; color: #fff; font: 700 54px system-ui, sans-serif; background: #61758b; }
@@ -94,6 +94,34 @@ function escapeHtml(value: string): string {
 }
 
 function clone(value: Config): Config { return structuredClone(value) }
+
+function navigationMarkup(options: Config): string {
+  const markup: string[] = []
+  const element = (tag: 'button' | 'div', classes: string, selector: unknown, label?: string, text = '') => {
+    const target = document.createElement(tag)
+    target.className = classes
+    // Простой селектор можно воспроизвести в HTML. Сложному нужна своя разметка.
+    if (typeof selector === 'string' && /^[#.][\w-]+$/.test(selector)) {
+      if (selector.startsWith('#')) target.id = selector.slice(1)
+      else target.classList.add(selector.slice(1))
+    }
+    if (tag === 'button') target.setAttribute('type', 'button')
+    if (label) target.setAttribute('aria-label', label)
+    target.textContent = text
+    return '  ' + target.outerHTML
+  }
+  if (options.arrows) {
+    const arrows = typeof options.arrows === 'object' ? options.arrows as Config : {}
+    markup.push(element('button', 'tvist-v1__arrow tvist-v1__arrow--prev', arrows.prev, 'Предыдущий слайд', arrows.addIcons === false ? '←' : ''))
+    markup.push(element('button', 'tvist-v1__arrow tvist-v1__arrow--next', arrows.next, 'Следующий слайд', arrows.addIcons === false ? '→' : ''))
+  }
+  if (options.pagination) {
+    const pagination = typeof options.pagination === 'object' ? options.pagination as Config : {}
+    markup.push(element('div', 'tvist-v1__pagination', pagination.container))
+  }
+  return markup.join('\n')
+}
+
 function getPath(value: Config, path: string): unknown {
   return path.split('.').reduce<unknown>((current, part) => current && typeof current === 'object' ? (current as Config)[part] : undefined, value)
 }
@@ -145,7 +173,8 @@ function parseInput(raw: string, type: string): unknown {
 }
 
 function field(path: string, type: string, description: string, value: unknown, nested = false): string {
-  if (/=>|HTMLElement|Tvist\b|Record</.test(type)) return ''
+  if (/=>|Tvist\b|Record</.test(type) || (type.includes('HTMLElement') && !type.includes('string'))) return ''
+  type = type.replace(/\s*\|\s*HTMLElement\b/g, '')
   const label = labels[path] || path.split('.').at(-1)!
   const key = escapeHtml(path)
   const help = description ? `<small>${escapeHtml(description.slice(0, 120))}</small>` : ''
@@ -187,7 +216,12 @@ function renderControls(config: Config): string {
     const option = meta.find((item) => item.name === name)
     if (!option) return ''
     const main = field(name, option.type, option.description, config[name])
-    return main + nestedFields(option, config)
+    const hint = name === 'arrows'
+      ? '<p class="builder-hint">Стрелкам нужны кнопки в HTML. Билдер добавляет их во вкладку HTML при включении. Для своих кнопок задайте prev и next: разметка для #id и .class создаётся здесь, для сложных селекторов добавьте её самостоятельно.</p>'
+      : name === 'pagination'
+        ? '<p class="builder-hint">Пагинации нужен контейнер в HTML; точки создаёт Tvist внутри него. Билдер добавляет контейнер во вкладку HTML при включении. Для своего контейнера задайте container: #id или .class; сложным селекторам нужна своя разметка.</p>'
+        : ''
+    return main + nestedFields(option, config) + hint
   }).join('')}</details>`).join('')
 }
 
@@ -201,8 +235,9 @@ function getCode(config: Config, variant: Preset['variant'], template: string): 
   const object = JSON.stringify(jsOptions, null, 2)
     .replace('"__RENDER_BULLET__"', '(index, className) => `<button class="${className}" aria-label="Слайд ${index + 1}">${index + 1}</button>`')
     .replace('"__ON_SLIDE_CHANGE__"', '(index) => console.log("Активный слайд:", index)')
-  const html = variant === 'thumbs' ? oneSlider('main-slider') + '\n\n' + oneSlider('thumb-slider') : oneSlider('', variant === 'cards' ? cardSlides : variant === 'stories' ? storySlides : numberedSlides)
-  const css = baseCss + (effective.direction === 'vertical' ? '\n.tvist-v1 { height: 320px; }\n.tvist-v1__slide { height: 150px; }' : '') + (variant === 'thumbs' ? '\n.thumb-slider { margin-top: 10px; }\n.thumb-slider .tvist-v1__slide { height: 65px; font-size: 18px; cursor: pointer; }' : variant ? variantCss[variant] || '' : '')
+  const navigation = navigationMarkup(jsOptions)
+  const html = variant === 'thumbs' ? oneSlider('main-slider', numberedSlides, navigation) + '\n\n' + oneSlider('thumb-slider') : oneSlider('', variant === 'cards' ? cardSlides : variant === 'stories' ? storySlides : numberedSlides, navigation)
+  const css = baseCss + (template === 'renderBullet' ? '\n.tvist-v1__pagination .tvist-v1__bullet { width: 28px; height: 28px; color: #25363a; font: 600 14px system-ui, sans-serif; }' : '') + (effective.direction === 'vertical' ? '\n.tvist-v1 { height: 320px; }\n.tvist-v1__slide { height: 150px; }' : '') + (variant === 'thumbs' ? '\n.thumb-slider { margin-top: 10px; }\n.thumb-slider .tvist-v1__slide { height: 65px; font-size: 18px; cursor: pointer; }' : variant ? variantCss[variant] || '' : '')
   const js = variant === 'thumbs'
     ? `const slider = new TvistV1('.main-slider', ${object});\nconst thumbs = new TvistV1('.thumb-slider', { perPage: 4, gap: 10, isNavigation: true });\nslider.sync(thumbs);`
     : `const slider = new TvistV1('.tvist-v1', ${object});`
@@ -223,7 +258,7 @@ export function mountBuilder(root: HTMLElement, _base: string): void {
   root.innerHTML = `<section class="builder-intro page-wrap"><span class="eyebrow">Инструмент / Tvist</span><h1>Соберите свой<br><em>слайдер.</em></h1><p>Выберите пресет, настройте поведение и заберите готовый код. Всё, что вы видите справа, работает на Tvist.</p></section>
   <div class="builder-layout page-wrap"><aside class="builder-panel"><div class="builder-panel-header"><h2>Параметры</h2></div>
   <section class="builder-section"><h3>Пресеты</h3><div class="builder-presets">${Object.entries(presets).map(([id, p]) => `<button type="button" data-preset="${id}" ${id === presetId ? 'class="is-active"' : ''}>${p.label}</button>`).join('')}</div></section>
-  <section class="builder-section"><h3>Шаблоны кода</h3><div class="builder-control"><label for="builder-template">Дополнительный сценарий</label><select id="builder-template" name="builder-template"><option value="none">Без шаблона</option><option value="events">Обработчик on.slideChangeEnd</option><option value="renderBullet">Своё оформление точек</option></select><small>Для галереи с миниатюрами выберите пресет «Миниатюры». Опция virtual отсутствует в текущем API Tvist.</small></div></section>
+  <section class="builder-section"><h3>Шаблоны кода</h3><div class="builder-control"><label for="builder-template">Дополнительный сценарий</label><select id="builder-template" name="builder-template"><option value="none">Без шаблона</option><option value="events">Обработчик on.slideChangeEnd</option><option value="renderBullet">Своё оформление точек</option></select><small>Свои точки требуют контейнер пагинации в HTML — шаблон добавляет его вместе с renderBullet. Для галереи с миниатюрами выберите пресет «Миниатюры».</small></div></section>
   <div id="builder-controls"></div></aside>
   <section class="builder-preview"><div class="builder-preview-top"><div><span class="eyebrow">Результат</span><h2>Предпросмотр</h2></div><span class="eyebrow" id="builder-status">Готово к работе</span></div>
   <div class="builder-preview-stage" id="builder-stage"></div><p id="builder-warning" class="builder-warning" role="status"></p>
@@ -247,6 +282,7 @@ export function mountBuilder(root: HTMLElement, _base: string): void {
     codeOutput.textContent = code[activeTab]
     warning.textContent = warnings.join(' ')
     stage.classList.toggle('is-vertical', options.direction === 'vertical')
+    stage.classList.toggle('has-custom-bullets', template === 'renderBullet')
     stage.innerHTML = code.html
     try {
       if (template === 'renderBullet') {
