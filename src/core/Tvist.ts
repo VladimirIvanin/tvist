@@ -74,6 +74,7 @@ const TVIST_ROOT_RUNTIME_STATE_CLASSES: readonly string[] = [
 ]
 
 export class Tvist {
+  /** Версия библиотеки из package.json. */
   static readonly VERSION = pkg.version ?? '0.0.0'
 
   /** Карта BEM-классов (префикс из package.json: tvist-v1, tvist-v1__container, …). Для использования нескольких версий на одной странице */
@@ -81,7 +82,7 @@ export class Tvist {
   /** Префикс BEM-блока для CSS. @deprecated Используйте Tvist.CLASSES.block */
   static readonly CSS_PREFIX = TVIST_CLASSES.block
 
-  // Реестр модулей (статический)
+  /** Глобальный реестр модулей; изменения применяются к новым экземплярам. */
   static readonly MODULES = new Map<string, ModuleConstructor>()
 
   // Генератор уникальных ID с поддержкой crypto.randomUUID() и fallback
@@ -102,23 +103,25 @@ export class Tvist {
     return `tvist-${uuid}`
   }
 
-  // Уникальный ID инстанса
+  /** Уникальный идентификатор экземпляра. */
   readonly id: string
 
-  // DOM элементы
+  /** Корневой элемент слайдера. */
   readonly root: HTMLElement
+  /** Элемент viewport, обрезающий видимую область. */
   readonly track: HTMLElement
+  /** Контейнер слайдов, к которому применяется transform. */
   readonly container: HTMLElement
   private _slides: HTMLElement[]
   private _originalSlideCountCache: number | null = null
 
-  // Опции
+  /** Текущая конфигурация. Для изменения используйте updateOptions(). */
   readonly options: TvistOptions
   
   // Оригинальные опции (до применения breakpoints) - для BreakpointsModule
   _originalOptions?: TvistOptions
 
-  // Ядро
+  /** Движок; расширенный доступ для собственных модулей. */
   readonly engine: Engine
 
   // События
@@ -149,7 +152,7 @@ export class Tvist {
   // Флаг видимости слайдера (управляется VisibilityModule)
   public _isVisible = true
 
-  // Флаг для контроля кликов (устанавливается в false при драге)
+  /** Флаг для контроля кликов (устанавливается в false при драге). @internal */
   public allowClick = true
 
   /** Последние аргументы для catch-up подписок (см. CATCH_UP_EVENTS) */
@@ -799,6 +802,7 @@ export class Tvist {
   /**
    * Проверить и сбросить флаг ручного изменения enabled
    * Используется в BreakpointsModule для принудительного применения брейкпоинта
+   * @internal
    */
   checkAndResetManualEnabledChange(): boolean {
     const hasChanged = this._manualEnabledChange
@@ -809,6 +813,7 @@ export class Tvist {
   /**
    * Проверить, происходит ли сейчас переключение enabled
    * Используется в BreakpointsModule для предотвращения применения брейкпоинтов
+   * @internal
    */
   get isTogglingEnabled(): boolean {
     return this._isTogglingEnabled
@@ -920,6 +925,7 @@ export class Tvist {
   /**
    * Обновить внутренний список слайдов из DOM
    * Используется LoopModule после перемещения слайдов
+   * @internal
    */
   updateSlidesList(): void {
     this._slides = getSlidesInTvistRoot(this.container, this.root)
@@ -1033,7 +1039,7 @@ export class Tvist {
     return this
   }
 
-  /** Нужны ли подписчикам промежуточные значения CSS-перехода. */
+  /** Нужны ли подписчикам промежуточные значения CSS-перехода. @internal */
   hasPositionListeners(): boolean {
     return this.events.hasPositionListeners()
   }

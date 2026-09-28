@@ -1,0 +1,40 @@
+@use 'variables' as *;
+
+// CSS-переменные с префиксом версии (--tvist-v1-*) для сосуществования нескольких версий
+:root {
+  // Отступы
+  --#{$tvist-block}-gap: 0px;
+
+  --#{$tvist-block}-arrow-size: 2em;
+  --#{$tvist-block}-arrow-icon-size: 1.2em;
+  --#{$tvist-block}-arrow-offset: 1em;
+  --#{$tvist-block}-arrow-color: #000;
+  --#{$tvist-block}-arrow-bg: #ccc;
+  --#{$tvist-block}-arrow-opacity: 0.7;
+  --#{$tvist-block}-arrow-opacity-hover: 0.9;
+  --#{$tvist-block}-arrow-disabled-opacity: 0.3;
+  --#{$tvist-block}-arrow-focus-color: #0bf;
+
+  // Пагинация
+  --#{$tvist-block}-pagination-bottom: 10px;
+  --#{$tvist-block}-pagination-gap: 8px;
+  --#{$tvist-block}-bullet-size: 8px;
+  --#{$tvist-block}-bullet-color: #ccc;
+  --#{$tvist-block}-bullet-opacity: 0.7;
+  --#{$tvist-block}-bullet-opacity-hover: 0.9;
+  --#{$tvist-block}-bullet-active-color: #fff;
+  --#{$tvist-block}-bullet-active-scale: 1.4;
+  --#{$tvist-block}-bullet-focus-color: #0bf;
+  --#{$tvist-block}-fraction-size: 14px;
+  --#{$tvist-block}-fraction-color: #000;
+  --#{$tvist-block}-progress-width: 200px;
+  --#{$tvist-block}-progress-height: 3px;
+  --#{$tvist-block}-progress-bg: rgba(0, 0, 0, 0.1);
+  --#{$tvist-block}-progress-radius: 2px;
+  --#{$tvist-block}-progress-active-color: #ccc;
+
+  // Z-indexes
+  --#{$tvist-block}-z-arrows: 1;
+  --#{$tvist-block}-z-pagination: 10;
+}
+

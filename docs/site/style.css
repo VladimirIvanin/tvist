@@ -185,6 +185,42 @@ img { max-width: 100%; display: block; }
 .table-scroll { max-width: 100%; overflow-x: auto; }
 .options-table { min-width: 750px; }
 .options-table th:first-child { white-space: nowrap; }
+
+.api-shell { grid-template-columns: 210px minmax(0, 1fr); gap: 36px; }
+.api-content { max-width: none; }
+.api-content > section, .api-module, .api-table tr[id], .api-content section[id], .api-content h4[id] { scroll-margin-top: 100px; }
+.api-sidebar { position: sticky; top: 100px; align-self: start; max-height: calc(100dvh - 120px); overflow-y: auto; padding-block: 16px; border-top: 1px solid var(--line); }
+.api-sidebar > .eyebrow { display: block; margin-bottom: 18px; }
+.api-nav { display: grid; gap: 8px; }
+.api-nav a { display: block; padding: 3px 8px; color: var(--muted); font-size: 14px; line-height: 1.4; text-decoration: none; }
+.api-nav a:hover, .api-nav a[aria-current] { color: var(--accent); background: var(--surface-alt); }
+.api-nav-label { margin: 16px 8px 4px; color: var(--ink); font-size: 12px; font-weight: 600; }
+.api-nav .api-nav-module { font-size: 13px; }
+.api-menu-toggle { display: none; }
+.api-table-scroll { margin-block: 20px; border: 1px solid var(--line); background: var(--surface); }
+.markdown-body .api-table { table-layout: fixed; min-width: 880px; font-size: 13px; line-height: 1.65; }
+.api-table th, .api-table td { padding: 14px 12px; overflow-wrap: anywhere; }
+.api-table thead th { color: var(--muted); background: var(--surface-alt); font-size: 12px; font-weight: 600; }
+.api-table th:first-child { width: 20%; }
+.api-table th:nth-child(2) { width: 24%; }
+.api-table thead:has(th:nth-child(4)) th:nth-child(3) { width: 15%; }
+.api-table thead:not(:has(th:nth-child(4))) th:first-child { width: 30%; }
+.api-table tr:target { background: var(--surface-alt); box-shadow: inset 3px 0 var(--accent); }
+.api-entry-link { display: inline; text-decoration: none; }
+.api-entry-link > span { margin-left: 7px; color: var(--muted); opacity: .55; }
+.api-type code, .api-table th code, .api-default code { padding: 0; background: transparent; font-size: 12px; white-space: normal; }
+.api-type a { text-decoration-style: dotted; }
+.api-description > :first-child { margin-top: 0; }
+.api-description > :last-child { margin-bottom: 0; }
+.api-description p { margin-block: 0 12px; }
+.api-description pre { max-width: 100%; padding: 12px; font-size: 12px; }
+.api-description pre code { white-space: pre; }
+.api-description ul { padding-left: 20px; }
+.api-description h3, .api-description h4 { margin: 12px 0; font-size: 16px; }
+.api-description table { font-size: 12px; }
+.api-readonly { display: block; margin-top: 8px; color: var(--muted); font-size: 11px; font-weight: 400; }
+.api-deprecated { color: var(--accent); font-weight: 600; }
+.api-content h4 { margin-block: 22px 10px; }
 .builder-intro { padding-top: 70px; padding-bottom: 35px; border-bottom: 1px solid var(--line); }
 .builder-intro h1 { font-size: clamp(48px, 5vw, 78px); }
 .builder-intro p { color: var(--muted); max-width: 680px; }
@@ -278,6 +314,14 @@ img { max-width: 100%; display: block; }
   .doc-shell { display: block; padding-top: 25px; }
   .doc-side { position: static; display: flex; flex-wrap: wrap; gap: 13px; margin-bottom: 30px; }
   .doc-side .eyebrow { width: 100%; margin: 0; }
+  .api-sidebar { position: static; max-height: none; overflow: visible; padding: 0; border: 0; margin-bottom: 24px; }
+  .api-sidebar > .eyebrow { display: none; }
+  .api-menu-toggle { display: flex; justify-content: space-between; width: 100%; padding: 12px 14px; border: 1px solid var(--line); color: var(--ink); background: var(--surface); }
+  .api-menu-toggle[aria-expanded="true"] span { transform: rotate(180deg); }
+  .api-nav { display: none; padding: 12px; border: 1px solid var(--line); border-top: 0; max-height: 60dvh; overflow-y: auto; background: var(--surface); }
+  .api-nav.is-open { display: grid; }
+  .api-table-scroll { margin-inline: 0; }
+  .api-content > section, .api-module, .api-table tr[id], .api-content section[id] { scroll-margin-top: 80px; }
   .examples-shell { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-top: 20px; }
   .examples-sidebar { position: static; }
   .examples-sidebar-title { display: none; }

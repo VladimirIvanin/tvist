@@ -1,6 +1,37 @@
 # Модули
 
-Tvist использует модульную архитектуру. Базовая функциональность (drag, навигация) включена по умолчанию, а дополнительные возможности подключаются через модули.
+[Настройки, методы и события встроенных модулей в едином справочнике API](/api/index#modules). Эта статья описывает подключение и создание модулей.
+
+Tvist использует модульную архитектуру. При использовании браузерной сборки core дополнительные возможности требуют подключения пакета modules. Полная сборка `tvist.min.js` с `tvist.css` уже включает все 16 модулей и их стили.
+
+## Подключение в браузере
+
+Для core нужны `tvist.core.min.js` и `tvist.core.css`. Если используются модули из пакета modules, дополнительно подключите `tvist.modules.min.js` и `tvist.modules.css` **до создания слайдера**; CSS modules подключается после CSS core. Все файлы должны иметь одну версию.
+
+| Модуль | Подключение при использовании core |
+|---|---|
+| DragModule | Входит в core |
+| BreakpointsModule | Входит в core |
+| NavigationModule | Входит в core |
+| PaginationModule | Входит в core |
+| SlideStatesModule | Входит в core |
+| AutoplayModule | Входит в core |
+| LoopModule | Входит в core |
+| VisibilityModule | Входит в core |
+| ThumbsModule | Требуется пакет modules |
+| EffectModule (Fade/Cube) | Требуется пакет modules |
+| GridModule | Требуется пакет modules |
+| ScrollControlModule | Требуется пакет modules |
+| ScrollbarModule | Требуется пакет modules |
+| MarqueeModule | Требуется пакет modules |
+| LazyLoadModule | Требуется пакет modules |
+| VideoModule | Требуется пакет modules |
+
+Все дополнительные модули загружаются одним пакетом `tvist.modules.min.js`. Опции `effect`, `grid`, `isNavigation`, `wheel`, `scrollbar`, `marquee`, `lazy` и `video` включают соответствующие возможности, но не загружают пакет автоматически. Это также относится к опциям в брейкпоинтах и вызовах `updateOptions()`.
+
+При подключении браузерных файлов регистрация модулей выполняется автоматически; вручную вызывать `registerModule()` не нужно. Примеры регистрации ниже описывают API расширения библиотеки. При npm-импорте `Tvist` из `tvist` встроенные модули уже зарегистрированы; полные стили подключаются через `tvist/dist/tvist.css`.
+
+[Примеры подключения JS и CSS](/guide/installation).
 
 ## Список модулей
 
@@ -43,6 +74,8 @@ Tvist использует модульную архитектуру. Базов
 ### Навигация и управление
 
 #### NavigationModule
+
+> **Браузерная сборка: core.** Отдельное подключение не требуется.
 
 ```javascript
 Tvist.registerModule('navigation', NavigationModule)
@@ -140,6 +173,8 @@ const slider = new Tvist('#slider-root', {
 
 #### PaginationModule
 
+> **Браузерная сборка: core.** Отдельное подключение не требуется.
+
 ```javascript
 Tvist.registerModule('pagination', PaginationModule)
 ```
@@ -181,6 +216,8 @@ const slider = new Tvist('#slider-root', {
 
 #### DragModule
 
+> **Браузерная сборка: core.** Отдельное подключение не требуется.
+
 ```javascript
 Tvist.registerModule('drag', DragModule)
 ```
@@ -204,6 +241,8 @@ const slider = new Tvist('.slider', {
 
 #### SlideStatesModule
 
+> **Браузерная сборка: core.** Отдельное подключение не требуется.
+
 ```javascript
 Tvist.registerModule('slide-states', SlideStatesModule)
 ```
@@ -221,6 +260,8 @@ Tvist.registerModule('slide-states', SlideStatesModule)
 ### Автоматизация
 
 #### AutoplayModule
+
+> **Браузерная сборка: core.** Отдельное подключение не требуется.
 
 ```javascript
 Tvist.registerModule('autoplay', AutoplayModule)
@@ -256,6 +297,8 @@ autoplay.start()
 
 #### LoopModule
 
+> **Браузерная сборка: core.** Отдельное подключение не требуется.
+
 ```javascript
 Tvist.registerModule('loop', LoopModule)
 ```
@@ -277,6 +320,8 @@ const slider = new Tvist('.slider', {
 ### Визуальные эффекты
 
 #### EffectModule
+
+> **При использовании core требуется пакет modules.** Подключите `tvist.modules.min.js` и `tvist.modules.css` дополнительно к core **до создания слайдера**. Все дополнительные модули поставляются одним пакетом. Полная сборка `tvist.min.js` с `tvist.css` уже включает эти возможности. [Схема подключения](/guide/installation).
 
 ```javascript
 Tvist.registerModule('effect', EffectModule)
@@ -321,6 +366,8 @@ const slider = new Tvist('.slider', {
 
 #### GridModule
 
+> **При использовании core требуется пакет modules.** Подключите `tvist.modules.min.js` и `tvist.modules.css` дополнительно к core **до создания слайдера**. Все дополнительные модули поставляются одним пакетом. Полная сборка `tvist.min.js` с `tvist.css` уже включает эти возможности. [Схема подключения](/guide/installation).
+
 ```javascript
 Tvist.registerModule('grid', GridModule)
 ```
@@ -359,6 +406,8 @@ const slider = new Tvist('.slider', {
 ### Адаптивность
 
 #### BreakpointsModule
+
+> **Браузерная сборка: core.** Отдельное подключение не требуется.
 
 ```javascript
 Tvist.registerModule('breakpoints', BreakpointsModule)
@@ -402,6 +451,8 @@ const slider = new Tvist('.slider', {
 
 #### ThumbsModule
 
+> **При использовании core требуется пакет modules.** Подключите `tvist.modules.min.js` и `tvist.modules.css` дополнительно к core **до создания слайдера**. Все дополнительные модули поставляются одним пакетом. Полная сборка `tvist.min.js` с `tvist.css` уже включает эти возможности. [Схема подключения](/guide/installation).
+
 ```javascript
 Tvist.registerModule('thumbs', ThumbsModule)
 ```
@@ -433,6 +484,8 @@ const main = new Tvist('.main-slider', {
 ### Производительность
 
 #### LazyLoadModule
+
+> **При использовании core требуется пакет modules.** Подключите `tvist.modules.min.js` и `tvist.modules.css` дополнительно к core **до создания слайдера**. Все дополнительные модули поставляются одним пакетом. Полная сборка `tvist.min.js` с `tvist.css` уже включает эти возможности. [Схема подключения](/guide/installation).
 
 ```javascript
 Tvist.registerModule('lazyload', LazyLoadModule)
@@ -507,7 +560,7 @@ lazyModule.loadSlide(5)
 Вы можете создать собственный модуль, расширив базовый класс `Module`:
 
 ```typescript
-import { Module } from 'tvist/modules'
+import { Module } from 'tvist'
 import type { Tvist } from 'tvist'
 import type { TvistOptions } from 'tvist'
 
@@ -665,7 +718,7 @@ if (autoplay) {
 }
 
 // С типизацией (TypeScript)
-import type { AutoplayModule } from 'tvist/modules'
+import type { AutoplayModule } from 'tvist'
 
 const autoplay = slider.getModule<AutoplayModule>('autoplay')
 if (autoplay) {
@@ -684,13 +737,13 @@ if (slider.getModule('pagination')) {
 
 ```javascript
 // ❌ Плохо: регистрировать все модули
-import * as AllModules from 'tvist/modules'
+import * as AllModules from 'tvist'
 Object.values(AllModules).forEach((Module, name) => {
   Tvist.registerModule(name, Module)
 })
 
 // ✅ Хорошо: только нужные
-import { AutoplayModule, PaginationModule } from 'tvist/modules'
+import { AutoplayModule, PaginationModule } from 'tvist'
 Tvist.registerModule('autoplay', AutoplayModule)
 Tvist.registerModule('pagination', PaginationModule)
 ```
@@ -700,7 +753,7 @@ Tvist.registerModule('pagination', PaginationModule)
 ```javascript
 // Загружать модули только когда они нужны
 async function enableAutoplay() {
-  const { AutoplayModule } = await import('tvist/modules/autoplay')
+  const { AutoplayModule } = await import('tvist')
   Tvist.registerModule('autoplay', AutoplayModule)
   
   slider.updateOptions({ autoplay: 3000 })

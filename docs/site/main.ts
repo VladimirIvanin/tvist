@@ -25,6 +25,53 @@ document.querySelector<HTMLButtonElement>('.theme-toggle')?.addEventListener('cl
 })
 setTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light')
 
+const apiNav = document.querySelector<HTMLElement>('#api-nav')
+const apiMenu = document.querySelector<HTMLButtonElement>('.api-menu-toggle')
+if (apiNav && apiMenu) {
+  const close = () => {
+    apiMenu.setAttribute('aria-expanded', 'false')
+    apiNav.classList.remove('is-open')
+  }
+  apiMenu.addEventListener('click', () => {
+    const expanded = apiMenu.getAttribute('aria-expanded') !== 'true'
+    apiMenu.setAttribute('aria-expanded', String(expanded))
+    apiNav.classList.toggle('is-open', expanded)
+  })
+  apiNav.addEventListener('click', event => {
+    const target = (event.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]')
+    if (!target) return
+    close()
+    const section = document.getElementById(target.hash.slice(1))
+    section?.setAttribute('tabindex', '-1')
+    section?.focus({ preventScroll: true })
+  })
+  apiNav.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') return
+    close()
+    apiMenu.focus()
+  })
+  const markCurrent = () => {
+    const hash = location.hash
+    apiNav.querySelectorAll<HTMLAnchorElement>('a').forEach(link => {
+      if (link.hash === hash) link.setAttribute('aria-current', 'location')
+      else link.removeAttribute('aria-current')
+    })
+  }
+  window.addEventListener('hashchange', markCurrent)
+  markCurrent()
+  // Long tables and late font metrics can leave the browser's initial fragment scroll short.
+  const revealTarget = () => {
+    let id = location.hash.slice(1)
+    try { id = decodeURIComponent(id) } catch { /* Preserve malformed fragments as literal IDs. */ }
+    const target = id ? document.getElementById(id) : null
+    if (target?.closest('.api-content')) target.scrollIntoView({ block: 'start', inline: 'nearest', behavior: 'instant' })
+  }
+  window.addEventListener('hashchange', revealTarget)
+  if (document.readyState === 'complete') revealTarget()
+  else window.addEventListener('load', revealTarget, { once: true })
+  void document.fonts.ready.then(revealTarget)
+}
+
 const menu = document.querySelector<HTMLButtonElement>('.menu-toggle')
 menu?.addEventListener('click', () => {
   const expanded = menu.getAttribute('aria-expanded') === 'true'

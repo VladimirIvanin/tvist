@@ -13,7 +13,9 @@
       "require": "./dist/tvist.cjs.js"
     },
     "./dist/tvist.css": "./dist/tvist.css",
-    "./browser-build/tvist.css": "./browser-build/tvist.css"
+    "./browser-build/tvist.css": "./browser-build/tvist.css",
+    "./browser-build/tvist.core.css": "./browser-build/tvist.core.css",
+    "./browser-build/tvist.modules.css": "./browser-build/tvist.modules.css"
   },
   "files": [
     "browser-build",

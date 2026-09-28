@@ -1,6 +1,8 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync, copyFileSync, rmSync } from 'node:fs'
 import { dirname, extname, join, relative, resolve, posix } from 'node:path'
 import MarkdownIt from 'markdown-it'
+import { generateApiMetadata } from './generate-options-meta'
+import { parseApiFragments, prepareApiReference, renderApiReference, legacyApiPages, legacyAnchorMap, renderLegacyRedirect } from './api-reference'
 
 const root = resolve('docs')
 const output = join(root, '.generated')
@@ -54,12 +56,29 @@ const inlineDemos: Record<string, string> = {
   centerRef: 'pagination-center', basicRef: 'scrollbar',
   verticalRef: 'scrollbar-vertical', hiddenRef: 'scrollbar-hidden',
 }
-const optionsMeta = JSON.parse(readFileSync(join(root, 'site/options-meta.json'), 'utf8')) as {
-  options: Array<{ name: string; type: string; default: string; description: string }>
-}
 const md = new MarkdownIt({ html: true, linkify: true, typographer: true })
 md.renderer.rules.table_open = (tokens, idx, opts, _env, self) => `<div class="table-scroll">${self.renderToken(tokens, idx, opts)}`
 md.renderer.rules.table_close = (tokens, idx, opts, _env, self) => `${self.renderToken(tokens, idx, opts)}</div>`
+md.renderer.rules.heading_open = (tokens, idx, opts, env, self) => {
+  const heading = tokens[idx]!
+  const inline = tokens[idx + 1]!
+  const explicit = inline.content.match(/\s*\{#([^}]+)\}\s*$/)
+  const state = env as { headingIds?: Set<string> }
+  const ids = state.headingIds ??= new Set<string>()
+  const text = inline.content.replace(/\s*\{#[^}]+\}\s*$/, '')
+  const original = explicit?.[1] || text.toLowerCase().replace(/[^\p{L}\p{N}\s_-]/gu, '').trim().replace(/\s+/g, '-')
+  let id = original
+  let suffix = 1
+  while (ids.has(id)) id = `${original}-${suffix++}`
+  ids.add(id)
+  heading.attrSet('id', id)
+  if (explicit) {
+    inline.content = text
+    const child = inline.children?.at(-1)
+    if (child?.type === 'text') child.content = child.content.replace(/\s*\{#[^}]+\}\s*$/, '')
+  }
+  return self.renderToken(tokens, idx, opts)
+}
 
 function escapeHtml(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -121,11 +140,6 @@ function cleanMarkdown(source: string): string {
   return result.join('\n')
 }
 
-function renderOptionsTable(): string {
-  const rows = optionsMeta.options.map((o) => `<tr><th scope="row"><code>${escapeHtml(o.name)}</code></th><td><code>${escapeHtml(o.type)}</code></td><td><code>${escapeHtml(o.default)}</code></td><td>${escapeHtml(o.description)}</td></tr>`).join('')
-  return `<div class="table-scroll"><table class="options-table"><thead><tr><th>Опция</th><th>Тип</th><th>По умолчанию</th><th>Описание</th></tr></thead><tbody>${rows}</tbody></table></div>`
-}
-
 function cleanExampleMarkdown(source: string): string {
   const withLegacyDemos = source.replace(/<([A-Z][A-Za-z0-9]*Example)\b([^>]*)\/>/g, (full, component: string, props: string) => {
     const id = component === 'ScrollControlDocExample' && props.includes('vertical') ? 'scroll-control-vertical' : componentDemos[component]
@@ -156,7 +170,7 @@ function cleanExampleMarkdown(source: string): string {
 
 function renderMarkdown(source: string, route: string, example = false): string {
   const prepared = example ? cleanExampleMarkdown(source) : cleanMarkdown(source)
-  return md.render(prepared.replaceAll('<OptionsTable />', renderOptionsTable()), { route })
+  return md.render(prepared, { route })
     .replace(/<div data-demo-slot="([a-z0-9-]+)"><\/div>/g, (_, id: string) => demoCard(id))
 }
 
@@ -169,7 +183,7 @@ const nav = [
 ]
 
 function shell(title: string, body: string, current: string, script = 'main.ts'): string {
-  const navHtml = nav.map((item) => `<a href="${base + item.link}" ${current === item.link || (item.link === 'examples-list.html' && current.startsWith('examples/')) ? 'aria-current="page"' : ''}>${item.text}</a>`).join('')
+  const navHtml = nav.map((item) => `<a href="${base + item.link}" ${current === item.link || (item.link === 'examples-list.html' && current.startsWith('examples/')) || (item.link === 'api/index.html' && current.startsWith('api/')) ? 'aria-current="page"' : ''}>${item.text}</a>`).join('')
   const depth = current.split('/').length - 1
   const src = '../'.repeat(depth + 1) + `site/${script}`
   return `<!doctype html>
@@ -259,6 +273,9 @@ function examplesLayout(current: string, content: string): string {
 }
 
 function main(): void {
+  const api = generateApiMetadata()
+  const fragments = parseApiFragments(readFileSync(join(root, 'api/reference.md'), 'utf8'))
+  prepareApiReference(api, fragments)
   // Удалённые исходные страницы не должны оставаться в следующей сборке.
   rmSync(output, { recursive: true, force: true })
   mkdirSync(output, { recursive: true })
@@ -281,19 +298,36 @@ function main(): void {
   for (const file of readdirSync(join(root, 'examples')).filter((n) => n.endsWith('.md'))) markdownFiles.push(join(root, 'examples', file))
   for (const file of markdownFiles) {
     const rel = relative(root, file).replace(/\.md$/, '.html')
+    if (rel === 'api/reference.html') continue // Fragment source is rendered in API records, never as a page.
+    const legacy = legacyApiPages[rel]
+    if (legacy) {
+      writePage(rel, shell('Справочник API', renderLegacyRedirect(`${base}api/index.html`, legacyAnchorMap(api, legacy.kind), legacy.section), rel))
+      continue
+    }
     const section = rel.split('/')[0] || ''
     const id = rel.split('/')[1]?.replace(/\.html$/, '') || ''
     const source = readFileSync(file, 'utf8')
     const isExample = section === 'examples'
     const heading = isExample ? (demoById.get(id)?.title || id) : (stripFrontmatter(source).match(/^#\s+(.+)$/m)?.[1] || id)
     const raw = renderMarkdown(source, rel, isExample)
+    if (rel === 'api/index.html') {
+      const content = renderApiReference(api, fragments, raw, text => renderMarkdown(text, rel), base)
+      const ids = [...content.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]!)
+      if (new Set(ids).size !== ids.length) throw new Error('Duplicate anchors in API page')
+      const anchors = new Set(ids)
+      for (const match of content.matchAll(/href="#([^"]+)"/g)) {
+        if (!anchors.has(match[1]!)) throw new Error(`Missing API anchor: ${match[1]}`)
+      }
+      writePage(rel, shell(heading, content, rel))
+      continue
+    }
     const hasInlineDemos = isExample && (/<Demo\s+id=/.test(source) || /<[A-Z][A-Za-z0-9]*Example\b[^>]*\/>/.test(source) || /<div\s+ref=/.test(source))
     const content = isExample
       ? examplesLayout(rel, `<article class="doc-content"><div class="doc-title"><span class="eyebrow">${escapeHtml(demoById.get(id)?.category || 'Tvist')}</span><h1>${escapeHtml(heading)}</h1></div>${hasInlineDemos ? '' : demoCard(id)}<div class="markdown-body">${raw}</div></article>`)
-      : `<div class="doc-shell page-wrap"><aside class="doc-side"><span class="eyebrow">${section === 'api' ? 'Справочник' : 'Руководство'}</span><a href="${base}guide/getting-started.html">Быстрый старт</a><a href="${base}api/options.html">Опции</a><a href="${base}api/methods.html">Методы</a><a href="${base}api/events.html">События</a></aside><article class="doc-content markdown-body">${raw}</article></div>`
+      : `<div class="doc-shell page-wrap"><aside class="doc-side"><span class="eyebrow">${section === 'api' ? 'Справочник' : 'Руководство'}</span><a href="${base}guide/getting-started.html">Быстрый старт</a><a href="${base}api/index.html">Справочник API</a><a href="${base}api/modules.html">Создание модулей</a><a href="${base}api/typescript.html">TypeScript</a><a href="${base}api/breakpoints.html">Breakpoints</a></aside><article class="doc-content markdown-body">${raw}</article></div>`
     writePage(rel, shell(heading, content, rel))
   }
-  console.log(`Generated ${markdownFiles.length + 4} pages`)
+  console.log(`Generated ${markdownFiles.length + 3} pages`)
 }
 
 main()

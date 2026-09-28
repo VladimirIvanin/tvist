@@ -475,14 +475,10 @@ describe('VisibilityModule', () => {
 
       const pagination = root.querySelector('.tvist-v1__pagination')
       
-      // Если пагинация не создалась, пропускаем тест
-      if (!pagination) {
-        console.warn('Pagination not created, skipping test')
-        return
-      }
+      expect(pagination).not.toBeNull()
 
-      const bullets = pagination.querySelectorAll('.tvist-v1__pagination-bullet')
-      expect(bullets[0].classList.contains('tvist-v1__pagination-bullet--active')).toBe(true)
+      const bullets = pagination!.querySelectorAll('.tvist-v1__bullet')
+      expect(bullets[0].classList.contains('tvist-v1__bullet--active')).toBe(true)
 
       // Скрываем слайдер
       root.style.display = 'none'
@@ -492,8 +488,8 @@ describe('VisibilityModule', () => {
       slider.scrollTo(1)
 
       // Активный буллет НЕ должен измениться
-      expect(bullets[0].classList.contains('tvist-v1__pagination-bullet--active')).toBe(true)
-      expect(bullets[1].classList.contains('tvist-v1__pagination-bullet--active')).toBe(false)
+      expect(bullets[0].classList.contains('tvist-v1__bullet--active')).toBe(true)
+      expect(bullets[1].classList.contains('tvist-v1__bullet--active')).toBe(false)
     })
 
     it('должен обновить буллеты пагинации после появления слайдера', async () => {
@@ -507,13 +503,9 @@ describe('VisibilityModule', () => {
 
       const pagination = root.querySelector('.tvist-v1__pagination')
       
-      // Если пагинация не создалась, пропускаем тест
-      if (!pagination) {
-        console.warn('Pagination not created, skipping test')
-        return
-      }
+      expect(pagination).not.toBeNull()
 
-      const bullets = pagination.querySelectorAll('.tvist-v1__pagination-bullet')
+      const bullets = pagination!.querySelectorAll('.tvist-v1__bullet')
 
       // Скрываем слайдер
       root.style.display = 'none'
@@ -521,7 +513,7 @@ describe('VisibilityModule', () => {
 
       // Пытаемся переключить слайд (не должно сработать)
       slider.scrollTo(1)
-      expect(bullets[0].classList.contains('tvist-v1__pagination-bullet--active')).toBe(true)
+      expect(bullets[0].classList.contains('tvist-v1__bullet--active')).toBe(true)
 
       // Показываем слайдер
       root.style.display = 'block'
@@ -531,8 +523,8 @@ describe('VisibilityModule', () => {
       slider.scrollTo(1)
 
       // Буллеты должны обновиться
-      expect(bullets[0].classList.contains('tvist-v1__pagination-bullet--active')).toBe(false)
-      expect(bullets[1].classList.contains('tvist-v1__pagination-bullet--active')).toBe(true)
+      expect(bullets[0].classList.contains('tvist-v1__bullet--active')).toBe(false)
+      expect(bullets[1].classList.contains('tvist-v1__bullet--active')).toBe(true)
     })
 
     it('не должен переключать слайды при клике на буллет пагинации когда слайдер скрыт', async () => {
@@ -546,13 +538,9 @@ describe('VisibilityModule', () => {
 
       const pagination = root.querySelector('.tvist-v1__pagination')
       
-      // Если пагинация не создалась, пропускаем тест
-      if (!pagination) {
-        console.warn('Pagination not created, skipping test')
-        return
-      }
+      expect(pagination).not.toBeNull()
 
-      const bullets = pagination.querySelectorAll('.tvist-v1__pagination-bullet') as NodeListOf<HTMLElement>
+      const bullets = pagination!.querySelectorAll('.tvist-v1__bullet') as NodeListOf<HTMLElement>
 
       expect(slider.activeIndex).toBe(0)
 

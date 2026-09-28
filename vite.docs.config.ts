@@ -37,9 +37,10 @@ export default defineConfig({
         response.setHeader('Content-Type', pathname.endsWith('.css') ? 'text/css' : 'application/javascript')
         response.end(transformed.code)
       })
-      server.watcher.add([resolve('docs/guide'), resolve('docs/api'), resolve('docs/examples'), resolve('docs/site/demos.json'), resolve('docs/site/variants.json')])
+      const apiSources = [resolve('scripts/build-docs.ts'), resolve('scripts/generate-options-meta.ts'), resolve('scripts/api-reference.ts'), resolve('src/core/types.ts'), resolve('src/core/Tvist.ts')]
+      server.watcher.add([resolve('docs/guide'), resolve('docs/api'), resolve('docs/examples'), resolve('docs/site/demos.json'), resolve('docs/site/variants.json'), ...apiSources])
       const refresh = (file: string) => {
-        if (!file.endsWith('.md') && !/(?:demos|variants)\.json$/.test(file)) return
+        if (!file.endsWith('.md') && !/(?:demos|variants)\.json$/.test(file) && !apiSources.includes(file)) return
         const result = spawnSync('npm', ['run', 'docs:generate'], { stdio: 'inherit' })
         if (result.status === 0) server.ws.send({ type: 'full-reload' })
       }

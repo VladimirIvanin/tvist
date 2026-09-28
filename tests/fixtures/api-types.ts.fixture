@@ -1,0 +1,27 @@
+interface Config {
+  /** Description containing { braces }, to catch line-based parsing errors. @default true */
+  enabled?: boolean
+  /** Delay in milliseconds.
+   * @default 1200
+   */
+  delay?: number
+  nested?: { value?: string; callback?: (index: number, options: { active: boolean }) => string }
+}
+type Alias = Config | false
+export interface TvistOptions {
+  /** Two object branches.
+   * @example
+   * const options = { peek: { left: 10 } }
+   */
+  peek?: number | string | { left?: number; right?: string } | { top?: number; bottom?: string }
+  /** Named union. */
+  autoplay?: boolean | Alias
+  /** Recursive mapped options. */
+  breakpoints?: Record<number, Partial<TvistOptions> & { enabled?: boolean }>
+  /** Intentionally no default. See {@link Tvist.destroy}. */
+  unset?: string
+  /** Hidden. @internal */
+  hidden?: boolean
+  /** No JSDoc on the following nested field is required. */
+  grid?: { dimensions?: [number, number][] }
+}

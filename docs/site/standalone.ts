@@ -8,18 +8,42 @@ export function standalonePage(code: Code): string {
   const latest = 'https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build'
   return `<!doctype html>
 <html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="stylesheet" href="${tagged}/tvist.css" onerror="this.onerror=null;this.href='${latest}/tvist.css'">
-<style>body { font-family: system-ui; padding: 24px; }\n${code.css}\n</style></head>
-<body>\n${code.html}\n<script src="${tagged}/tvist.min.js"></script>
+<style id="tvist-example-style">body { font-family: system-ui; padding: 24px; }\n${code.css}\n</style></head>
+<body>\n${code.html}
 <script>
 function startTvistExample() {\n${code.js}\n}
-if (window.TvistV1) {
-  startTvistExample();
-} else {
-  const fallback = document.createElement('script');
-  fallback.src = '${latest}/tvist.min.js';
-  fallback.onload = startTvistExample;
-  document.head.append(fallback);
+async function loadTvistAssets(base) {
+  const resources = [];
+  function load(file) {
+    return new Promise((resolve, reject) => {
+      const isStyle = file.endsWith('.css');
+      const element = document.createElement(isStyle ? 'link' : 'script');
+      if (isStyle) {
+        element.rel = 'stylesheet';
+        element.href = base + '/' + file;
+      } else {
+        element.src = base + '/' + file;
+      }
+      element.onload = resolve;
+      element.onerror = () => reject(new Error('Failed to load ' + file));
+      resources.push(element);
+      document.head.insertBefore(element, document.getElementById('tvist-example-style'));
+    });
+  }
+  try {
+    await Promise.all([load('tvist.core.css'), load('tvist.modules.css')]);
+    await load('tvist.core.min.js');
+    await load('tvist.modules.min.js');
+  } catch (error) {
+    resources.forEach(element => element.remove());
+    delete window.TvistV1;
+    delete window.__tvistV1Queue;
+    throw error;
+  }
 }
+loadTvistAssets('${tagged}')
+  .catch(() => loadTvistAssets('${latest}'))
+  .then(startTvistExample)
+  .catch(error => console.error(error));
 </script></body></html>`
 }

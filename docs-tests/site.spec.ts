@@ -33,7 +33,10 @@ test('каталог фильтруется, пример показывает �
   await page.locator('[data-copy-code]').first().click()
   expect(await page.evaluate(() => navigator.clipboard.readText())).toContain('new TvistV1')
   await page.locator('[data-demo-copy-all]').first().click()
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toContain('browser-build/tvist.min.js')
+  const copied = await page.evaluate(() => navigator.clipboard.readText())
+  for (const file of ['tvist.core.min.js', 'tvist.modules.min.js', 'tvist.core.css', 'tvist.modules.css']) {
+    expect(copied).toContain(file)
+  }
 })
 
 test('варианты на страницах сохраняют отдельные живые демонстрации', async ({ page }) => {
@@ -136,7 +139,9 @@ test('конструктор выдаёт код пресета и полную 
   await expect(page.locator('#builder-code-output')).toContainText('slider.sync(thumbs)')
   await page.locator('[data-builder-copy-all]').click()
   const copied = await page.evaluate(() => navigator.clipboard.readText())
-  expect(copied).toContain('browser-build/tvist.min.js')
+  for (const file of ['tvist.core.min.js', 'tvist.modules.min.js', 'tvist.core.css', 'tvist.modules.css']) {
+    expect(copied).toContain(file)
+  }
   expect(copied).toContain('slider.sync(thumbs)')
   expect(copied).toContain('class="tvist-v1 main-slider"')
 })

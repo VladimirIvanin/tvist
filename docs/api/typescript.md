@@ -106,7 +106,7 @@ slider.updateOptions({
 ### Module и ModuleConstructor
 
 ```typescript
-import type { Module, ModuleConstructor } from 'tvist/modules'
+import type { Module, ModuleConstructor } from 'tvist'
 
 // Тип модуля
 const module: Module = slider.getModule('autoplay')!
@@ -147,7 +147,7 @@ slider.on('breakpoint', (breakpoint: number | null) => {
 ### Получение модуля с типом
 
 ```typescript
-import type { AutoplayModule } from 'tvist/modules'
+import type { AutoplayModule } from 'tvist'
 
 // Generic типизация
 const autoplay = slider.getModule<AutoplayModule>('autoplay')
@@ -162,7 +162,7 @@ if (autoplay) {
 ### Создание типизированного модуля
 
 ```typescript
-import { Module } from 'tvist/modules'
+import { Module } from 'tvist'
 import type { Tvist, TvistOptions } from 'tvist'
 
 export class MyModule extends Module {
@@ -463,7 +463,7 @@ const slider = new SliderBuilder()
 ### Type guards для модулей
 
 ```typescript
-import type { AutoplayModule, PaginationModule } from 'tvist/modules'
+import type { AutoplayModule, PaginationModule } from 'tvist'
 
 function isAutoplayModule(module: Module): module is AutoplayModule {
   return module.name === 'autoplay'

@@ -2,20 +2,6 @@
  * Tvist - главный файл стилей
  */
 
-// Core (используем @use вместо устаревшего @import)
-@use 'core/variables';
-@use 'core/base';
-
-// Modules
-@use 'modules/navigation';
-@use 'modules/pagination';
-@use 'modules/cube';
-@use 'modules/thumbs';
-@use 'modules/grid';
-@use 'modules/scrollbar';
-@use 'modules/lazyload';
-
-// Сброс box-sizing для корректных расчётов
-* {
-  box-sizing: border-box;
-}
+// Полные стили для npm, sandbox и внутренних примеров.
+@use 'tvist.core' as core;
+@use 'tvist.modules' as modules;

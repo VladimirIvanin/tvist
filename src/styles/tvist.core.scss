@@ -1,0 +1,9 @@
+/** Базовые стили браузерной сборки core. */
+@use 'core/defaults';
+@use 'core/base';
+@use 'modules/navigation';
+@use 'modules/pagination';
+
+* {
+  box-sizing: border-box;
+}

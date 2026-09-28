@@ -20,40 +20,41 @@ CDN (файлы из `browser-build/`): **`@latest`** в jsDelivr указыва
 
 Для production закрепите тег релиза или разместите файлы на своём домене с долгим кешированием.
 
-- **CSS:** [jsDelivr](https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css) · [raw (main)](https://raw.githubusercontent.com/VladimirIvanin/tvist/main/browser-build/tvist.css)
-- **JS:** [jsDelivr](https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js) · [raw (main)](https://raw.githubusercontent.com/VladimirIvanin/tvist/main/browser-build/tvist.min.js)
+`npm run build:browser` (или `npm run build:browser:split`) выпускает три пары JS/CSS: core, modules и полную сборку. Выберите полную пару либо core с нужными дополнениями.
+
+Для обычной карусели подключите core: он включает свайпы, брейкпоинты, стрелки, пагинацию, классы состояний, autoplay, loop и visibility.
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.core.css">
+<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.core.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    new TvistV1('#slider', { arrows: true, pagination: true, loop: true });
+  });
+</script>
+```
+
+Для миниатюр, эффектов Fade/Cube, Grid, ScrollControl, Scrollbar, Marquee, LazyLoad или Video добавьте пару modules:
+
+```html
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.core.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.modules.css">
+<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.core.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.modules.min.js"></script>
+```
+
+Используйте одну версию всех файлов. CSS modules подключайте после CSS core. Создавайте слайдер после загрузки нужных JS; с `defer` — в `DOMContentLoaded`. Modules также может загрузиться до core благодаря очереди регистрации.
+
+Для всех возможностей в одном JS и одном CSS подключите полную сборку:
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css">
 <script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    new TvistV1('#slider', { perPage: 1, drag: true });
-  });
-</script>
 ```
 
-Если на странице нужны все модули, используйте полный `tvist.min.js` из примера выше. Сочетание `core` и пакета модулей передаёт больше JS.
+Полная сборка включает все 16 модулей и использует тот же конструктор `TvistV1`. Подключайте её вместо пар core и modules; инициализируйте слайдер после загрузки JS.
 
-Для обычной карусели со стрелками и пагинацией используйте один `tvist.standard.min.js` (около 21 КБ gzip):
-
-```html
-<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.standard.min.js"></script>
-```
-
-Если нужны только свайпы, хватит `tvist.core.min.js` (около 16 КБ gzip). Для выборочной функции подключите `core` и нужный модуль до создания слайдера:
-
-```html
-<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.core.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/modules/pagination.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    new TvistV1('#slider', { pagination: true });
-  });
-</script>
-```
-
-Общий `tvist.css` нужен для обоих вариантов. [Список модулей и способы подключения](docs/guide/installation.md#лёгкая-сборка-и-отдельные-модули).
+[Состав сборок и способы подключения](docs/guide/installation.md#cdn).
 
 ## ✨ Возможности
 
@@ -92,7 +93,7 @@ CDN (файлы из `browser-build/`): **`@latest`** в jsDelivr указыва
 
 ```typescript
 import Tvist from 'tvist';
-import 'tvist/browser-build/tvist.css';
+import 'tvist/dist/tvist.css';
 
 const slider = new Tvist('#slider', {
   perPage: 3,

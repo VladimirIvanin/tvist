@@ -1,0 +1,6 @@
+/** Дополнительные стили; подключаются после tvist.core.css. */
+@use 'modules/cube';
+@use 'modules/thumbs';
+@use 'modules/grid';
+@use 'modules/scrollbar';
+@use 'modules/lazyload';

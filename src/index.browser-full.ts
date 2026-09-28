@@ -1,21 +1,23 @@
-/** Полная сборка для обычного браузерного <script>. */
-import './styles/tvist.scss'
+/** Полная браузерная сборка: core и все дополнительные модули. */
+import Tvist from './index.browser-core'
+import './styles/tvist.modules.scss'
 
-import './modules/drag'
-import './modules/navigation'
-import './modules/pagination'
-import './modules/autoplay'
-import './modules/breakpoints'
-import './modules/loop'
-import './modules/slide-states'
-import './modules/thumbs'
-import './modules/effects'
-import './modules/grid'
-import './modules/scroll-control'
-import './modules/scrollbar'
-import './modules/marquee'
-import './modules/lazyload'
-import './modules/video'
-import './modules/visibility'
+import { ThumbsModule } from './modules/thumbs/ThumbsModule'
+import { EffectModule } from './modules/effects/EffectModule'
+import { GridModule } from './modules/grid/GridModule'
+import { ScrollControlModule } from './modules/scroll-control/ScrollControlModule'
+import { ScrollbarModule } from './modules/scrollbar/ScrollbarModule'
+import { MarqueeModule } from './modules/marquee/MarqueeModule'
+import { LazyLoadModule } from './modules/lazyload/LazyLoadModule'
+import { VideoModule } from './modules/video/VideoModule'
 
-export { Tvist as default } from './core/Tvist'
+Tvist.registerModule('thumbs', ThumbsModule)
+Tvist.registerModule('effect', EffectModule)
+Tvist.registerModule('grid', GridModule)
+Tvist.registerModule('scroll-control', ScrollControlModule)
+Tvist.registerModule('scrollbar', ScrollbarModule)
+Tvist.registerModule('marquee', MarqueeModule)
+Tvist.registerModule('lazyload', LazyLoadModule)
+Tvist.registerModule('video', VideoModule)
+
+export { Tvist as default }
