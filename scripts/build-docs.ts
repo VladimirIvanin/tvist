@@ -195,8 +195,8 @@ function demoCard(id: string): string {
   const demo = demoById.get(id)
   if (!demo) return ''
   return `<section class="demo-card" data-demo="${id}">
-  <div class="demo-heading"><div><span class="eyebrow">Живой пример</span><h2>${escapeHtml(demo.title)}</h2></div><span class="demo-count">6 слайдов</span></div>
-  <iframe class="demo-frame" src="${base}preview.html?id=${id}" title="${escapeHtml(demo.title)}" loading="lazy"></iframe>
+  <div class="demo-heading"><div><span class="eyebrow">Живой пример</span><h2>${escapeHtml(demo.title)}</h2></div><div class="demo-heading-actions"><button class="demo-view-toggle" type="button" data-demo-mobile aria-pressed="false" aria-controls="demo-frame-${id}">Мобильный вид · 375 px</button><span class="demo-count">6 слайдов</span></div></div>
+  <div class="demo-preview"><iframe class="demo-frame" id="demo-frame-${id}" src="${base}preview.html?id=${id}" title="${escapeHtml(demo.title)}" loading="lazy"></iframe></div>
   <div class="demo-toolbar"><div class="code-tabs" role="group" aria-label="Код примера">
   <button type="button" class="is-active" data-code-tab="html">HTML</button>
   <button type="button" data-code-tab="css">CSS</button>

@@ -2,6 +2,7 @@ import { Tvist } from '../../src/index'
 import type { TvistOptions } from '../../src/core/types'
 import optionsMeta from './options-meta.json'
 import { standalonePage } from './standalone'
+import { mountNumberControls, numberControl } from './number-control'
 
 type Config = Record<string, unknown>
 type MetaOption = { name: string; type: string; default: string; description: string; nested?: Array<{ name: string; type: string; description: string }> }
@@ -54,6 +55,16 @@ const labels: Record<string, string> = {
   peek: 'Видимые края соседних', speed: 'Скорость, мс', loop: 'Бесконечный цикл',
   arrows: 'Стрелки', pagination: 'Пагинация', autoplay: 'Автопрокрутка', direction: 'Направление',
   effect: 'Эффект', breakpoints: 'Брейкпоинты', drag: 'Перетаскивание',
+}
+
+const numberSettings: Record<string, { min?: number; max?: number; step?: number }> = {
+  perPage: { min: 1 }, slidesPerGroup: { min: 1 }, start: { min: 0 },
+  slideMinSize: { min: 1 }, speed: { min: 0, step: 50 }, navThrottleMs: { min: 0, step: 50 },
+  dragSpeed: { step: 0.1 }, flickPower: { min: 0, step: 50 }, flickMaxPages: { min: 1 },
+  'autoplay.delay': { min: 0, step: 100 }, 'holdToPause.threshold': { min: 0, step: 50 },
+  'visibility.threshold': { min: 0, max: 1, step: 0.1 },
+  'grid.rows': { min: 1 }, 'grid.cols': { min: 1 }, 'pagination.limit': { min: 1 },
+  'cubeEffect.shadowScale': { step: 0.1 },
 }
 
 const slideLabels = ['01', '02', '03', '04', '05', '06']
@@ -189,7 +200,13 @@ function field(path: string, type: string, description: string, value: unknown, 
   if (type === 'boolean') {
     return `<div class="builder-control"><label for="field-${key}">${escapeHtml(label)}</label><select id="field-${key}" name="${key}" data-path="${key}" data-type="boolean"><option value="">По умолчанию</option><option value="true" ${value === true ? 'selected' : ''}>Да</option><option value="false" ${value === false ? 'selected' : ''}>Нет</option></select>${help}</div>`
   }
-  return `<div class="builder-control"><label for="field-${key}">${escapeHtml(label)}</label><input id="field-${key}" name="${key}" autocomplete="off" data-path="${key}" data-type="${escapeHtml(type)}" type="${type === 'number' ? 'number' : 'text'}" value="${value === undefined ? '' : typeof value === 'object' ? escapeHtml(JSON.stringify(value)) : escapeHtml(String(value))}" placeholder="По умолчанию">${help}</div>`
+  if (type === 'number') {
+    const meta = (optionsMeta.options as MetaOption[]).find((option) => option.name === path)
+    const defaultValue = meta && Number.isFinite(Number(meta.default)) ? Number(meta.default) : undefined
+    const control = numberControl({ id: `field-${path}`, label, value, defaultValue, ...numberSettings[path], attributes: { name: path, 'data-path': path, 'data-type': type } })
+    return `<div class="builder-control"><label for="field-${key}">${escapeHtml(label)}</label>${control}${help}</div>`
+  }
+  return `<div class="builder-control"><label for="field-${key}">${escapeHtml(label)}</label><input id="field-${key}" name="${key}" autocomplete="off" data-path="${key}" data-type="${escapeHtml(type)}" type="text" value="${value === undefined ? '' : typeof value === 'object' ? escapeHtml(JSON.stringify(value)) : escapeHtml(String(value))}" placeholder="По умолчанию">${help}</div>`
 }
 
 function nestedFields(option: MetaOption, config: Config): string {
@@ -202,9 +219,13 @@ function nestedFields(option: MetaOption, config: Config): string {
 
 function breakpointRows(config: Config): string {
   const current = (config.breakpoints || {}) as Record<string, Config>
-  const rows = Object.entries(current).sort((a,b) => Number(b[0]) - Number(a[0])).map(([width, options]) => {
+  const rows = Object.entries(current).sort((a,b) => Number(b[0]) - Number(a[0])).map(([width, options], index) => {
     const extra = Object.fromEntries(Object.entries(options).filter(([name]) => !['perPage', 'gap', 'enabled'].includes(name)))
-    return `<div class="breakpoint-row" data-breakpoint-row><label>До <input type="number" min="1" data-breakpoint-width value="${escapeHtml(width)}"> px</label><label>perPage <input type="number" min="1" data-breakpoint-perpage value="${escapeHtml(String(options.perPage ?? ''))}"></label><label>gap <input type="text" data-breakpoint-gap value="${escapeHtml(String(options.gap ?? ''))}"></label><label>Включить слайдер<select data-breakpoint-enabled><option value="" ${options.enabled === undefined ? 'selected' : ''}>По умолчанию</option><option value="true" ${options.enabled === true ? 'selected' : ''}>Да</option><option value="false" ${options.enabled === false ? 'selected' : ''}>Нет</option></select></label><label class="breakpoint-extra">Другие опции (JSON)<textarea data-breakpoint-extra rows="2" placeholder="{ }">${escapeHtml(Object.keys(extra).length ? JSON.stringify(extra, null, 2) : '')}</textarea></label><button type="button" data-remove-breakpoint aria-label="Удалить брейкпоинт">Удалить ×</button></div>`
+    const widthId = `field-breakpoint-${index}-width`
+    const perPageId = `field-breakpoint-${index}-perpage`
+    const widthControl = numberControl({ id: widthId, label: 'Ширина брейкпоинта, px', value: width, min: 1, attributes: { 'data-breakpoint-width': '' } })
+    const perPageControl = numberControl({ id: perPageId, label: 'Видимых слайдов в брейкпоинте', value: options.perPage, min: 1, defaultValue: Number(config.perPage ?? 1), attributes: { 'data-breakpoint-perpage': '' } })
+    return `<div class="breakpoint-row" data-breakpoint-row><div class="breakpoint-number"><label for="${widthId}">До, px</label>${widthControl}</div><div class="breakpoint-number"><label for="${perPageId}">perPage</label>${perPageControl}</div><label>gap <input type="text" data-breakpoint-gap value="${escapeHtml(String(options.gap ?? ''))}"></label><label>Включить слайдер<select data-breakpoint-enabled><option value="" ${options.enabled === undefined ? 'selected' : ''}>По умолчанию</option><option value="true" ${options.enabled === true ? 'selected' : ''}>Да</option><option value="false" ${options.enabled === false ? 'selected' : ''}>Нет</option></select></label><label class="breakpoint-extra">Другие опции (JSON)<textarea data-breakpoint-extra rows="2" placeholder="{ }">${escapeHtml(Object.keys(extra).length ? JSON.stringify(extra, null, 2) : '')}</textarea></label><button type="button" data-remove-breakpoint aria-label="Удалить брейкпоинт">Удалить ×</button></div>`
   }).join('')
   return `<div class="builder-control"><label>Брейкпоинты</label><div class="breakpoint-rows">${rows}</div><button type="button" class="small-action" data-add-breakpoint>+ Добавить ширину</button><small>Ширина задаётся в пикселях. Для остальных настроек брейкпоинта используйте JSON.</small></div>`
 }
@@ -267,6 +288,7 @@ export function mountBuilder(root: HTMLElement, _base: string): void {
   <button type="button" class="copy-code" data-builder-copy>Копировать</button></div><pre class="demo-code"><code id="builder-code-output"></code></pre>
   <div class="demo-foot"><span>Код подключается через CDN с текущей версией Tvist.</span><button type="button" class="copy-code" data-builder-copy-all>Скопировать всю страницу</button></div></div></section></div>`
   const controls = root.querySelector<HTMLElement>('#builder-controls')!
+  mountNumberControls(controls)
   const stage = root.querySelector<HTMLElement>('#builder-stage')!
   const codeOutput = root.querySelector<HTMLElement>('#builder-code-output')!
   const warning = root.querySelector<HTMLElement>('#builder-warning')!

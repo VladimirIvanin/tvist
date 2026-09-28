@@ -143,10 +143,17 @@ img { max-width: 100%; display: block; }
 .doc-title { padding-bottom: 25px; border-bottom: 1px solid var(--line); }
 .doc-title h1 { font-size: clamp(45px, 5vw, 75px); line-height: 1.12; letter-spacing: -.06em; margin: 15px 0 0; }
 .demo-card { margin-top: 40px; border: 1px solid var(--line); background: var(--surface); }
-.demo-heading { display: flex; justify-content: space-between; align-items: start; padding: 22px 24px 18px; }
+.demo-heading { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: start; padding: 22px 24px 18px; }
+.demo-heading > div:first-child { flex: 1 1 260px; min-width: 0; }
+.demo-heading-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.demo-view-toggle { padding: 7px 10px; border: 1px solid var(--line); background: transparent; color: var(--ink); font-size: 13px; line-height: 1.5; }
+.demo-view-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.demo-view-toggle[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .demo-card .demo-heading h2 { font-size: 24px; line-height: 1.25; margin: 3px 0 0; padding: 0; border: 0; letter-spacing: -.04em; }
-.demo-count { color: var(--muted); font: 500 11px 'IBM Plex Mono', monospace; }
+.demo-count { color: var(--muted); font: 500 11px 'IBM Plex Mono', monospace; white-space: nowrap; }
+.demo-preview { background: var(--surface-alt); }
 .demo-frame { display: block; width: 100%; height: 390px; border: 0; background: #eae7df; }
+.demo-card.is-mobile-preview .demo-frame { width: 375px; max-width: 100%; margin-inline: auto; }
 .demo-card[data-demo*="vertical"] .demo-frame, .demo-card[data-demo="auto-height"] .demo-frame { height: 450px; }
 .demo-toolbar { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .code-tabs { display: flex; overflow-x: auto; }
@@ -203,6 +210,21 @@ img { max-width: 100%; display: block; }
 .builder-control input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--accent); }
 .builder-control:has(input[type="checkbox"]) { display: flex; align-items: center; justify-content: space-between; }
 .builder-control small { color: var(--muted); font-size: 13px; }
+.builder-number { display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px; min-width: 0; border: 1px solid var(--line); background: var(--paper); transition: border-color .15s, box-shadow .15s; }
+.builder-number:focus-within { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 16%, transparent); }
+.builder-number > input { width: 100%; min-width: 0; border: 0; background: transparent; padding: 9px 4px; text-align: center; font: 500 14px/24px 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+.builder-number > input:focus-visible { outline: none; }
+.builder-number > input::placeholder { color: var(--muted); font: 400 13px/24px 'IBM Plex Sans', sans-serif; }
+.builder-number > button { display: grid; place-items: center; min-width: 0; border: 0; background: transparent; color: var(--muted); padding: 0; font: 400 22px/1 'IBM Plex Sans', sans-serif; transition: color .15s, background .15s; }
+.builder-number > button:first-child { border-right: 1px solid var(--line); }
+.builder-number > button:last-child { border-left: 1px solid var(--line); }
+.builder-number > button:hover:not(:disabled) { background: var(--surface-alt); color: var(--accent); }
+.builder-number > button:active:not(:disabled) { background: var(--line); }
+.builder-number > button:disabled { opacity: .3; cursor: default; }
+.builder-number > button:focus-visible { outline-offset: -4px; }
+.breakpoint-number { display: grid; gap: 4px; min-width: 0; }
+.breakpoint-number .builder-number { grid-template-columns: 30px minmax(0, 1fr) 30px; }
+.breakpoint-number .builder-number > input { padding-block: 5px; }
 .builder-preview { min-width: 0; }
 .builder-preview-top { display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; }
 .builder-preview-stage { min-height: 350px; display: grid; align-items: center; padding: 22px; border: 1px solid var(--line); background: var(--surface-alt); overflow: hidden; }

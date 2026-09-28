@@ -100,6 +100,12 @@ if (search) {
 for (const card of document.querySelectorAll<HTMLElement>('[data-demo]')) {
   const id = card.dataset.demo
   if (!id) continue
+  card.querySelector<HTMLButtonElement>('[data-demo-mobile]')?.addEventListener('click', (event) => {
+    const button = event.currentTarget as HTMLButtonElement
+    const mobile = card.classList.toggle('is-mobile-preview')
+    button.setAttribute('aria-pressed', String(mobile))
+    button.textContent = mobile ? 'Полная ширина' : 'Мобильный вид · 375 px'
+  })
   const code = {
     html: sources.html[`./demos/${id}/markup.html`] || '',
     css: sources.css[`./demos/${id}/style.css`] || '',
