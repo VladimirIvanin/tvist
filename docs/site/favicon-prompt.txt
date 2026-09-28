@@ -1,0 +1,8 @@
+Tool: built-in image_gen.
+Final prompt (edit of the initial generated t. monogram):
+
+Use case: precise-object-edit
+Asset type: Tvist website favicon.
+Edit target: the attached favicon.
+Primary request: Keep the existing lowercase "t." monogram shape, positions and proportions. Change only the background and surface finish to make a perfectly flat, fully opaque favicon.
+Remove ALL glow, gradients, texture, shadows, translucency and transparency. Replace the entire background edge to edge with one SOLID flat forest green #225d53. No outline, no rounded-square border, no outer margin. The background must completely fill the square canvas and remain uniformly colored everywhere outside the glyphs. The t is a solid off-white #f7fcf9 and the dot is a solid mint #8ecfba. Preserve the glyphs' crisp edges. Only three flat colors with antialiasing at glyph edges. No transparent pixels anywhere. Single square image. Exact text: "t."

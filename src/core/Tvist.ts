@@ -488,6 +488,16 @@ export class Tvist {
   private navByStep(sign: 1 | -1): this {
     if (!this._isEnabled || !this._isVisible) return this
 
+    const loop = this.options.loop
+    const isLoop = loop === true || (typeof loop === 'object' && loop.enabled !== false)
+    if (isLoop && this.engine.animator.isAnimating()) {
+      // Повторный шаг в том же направлении переставляет слайды раньше,
+      // чем видимая позиция достигнет цели, и может увести трек за viewport.
+      // Даём переходу завершиться; смена направления по-прежнему доступна.
+      const movement = this.engine.target.get() - this.engine.location.get()
+      if (movement * sign < 0) return this
+    }
+
     const throttleMs = this.options.navThrottleMs ?? 0
     if (throttleMs > 0) {
       const now = this.monotonicNow()

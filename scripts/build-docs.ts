@@ -5,6 +5,10 @@ import MarkdownIt from 'markdown-it'
 const root = resolve('docs')
 const output = join(root, '.generated')
 const base = '/tvist/'
+const faviconLinks = `<link rel="icon" href="${base}assets/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="${base}assets/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="${base}assets/favicon-16x16.png" sizes="16x16">
+<link rel="apple-touch-icon" href="${base}assets/apple-touch-icon.png" sizes="180x180">`
 const version = (JSON.parse(readFileSync(resolve('package.json'), 'utf8')) as { version: string }).version
 const demos = JSON.parse(readFileSync(join(root, 'site/demos.json'), 'utf8')) as Array<{
   id: string
@@ -170,6 +174,7 @@ function shell(title: string, body: string, current: string, script = 'main.ts')
   return `<!doctype html>
 <html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f2f5f2"><title>${escapeHtml(title)} · Tvist</title>
+${faviconLinks}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <meta name="description" content="Tvist — слайдер с широким API. Живые примеры, документация и конструктор.">
 <script>document.documentElement.dataset.theme=localStorage.getItem('tvist-theme')||'light'</script>
@@ -259,7 +264,7 @@ function main(): void {
   writePage('index.html', shell('Главная', home(), 'index.html'))
   writePage('examples-list.html', shell('Примеры', catalog(), 'examples-list.html'))
   writePage('builder.html', shell('Конструктор', '<div id="builder"></div>', 'builder.html'))
-  writePage('preview.html', '<!doctype html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><script type="module" src="../site/preview.ts"></script></head><body><main id="preview"></main></body></html>')
+  writePage('preview.html', `<!doctype html><html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">${faviconLinks}<script type="module" src="../site/preview.ts"></script></head><body><main id="preview"></main></body></html>`)
   const markdownFiles: string[] = []
   function collect(dir: string): void {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {

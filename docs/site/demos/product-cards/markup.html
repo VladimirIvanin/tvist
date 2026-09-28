@@ -1,12 +1,108 @@
-<div class="tvist-v1 " aria-label="Демонстрационный слайдер">
-  <div class="tvist-v1__track">
-    <div class="tvist-v1__container">
-      <div class="tvist-v1__slide"><span>Кресло 01<br><small>12 900 ₽</small></span></div>
-      <div class="tvist-v1__slide"><span>Лампа 02<br><small>7 400 ₽</small></span></div>
-      <div class="tvist-v1__slide">03</div>
-      <div class="tvist-v1__slide">04</div>
-      <div class="tvist-v1__slide">05</div>
-      <div class="tvist-v1__slide">06</div>
+<section class="product-demo" aria-label="Товарная подборка">
+  <header class="product-demo__header">
+    <div><h2>Новинки сезона</h2><p>Коллекция на каждый день</p></div>
+    <span class="product-demo__cart">В корзине: <strong data-cart-count>0</strong></span>
+  </header>
+  <div class="tvist-v1 product-slider" aria-label="Карточки товаров">
+    <div class="tvist-v1__track">
+      <div class="tvist-v1__container">
+      <article class="tvist-v1__slide product-card" data-product="tee">
+        <div class="product-card__media">
+          <a href="https://newtone-demo.myinsales.ru/product/povsednevnaya-hlopkovaya-futbolka" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+            <img src="https://cdn.insales-shop.ru/r/Sszh6yMwYsE/rs:fit:440:0:1/q:100/plain/images/products/1/3360/465005856/17050100_10_1.jpg@webp" alt="Хлопковая футболка" width="440" height="550" loading="eager" draggable="false">
+          </a>
+          <span class="product-card__badge">Новинка</span>
+          <button class="product-card__favorite" type="button" data-product-favorite aria-pressed="false" aria-label="Избранное: Хлопковая футболка"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>
+        </div>
+        <div class="product-card__info">
+          <h3 class="product-card__title"><a href="https://newtone-demo.myinsales.ru/product/povsednevnaya-hlopkovaya-futbolka" target="_blank" rel="noopener noreferrer">Хлопковая футболка</a></h3>
+          <div class="product-card__price"><strong>990 ₽</strong></div>
+          <label class="product-card__size">Размер <select aria-label="Размер: Хлопковая футболка"><option>S</option><option selected>M</option><option>L</option><option>XL</option></select></label>
+          <button class="product-card__buy" type="button" data-add-to-cart>В корзину</button>
+        </div>
+      </article>
+      <article class="tvist-v1__slide product-card" data-product="cardigan">
+        <div class="product-card__media">
+          <a href="https://newtone-demo.myinsales.ru/product/tvidovyy-kardigan-iz-hlopka" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+            <img src="https://cdn.insales-shop.ru/r/4cPJgEcI7AM/rs:fit:440:0:1/q:100/plain/images/products/1/4006/465006502/17024061_43.jpg@webp" alt="Твидовый кардиган" width="440" height="550" loading="eager" draggable="false">
+          </a>
+
+          <button class="product-card__favorite" type="button" data-product-favorite aria-pressed="false" aria-label="Избранное: Твидовый кардиган"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>
+        </div>
+        <div class="product-card__info">
+          <h3 class="product-card__title"><a href="https://newtone-demo.myinsales.ru/product/tvidovyy-kardigan-iz-hlopka" target="_blank" rel="noopener noreferrer">Твидовый кардиган</a></h3>
+          <div class="product-card__price"><strong>7 490 ₽</strong></div>
+          <label class="product-card__size">Размер <select aria-label="Размер: Твидовый кардиган"><option>S</option><option selected>M</option><option>L</option><option>XL</option></select></label>
+          <button class="product-card__buy" type="button" data-add-to-cart>В корзину</button>
+        </div>
+      </article>
+      <article class="tvist-v1__slide product-card" data-product="trench">
+        <div class="product-card__media">
+          <a href="https://newtone-demo.myinsales.ru/product/obemnyy-vodoottalkivayuschiy-trench" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+            <img src="https://cdn.insales-shop.ru/r/QyP5eFDCmu0/rs:fit:440:0:1/q:100/plain/images/products/1/4851/465007347/17024061_43_R.jpg@webp" alt="Тренч свободного кроя" width="440" height="550" loading="eager" draggable="false">
+          </a>
+          <span class="product-card__badge product-card__badge--sale">−50%</span>
+          <button class="product-card__favorite" type="button" data-product-favorite aria-pressed="false" aria-label="Избранное: Тренч свободного кроя"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>
+        </div>
+        <div class="product-card__info">
+          <h3 class="product-card__title"><a href="https://newtone-demo.myinsales.ru/product/obemnyy-vodoottalkivayuschiy-trench" target="_blank" rel="noopener noreferrer">Тренч свободного кроя</a></h3>
+          <div class="product-card__price"><strong>4 990 ₽</strong><del>9 990 ₽</del></div>
+          <label class="product-card__size">Размер <select aria-label="Размер: Тренч свободного кроя"><option>S</option><option selected>M</option><option>L</option><option>XL</option></select></label>
+          <button class="product-card__buy" type="button" data-add-to-cart>В корзину</button>
+        </div>
+      </article>
+      <article class="tvist-v1__slide product-card" data-product="vest">
+        <div class="product-card__media">
+          <a href="https://newtone-demo.myinsales.ru/product/zhilet-iz-trikotazha-v-rubchik" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+            <img src="https://cdn.insales-shop.ru/r/F8qe8DG-f7I/rs:fit:440:0:1/q:100/plain/images/products/1/5570/465008066/17024061_43_R.jpg@webp" alt="Трикотажный жилет" width="440" height="550" loading="lazy" draggable="false">
+          </a>
+
+          <button class="product-card__favorite" type="button" data-product-favorite aria-pressed="false" aria-label="Избранное: Трикотажный жилет"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>
+        </div>
+        <div class="product-card__info">
+          <h3 class="product-card__title"><a href="https://newtone-demo.myinsales.ru/product/zhilet-iz-trikotazha-v-rubchik" target="_blank" rel="noopener noreferrer">Трикотажный жилет</a></h3>
+          <div class="product-card__price"><strong>3 290 ₽</strong></div>
+          <label class="product-card__size">Размер <select aria-label="Размер: Трикотажный жилет"><option>S</option><option selected>M</option><option>L</option><option>XL</option></select></label>
+          <button class="product-card__buy" type="button" data-add-to-cart>В корзину</button>
+        </div>
+      </article>
+      <article class="tvist-v1__slide product-card" data-product="striped-shirt">
+        <div class="product-card__media">
+          <a href="https://newtone-demo.myinsales.ru/product/hlopkovaya-rubashka-v-polosku" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+            <img src="https://cdn.insales-shop.ru/r/6sLXRJ0UgX0/rs:fit:440:0:1/q:100/plain/images/products/1/6068/465008564/17024061_43-99999999_01.jpg@webp" alt="Рубашка в полоску" width="440" height="550" loading="lazy" draggable="false">
+          </a>
+          <span class="product-card__badge">Новинка</span>
+          <button class="product-card__favorite" type="button" data-product-favorite aria-pressed="false" aria-label="Избранное: Рубашка в полоску"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>
+        </div>
+        <div class="product-card__info">
+          <h3 class="product-card__title"><a href="https://newtone-demo.myinsales.ru/product/hlopkovaya-rubashka-v-polosku" target="_blank" rel="noopener noreferrer">Рубашка в полоску</a></h3>
+          <div class="product-card__price"><strong>3 590 ₽</strong></div>
+          <label class="product-card__size">Размер <select aria-label="Размер: Рубашка в полоску"><option>S</option><option selected>M</option><option>L</option><option>XL</option></select></label>
+          <button class="product-card__buy" type="button" data-add-to-cart>В корзину</button>
+        </div>
+      </article>
+      <article class="tvist-v1__slide product-card" data-product="checked-shirt">
+        <div class="product-card__media">
+          <a href="https://newtone-demo.myinsales.ru/product/obemnaya-rubashka-v-kletku" target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+            <img src="https://cdn.insales-shop.ru/r/eEc-vVzRZks/rs:fit:440:0:1/q:100/plain/images/products/1/7000/465009496/17024061_43_R.jpg@webp" alt="Рубашка в клетку" width="440" height="550" loading="lazy" draggable="false">
+          </a>
+
+          <button class="product-card__favorite" type="button" data-product-favorite aria-pressed="false" aria-label="Избранное: Рубашка в клетку"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/></svg></button>
+        </div>
+        <div class="product-card__info">
+          <h3 class="product-card__title"><a href="https://newtone-demo.myinsales.ru/product/obemnaya-rubashka-v-kletku" target="_blank" rel="noopener noreferrer">Рубашка в клетку</a></h3>
+          <div class="product-card__price"><strong>3 590 ₽</strong></div>
+          <label class="product-card__size">Размер <select aria-label="Размер: Рубашка в клетку"><option>S</option><option selected>M</option><option>L</option><option>XL</option></select></label>
+          <button class="product-card__buy" type="button" data-add-to-cart>В корзину</button>
+        </div>
+      </article>
+      </div>
     </div>
   </div>
-</div>
+  <div class="product-demo__controls">
+    <button class="product-demo__nav" type="button" data-products-prev aria-label="Предыдущие товары">←</button>
+    <div class="tvist-v1__pagination product-demo__pagination" aria-label="Страницы товаров"></div>
+    <button class="product-demo__nav" type="button" data-products-next aria-label="Следующие товары">→</button>
+  </div>
+  <p class="product-demo__status" role="status" aria-live="polite" aria-atomic="true"></p>
+</section>
