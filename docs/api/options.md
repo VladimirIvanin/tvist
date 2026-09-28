@@ -41,6 +41,8 @@
 
 - `arrows` — стрелки (true или объект с `prev`, `next`, `disabledClass`, `hiddenClass`, `addIcons`, `hideWhenSinglePage`; селекторы/элементы могут быть **вне root**, см. [Примеры навигации](/examples/navigation))
 - `pagination` — пагинация (true или объект с `container`, `type`, `clickable`, `bulletClass`, `bulletActiveClass`, `renderBullet` / `renderFraction` / `renderCustom`, `hideWhenSinglePage`, `limit`, `strategy`, `remainderStrategy`; `container` может быть **вне root**)
+
+`arrows` и `pagination` выключены по умолчанию. При включении готовые элементы используются, а недостающие автоматически создаются внутри root, после трека. Разметка управления в HTML необязательна. Созданные элементы удаляются при отключении опции или `destroy()`.
 - `keyboard` — управление с клавиатуры (true или объект с `enabled`, `onlyInViewport`)
 - `wheel` — управление колёсиком мыши (true или объект с `sensitivity`, `releaseOnEdges`)
 - `scrollbar` — кастомный скроллбар (true или объект с `container`, `hide`, `hideDelay`, `scrollbarClass`, `trackClass`, `thumbClass`, `draggable`)

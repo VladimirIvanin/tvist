@@ -157,6 +157,7 @@ img { max-width: 100%; display: block; }
 .demo-card[data-demo*="vertical"] .demo-frame, .demo-card[data-demo="auto-height"] .demo-frame { height: 450px; }
 .demo-card[data-demo="grid"] .demo-frame, .demo-card[data-demo="grid-dimensions"] .demo-frame { height: 530px; }
 .demo-card[data-demo="product-cards"] .demo-frame { height: 780px; }
+.demo-card[data-demo="stories"] .demo-frame { height: 740px; }
 .demo-toolbar { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .code-tabs { display: flex; overflow-x: auto; }
 .code-tabs button, .copy-code { background: transparent; border: 0; color: var(--muted); padding: 13px 17px; font: 500 11px 'IBM Plex Mono', monospace; white-space: nowrap; }

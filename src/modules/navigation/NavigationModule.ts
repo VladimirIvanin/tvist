@@ -6,7 +6,7 @@
  * - Disabled состояния на границах
  * - Hidden когда слайдов мало
  * - Accessibility (aria-label)
- * - Кастомные элементы или auto-search
+ * - Кастомные элементы, поиск и автоматическое создание
  */
 
 import { Module } from '../Module'
@@ -23,6 +23,8 @@ export class NavigationModule extends Module {
 
   private prevButton: HTMLElement | null = null
   private nextButton: HTMLElement | null = null
+  private readonly createdButtons: HTMLButtonElement[] = []
+  private readonly stateChangeHandler = () => this.updateArrowsState()
 
   private prevClickHandler?: () => void
   private nextClickHandler?: () => void
@@ -49,20 +51,28 @@ export class NavigationModule extends Module {
     this.emit('navigation:mounted')
 
     // Обновляем состояние при изменении слайда
-    this.on('slideChangeEnd', () => this.updateArrowsState())
+    this.on('slideChangeEnd', this.stateChangeHandler)
 
     // После анимации (в т.ч. когда индекс не менялся, но translate дошёл до упора)
-    this.on('transitionEnd', () => this.updateArrowsState())
+    this.on('transitionEnd', this.stateChangeHandler)
     
     // Обновляем состояние при lock/unlock (для breakpoints)
-    this.on('lock', () => this.updateArrowsState())
-    this.on('unlock', () => this.updateArrowsState())
+    this.on('lock', this.stateChangeHandler)
+    this.on('unlock', this.stateChangeHandler)
   }
 
   override destroy(): void {
     this.detachEvents()
+    this.off('slideChangeEnd', this.stateChangeHandler)
+    this.off('transitionEnd', this.stateChangeHandler)
+    this.off('lock', this.stateChangeHandler)
+    this.off('unlock', this.stateChangeHandler)
+    this.createdButtons.forEach(button => button.remove())
+    this.createdButtons.length = 0
     this.prevButton = null
     this.nextButton = null
+    this.prevClickHandler = undefined
+    this.nextClickHandler = undefined
   }
 
   public override shouldBeActive(): boolean {
@@ -97,6 +107,20 @@ export class NavigationModule extends Module {
     // Если не найдены - ищем по дефолтным классам
     this.prevButton ??= this.tvist.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.arrowPrev}`)
     this.nextButton ??= this.tvist.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.arrowNext}`)
+
+    this.prevButton ??= this.createArrow('prev')
+    this.nextButton ??= this.createArrow('next')
+  }
+
+  /** Создаёт недостающую стрелку вне трека и запоминает её для удаления. */
+  private createArrow(direction: 'prev' | 'next'): HTMLButtonElement {
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.className = `${TVIST_CLASSES.block}__arrow ${direction === 'prev' ? TVIST_CLASSES.arrowPrev : TVIST_CLASSES.arrowNext}`
+    button.setAttribute('aria-label', direction === 'prev' ? 'Предыдущий слайд' : 'Следующий слайд')
+    this.tvist.root.appendChild(button)
+    this.createdButtons.push(button)
+    return button
   }
 
   /**
@@ -362,4 +386,3 @@ export class NavigationModule extends Module {
     this.updateArrowsState()
   }
 }
-

@@ -42,6 +42,38 @@ test('варианты на страницах сохраняют отдельн
   await expect(page.locator('.demo-card')).toHaveCount(7)
 })
 
+test('пример навигации создаёт стрелки и пагинацию без разметки управления', async ({ page }) => {
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await page.goto('examples/navigation.html')
+  const demo = page.frameLocator('#demo-frame-navigation')
+  const root = demo.locator('.tvist-v1')
+  const activeSlide = root.locator('.tvist-v1__slide--active')
+  const prev = root.getByRole('button', { name: 'Предыдущий слайд', exact: true })
+  const next = root.getByRole('button', { name: 'Следующий слайд', exact: true })
+
+  await expect(root.locator(':scope > .tvist-v1__arrow')).toHaveCount(2)
+  await expect(root.locator(':scope > .tvist-v1__pagination')).toHaveCount(1)
+  await expect(root.locator('.tvist-v1__track .tvist-v1__arrow, .tvist-v1__track .tvist-v1__pagination')).toHaveCount(0)
+  await expect(root.locator('.tvist-v1__bullet')).toHaveCount(6)
+  await expect(prev).toBeDisabled()
+  await next.click()
+  await expect(activeSlide).toHaveAttribute('data-tvist-slide-index', '1')
+  await expect(root.locator('.tvist-v1__bullet--active')).toHaveAttribute('data-index', '1')
+  await root.locator('.tvist-v1__bullet').last().click()
+  await expect(activeSlide).toHaveAttribute('data-tvist-slide-index', '5')
+  await expect(next).toBeDisabled()
+  await prev.click()
+  await expect(activeSlide).toHaveAttribute('data-tvist-slide-index', '4')
+
+  await page.locator('[data-code-tab="html"]').first().click()
+  const html = page.locator('[data-code-output]').first()
+  await expect(html).toContainText('tvist-v1__track')
+  await expect(html).not.toContainText('tvist-v1__arrow')
+  await expect(html).not.toContainText('tvist-v1__pagination')
+  expect(errors).toEqual([])
+})
+
 test('автоматическое движение можно остановить в примерах', async ({ page }) => {
   for (const id of ['autoplay', 'marquee']) {
     await page.goto(`preview.html?id=${id}`)

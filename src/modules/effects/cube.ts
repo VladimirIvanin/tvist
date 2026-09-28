@@ -1,7 +1,7 @@
 import { TVIST_CLASSES } from '../../core/constants'
 import type { Tvist } from '../../core/Tvist'
 import type { TvistOptions } from '../../core/types'
-import { getCubeSlidesInRange } from './cubeSlideInRange'
+import { getCubeSlideIndex, getCubeSlidesInRange } from './cubeSlideInRange'
 
 // Кэш для теней и списка слайдов
 interface SlideShadows {
@@ -89,7 +89,9 @@ export function setCubeEffect(
     container.style.transform = `translate3d(0,0,-${zOffset}px) rotateY(${wrapperRotate}deg)`
     
     slidesList.forEach((slide, i) => {
-        const slideAngle = i * 90
+        // Use the same wrapped position as visibility so the first/last slide
+        // closes the neighboring face during edge drag, even without loop.
+        const slideAngle = getCubeSlideIndex(i, progressTotal, numSlides) * 90
         
         // Fix for horizontal scroll and layout issues:
         // Use position: absolute to collapse the container width and avoid page overflow.

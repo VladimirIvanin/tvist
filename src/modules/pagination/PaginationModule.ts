@@ -36,8 +36,17 @@ export class PaginationModule extends Module {
   readonly name = 'pagination'
 
   private container: HTMLElement | null = null
+  private createdContainer = false
   private bullets: HTMLElement[] = []
   private clickHandlers = new Map<HTMLElement, () => void>()
+  private updateFrameId: number | null = null
+  private readonly activeChangeHandler = () => this.updateActive()
+  private readonly settledChangeHandler = () => {
+    this.updateActive()
+    if (this.options.loop) this.scheduleUpdateActive()
+  }
+  private readonly visibilityChangeHandler = () => this.updateVisibility()
+  private readonly positionChangeHandler = () => this.updateActiveByPosition()
   
   // Счётчик обновлений для отладки
   private updateCounter = 0
@@ -75,25 +84,18 @@ export class PaginationModule extends Module {
     // Обновляем при изменении слайда СИНХРОННО (slideChangeStart эмитится ДО анимации),
     // чтобы к моменту slideChangeEnd (после анимации) bullet'ы были уже актуальны.
     // Также слушаем slideChangeEnd для instant-переходов (scrollTo с instant=true).
-    this.on('slideChangeStart', (_index: number) => {
-      this.updateActive()
-    })
+    this.on('slideChangeStart', this.activeChangeHandler)
     
-    this.on('slideChangeEnd', (_index: number) => {
-      this.updateActive()
-      if (this.options.loop) this.scheduleUpdateActive()
-    })
+    this.on('slideChangeEnd', this.settledChangeHandler)
     
     // Обновляем видимость при lock/unlock (для breakpoints)
-    this.on('lock', () => this.updateVisibility())
-    this.on('unlock', () => this.updateVisibility())
+    this.on('lock', this.visibilityChangeHandler)
+    this.on('unlock', this.visibilityChangeHandler)
 
     // В free mode (drag: 'free') slideChangeStart/End не эмитятся при прокрутке —
     // обновляем активный bullet по ближайшему слайду на каждом кадре scroll.
     if (this.options.drag === 'free') {
-      this.on('scroll', () => {
-        this.updateActiveByPosition()
-      })
+      this.on('scroll', this.positionChangeHandler)
     }
 
     this.render()
@@ -103,37 +105,45 @@ export class PaginationModule extends Module {
     
     // Для loop режима нужны дополнительные события
     if (this.options.loop) {
-      this.on('loopFix', () => {
-        this.updateActive()
-        this.scheduleUpdateActive()
-      })
+      this.on('loopFix', this.settledChangeHandler)
       
-      this.on('transitionEnd', () => {
-        this.updateActive()
-        this.scheduleUpdateActive()
-      })
+      this.on('transitionEnd', this.settledChangeHandler)
     }
   }
   
   /** Дополнительное отложенное обновление (для loop: после применения DOM/индекса) */
   private scheduleUpdateActive(): void {
-    if (this.updateScheduled) return
-    this.updateScheduled = true
-    requestAnimationFrame(() => {
+    if (this.updateFrameId !== null) return
+    this.updateFrameId = requestAnimationFrame(() => {
+      this.updateFrameId = null
       this.updateActive()
-      this.updateScheduled = false
     })
   }
-  
-  private updateScheduled = false
 
   override destroy(): void {
     this.detachClickHandlers()
+    this.off('slideChangeStart', this.activeChangeHandler)
+    this.off('slideChangeEnd', this.settledChangeHandler)
+    this.off('lock', this.visibilityChangeHandler)
+    this.off('unlock', this.visibilityChangeHandler)
+    this.off('scroll', this.positionChangeHandler)
+    this.off('loopFix', this.settledChangeHandler)
+    this.off('transitionEnd', this.settledChangeHandler)
+    if (this.updateFrameId !== null) {
+      cancelAnimationFrame(this.updateFrameId)
+      this.updateFrameId = null
+    }
     if (this.container) {
-      this.container.innerHTML = ''
+      if (this.createdContainer) {
+        this.container.remove()
+      } else {
+        this.container.innerHTML = ''
+      }
     }
     this.container = null
+    this.createdContainer = false
     this.bullets = []
+    this.bulletGroups = []
     this.progressBarEl = null
     this.lastFreeIndex = -1
   }
@@ -208,6 +218,13 @@ export class PaginationModule extends Module {
 
     // Если не найден - ищем по дефолтному классу
     this.container ??= this.tvist.root.querySelector(`.${TVIST_CLASSES.pagination}`)
+
+    if (!this.container) {
+      this.container = document.createElement('div')
+      this.container.className = TVIST_CLASSES.pagination
+      this.tvist.root.appendChild(this.container)
+      this.createdContainer = true
+    }
   }
 
   /**
@@ -929,4 +946,3 @@ export class PaginationModule extends Module {
     this.updateVisibility()
   }
 }
-

@@ -1,13 +1,73 @@
-<div class="tvist-v1 " aria-label="Демонстрационный слайдер">
-  <div class="tvist-v1__track">
-    <div class="tvist-v1__container">
-      <div class="tvist-v1__slide">01</div>
-      <div class="tvist-v1__slide">02</div>
-      <div class="tvist-v1__slide">03</div>
-      <div class="tvist-v1__slide">04</div>
-      <div class="tvist-v1__slide">05</div>
-      <div class="tvist-v1__slide">06</div>
+<div class="stories-demo">
+  <div class="stories-groups-nav" role="group" aria-label="Авторы историй">
+    <button class="stories-group-chip" type="button" data-story-group="0" aria-pressed="true"><span>Маша</span><span class="stories-group-chip__count">3</span></button>
+    <button class="stories-group-chip" type="button" data-story-group="1" aria-pressed="false"><span>Саша</span><span class="stories-group-chip__count">2</span></button>
+    <button class="stories-group-chip" type="button" data-story-group="2" aria-pressed="false"><span>Ира</span><span class="stories-group-chip__count">3</span></button>
+  </div>
+
+  <div class="stories-shell">
+    <div class="tvist-v1 stories-groups" aria-label="Группы историй">
+      <div class="tvist-v1__track">
+        <div class="tvist-v1__container">
+          <div class="tvist-v1__slide stories-group-slide">
+            <div class="tvist-v1 stories-inner" aria-label="Истории Маши">
+              <div class="stories-progress" aria-hidden="true">
+                <div class="stories-progress__segment"><div class="stories-progress__fill"></div></div>
+                <div class="stories-progress__segment"><div class="stories-progress__fill"></div></div>
+                <div class="stories-progress__segment"><div class="stories-progress__fill"></div></div>
+              </div>
+              <div class="tvist-v1__track">
+                <div class="tvist-v1__container">
+                  <div class="tvist-v1__slide stories-inner-slide" data-story="sea"><div class="stories-meta"><span class="stories-author">Маша</span><h3 class="stories-title">Утро у моря</h3></div></div>
+                  <div class="tvist-v1__slide stories-inner-slide" data-story="coffee"><div class="stories-meta"><span class="stories-author">Маша</span><h3 class="stories-title">Кофе-брейк</h3></div></div>
+                  <div class="tvist-v1__slide stories-inner-slide" data-story="work"><div class="stories-meta"><span class="stories-author">Маша</span><h3 class="stories-title">Рабочий спринт</h3></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tvist-v1__slide stories-group-slide">
+            <div class="tvist-v1 stories-inner" aria-label="Истории Саши">
+              <div class="stories-progress" aria-hidden="true">
+                <div class="stories-progress__segment"><div class="stories-progress__fill"></div></div>
+                <div class="stories-progress__segment"><div class="stories-progress__fill"></div></div>
+              </div>
+              <div class="tvist-v1__track">
+                <div class="tvist-v1__container">
+                  <div class="tvist-v1__slide stories-inner-slide" data-story="skate"><div class="stories-meta"><span class="stories-author">Саша</span><h3 class="stories-title">Скейт-парк</h3></div></div>
+                  <div class="tvist-v1__slide stories-inner-slide" data-story="city"><div class="stories-meta"><span class="stories-author">Саша</span><h3 class="stories-title">Город вечером</h3></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tvist-v1__slide stories-group-slide">
+            <div class="tvist-v1 stories-inner" aria-label="Истории Иры">
+              <div class="stories-progress" aria-hidden="true">
+                <div class="stories-progress__segment"><div class="stories-progress__fill"></div></div>
+                <div class="stories-progress__segment"><div class="stories-progress__fill"></div></div>
+                <div class="stories-progress__segment"><div class="stories-progress__fill"></div></div>
+              </div>
+              <div class="tvist-v1__track">
+                <div class="tvist-v1__container">
+                  <div class="tvist-v1__slide stories-inner-slide" data-story="mountains"><div class="stories-meta"><span class="stories-author">Ира</span><h3 class="stories-title">Горы</h3></div></div>
+                  <div class="tvist-v1__slide stories-inner-slide" data-story="hike"><div class="stories-meta"><span class="stories-author">Ира</span><h3 class="stories-title">Треккинг</h3></div></div>
+                  <div class="tvist-v1__slide stories-inner-slide" data-story="sunset"><div class="stories-meta"><span class="stories-author">Ира</span><h3 class="stories-title">Закат</h3></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <div class="stories-controls">
+    <button type="button" data-story-prev aria-label="Предыдущая история">←</button>
+    <button type="button" class="demo-motion-toggle" aria-pressed="false">Пауза</button>
+    <button type="button" data-stories-replay>Сначала</button>
+    <button type="button" data-story-next aria-label="Следующая история">→</button>
+  </div>
+  <p class="stories-status" role="status" aria-live="polite"></p>
+  <p class="stories-caption">Тап по краям — назад / вперёд. Удержание — пауза. В мобильном виде группы переключаются кубом.</p>
 </div>
-<button class="demo-motion-toggle" type="button">Пауза</button>

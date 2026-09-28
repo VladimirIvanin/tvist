@@ -5,7 +5,9 @@
 
 ## Навигация по умолчанию (внутри root)
 
-Стрелки и пагинация лежат **внутри** корневого элемента слайдера. Кнопки ищутся по классам `.tvist-v1__arrow--prev` / `.tvist-v1__arrow--next`, контейнер пагинации — `.tvist-v1__pagination`.
+При `arrows: true` и `pagination: true` Tvist автоматически создаёт недостающие элементы управления **внутри** корня слайдера, после трека. Достаточно разметки трека и слайдов. Обе опции выключены по умолчанию.
+
+Если кнопки с классами `.tvist-v1__arrow--prev` / `.tvist-v1__arrow--next` или контейнер `.tvist-v1__pagination` уже есть, Tvist использует их. Можно заранее добавить только одну стрелку — вторая создастся автоматически.
 
 <Demo id="navigation" />
 
@@ -21,11 +23,10 @@ const slider = new Tvist('.slider', {
   <div class="tvist-v1__track">
     <div class="tvist-v1__container">...</div>
   </div>
-  <button class="tvist-v1__arrow tvist-v1__arrow--prev"></button>
-  <button class="tvist-v1__arrow tvist-v1__arrow--next"></button>
-  <div class="tvist-v1__pagination"></div>
 </div>
 ```
+
+При отключении опции через `updateOptions()` или брейкпоинт, а также при `destroy()`, созданные элементы удаляются. Пользовательские кнопки и контейнер пагинации остаются в DOM; обработчики отключаются, содержимое пагинации очищается. Повторное включение снова создаёт недостающие элементы.
 
 ---
 
@@ -88,7 +89,7 @@ const slider = new Tvist('#my-slider', {
 
 | Опция | Тип | Описание | Пример |
 |-------|-----|----------|--------|
-| `prev` | `string \| HTMLElement` | Селектор или элемент кнопки «назад». По умолчанию ищется `.tvist-v1__arrow--prev` внутри root. **Может быть вне root.** | `prev: '#my-prev-btn'` |
+| `prev` | `string \| HTMLElement` | Селектор или элемент кнопки «назад». Затем ищется `.tvist-v1__arrow--prev` внутри root; если кнопка отсутствует, она создаётся. **Может быть вне root.** | `prev: '#my-prev-btn'` |
 | `next` | `string \| HTMLElement` | Селектор или элемент кнопки «вперёд». **Может быть вне root.** | `next: '.sidebar-next'` |
 | `disabledClass` | `string` | Класс для неактивной стрелки (по умолчанию `'disabled'`). | `disabledClass: 'is-disabled'` |
 | `hiddenClass` | `string` | Класс для скрытой стрелки (по умолчанию `'hidden'`). | `hiddenClass: 'is-hidden'` |
@@ -97,7 +98,7 @@ const slider = new Tvist('#my-slider', {
 **Примеры:**
 
 ```javascript
-// Только включить стрелки (разметка с классами внутри root)
+// Включить стрелки: готовые кнопки используются, недостающие создаются
 arrows: true
 
 // Стрелки снаружи по id
@@ -118,7 +119,7 @@ arrows: {
 
 | Опция | Тип | Описание | Пример |
 |-------|-----|----------|--------|
-| `container` | `string \| HTMLElement` | Селектор или элемент, куда рендерить пагинацию. По умолчанию — `.tvist-v1__pagination` внутри root. **Может быть вне root.** | `container: '#pagination'` |
+| `container` | `string \| HTMLElement` | Селектор или элемент, куда рендерить пагинацию. Затем ищется `.tvist-v1__pagination` внутри root; если контейнер отсутствует, он создаётся. **Может быть вне root.** | `container: '#pagination'` |
 | `type` | `'bullets' \| 'fraction' \| 'progress' \| 'custom'` | Тип: точки, дробь, прогресс-бар, кастомный HTML. | `type: 'fraction'` |
 | `clickable` | `boolean` | Клик по буллету переключает слайд. | `clickable: true` |
 | `bulletClass` | `string` | Класс буллета. | `bulletClass: 'dot'` |
@@ -154,5 +155,5 @@ pagination: {
 
 ## Кратко
 
-- **Стрелки:** `arrows: true` — кнопки с классами `.tvist-v1__arrow--prev` / `--next` внутри root. Для кнопок **вне root** задайте `arrows: { prev: '#id-prev', next: '#id-next' }` (селекторы ищутся по всему документу).
-- **Пагинация:** по умолчанию контейнер — `.tvist-v1__pagination` внутри root. Чтобы вывести пагинацию **вне root**, укажите `pagination: { container: '#id-pagination', ... }`.
+- **Стрелки:** `arrows: true` — использование готовых кнопок или создание недостающих внутри root. Для кнопок **вне root** задайте `arrows: { prev: '#id-prev', next: '#id-next' }` (селекторы ищутся по всему документу).
+- **Пагинация:** `pagination: true` — использование готового контейнера `.tvist-v1__pagination` или создание нового внутри root. Чтобы вывести пагинацию **вне root**, укажите `pagination: { container: '#id-pagination', ... }`.
