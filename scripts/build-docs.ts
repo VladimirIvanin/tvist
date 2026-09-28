@@ -176,7 +176,10 @@ function shell(title: string, body: string, current: string, script = 'main.ts')
 <header class="site-header"><div class="header-inner"><a class="brand" href="${base}">tvist<span class="brand-dot">.</span><small>v${version}</small></a>
 <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Открыть меню">☰</button>
 <nav class="site-nav" id="site-nav" aria-label="Главное меню">${navHtml}</nav>
-<button class="theme-toggle" type="button" aria-label="Переключить тему" title="Переключить тему">◐</button></div></header>
+<button class="theme-toggle" type="button" aria-label="Включить тёмную тему" title="Включить тёмную тему">
+<svg class="theme-toggle__icon theme-toggle__icon--moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.9 13.3A9 9 0 0 1 10.7 3.1 9 9 0 1 0 20.9 13.3Z"/></svg>
+<svg class="theme-toggle__icon theme-toggle__icon--sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+</button></div></header>
 <main id="main">${body}</main>
 <footer class="site-footer"><span>Tvist · слайдер для современного веба</span><a href="https://github.com/VladimirIvanin/tvist">GitHub ↗</a></footer>
 </body></html>`

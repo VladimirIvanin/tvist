@@ -49,6 +49,12 @@ img { max-width: 100%; display: block; }
 .site-nav a[aria-current] { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 8px; }
 .theme-toggle, .menu-toggle { border: 1px solid var(--line); color: var(--ink); background: transparent; width: 35px; height: 35px; border-radius: 50%; display: grid; place-items: center; font-size: 19px; line-height: 1; }
 .theme-toggle:hover, .menu-toggle:hover { border-color: var(--accent); }
+.theme-toggle { flex-shrink: 0; padding: 0; }
+.theme-toggle:hover { color: var(--accent); background: var(--surface-alt); }
+.theme-toggle__icon { display: block; grid-area: 1 / 1; }
+.theme-toggle__icon--sun { display: none; }
+:root[data-theme="dark"] .theme-toggle__icon--moon { display: none; }
+:root[data-theme="dark"] .theme-toggle__icon--sun { display: block; }
 .menu-toggle { display: none; }
 .site-footer { border-top: 1px solid var(--line); max-width: 1380px; margin: 96px auto 0; min-height: 90px; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 12px; padding: 0 40px; }
 .site-footer a { color: var(--ink); text-decoration: none; }

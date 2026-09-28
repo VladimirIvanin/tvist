@@ -14,7 +14,10 @@ function setTheme(theme: 'light' | 'dark'): void {
   document.documentElement.dataset.theme = theme
   localStorage.setItem('tvist-theme', theme)
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#151f21' : '#f2f5f2')
-  document.querySelector<HTMLButtonElement>('.theme-toggle')?.setAttribute('aria-label', theme === 'light' ? 'Включить тёмную тему' : 'Включить светлую тему')
+  const toggle = document.querySelector<HTMLButtonElement>('.theme-toggle')
+  const label = theme === 'light' ? 'Включить тёмную тему' : 'Включить светлую тему'
+  toggle?.setAttribute('aria-label', label)
+  toggle?.setAttribute('title', label)
 }
 
 document.querySelector<HTMLButtonElement>('.theme-toggle')?.addEventListener('click', () => {
