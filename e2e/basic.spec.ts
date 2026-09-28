@@ -141,80 +141,89 @@ test.describe('Loop slider', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     await waitForSliderReady(page, 'slider-loop');
-  });
-
-  test('быстрые клики назад сохраняют видимые слайды и работу autoplay', async ({ page }) => {
-    const result = await page.evaluate(async () => {
+    await page.getByTestId('slider-loop').scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => {
       const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
         '[data-testid="slider-loop"]'
-      )!;
-      const slider = root.tvistInstance!;
-      const pagination = document.createElement('div');
-      pagination.className = 'tvist-v1__pagination';
-      root.appendChild(pagination);
-      slider.updateOptions({
-        perPage: 1,
-        loop: true,
-        speed: 300,
-        autoplay: { delay: 2600, pauseOnHover: true },
-        arrows: true,
-        pagination: true,
-      });
-      root.dispatchEvent(new MouseEvent('mouseenter'));
-      const prev = root.querySelector<HTMLElement>('.tvist-v1__arrow--prev')!;
-      let completed = 0;
-      let checkedFrames = 0;
-      let uncoveredFrames = 0;
-      let watching = true;
-      slider.on('transitionEnd', () => { completed += 1; });
-
-      const checkCoverage = () => {
-        if (!watching) return;
-        const track = slider.track.getBoundingClientRect();
-        const bounds = slider.slides.map((slide) => slide.getBoundingClientRect());
-        if (
-          Math.min(...bounds.map((rect) => rect.left)) > track.left + 1 ||
-          Math.max(...bounds.map((rect) => rect.right)) < track.right - 1
-        ) {
-          uncoveredFrames += 1;
-        }
-        checkedFrames += 1;
-        requestAnimationFrame(checkCoverage);
-      };
-      requestAnimationFrame(checkCoverage);
-
-      for (let i = 0; i < 60; i += 1) {
-        prev.click();
-        await new Promise(resolve => setTimeout(resolve, 20));
-      }
-      const completedDuringClicks = completed;
-      await new Promise(resolve => setTimeout(resolve, 400));
-      const settled = !slider.engine.animator.isAnimating();
-      const rendered = new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m41;
-      const target = slider.engine.target.get();
-      const index = slider.realIndex;
-      const activeBullet = root.querySelector('.tvist-v1__bullet--active');
-      const bullets = [...root.querySelectorAll('.tvist-v1__bullet')];
-      const paginationMatches = bullets.indexOf(activeBullet!) === index;
-
-      root.dispatchEvent(new MouseEvent('mouseleave'));
-      await new Promise(resolve => setTimeout(resolve, 3100));
-      watching = false;
-      return {
-        checkedFrames, uncoveredFrames, completedDuringClicks, settled, rendered, target,
-        paginationMatches,
-        autoplayResumed: slider.realIndex === (index + 1) % slider.originalSlideCount,
-      };
+      );
+      return root?.tvistInstance?._isVisible;
     });
-
-    expect(result.checkedFrames).toBeGreaterThan(0);
-    expect(result.uncoveredFrames).toBe(0);
-    expect(result.completedDuringClicks).toBeGreaterThan(0);
-    expect(result.settled).toBe(true);
-    expect(result.rendered).toBeCloseTo(result.target, 0);
-    expect(result.paginationMatches).toBe(true);
-    expect(result.autoplayResumed).toBe(true);
   });
+
+  for (const direction of ['prev', 'next'] as const) {
+    test(`быстрые клики ${direction} сохраняют видимые слайды и работу autoplay`, async ({ page }) => {
+      const result = await page.evaluate(async (direction) => {
+        const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
+          '[data-testid="slider-loop"]'
+        )!;
+        const slider = root.tvistInstance!;
+        const pagination = document.createElement('div');
+        pagination.className = 'tvist-v1__pagination';
+        root.appendChild(pagination);
+        slider.updateOptions({
+          perPage: 1,
+          loop: true,
+          speed: 300,
+          autoplay: { delay: 2600, pauseOnHover: true },
+          arrows: true,
+          pagination: true,
+        });
+        root.dispatchEvent(new MouseEvent('mouseenter'));
+        const button = root.querySelector<HTMLElement>(`.tvist-v1__arrow--${direction}`)!;
+        let completed = 0;
+        let checkedFrames = 0;
+        let uncoveredFrames = 0;
+        let watching = true;
+        slider.on('transitionEnd', () => { completed += 1; });
+
+        const checkCoverage = () => {
+          if (!watching) return;
+          const track = slider.track.getBoundingClientRect();
+          const bounds = slider.slides.map((slide) => slide.getBoundingClientRect());
+          if (
+            Math.min(...bounds.map((rect) => rect.left)) > track.left + 1 ||
+            Math.max(...bounds.map((rect) => rect.right)) < track.right - 1
+          ) {
+            uncoveredFrames += 1;
+          }
+          checkedFrames += 1;
+          requestAnimationFrame(checkCoverage);
+        };
+        requestAnimationFrame(checkCoverage);
+
+        for (let i = 0; i < 60; i += 1) {
+          button.click();
+          await new Promise(resolve => setTimeout(resolve, 20));
+        }
+        const completedDuringClicks = completed;
+        await new Promise(resolve => setTimeout(resolve, 400));
+        const settled = !slider.engine.animator.isAnimating();
+        const rendered = new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m41;
+        const target = slider.engine.target.get();
+        const index = slider.realIndex;
+        const activeBullet = root.querySelector('.tvist-v1__bullet--active');
+        const bullets = [...root.querySelectorAll('.tvist-v1__bullet')];
+        const paginationMatches = bullets.indexOf(activeBullet!) === index;
+
+        root.dispatchEvent(new MouseEvent('mouseleave'));
+        await new Promise(resolve => setTimeout(resolve, 3100));
+        watching = false;
+        return {
+          checkedFrames, uncoveredFrames, completedDuringClicks, settled, rendered, target,
+          paginationMatches,
+          autoplayResumed: slider.realIndex === (index + 1) % slider.originalSlideCount,
+        };
+      }, direction);
+
+      expect(result.checkedFrames).toBeGreaterThan(0);
+      expect(result.uncoveredFrames).toBe(0);
+      expect(result.completedDuringClicks).toBeGreaterThan(0);
+      expect(result.settled).toBe(true);
+      expect(result.rendered).toBeCloseTo(result.target, 0);
+      expect(result.paginationMatches).toBe(true);
+      expect(result.autoplayResumed).toBe(true);
+    });
+  }
 
   test('переходит с последнего слайда на первый', async ({ page }) => {
     const slider = page.getByTestId('slider-loop');

@@ -83,6 +83,28 @@ describe('Loop rapid navigation', () => {
     expect(slider.engine.location.get()).toBe(slider.engine.target.get())
   })
 
+  it.each(['prev', 'next'] as const)(
+    'lets %s complete when the position reaches the target before the completion callback',
+    async (direction) => {
+      const button = direction === 'prev' ? prev : next
+      const ended = vi.fn()
+      slider.on('transitionEnd', ended)
+      button.click()
+      const index = slider.realIndex
+
+      // The browser clock can reach the transition deadline before its timer is dispatched.
+      vi.spyOn(performance, 'now').mockReturnValue(300)
+      expect(slider.engine.location.get()).toBe(slider.engine.target.get())
+      expect(slider.engine.animator.isAnimating()).toBe(true)
+      for (let i = 0; i < 10; i++) button.click()
+      expect(slider.realIndex).toBe(index)
+
+      await vi.advanceTimersByTimeAsync(300)
+      expect(ended).toHaveBeenCalledTimes(1)
+      expect(slider.engine.animator.isAnimating()).toBe(false)
+    }
+  )
+
   it('allows every step when transitions are instant', () => {
     slider.updateOptions({ speed: 0 })
     for (let i = 1; i <= 10; i++) {

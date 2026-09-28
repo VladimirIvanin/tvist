@@ -493,7 +493,9 @@ export class Tvist {
       // чем видимая позиция достигнет цели, и может увести трек за viewport.
       // Даём переходу завершиться; смена направления по-прежнему доступна.
       const movement = this.engine.target.get() - this.engine.location.get()
-      if (movement * sign < 0) return this
+      // location может уже достигнуть target до обработки transitionEnd/таймера.
+      // В этот момент тоже нельзя отменять ещё активный переход.
+      if (movement * sign <= 0) return this
     }
 
     const throttleMs = this.options.navThrottleMs ?? 0

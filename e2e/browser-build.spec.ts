@@ -121,3 +121,61 @@ test('module pack loaded after core restores the full feature set', async ({ pag
   expect(result.registered).toHaveLength(16)
   expect(result).toMatchObject({ drag: true, pagination: true, effect: true, bullets: 3 })
 })
+
+for (const direction of ['prev', 'next'] as const) {
+  test(`full browser bundle keeps loop moving during rapid ${direction} clicks`, async ({ page }) => {
+    const frame = await isolatedFrame(page)
+    await page.locator('iframe[name="browser-bundle-test"]').scrollIntoViewIfNeeded()
+    await frame.addScriptTag({ path: bundlePath('tvist.min.js') })
+    await createSlider(frame, {
+      perPage: 1,
+      loop: true,
+      autoplay: { delay: 2600, pauseOnHover: true },
+      arrows: true,
+      pagination: true,
+    })
+    await frame.locator('#browser-slider').scrollIntoViewIfNeeded()
+    await frame.evaluate(() => new Promise(resolve => {
+      requestAnimationFrame(() => requestAnimationFrame(resolve))
+    }))
+    await frame.waitForFunction(() => {
+      const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>('#browser-slider')
+      return root?.tvistInstance?._isVisible
+    })
+
+    const result = await frame.evaluate(async (direction) => {
+      const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>('#browser-slider')!
+      const slider = root.tvistInstance!
+      root.dispatchEvent(new MouseEvent('mouseenter'))
+      const button = root.querySelector<HTMLButtonElement>(`.tvist-v1__arrow--${direction}`)!
+      let completed = 0
+      let uncovered = 0
+      slider.on('transitionEnd', () => { completed += 1 })
+
+      for (let i = 0; i < 60; i += 1) {
+        button.click()
+        const track = slider.track.getBoundingClientRect()
+        const bounds = slider.slides.map(slide => slide.getBoundingClientRect())
+        if (
+          Math.min(...bounds.map(rect => rect.left)) > track.left + 1 ||
+          Math.max(...bounds.map(rect => rect.right)) < track.right - 1
+        ) uncovered += 1
+        await new Promise(resolve => setTimeout(resolve, 20))
+      }
+      const completedDuringClicks = completed
+      await new Promise(resolve => setTimeout(resolve, 400))
+      return {
+        completedDuringClicks,
+        uncovered,
+        settled: !slider.engine.animator.isAnimating(),
+        rendered: new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m41,
+        target: slider.engine.target.get(),
+      }
+    }, direction)
+
+    expect(result.completedDuringClicks, JSON.stringify(result)).toBeGreaterThan(0)
+    expect(result.uncovered).toBe(0)
+    expect(result.settled).toBe(true)
+    expect(result.rendered).toBeCloseTo(result.target, 0)
+  })
+}
