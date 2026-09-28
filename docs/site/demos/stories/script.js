@@ -10,12 +10,12 @@ const status = demo.querySelector('.stories-status');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const HOLD_THRESHOLD = 100;
 const STORY_AUTOPLAY = { delay: 2800, pauseOnHover: false, pauseOnFocus: false, waitForVideo: false };
-const groupsToReset = new Set();
 let activeGroup = 0;
 let transitioning = false;
 let ended = false;
 let paused = reducedMotion.matches;
 let holding = false;
+let visible = true;
 let tap = null;
 
 // Внешний слайдер переключает авторов, внутренние — истории каждого автора.
@@ -48,7 +48,7 @@ function renderControls() {
   groupButtons.forEach((button, index) => button.setAttribute('aria-pressed', String(index === activeGroup)));
   previousButton.disabled = transitioning || ended || (activeGroup === 0 && slider.realIndex === 0);
   nextButton.disabled = transitioning || ended;
-  motionButton.disabled = ended;
+  motionButton.disabled = transitioning || ended;
   motionButton.textContent = paused ? 'Воспроизвести' : 'Пауза';
   motionButton.setAttribute('aria-pressed', String(paused));
   shell.classList.toggle('stories-shell--hold-paused', holding);
@@ -67,12 +67,10 @@ function activateGroup(index) {
     const active = groupIndex === index;
     if (active) {
       slider.update();
-      // Скрытая группа может пропускать layout; сбрасываем позицию после её показа.
-      if (groupsToReset.delete(groupIndex)) slider.scrollTo(0, true);
       renderProgress(index, slider.realIndex, 0);
     }
     slider.updateOptions({ autoplay: active ? STORY_AUTOPLAY : false });
-    if (active && paused) slider.autoplay.pause();
+    if (active && (paused || !visible)) slider.autoplay.pause();
   });
   renderControls();
 }
@@ -100,6 +98,8 @@ const innerSliders = innerRoots.map((root, groupIndex) => new TvistV1(root, {
   speed: 0,
   loop: false,
   drag: true,
+  // Видимость всего примера отслеживает внешний слайдер. Группами управляем здесь.
+  visibility: false,
   autoplay: false,
   holdToPause: { threshold: HOLD_THRESHOLD, cancelOnDrag: true },
   on: {
@@ -135,6 +135,14 @@ groupSlider.on('slideChangeStart', () => {
   renderControls();
 });
 groupSlider.on('slideChangeEnd', index => activateGroup(index));
+groupSlider.on('sliderHidden', () => {
+  visible = false;
+  innerSliders[activeGroup].autoplay?.pause();
+});
+groupSlider.on('sliderVisible', () => {
+  visible = true;
+  if (!paused && !holding && !transitioning && !ended) innerSliders[activeGroup].autoplay?.resume();
+});
 
 function navigateStory(direction) {
   if (transitioning || ended) return;
@@ -166,7 +174,7 @@ demo.querySelector('[data-stories-replay]').addEventListener('click', () => {
   paused = reducedMotion.matches;
   innerSliders.forEach((slider, index) => {
     slider.updateOptions({ autoplay: false });
-    groupsToReset.add(index);
+    slider.scrollTo(0, true);
     renderProgress(index, 0, 0);
   });
   if (groupSlider.realIndex === 0) activateGroup(0);
