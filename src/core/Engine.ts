@@ -1038,6 +1038,12 @@ export class Engine {
     complete: () => void
   ): void {
     const container = this.tvist.container
+    // Loop-перестановка и остановка предыдущего перехода меняют transform
+    // в том же кадре. Фиксируем начальную позицию в computed style, иначе
+    // браузер объединит её с конечной и пропустит CSS-анимацию.
+    this.writeTransform(from)
+    void getComputedStyle(container).transform
+
     const start = performance.now()
     this.cssTransitionActive = true
     this.location.setReader(() =>

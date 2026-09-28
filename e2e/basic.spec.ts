@@ -168,17 +168,26 @@ test.describe('Loop slider', () => {
       const container = root.querySelector<HTMLElement>('.tvist-v1__container')!;
       const indices: number[] = [];
       const transitions: string[] = [];
-      for (let i = 0; i < 5; i++) {
-        slider.next();
+      const animations: number[] = [];
+      const remainingDistances: number[] = [];
+      const directions = ['next', 'next', 'next', 'next', 'next', 'prev', 'prev', 'prev', 'prev', 'prev'] as const;
+      for (const direction of directions) {
+        slider[direction]();
         indices.push(slider.realIndex);
         transitions.push(container.style.transition);
-        await new Promise(resolve => setTimeout(resolve, 220));
+        await new Promise(resolve => setTimeout(resolve, 60));
+        animations.push(container.getAnimations().length);
+        const rendered = new DOMMatrixReadOnly(getComputedStyle(container).transform).m41;
+        remainingDistances.push(Math.abs(rendered - slider.engine.target.get()));
+        await new Promise(resolve => setTimeout(resolve, 160));
       }
-      return { indices, transitions, animating: slider.engine.animator.isAnimating() };
+      return { indices, transitions, animations, remainingDistances, animating: slider.engine.animator.isAnimating() };
     });
 
-    expect(result.indices).toEqual([1, 2, 0, 1, 2]);
+    expect(result.indices).toEqual([1, 2, 0, 1, 2, 1, 0, 2, 1, 0]);
     expect(result.transitions.every(value => value.includes('transform 180ms'))).toBe(true);
+    expect(result.animations).toEqual(Array(10).fill(1));
+    expect(result.remainingDistances.every(distance => distance > 1)).toBe(true);
     expect(result.animating).toBe(false);
   });
 });
