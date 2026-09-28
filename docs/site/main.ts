@@ -104,7 +104,7 @@ for (const card of document.querySelectorAll<HTMLElement>('[data-demo]')) {
     const button = event.currentTarget as HTMLButtonElement
     const mobile = card.classList.toggle('is-mobile-preview')
     button.setAttribute('aria-pressed', String(mobile))
-    button.textContent = mobile ? 'Полная ширина' : 'Мобильный вид · 375 px'
+    button.title = mobile ? 'Вернуть полную ширину' : 'Показать пример шириной 375 px'
   })
   const code = {
     html: sources.html[`./demos/${id}/markup.html`] || '',

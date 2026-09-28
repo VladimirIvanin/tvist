@@ -53,6 +53,8 @@ const optionsMeta = JSON.parse(readFileSync(join(root, 'site/options-meta.json')
   options: Array<{ name: string; type: string; default: string; description: string }>
 }
 const md = new MarkdownIt({ html: true, linkify: true, typographer: true })
+md.renderer.rules.table_open = (tokens, idx, opts, _env, self) => `<div class="table-scroll">${self.renderToken(tokens, idx, opts)}`
+md.renderer.rules.table_close = (tokens, idx, opts, _env, self) => `${self.renderToken(tokens, idx, opts)}</div>`
 
 function escapeHtml(value: string): string {
   return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -195,7 +197,7 @@ function demoCard(id: string): string {
   const demo = demoById.get(id)
   if (!demo) return ''
   return `<section class="demo-card" data-demo="${id}">
-  <div class="demo-heading"><div><span class="eyebrow">Живой пример</span><h2>${escapeHtml(demo.title)}</h2></div><div class="demo-heading-actions"><button class="demo-view-toggle" type="button" data-demo-mobile aria-pressed="false" aria-controls="demo-frame-${id}">Мобильный вид · 375 px</button><span class="demo-count">6 слайдов</span></div></div>
+  <div class="demo-heading"><div><span class="eyebrow">Живой пример</span><h2>${escapeHtml(demo.title)}</h2></div><div class="demo-heading-actions"><button class="demo-view-toggle" type="button" data-demo-mobile aria-pressed="false" aria-controls="demo-frame-${id}" title="Показать пример шириной 375 px">Мобильный вид · 375 px</button><span class="demo-count">6 слайдов</span></div></div>
   <div class="demo-preview"><iframe class="demo-frame" id="demo-frame-${id}" src="${base}preview.html?id=${id}" title="${escapeHtml(demo.title)}" loading="lazy"></iframe></div>
   <div class="demo-toolbar"><div class="code-tabs" role="group" aria-label="Код примера">
   <button type="button" class="is-active" data-code-tab="html">HTML</button>
