@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, readdirSync, writeFileSync, copyFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, readdirSync, writeFileSync, copyFileSync, rmSync } from 'node:fs'
 import { dirname, extname, join, relative, resolve, posix } from 'node:path'
 import MarkdownIt from 'markdown-it'
 
@@ -33,7 +33,7 @@ const componentDemos: Record<string, string> = {
   LoopPeekGapExample: 'loop-peek-gap', MarqueeDocExample: 'marquee',
   AutoplayBasicExample: 'autoplay', AutoplayLoopExample: 'autoplay-loop',
   AutoplayRewindExample: 'autoplay-rewind', FadeExample: 'effect-fade',
-  CubeExample: 'effect-cube', StackExample: 'effect-stack',
+  CubeExample: 'effect-cube',
   VerticalExample: 'vertical', VerticalThumbsExample: 'vertical-thumbs',
   DragFreeDocExample: 'drag-free', ScrollControlDocExample: 'scroll-control',
   LockExample: 'lock', DragNavigationExample: 'modules',
@@ -258,6 +258,8 @@ function examplesLayout(current: string, content: string): string {
 }
 
 function main(): void {
+  // Удалённые исходные страницы не должны оставаться в следующей сборке.
+  rmSync(output, { recursive: true, force: true })
   mkdirSync(output, { recursive: true })
   mkdirSync(join(output, 'public/assets'), { recursive: true })
   for (const file of readdirSync(join(root, 'site/assets'))) copyFileSync(join(root, 'site/assets', file), join(output, 'public/assets', file))

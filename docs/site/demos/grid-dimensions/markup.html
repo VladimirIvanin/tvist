@@ -1,12 +1,46 @@
-<div class="tvist-v1 " aria-label="Демонстрационный слайдер">
-  <div class="tvist-v1__track">
-    <div class="tvist-v1__container">
-      <div class="tvist-v1__slide">01</div>
-      <div class="tvist-v1__slide">02</div>
-      <div class="tvist-v1__slide">03</div>
-      <div class="tvist-v1__slide">04</div>
-      <div class="tvist-v1__slide">05</div>
-      <div class="tvist-v1__slide">06</div>
+<section class="journal-demo" aria-label="Журнал о дизайне">
+  <header class="journal-demo__header">
+    <div><span class="journal-demo__eyebrow">Форма / Журнал о дизайне</span><h2>У каждой истории свой формат</h2></div>
+    <span class="journal-demo__tag">Выпуск 06</span>
+  </header>
+  <div class="tvist-v1 journal-slider" aria-label="Журнал с разными сетками страниц">
+    <div class="tvist-v1__track">
+      <div class="tvist-v1__container">
+        <article class="tvist-v1__slide journal-card journal-card--cover">
+          <div class="journal-card__art journal-card__art--orbit" aria-hidden="true"></div>
+          <div class="journal-card__copy"><span class="journal-card__label">01 / Главная история</span><h3>Искусство<br>простых вещей</h3><p>Красота начинается с внимательного взгляда.</p></div>
+          <span class="journal-card__number" aria-hidden="true">01</span>
+        </article>
+        <article class="tvist-v1__slide journal-card journal-card--wide journal-card--cream">
+          <div class="journal-card__copy"><span class="journal-card__label">02 / Архитектура</span><h3>Пространство и свет</h3><p>Как пустота становится частью интерьера.</p></div>
+          <div class="journal-card__art journal-card__art--window" aria-hidden="true"></div>
+        </article>
+        <article class="tvist-v1__slide journal-card journal-card--wide journal-card--blue">
+          <div class="journal-card__copy"><span class="journal-card__label">03 / Наблюдения</span><h3>Между небом и морем</h3><p>Один цвет, тысяча оттенков.</p></div>
+          <div class="journal-card__art journal-card__art--horizon" aria-hidden="true"></div>
+        </article>
+        <article class="tvist-v1__slide journal-card journal-card--portrait journal-card--peach">
+          <div class="journal-card__art journal-card__art--sculpture" aria-hidden="true"></div>
+          <div class="journal-card__copy"><span class="journal-card__label">04 / Предметы</span><h3>Баланс форм</h3><p>Скульптура в повседневной жизни.</p></div>
+        </article>
+        <article class="tvist-v1__slide journal-card journal-card--portrait journal-card--green">
+          <div class="journal-card__art journal-card__art--plant" aria-hidden="true"></div>
+          <div class="journal-card__copy"><span class="journal-card__label">05 / Природа</span><h3>Живой ритм</h3><p>Плавные линии без чертежей.</p></div>
+        </article>
+        <article class="tvist-v1__slide journal-card journal-card--cover journal-card--final">
+          <div class="journal-card__art journal-card__art--rings" aria-hidden="true"></div>
+          <div class="journal-card__copy"><span class="journal-card__label">06 / Вдохновение</span><h3>Новый взгляд<br>на привычное</h3><p>Замечать детали. Находить идеи. Создавать своё.</p></div>
+          <span class="journal-card__number" aria-hidden="true">06</span>
+        </article>
+      </div>
     </div>
   </div>
-</div>
+  <footer class="journal-demo__footer">
+    <span class="journal-demo__hint">Листайте истории</span>
+    <div class="journal-demo__controls">
+      <button class="journal-demo__arrow" type="button" id="journal-prev" aria-label="Предыдущая страница журнала">←</button>
+      <span class="journal-demo__pagination" id="journal-pagination" role="status" aria-label="Страница журнала"></span>
+      <button class="journal-demo__arrow" type="button" id="journal-next" aria-label="Следующая страница журнала">→</button>
+    </div>
+  </footer>
+</section>

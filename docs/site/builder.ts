@@ -23,7 +23,7 @@ const groups: Array<[string, string[]]> = [
   ['Размеры и положение', ['perPage', 'slidesPerGroup', 'autoWidth', 'autoHeight', 'fixedWidth', 'fixedHeight', 'slideMinSize', 'gap', 'peek', 'peekTrim', 'center', 'direction', 'start', 'roundLengths']],
   ['Движение', ['speed', 'loop', 'rewind', 'rewindByDrag', 'drag', 'dragSpeed', 'rubberband', 'freeSnap', 'flickPower', 'flickMaxPages', 'marquee']],
   ['Навигация', ['arrows', 'pagination', 'keyboard', 'wheel', 'scrollbar', 'navThrottleMs', 'isNavigation']],
-  ['Медиа и поведение', ['autoplay', 'video', 'holdToPause', 'visibility', 'lazy', 'nativeLazyAdjacent', 'grid', 'effect', 'fadeEffect', 'stackEffect', 'cubeEffect']],
+  ['Медиа и поведение', ['autoplay', 'video', 'holdToPause', 'visibility', 'lazy', 'nativeLazyAdjacent', 'grid', 'effect', 'fadeEffect', 'cubeEffect']],
   ['Адаптивность и другое', ['breakpoints', 'breakpointsBase', 'enabled', 'syncOnDrag', 'browserFixes', 'focusableElements', 'preventClicks', 'preventClicksPropagation', 'debug']],
 ]
 
@@ -43,13 +43,13 @@ const aliases: Record<string, Array<[string, string]>> = {
 }
 
 const enums: Record<string, string[]> = {
-  direction: ['horizontal', 'vertical'], effect: ['slide', 'fade', 'cube', 'stack'], drag: ['true', 'false', 'free'],
+  direction: ['horizontal', 'vertical'], effect: ['slide', 'fade', 'cube'], drag: ['true', 'false', 'free'],
   breakpointsBase: ['window', 'container'], 'pagination.type': ['bullets', 'fraction', 'progress', 'custom'],
   'pagination.strategy': ['even', 'center'], 'pagination.remainderStrategy': ['left', 'center', 'right'],
   'marquee.direction': ['left', 'right', 'up', 'down'], 'holdToPause.root': ['slider', 'container'],
 }
-const modeOptions = new Set(['autoplay', 'video', 'center', 'loop', 'arrows', 'pagination', 'keyboard', 'wheel', 'scrollbar', 'marquee', 'lazy', 'holdToPause', 'visibility', 'nativeLazyAdjacent', 'grid', 'fadeEffect', 'stackEffect', 'cubeEffect', 'browserFixes'])
-const objectOnly = new Set(['grid', 'fadeEffect', 'stackEffect', 'cubeEffect', 'browserFixes'])
+const modeOptions = new Set(['autoplay', 'video', 'center', 'loop', 'arrows', 'pagination', 'keyboard', 'wheel', 'scrollbar', 'marquee', 'lazy', 'holdToPause', 'visibility', 'nativeLazyAdjacent', 'grid', 'fadeEffect', 'cubeEffect', 'browserFixes'])
+const objectOnly = new Set(['grid', 'fadeEffect', 'cubeEffect', 'browserFixes'])
 const labels: Record<string, string> = {
   perPage: 'Видимых слайдов', slidesPerGroup: 'Слайдов за шаг', gap: 'Отступ между слайдами',
   peek: 'Видимые края соседних', speed: 'Скорость, мс', loop: 'Бесконечный цикл',

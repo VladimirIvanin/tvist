@@ -1,12 +1,47 @@
-<div class="tvist-v1 " aria-label="Демонстрационный слайдер">
-  <div class="tvist-v1__track">
-    <div class="tvist-v1__container">
-      <div class="tvist-v1__slide">01</div>
-      <div class="tvist-v1__slide">02</div>
-      <div class="tvist-v1__slide">03</div>
-      <div class="tvist-v1__slide">04</div>
-      <div class="tvist-v1__slide">05</div>
-      <div class="tvist-v1__slide">06</div>
+<section class="grid-demo" aria-label="Подборка идей для дома">
+  <header class="grid-demo__header">
+    <div>
+      <span class="grid-demo__eyebrow">Коллекция / 01</span>
+      <h2>Детали, которые вдохновляют</h2>
+    </div>
+    <span class="grid-demo__tag">6 идей для дома</span>
+  </header>
+  <div class="tvist-v1 grid-slider" aria-label="Идеи для дома в сетке">
+    <div class="tvist-v1__track">
+      <div class="tvist-v1__container">
+        <article class="tvist-v1__slide grid-card grid-card--sand">
+          <div class="grid-card__copy"><span class="grid-card__label">01 / Пространство</span><h3>Тихие формы</h3><p>Меньше деталей, больше воздуха.</p></div>
+          <div class="grid-card__art grid-card__art--arch" aria-hidden="true"></div>
+        </article>
+        <article class="tvist-v1__slide grid-card grid-card--sage">
+          <div class="grid-card__copy"><span class="grid-card__label">02 / Палитра</span><h3>Ближе к природе</h3><p>Оттенки шалфея, мха и оливы.</p></div>
+          <div class="grid-card__art grid-card__art--palette" aria-hidden="true"><i></i><i></i><i></i></div>
+        </article>
+        <article class="tvist-v1__slide grid-card grid-card--ink">
+          <div class="grid-card__copy"><span class="grid-card__label">03 / Свет</span><h3>Мягкий вечер</h3><p>Свет, который меняет настроение.</p></div>
+          <div class="grid-card__art grid-card__art--light" aria-hidden="true"></div>
+        </article>
+        <article class="tvist-v1__slide grid-card grid-card--clay">
+          <div class="grid-card__copy"><span class="grid-card__label">04 / Материал</span><h3>Тепло керамики</h3><p>Несовершенство ручной работы.</p></div>
+          <div class="grid-card__art grid-card__art--vase" aria-hidden="true"></div>
+        </article>
+        <article class="tvist-v1__slide grid-card grid-card--paper">
+          <div class="grid-card__copy"><span class="grid-card__label">05 / Ритм</span><h3>Чистые линии</h3><p>Геометрия повседневных вещей.</p></div>
+          <div class="grid-card__art grid-card__art--lines" aria-hidden="true"></div>
+        </article>
+        <article class="tvist-v1__slide grid-card grid-card--rose">
+          <div class="grid-card__copy"><span class="grid-card__label">06 / Акцент</span><h3>Немного цвета</h3><p>Одна деталь — новое ощущение.</p></div>
+          <div class="grid-card__art grid-card__art--circle" aria-hidden="true"></div>
+        </article>
+      </div>
     </div>
   </div>
-</div>
+  <footer class="grid-demo__footer">
+    <span class="grid-demo__hint">Листайте подборку</span>
+    <div class="grid-demo__controls">
+      <button class="grid-demo__arrow" type="button" id="grid-prev" aria-label="Предыдущая страница">←</button>
+      <span class="grid-demo__pagination" id="grid-pagination" role="status" aria-label="Страница подборки"></span>
+      <button class="grid-demo__arrow" type="button" id="grid-next" aria-label="Следующая страница">→</button>
+    </div>
+  </footer>
+</section>

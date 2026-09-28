@@ -56,7 +56,7 @@
 - `autoWidth` / `autoHeight` — размер слайдов по содержимому
 - `loop` — бесконечная прокрутка (`true` | `false` | `'auto'`)
 - `rewind` — возврат к первому слайду после последнего (без loop)
-- `effect` — эффект перехода (`slide` | `fade` | `cube` | `stack`)
+- `effect` — эффект перехода (`slide` | `fade` | `cube`)
 - `fadeEffect` — настройки fade (например `crossFade`)
 - `cubeEffect` — настройки cube (`slideShadows`, `shadow`, `shadowOffset`, `shadowScale`, `perspective`, `perspectiveOriginY`, `viewportPadding`)
 - `grid` — сетка (объект с `rows`, `cols`, `gap`, `dimensions`)

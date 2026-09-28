@@ -61,7 +61,7 @@ const DEFAULT_OPTIONS: Partial<TvistOptions> = {
 /**
  * Модификаторы на root, которые выставляют движок и модули.
  * При новом `Tvist` на том же элементе и при `clearSliderStyles` снимаются принудительно —
- * иначе часть классов остаётся после `destroy()` (locked, nav, disabled, stack и т.д.).
+ * иначе часть классов остаётся после `destroy()` (locked, nav, disabled и т.д.).
  */
 const TVIST_ROOT_RUNTIME_STATE_CLASSES: readonly string[] = [
   TVIST_CLASSES.draggable,
@@ -69,8 +69,6 @@ const TVIST_ROOT_RUNTIME_STATE_CLASSES: readonly string[] = [
   TVIST_CLASSES.singlePage,
   TVIST_CLASSES.nav,
   TVIST_CLASSES.cube,
-  TVIST_CLASSES.stack,
-  TVIST_CLASSES.stackPile,
   TVIST_CLASSES.locked,
   TVIST_CLASSES.vertical,
 ]

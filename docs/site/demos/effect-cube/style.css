@@ -1,8 +1,18 @@
-.tvist-v1 { position: relative; width: 100%; min-width: 0; }
-.tvist-v1__slide { height: 270px; display: grid; place-items: center; border-radius: 12px; font: 600 clamp(2.2rem, 7vw, 5rem)/1 system-ui, sans-serif; color: #fff; overflow: hidden; }
+.cube-demo { padding-top: 8px; }
+/* Абсолютно позиционированные грани не задают высоту контейнеру. */
+.cube-slider { position: relative; width: min(100%, 280px); aspect-ratio: 1; min-width: 0; margin-inline: auto; }
+.cube-slider > .tvist-v1__track { height: 100%; }
+.cube-slider .tvist-v1__slide { display: grid; place-items: center; border-radius: 0; font: 600 clamp(2.2rem, 7vw, 5rem)/1 system-ui, sans-serif; color: #fff; overflow: hidden; }
 .tvist-v1__slide[data-tvist-slide-index="0"] { background: #425b80; }
 .tvist-v1__slide[data-tvist-slide-index="1"] { background: #a9584f; }
 .tvist-v1__slide[data-tvist-slide-index="2"] { background: #718566; }
 .tvist-v1__slide[data-tvist-slide-index="3"] { background: #937887; }
 .tvist-v1__slide[data-tvist-slide-index="4"] { background: #bd8151; }
 .tvist-v1__slide[data-tvist-slide-index="5"] { background: #568887; }
+.cube-controls { display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 18px; color: #27302e; }
+.cube-controls button { display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 1px solid currentColor; border-radius: 4px; background: transparent; color: inherit; font-size: 20px; cursor: pointer; }
+.cube-controls button:disabled { opacity: .35; cursor: default; }
+.cube-controls button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.cube-pagination { display: flex; gap: 6px; font: 14px/1.5 system-ui, sans-serif; }
+.cube-pagination span { color: inherit; }
+:root[data-theme="dark"] .cube-controls { color: #f2f1ea; }

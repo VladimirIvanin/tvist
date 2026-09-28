@@ -155,6 +155,7 @@ img { max-width: 100%; display: block; }
 .demo-frame { display: block; width: 100%; height: 390px; border: 0; background: #eae7df; }
 .demo-card.is-mobile-preview .demo-frame { width: 375px; max-width: 100%; margin-inline: auto; }
 .demo-card[data-demo*="vertical"] .demo-frame, .demo-card[data-demo="auto-height"] .demo-frame { height: 450px; }
+.demo-card[data-demo="grid"] .demo-frame, .demo-card[data-demo="grid-dimensions"] .demo-frame { height: 530px; }
 .demo-card[data-demo="product-cards"] .demo-frame { height: 780px; }
 .demo-toolbar { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .code-tabs { display: flex; overflow-x: auto; }

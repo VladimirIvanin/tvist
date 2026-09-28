@@ -45,6 +45,7 @@ export default defineConfig({
       }
       server.watcher.on('change', refresh)
       server.watcher.on('add', refresh)
+      server.watcher.on('unlink', refresh)
     },
   }],
   resolve: {

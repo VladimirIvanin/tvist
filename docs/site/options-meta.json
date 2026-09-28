@@ -375,7 +375,7 @@
     },
     {
       "name": "effect",
-      "type": "'slide' | 'fade' | 'cube' | 'stack'",
+      "type": "'slide' | 'fade' | 'cube'",
       "default": "'slide'",
       "description": "Эффект перехода между слайдами"
     },
@@ -394,80 +394,6 @@
           "name": "crossFade",
           "type": "boolean",
           "description": ""
-        }
-      ]
-    },
-    {
-      "name": "stackEffect",
-      "type": "object",
-      "default": "undefined",
-      "description": "Настройки stack эффекта",
-      "nested": [
-        {
-          "name": "stackEffect",
-          "type": "{",
-          "description": ""
-        },
-        {
-          "name": "mode",
-          "type": "'cover' | 'uncover'",
-          "default": "'cover'",
-          "description": "Режим наложения слайдов. - `'cover'` — активный слайд сверху, едет поверх следующего (как страница поверх стопки). - `'uncover'` — в покое как `cover`; в переходе next — накрываем карту, prev — снимаем (нижний слайд на месте, верхний уезжает с `translate`)."
-        },
-        {
-          "name": "slideShadows",
-          "type": "boolean",
-          "description": ""
-        },
-        {
-          "name": "rotate",
-          "type": "boolean",
-          "description": ""
-        },
-        {
-          "name": "perSlideRotate",
-          "type": "number",
-          "description": ""
-        },
-        {
-          "name": "perSlideOffset",
-          "type": "number",
-          "default": "0",
-          "description": "Смещение стопки на слайд (px). При `stackLayout: 'pile'` — только поперёк оси прокрутки (вертикаль: вправо, горизонталь: вниз), чтобы колода не разъезжалась вдоль рельса."
-        },
-        {
-          "name": "perSlideScale",
-          "type": "number",
-          "description": ""
-        },
-        {
-          "name": "perSlideDepth",
-          "type": "number",
-          "description": ""
-        },
-        {
-          "name": "stackLayout",
-          "type": "'track' | 'pile'",
-          "default": "'track'",
-          "description": "Раскладка «ожидающих» слайдов (`progress > 0`) в покое. - `'track'` — каждый слайд на своей позиции вдоль оси (`-slidePosition`), как рельс. - `'pile'` — ожидающие (`progress > 0`) делят с активным текущий `translate` по оси; на root вешается модификатор `--stack-pile`: слайды `position: absolute` в контейнере (иначе остаются в потоке и идут столбиком). Веер: `rotate` / `perSlideOffset` / `perSlideScale` / `perSlideDepth`."
-        },
-        {
-          "name": "viewportPadding",
-          "type": "number",
-          "default": "0 (не задаётся)",
-          "description": "Внутренние отступы трека (px), как у `cubeEffect.viewportPadding`: запас под `rotate` и тени, без использования `peek`."
-        },
-        {
-          "name": "zIndexProgressScale",
-          "type": "number",
-          "default": "1",
-          "description": "Масштаб только для расчёта z-index: `progress / zIndexProgressScale`. Значения меньше 1 дают более раннюю перестановку слоёв (как в Swiper Cards)."
-        },
-        {
-          "name": "slideTravelRatio",
-          "type": "number",
-          "default": "1",
-          "description": "Доля визуального смещения слайдов, которые следуют за `translate` движка (`cover` в переходе, `uncover` — слой с `progress > 0`). Меньше 1 — короткий «снос» карты без полного хода по оси."
         }
       ]
     },
