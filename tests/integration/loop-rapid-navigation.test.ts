@@ -5,7 +5,8 @@ import '@modules/loop'
 import '@modules/navigation'
 import '@modules/pagination'
 import '@modules/autoplay'
-import { createSliderFixture, type SliderFixture } from '../fixtures'
+import '@modules/drag'
+import { createMouseEvent, createSliderFixture, type SliderFixture } from '../fixtures'
 
 describe('Loop rapid navigation', () => {
   let fixture: SliderFixture
@@ -81,6 +82,57 @@ describe('Loop rapid navigation', () => {
     await vi.advanceTimersByTimeAsync(300)
     expect(slider.engine.animator.isAnimating()).toBe(false)
     expect(slider.engine.location.get()).toBe(slider.engine.target.get())
+  })
+
+  it.each([
+    ['prev', 'button'],
+    ['prev', 'icon'],
+    ['next', 'button'],
+    ['next', 'icon'],
+  ] as const)('keeps animating when pressing the %s %s again', async (direction, targetType) => {
+    const button = direction === 'prev' ? prev : next
+    button.click()
+    await vi.advanceTimersByTimeAsync(60)
+    const index = slider.realIndex
+    const position = slider.engine.location.get()
+    const stop = vi.spyOn(slider.engine.animator, 'stop')
+    const ended = vi.fn()
+    slider.on('transitionEnd', ended)
+    const target = targetType === 'button' ? button : button.querySelector('svg path')!
+
+    target.dispatchEvent(createMouseEvent('mousedown', { clientX: 100, clientY: 100 }))
+    expect(slider.engine.animator.isAnimating()).toBe(true)
+    await vi.advanceTimersByTimeAsync(60)
+    expect(slider.engine.location.get()).not.toBe(position)
+    target.dispatchEvent(createMouseEvent('mouseup', { clientX: 100, clientY: 100 }))
+    button.click()
+
+    expect(stop).not.toHaveBeenCalled()
+    expect(slider.realIndex).toBe(index)
+    await vi.advanceTimersByTimeAsync(180)
+    expect(ended).toHaveBeenCalledTimes(1)
+    expect(slider.engine.animator.isAnimating()).toBe(false)
+  })
+
+  it('ignores pointer presses on pagination content for drag and holdToPause', async () => {
+    slider.updateOptions({ holdToPause: true })
+    next.click()
+    await vi.advanceTimersByTimeAsync(60)
+    const stop = vi.spyOn(slider.engine.animator, 'stop')
+    const hold = vi.fn()
+    slider.on('longPressStart', hold)
+    const bullet = fixture.root.querySelector(`.${TVIST_CLASSES.bullet}`)!
+    const label = document.createElement('span')
+    bullet.appendChild(label)
+
+    label.dispatchEvent(createMouseEvent('mousedown', { clientX: 100, clientY: 100 }))
+    await vi.advanceTimersByTimeAsync(120)
+    expect(slider.engine.animator.isAnimating()).toBe(true)
+    expect(stop).not.toHaveBeenCalled()
+    expect(hold).not.toHaveBeenCalled()
+    label.dispatchEvent(createMouseEvent('mouseup', { clientX: 100, clientY: 100 }))
+    await vi.advanceTimersByTimeAsync(120)
+    expect(slider.engine.animator.isAnimating()).toBe(false)
   })
 
   it.each(['prev', 'next'] as const)(

@@ -25,13 +25,13 @@ async function createSlider(frame: Frame, options: TvistOptions = {}) {
       <div id="browser-slider" class="tvist-v1" style="width:600px">
         <div class="tvist-v1__track">
           <div class="tvist-v1__container">
-            <div class="tvist-v1__slide">1</div>
-            <div class="tvist-v1__slide">2</div>
-            <div class="tvist-v1__slide">3</div>
+            <div class="tvist-v1__slide" style="height:200px">1</div>
+            <div class="tvist-v1__slide" style="height:200px">2</div>
+            <div class="tvist-v1__slide" style="height:200px">3</div>
           </div>
         </div>
-        <button class="tvist-v1__arrow--prev" type="button"></button>
-        <button class="tvist-v1__arrow--next" type="button"></button>
+        <button class="tvist-v1__arrow tvist-v1__arrow--prev" type="button"></button>
+        <button class="tvist-v1__arrow tvist-v1__arrow--next" type="button"></button>
         <div class="tvist-v1__pagination"></div>
       </div>`
     const BrowserTvist = (window as typeof window & { TvistV1: typeof Tvist }).TvistV1
@@ -125,11 +125,16 @@ test('module pack loaded after core restores the full feature set', async ({ pag
 for (const direction of ['prev', 'next'] as const) {
   test(`full browser bundle keeps loop moving during rapid ${direction} clicks`, async ({ page }) => {
     const frame = await isolatedFrame(page)
+    await page.locator('iframe[name="browser-bundle-test"]').evaluate(iframe => {
+      iframe.style.width = '720px'
+      iframe.style.height = '320px'
+    })
     await page.locator('iframe[name="browser-bundle-test"]').scrollIntoViewIfNeeded()
     await frame.addScriptTag({ path: bundlePath('tvist.min.js') })
     await createSlider(frame, {
       perPage: 1,
       loop: true,
+      speed: 1200,
       autoplay: { delay: 2600, pauseOnHover: true },
       arrows: true,
       pagination: true,
@@ -141,6 +146,41 @@ for (const direction of ['prev', 'next'] as const) {
     await frame.waitForFunction(() => {
       const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>('#browser-slider')
       return root?.tvistInstance?._isVisible
+    })
+
+    const arrow = frame.locator(`.tvist-v1__arrow--${direction}`)
+    await arrow.click()
+    await page.waitForTimeout(60)
+    await arrow.locator('svg').hover()
+    await page.mouse.down()
+    const pressed = await frame.evaluate(() => {
+      const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>('#browser-slider')!
+      const slider = root.tvistInstance!
+      return {
+        animating: slider.engine.animator.isAnimating(),
+        position: new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m41,
+      }
+    })
+    await page.waitForTimeout(200)
+    const held = await frame.evaluate(() => {
+      const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>('#browser-slider')!
+      const slider = root.tvistInstance!
+      return {
+        animating: slider.engine.animator.isAnimating(),
+        position: new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m41,
+      }
+    })
+    await page.mouse.up()
+    expect(pressed.animating).toBe(true)
+    expect(held.animating).toBe(true)
+    expect(Math.abs(held.position - pressed.position)).toBeGreaterThan(1)
+    await frame.waitForFunction(() => {
+      const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>('#browser-slider')!
+      return !root.tvistInstance!.engine.animator.isAnimating()
+    })
+    await frame.evaluate(() => {
+      const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>('#browser-slider')!
+      root.tvistInstance!.updateOptions({ speed: 300 })
     })
 
     const result = await frame.evaluate(async (direction) => {

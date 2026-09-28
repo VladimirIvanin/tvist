@@ -151,6 +151,67 @@ test.describe('Loop slider', () => {
   });
 
   for (const direction of ['prev', 'next'] as const) {
+    test(`повторное нажатие мышью на ${direction} не останавливает переход`, async ({ page }) => {
+      await page.evaluate(() => {
+        const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
+          '[data-testid="slider-loop"]'
+        )!;
+        root.tvistInstance!.updateOptions({
+          perPage: 1,
+          loop: true,
+          speed: 1200,
+          autoplay: { delay: 2600, pauseOnHover: true },
+          arrows: true,
+          pagination: true,
+        });
+      });
+      const arrow = page.getByTestId('slider-loop').locator(`.tvist-v1__arrow--${direction}`);
+      await arrow.click();
+      await page.waitForTimeout(60);
+      await arrow.locator('svg').hover();
+      await page.mouse.down();
+      const pressed = await page.evaluate(() => {
+        const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
+          '[data-testid="slider-loop"]'
+        )!;
+        const slider = root.tvistInstance!;
+        return {
+          animating: slider.engine.animator.isAnimating(),
+          position: new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m41,
+          index: slider.realIndex,
+        };
+      });
+      await page.waitForTimeout(200);
+      const held = await page.evaluate(() => {
+        const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
+          '[data-testid="slider-loop"]'
+        )!;
+        const slider = root.tvistInstance!;
+        return {
+          animating: slider.engine.animator.isAnimating(),
+          position: new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m41,
+        };
+      });
+      await page.mouse.up();
+
+      expect(pressed.animating).toBe(true);
+      expect(held.animating).toBe(true);
+      expect(Math.abs(held.position - pressed.position)).toBeGreaterThan(1);
+      await page.waitForFunction(() => {
+        const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
+          '[data-testid="slider-loop"]'
+        )!;
+        return !root.tvistInstance!.engine.animator.isAnimating();
+      });
+      const index = await page.evaluate(() => {
+        const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
+          '[data-testid="slider-loop"]'
+        )!;
+        return root.tvistInstance!.realIndex;
+      });
+      expect(index).toBe(pressed.index);
+    });
+
     test(`быстрые клики ${direction} сохраняют видимые слайды и работу autoplay`, async ({ page }) => {
       const result = await page.evaluate(async (direction) => {
         const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(

@@ -29,6 +29,13 @@ const dragLog = (..._args: unknown[]) => {
 
 const RUBBERBAND_FRICTION = 5;
 
+const SLIDER_CONTROL_SELECTOR = [
+  TVIST_CLASSES.arrowPrev,
+  TVIST_CLASSES.arrowNext,
+  TVIST_CLASSES.pagination,
+  TVIST_CLASSES.bullet,
+].map(className => `.${className}`).join(', ');
+
 interface DragPoint {
   x: number;
   y: number;
@@ -379,7 +386,7 @@ export class DragModule extends Module {
 
     const nearestBlock = target.closest?.(`.${TVIST_CLASSES.block}`);
     if (nearestBlock && nearestBlock !== this.tvist.root) return;
-    if (this.isFocusableElement(target)) return;
+    if (target.closest(SLIDER_CONTROL_SELECTOR) || this.isFocusableElement(target)) return;
     if (this.holdConfig.exclude && target.closest(this.holdConfig.exclude)) return;
 
     const point = this.getPointerPosition(e);
@@ -550,7 +557,8 @@ export class DragModule extends Module {
     const target = e.target as HTMLElement;
     const nearestBlock = target?.closest?.(`.${TVIST_CLASSES.block}`);
     if (nearestBlock && nearestBlock !== this.tvist.root) return;
-    if (this.isFocusableElement(target)) return;
+    // Нажатие на стрелку или её SVG не должно останавливать переход как начало drag.
+    if (target.closest(SLIDER_CONTROL_SELECTOR) || this.isFocusableElement(target)) return;
 
     const point = this.getPointerPosition(e);
     if (!point) return;
