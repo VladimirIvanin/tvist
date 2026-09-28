@@ -216,8 +216,8 @@ export class PaginationModule extends Module {
       }
     }
 
-    // Если не найден - ищем по дефолтному классу
-    this.container ??= this.tvist.root.querySelector(`.${TVIST_CLASSES.pagination}`)
+    // Ищем по стандартному классу только контейнер этого слайдера.
+    this.container ??= this.findOwnElement(`.${TVIST_CLASSES.pagination}`)
 
     if (!this.container) {
       this.container = document.createElement('div')

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import demos from '../docs/site/demos.json' with { type: 'json' }
+import type { Tvist, TvistRootElement } from '../src/core/Tvist'
 
 test('старые адреса и все страницы примеров открываются напрямую', async ({ page }) => {
   for (const route of ['examples-list.html', 'guide/getting-started.html', 'api/options.html', ...demos.map((demo) => `examples/${demo.id}.html`)]) {
@@ -92,6 +93,38 @@ test('вложенный слайдер и модуль ленивой загр�
   await page.goto('preview.html?id=lazyload')
   await expect(page.locator('.tvist-v1__slide img').first()).toHaveAttribute('src', /^data:image\/svg\+xml/)
   await expect(page.locator('.tvist-v1__slide img').first()).not.toHaveAttribute('data-src')
+})
+
+test('управление вложенного слайдера не перехватывается родителем при обратном порядке инициализации', async ({ page }) => {
+  await page.goto('preview.html?id=nested-sliders')
+  await expect(page.locator('.parent-slider > .tvist-v1__arrow')).toHaveCount(2)
+  await page.evaluate(() => {
+    const parentRoot = document.querySelector<TvistRootElement>('.parent-slider')!
+    const childRoot = document.querySelector<TvistRootElement>('.child-slider')!
+    const Slider = (window as unknown as { TvistV1: typeof Tvist }).TvistV1
+    parentRoot.tvistInstance!.destroy({ destroyNested: true })
+    new Slider(childRoot, { perPage: 1, arrows: true, pagination: true, speed: 0 })
+    new Slider(parentRoot, { perPage: 1, arrows: true, pagination: true, speed: 0 })
+  })
+
+  const parent = page.locator('.parent-slider')
+  const child = page.locator('.child-slider')
+  const parentSlide = parent.locator(':scope > .tvist-v1__track > .tvist-v1__container > .tvist-v1__slide--active')
+  const childSlide = child.locator('.tvist-v1__slide--active')
+  await expect(parent.locator(':scope > .tvist-v1__arrow')).toHaveCount(2)
+  await expect(child.locator(':scope > .tvist-v1__arrow')).toHaveCount(2)
+  await expect(parent.locator(':scope > .tvist-v1__pagination > .tvist-v1__bullet')).toHaveCount(3)
+  await expect(child.locator(':scope > .tvist-v1__pagination > .tvist-v1__bullet')).toHaveCount(3)
+  await child.locator('.tvist-v1__arrow--next').click()
+  await expect(childSlide).toHaveAttribute('data-tvist-slide-index', '1')
+  await expect(parentSlide).toHaveAttribute('data-tvist-slide-index', '0')
+  await parent.locator(':scope > .tvist-v1__arrow--next').click()
+  await expect(parentSlide).toHaveAttribute('data-tvist-slide-index', '1')
+  await expect(childSlide).toHaveAttribute('data-tvist-slide-index', '1')
+  await parent.locator(':scope > .tvist-v1__arrow--prev').click()
+  await child.locator('.tvist-v1__bullet').last().click()
+  await expect(childSlide).toHaveAttribute('data-tvist-slide-index', '2')
+  await expect(parentSlide).toHaveAttribute('data-tvist-slide-index', '0')
 })
 
 test('конструктор выдаёт код пресета и полную CDN-страницу', async ({ page, context }) => {

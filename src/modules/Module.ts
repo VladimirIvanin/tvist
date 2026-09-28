@@ -5,6 +5,7 @@
 
 import type { Tvist } from '../core/Tvist'
 import type { TvistOptions } from '../core/types'
+import { TVIST_CLASSES } from '../core/constants'
 
 export abstract class Module {
   /**
@@ -67,6 +68,15 @@ export abstract class Module {
     return true
   }
 
+  /** Находит первый элемент своего root, пропуская элементы вложенных слайдеров. */
+  protected findOwnElement(selector: string): HTMLElement | null {
+    const root = this.tvist.root
+    const blockSelector = `.${TVIST_CLASSES.block}`
+    return Array.from(root.querySelectorAll<HTMLElement>(selector)).find(
+      element => element.closest(blockSelector) === root
+    ) ?? null
+  }
+
   /**
    * Emit события через главный event emitter
    */
@@ -99,4 +109,3 @@ export type ModuleConstructor = new (
   tvist: Tvist,
   options: TvistOptions
 ) => Module
-

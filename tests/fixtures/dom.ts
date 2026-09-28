@@ -163,9 +163,7 @@ export function createSliderFixture(config: SliderFixtureConfig = {}): SliderFix
 
   // Cleanup функция
   const cleanup = () => {
-    if (root.parentNode) {
-      document.body.removeChild(root)
-    }
+    root.remove()
   }
 
   return { root, track, container, slides, cleanup }
@@ -319,4 +317,3 @@ export function resizeSlider(root: HTMLElement, width: number, height?: number):
     })
   }
 }
-

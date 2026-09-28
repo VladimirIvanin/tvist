@@ -104,9 +104,9 @@ export class NavigationModule extends Module {
       }
     }
 
-    // Если не найдены - ищем по дефолтным классам
-    this.prevButton ??= this.tvist.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.arrowPrev}`)
-    this.nextButton ??= this.tvist.root.querySelector<HTMLElement>(`.${TVIST_CLASSES.arrowNext}`)
+    // Ищем по стандартным классам только элементы этого слайдера.
+    this.prevButton ??= this.findOwnElement(`.${TVIST_CLASSES.arrowPrev}`)
+    this.nextButton ??= this.findOwnElement(`.${TVIST_CLASSES.arrowNext}`)
 
     this.prevButton ??= this.createArrow('prev')
     this.nextButton ??= this.createArrow('next')
