@@ -10,6 +10,7 @@ const status = demo.querySelector('.stories-status');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const HOLD_THRESHOLD = 100;
 const STORY_AUTOPLAY = { delay: 2800, pauseOnHover: false, pauseOnFocus: false, waitForVideo: false };
+const groupsToReset = new Set();
 let activeGroup = 0;
 let transitioning = false;
 let ended = false;
@@ -45,13 +46,15 @@ function renderProgress(groupIndex, storyIndex, progress) {
 function renderControls() {
   const slider = innerSliders[activeGroup];
   groupButtons.forEach((button, index) => button.setAttribute('aria-pressed', String(index === activeGroup)));
-  previousButton.disabled = transitioning || (activeGroup === 0 && slider.realIndex === 0);
+  previousButton.disabled = transitioning || ended || (activeGroup === 0 && slider.realIndex === 0);
   nextButton.disabled = transitioning || ended;
   motionButton.disabled = ended;
   motionButton.textContent = paused ? 'Воспроизвести' : 'Пауза';
   motionButton.setAttribute('aria-pressed', String(paused));
   shell.classList.toggle('stories-shell--hold-paused', holding);
-  status.textContent = ended ? 'Все истории просмотрены. Можно начать сначала.' : holding ? 'Пауза по удержанию' : `${groupButtons[activeGroup].firstElementChild.textContent} · история ${slider.realIndex + 1} из ${slider.slides.length}`;
+  if (ended) status.textContent = 'Все истории просмотрены. Можно начать сначала.';
+  else if (holding) status.textContent = 'Пауза по удержанию';
+  else status.textContent = `${groupButtons[activeGroup].firstElementChild.textContent} · история ${slider.realIndex + 1} из ${slider.slides.length}`;
 }
 
 function activateGroup(index) {
@@ -64,6 +67,8 @@ function activateGroup(index) {
     const active = groupIndex === index;
     if (active) {
       slider.update();
+      // Скрытая группа может пропускать layout; сбрасываем позицию после её показа.
+      if (groupsToReset.delete(groupIndex)) slider.scrollTo(0, true);
       renderProgress(index, slider.realIndex, 0);
     }
     slider.updateOptions({ autoplay: active ? STORY_AUTOPLAY : false });
@@ -161,7 +166,7 @@ demo.querySelector('[data-stories-replay]').addEventListener('click', () => {
   paused = reducedMotion.matches;
   innerSliders.forEach((slider, index) => {
     slider.updateOptions({ autoplay: false });
-    slider.scrollTo(0, true);
+    groupsToReset.add(index);
     renderProgress(index, 0, 0);
   });
   if (groupSlider.realIndex === 0) activateGroup(0);
@@ -173,7 +178,15 @@ innerRoots.forEach((root, groupIndex) => root.addEventListener('pointerdown', ev
   if (!event.isPrimary || event.button !== 0 || transitioning || ended || groupIndex !== activeGroup) return;
   const bounds = root.getBoundingClientRect();
   const position = (event.clientX - bounds.left) / bounds.width;
-  tap = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, startedAt: performance.now(), groupIndex, storyIndex: innerSliders[groupIndex].realIndex, direction: position < .35 ? 'prev' : position > .65 ? 'next' : null };
+  tap = {
+    pointerId: event.pointerId,
+    x: event.clientX,
+    y: event.clientY,
+    startedAt: performance.now(),
+    groupIndex,
+    storyIndex: innerSliders[groupIndex].realIndex,
+    direction: position < .35 ? 'prev' : position > .65 ? 'next' : null,
+  };
 }, { capture: true }));
 
 function onPointerUp(event) {
