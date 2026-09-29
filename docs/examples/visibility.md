@@ -1,7 +1,5 @@
 # Visibility - Отслеживание видимости
 
-> **Visibility и Autoplay входят в core.** Для примера с Marquee дополнительно подключите `tvist.min.js` и `tvist.css` до создания слайдера. Полная сборка `tvist.min.js` с `tvist.css` уже включает эти возможности. [Схема подключения](/guide/installation).
-
 Модуль `visibility` автоматически приостанавливает работу autoplay и marquee, когда слайдер скрыт через CSS (`display: none`, `visibility: hidden`), и возобновляет их при появлении.
 
 ## Зачем это нужно?
