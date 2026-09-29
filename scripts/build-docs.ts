@@ -241,7 +241,11 @@ function home(): string {
   <div class="tvist-v1__slide"><img src="assets/abstract-2.webp" alt="Абстрактная композиция из цветного стекла" width="1200" height="800"></div>
   <div class="tvist-v1__slide"><img src="assets/abstract-3.webp" alt="Абстрактная композиция с призмами" width="1200" height="800"></div>
   </div></div></div><div class="hero-demo-bottom"><span>Настоящий Tvist в действии</span><div><button type="button" data-hero-prev aria-label="Предыдущий слайд">←</button><button type="button" data-hero-next aria-label="Следующий слайд">→</button></div></div></div></section>
-  <section class="feature-band page-wrap"><p>От одной карточки до бесконечной ленты.<br>Вся механика под вашим контролем.</p><div><span>01 / Drag</span><span>02 / Loop</span><span>03 / Responsive</span><span>04 / Modules</span></div></section>
+  <section class="quick-start page-wrap" aria-labelledby="quick-start-title">
+  <div class="quick-start-copy"><span class="eyebrow">Быстрый старт / браузер</span><h2 id="quick-start-title">Первый слайдер<br><em>за пару строк.</em></h2><p>Подключите Tvist через CDN и создайте слайдер прямо на странице. Сборка и импорты не нужны.</p><a href="${base}guide/getting-started.html">Полное руководство <span>↗</span></a></div>
+  <div class="quick-start-code"><div class="quick-start-bar"><div class="quick-start-dots" aria-hidden="true"><i></i><i></i><i></i></div><span>index.html</span><button type="button" data-quick-start-copy>Копировать код</button></div>
+  <div class="quick-start-tabs" role="group" aria-label="Код быстрого старта"><button type="button" class="is-active" aria-pressed="true" data-quick-start-tab="html">HTML</button><button type="button" aria-pressed="false" data-quick-start-tab="js">JavaScript</button></div>
+  <pre class="quick-start-pre"><code data-quick-start-code></code></pre></div></section>
   <section class="home-links page-wrap"><span class="eyebrow">Начните здесь</span><div class="home-link-grid">
   <a href="${base}guide/getting-started.html"><h2>Быстрый старт</h2><p>Подключите Tvist и запустите первый слайдер.</p><span>↗</span></a>
   <a href="${base}examples-list.html"><h2>Живые примеры</h2><p>Попробуйте возможности и скопируйте код.</p><span>↗</span></a>

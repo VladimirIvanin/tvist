@@ -121,6 +121,38 @@ if (hero) {
   document.querySelector('[data-hero-next]')?.addEventListener('click', () => slider.next())
 }
 
+const quickStart = document.querySelector<HTMLElement>('.quick-start-code')
+if (quickStart) {
+  const code = {
+    html: `<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css">\n\n<div class="tvist-v1 my-slider">\n  <div class="tvist-v1__track">\n    <div class="tvist-v1__container">\n      <div class="tvist-v1__slide">Слайд 1</div>\n      <div class="tvist-v1__slide">Слайд 2</div>\n      <div class="tvist-v1__slide">Слайд 3</div>\n    </div>\n  </div>\n</div>\n\n<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>`,
+    js: `<script>\ndocument.addEventListener('DOMContentLoaded', function () {\n  var slider = new window.TvistV1('.my-slider', {\n    perPage: 1,\n    gap: 16\n  });\n});\n</script>`,
+  }
+  const output = quickStart.querySelector<HTMLElement>('[data-quick-start-code]')
+  let active: keyof typeof code = 'html'
+  const show = () => { if (output) output.textContent = code[active] }
+  show()
+  quickStart.querySelectorAll<HTMLButtonElement>('[data-quick-start-tab]').forEach((button) => button.addEventListener('click', () => {
+    active = button.dataset.quickStartTab as keyof typeof code
+    quickStart.querySelectorAll<HTMLButtonElement>('[data-quick-start-tab]').forEach((tab) => {
+      const selected = tab === button
+      tab.classList.toggle('is-active', selected)
+      tab.setAttribute('aria-pressed', String(selected))
+    })
+    show()
+  }))
+  quickStart.querySelector<HTMLButtonElement>('[data-quick-start-copy]')?.addEventListener('click', async (event) => {
+    const button = event.currentTarget as HTMLButtonElement
+    try {
+      await navigator.clipboard.writeText(code[active])
+      button.textContent = 'Скопировано ✓'
+    } catch {
+      button.textContent = 'Выделите код вручную'
+      output?.parentElement?.focus()
+    }
+    window.setTimeout(() => { button.textContent = 'Копировать код' }, 1800)
+  })
+}
+
 const search = document.querySelector<HTMLInputElement>('#example-search')
 if (search) {
   let category = 'all'
