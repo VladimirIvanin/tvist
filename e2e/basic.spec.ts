@@ -57,49 +57,64 @@ test.describe('Basic slider', () => {
     }
     await page.mouse.up();
 
-    await page.waitForFunction(() =>
-      Number(document.querySelector('[data-testid="basic-real-index"]')?.textContent) > 0
+    await page.waitForFunction(
+      () => Number(document.querySelector('[data-testid="basic-real-index"]')?.textContent) > 0
     );
     expect(await getActiveSlideIndex(page, 'slider-basic')).toBeGreaterThan(0);
   });
 
-  test('CSS-переход движется без покадровых записей и прерывается в текущей точке', async ({ page }) => {
+  test('CSS-переход движется без покадровых записей и прерывается в текущей точке', async ({
+    page,
+  }) => {
     const result = await page.evaluate(async () => {
       const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
         '[data-testid="slider-basic"]'
       )!;
       const slider = root.tvistInstance!;
       const container = root.querySelector<HTMLElement>('.tvist-v1__container')!;
-      slider.updateOptions({ speed: 600 });
+      slider.updateOptions({ speed: 1200 });
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
       let styleWrites = 0;
       let ends = 0;
-      const observer = new MutationObserver((records) => { styleWrites += records.length; });
+      const observer = new MutationObserver((records) => {
+        styleWrites += records.length;
+      });
       observer.observe(container, { attributes: true, attributeFilter: ['style'] });
-      slider.on('transitionEnd', () => { ends += 1; });
+      slider.on('transitionEnd', () => {
+        ends += 1;
+      });
 
       const position = () => new DOMMatrixReadOnly(getComputedStyle(container).transform).m41;
       slider.scrollTo(1);
-      await new Promise(resolve => setTimeout(resolve, 120));
+      await new Promise((resolve) => setTimeout(resolve, 120));
       const middle = position();
-      const target = slider.engine.target.get();
+      const target = -slider.slides[slider.activeIndex]!.offsetLeft;
       const writesDuringTransition = styleWrites;
-      slider.engine.animator.stop();
-      const frozen = position();
       slider.scrollTo(2);
-      await new Promise(resolve => setTimeout(resolve, 80));
+      const frozen = position();
+      await new Promise((resolve) => setTimeout(resolve, 80));
       let midEvents = 0;
-      const onScroll = () => { midEvents += 1; };
+      const onScroll = () => {
+        midEvents += 1;
+      };
       slider.on('scroll', onScroll);
-      await new Promise(resolve => setTimeout(resolve, 80));
+      await new Promise<void>((resolve) => slider.once('scroll', resolve));
       slider.off('scroll', onScroll);
       const eventsAfterOff = midEvents;
-      await new Promise(resolve => setTimeout(resolve, 600));
+      await new Promise((resolve) => setTimeout(resolve, 1200));
       observer.disconnect();
       return {
-        middle, target, frozen, writesDuringTransition, ends, midEvents, eventsAfterOff,
-        final: position(), finalTarget: slider.engine.target.get(),
-        animating: slider.engine.animator.isAnimating(),
+        middle,
+        target,
+        frozen,
+        writesDuringTransition,
+        ends,
+        midEvents,
+        eventsAfterOff,
+        final: position(),
+        finalTarget: -slider.slides[slider.activeIndex]!.offsetLeft,
+        animating: Boolean(slider.container.style.transition),
       };
     });
 
@@ -121,13 +136,14 @@ test.describe('Basic slider', () => {
       )!;
       const slider = root.tvistInstance!;
       slider.updateOptions({ speed: 600 });
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
       slider.scrollTo(1);
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       slider.updateOptions({ direction: 'vertical' });
       return {
-        animating: slider.engine.animator.isAnimating(),
+        animating: Boolean(slider.container.style.transition),
         transition: slider.container.style.transition,
-        location: slider.engine.location.get(),
+        location: new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m42,
       };
     });
 
@@ -146,7 +162,7 @@ test.describe('Loop slider', () => {
       const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
         '[data-testid="slider-loop"]'
       );
-      return root?.tvistInstance?._isVisible;
+      return root?.tvistInstance?.visibility?.isVisible();
     });
   });
 
@@ -176,7 +192,7 @@ test.describe('Loop slider', () => {
         )!;
         const slider = root.tvistInstance!;
         return {
-          animating: slider.engine.animator.isAnimating(),
+          animating: Boolean(slider.container.style.transition),
           position: new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m41,
           index: slider.realIndex,
         };
@@ -188,7 +204,7 @@ test.describe('Loop slider', () => {
         )!;
         const slider = root.tvistInstance!;
         return {
-          animating: slider.engine.animator.isAnimating(),
+          animating: Boolean(slider.container.style.transition),
           position: new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m41,
         };
       });
@@ -201,7 +217,7 @@ test.describe('Loop slider', () => {
         const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
           '[data-testid="slider-loop"]'
         )!;
-        return !root.tvistInstance!.engine.animator.isAnimating();
+        return !Boolean(root.tvistInstance!.container.style.transition);
       });
       const index = await page.evaluate(() => {
         const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
@@ -212,7 +228,9 @@ test.describe('Loop slider', () => {
       expect(index).toBe(pressed.index);
     });
 
-    test(`быстрые клики ${direction} сохраняют видимые слайды и работу autoplay`, async ({ page }) => {
+    test(`быстрые клики ${direction} сохраняют видимые слайды и работу autoplay`, async ({
+      page,
+    }) => {
       const result = await page.evaluate(async (direction) => {
         const root = document.querySelector<HTMLElement & { tvistInstance?: Tvist }>(
           '[data-testid="slider-loop"]'
@@ -235,7 +253,9 @@ test.describe('Loop slider', () => {
         let checkedFrames = 0;
         let uncoveredFrames = 0;
         let watching = true;
-        slider.on('transitionEnd', () => { completed += 1; });
+        slider.on('transitionEnd', () => {
+          completed += 1;
+        });
 
         const checkCoverage = () => {
           if (!watching) return;
@@ -254,23 +274,28 @@ test.describe('Loop slider', () => {
 
         for (let i = 0; i < 60; i += 1) {
           button.click();
-          await new Promise(resolve => setTimeout(resolve, 20));
+          await new Promise((resolve) => setTimeout(resolve, 20));
         }
         const completedDuringClicks = completed;
-        await new Promise(resolve => setTimeout(resolve, 400));
-        const settled = !slider.engine.animator.isAnimating();
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        const settled = !Boolean(slider.container.style.transition);
         const rendered = new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m41;
-        const target = slider.engine.target.get();
+        const target = -slider.slides[slider.activeIndex]!.offsetLeft;
         const index = slider.realIndex;
         const activeBullet = root.querySelector('.tvist-v1__bullet--active');
         const bullets = [...root.querySelectorAll('.tvist-v1__bullet')];
         const paginationMatches = bullets.indexOf(activeBullet!) === index;
 
         root.dispatchEvent(new MouseEvent('mouseleave'));
-        await new Promise(resolve => setTimeout(resolve, 3100));
+        await new Promise((resolve) => setTimeout(resolve, 3100));
         watching = false;
         return {
-          checkedFrames, uncoveredFrames, completedDuringClicks, settled, rendered, target,
+          checkedFrames,
+          uncoveredFrames,
+          completedDuringClicks,
+          settled,
+          rendered,
+          target,
           paginationMatches,
           autoplayResumed: slider.realIndex === (index + 1) % slider.originalSlideCount,
         };
@@ -313,24 +338,43 @@ test.describe('Loop slider', () => {
       const transitions: string[] = [];
       const animations: number[] = [];
       const remainingDistances: number[] = [];
-      const directions = ['next', 'next', 'next', 'next', 'next', 'prev', 'prev', 'prev', 'prev', 'prev'] as const;
+      const directions = [
+        'next',
+        'next',
+        'next',
+        'next',
+        'next',
+        'prev',
+        'prev',
+        'prev',
+        'prev',
+        'prev',
+      ] as const;
       for (const direction of directions) {
         slider[direction]();
         indices.push(slider.realIndex);
         transitions.push(container.style.transition);
-        await new Promise(resolve => setTimeout(resolve, 60));
+        await new Promise((resolve) => setTimeout(resolve, 60));
         animations.push(container.getAnimations().length);
         const rendered = new DOMMatrixReadOnly(getComputedStyle(container).transform).m41;
-        remainingDistances.push(Math.abs(rendered - slider.engine.target.get()));
-        await new Promise(resolve => setTimeout(resolve, 160));
+        remainingDistances.push(
+          Math.abs(rendered - -slider.slides[slider.activeIndex]!.offsetLeft)
+        );
+        await new Promise((resolve) => setTimeout(resolve, 160));
       }
-      return { indices, transitions, animations, remainingDistances, animating: slider.engine.animator.isAnimating() };
+      return {
+        indices,
+        transitions,
+        animations,
+        remainingDistances,
+        animating: Boolean(slider.container.style.transition),
+      };
     });
 
     expect(result.indices).toEqual([1, 2, 0, 1, 2, 1, 0, 2, 1, 0]);
-    expect(result.transitions.every(value => value.includes('transform 180ms'))).toBe(true);
+    expect(result.transitions.every((value) => value.includes('transform 180ms'))).toBe(true);
     expect(result.animations).toEqual(Array(10).fill(1));
-    expect(result.remainingDistances.every(distance => distance > 1)).toBe(true);
+    expect(result.remainingDistances.every((distance) => distance > 1)).toBe(true);
     expect(result.animating).toBe(false);
   });
 });

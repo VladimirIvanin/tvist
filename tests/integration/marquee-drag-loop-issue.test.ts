@@ -1,6 +1,7 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * Marquee + Drag + Loop - Тесты для локализации проблемы с "дырами"
- * 
+ *
  * ПРОБЛЕМА: при drag в marquee режиме появляются пустые пространства (дыры)
  * потому что логика loop не срабатывает корректно
  */
@@ -112,15 +113,15 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
         gap: 20
       })
 
-      const loopModule = slider.getModule('loop') as any
-      const marqueeModule = slider.getModule('marquee') as any
+      const loopModule = getRuntime(slider).getModule('loop') as any
+      const marqueeModule = getRuntime(slider).getModule('marquee') as any
 
       expect(loopModule).toBeDefined()
       expect(marqueeModule).toBeDefined()
-      
+
       // Проверяем что loop был автоматически включен marquee
       expect(slider.options.loop).toBe(true)
-      
+
       // Проверяем начальное состояние
       const state = loopModule.getTransformState()
       console.log('Начальное состояние:')
@@ -128,7 +129,7 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
       console.log('  Active Index:', state.activeIndex)
       console.log('  Slides Order:', state.slidesOrder.join(', '))
       console.log('  Looped Slides:', state.loopedSlides)
-      
+
       // В начале location должен быть 0
       expect(state.location).toBe(0)
     })
@@ -159,33 +160,33 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
         gap: 20
       })
 
-      const loopModule = slider.getModule('loop') as any
+      const loopModule = getRuntime(slider).getModule('loop') as any
       let loopFixCalls: any[] = []
-      
+
       const originalFix = loopModule.fix.bind(loopModule)
       loopModule.fix = (params: any) => {
         const before = {
-          location: slider.engine.location.get(),
+          location: getRuntime(slider).engine.location.get(),
           slidesOrder: [...slider.slides].map(s => s.getAttribute('data-tvist-slide-index'))
         }
         const result = originalFix(params)
         const after = {
-          location: slider.engine.location.get(),
+          location: getRuntime(slider).engine.location.get(),
           slidesOrder: [...slider.slides].map(s => s.getAttribute('data-tvist-slide-index'))
         }
-        
+
         loopFixCalls.push({
           params,
           before,
           after,
           reordered: before.slidesOrder.join(',') !== after.slidesOrder.join(',')
         })
-        
+
         return result
       }
 
       console.log('\n=== ОТСЛЕЖИВАНИЕ LOOPFIX ===')
-      
+
       await simulateDrag(root, 400, 30, 3)
 
       console.log('Вызовов loopFix:', loopFixCalls.length)
@@ -202,7 +203,7 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
       // АНАЛИЗ: был ли вызван loopFix и перестроил ли он слайды?
       const anyReordered = loopFixCalls.some(call => call.reordered)
       console.log('\nБыли ли перестроены слайды?', anyReordered)
-      
+
       if (!anyReordered && loopFixCalls.length > 0) {
         console.log('❌ ПРОБЛЕМА: loopFix был вызван, но НЕ перестроил слайды')
         console.log('   Возможно условия для prepend не выполнились')
@@ -222,11 +223,11 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
         gap: 20
       })
 
-      const marqueeModule = slider.getModule('marquee') as any
-      const loopModule = slider.getModule('loop') as any
+      const marqueeModule = getRuntime(slider).getModule('marquee') as any
+      const loopModule = getRuntime(slider).getModule('loop') as any
 
       console.log('\n=== ТЕСТ 3: Drag с начальной позицией marquee ===')
-      
+
       // Симулируем что marquee уже прокрутился на 100px
       if (marqueeModule?.setCurrentPosition) {
         marqueeModule.setCurrentPosition(100)
@@ -241,8 +242,8 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
       await simulateDrag(root, 400, 50, 5)
 
       const finalTransform = getTranslateX(container)
-      const finalLocation = slider.engine.location.get()
-      
+      const finalLocation = getRuntime(slider).engine.location.get()
+
       console.log('Финальный transform:', finalTransform)
       console.log('Финальный location:', finalLocation)
       console.log('Marquee position после:', marqueeModule.getCurrentPosition())
@@ -250,7 +251,7 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
       // ПРОВЕРКА: трансформ должен учитывать начальную позицию marquee
       // Ожидаемая позиция: -100 (начальная) + 50 (драг) = -50
       const expectedRange = [-60, -40] // Допуск
-      
+
       if (finalTransform < expectedRange[0] || finalTransform > expectedRange[1]) {
         console.log('❌ ПРОБЛЕМА: финальный transform =', finalTransform)
         console.log('   Ожидался диапазон:', expectedRange)
@@ -269,8 +270,8 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
         gap: 20
       })
 
-      const marqueeModule = slider.getModule('marquee') as any
-      const dragModule = slider.getModule('drag') as any
+      const marqueeModule = getRuntime(slider).getModule('marquee') as any
+      const dragModule = getRuntime(slider).getModule('drag') as any
 
       // Устанавливаем позицию marquee
       if (marqueeModule?.setCurrentPosition) {
@@ -315,7 +316,7 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
       // Проверяем что позиция не "откатилась"
       const transformAfterStart = getTranslateX(container)
       console.log('Transform после начала драга:', transformAfterStart)
-      
+
       // Позиция должна быть больше -150 (двинулись вправо)
       expect(transformAfterStart).toBeGreaterThan(-150)
       // Но не слишком далеко
@@ -345,10 +346,10 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
         perPage: 4 // Показываем 4 слайда (800px / 200px)
       })
 
-      const loopModule = slider.getModule('loop') as any
-      
+      const loopModule = getRuntime(slider).getModule('loop') as any
+
       console.log('\n=== ТЕСТ 4: Подстановка слайдов при drag вправо ===')
-      
+
       const initialOrder = [...slider.slides].map(s => s.getAttribute('data-tvist-slide-index'))
       console.log('Начальный порядок слайдов:', initialOrder.join(', '))
       console.log('Looped slides:', loopModule.loopedSlides)
@@ -358,17 +359,17 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
 
       const finalOrder = [...slider.slides].map(s => s.getAttribute('data-tvist-slide-index'))
       console.log('Финальный порядок слайдов:', finalOrder.join(', '))
-      
-      const location = slider.engine.location.get()
-      const activeIndex = slider.engine.index.get()
-      
+
+      const location = getRuntime(slider).engine.location.get()
+      const activeIndex = getRuntime(slider).engine.index.get()
+
       console.log('Location:', location)
       console.log('Active Index:', activeIndex)
-      
+
       // АНАЛИЗ: изменился ли порядок слайдов?
       const orderChanged = initialOrder.join(',') !== finalOrder.join(',')
       console.log('Порядок изменился?', orderChanged)
-      
+
       // После фикса Bug 2 важно, чтобы loopFix вызывался и мог подставлять
       // слайды при drag в marquee режиме (это проверяется отдельным тестом
       // ниже). Однако конкретный порядок слайдов может не измениться в каждом
@@ -387,9 +388,9 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
         gap: 20
       })
 
-      const loopModule = slider.getModule('loop') as any
+      const loopModule = getRuntime(slider).getModule('loop') as any
       const loopFixParams: any[] = []
-      
+
       const originalFix = loopModule.fix.bind(loopModule)
       loopModule.fix = (params: any) => {
         loopFixParams.push(params)
@@ -424,10 +425,10 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
         gap: 20
       })
 
-      const marqueeModule = slider.getModule('marquee') as any
-      
+      const marqueeModule = getRuntime(slider).getModule('marquee') as any
+
       console.log('\n=== ТЕСТ 5: Marquee vs Loop конфликт ===')
-      
+
       // Проверяем что marquee остановлен во время drag
       const api = marqueeModule.getMarquee()
       console.log('Marquee running перед драгом?', api.isRunning())
@@ -470,7 +471,7 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
       await new Promise(resolve => setTimeout(resolve, 50))
 
       console.log('Marquee running после драга?', api.isRunning())
-      
+
       // После драга marquee должен возобновиться
       expect(api.isRunning()).toBe(true)
     })

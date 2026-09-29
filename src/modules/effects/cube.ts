@@ -1,152 +1,147 @@
-import { TVIST_CLASSES } from '../../core/constants'
-import type { Tvist } from '../../core/Tvist'
-import type { TvistOptions } from '../../core/types'
-import { getCubeSlideIndex, getCubeSlidesInRange } from './cubeSlideInRange'
+import { TVIST_CLASSES } from '../../core/constants';
+import type { TvistRuntime as Tvist } from '../../core/runtime';
+import type { TvistOptions } from '../../core/types';
+import { getCubeSlideIndex, getCubeSlidesInRange } from './cubeSlideInRange';
 
 // Кэш для теней и списка слайдов
 interface SlideShadows {
-    left: HTMLElement
-    right: HTMLElement
+  left: HTMLElement;
+  right: HTMLElement;
 }
 
 interface CubeCache {
-    slides: HTMLElement[]
-    shadows: WeakMap<HTMLElement, SlideShadows>
-    lastSlidesList: HTMLElement[]
+  slides: HTMLElement[];
+  shadows: WeakMap<HTMLElement, SlideShadows>;
+  lastSlidesList: HTMLElement[];
 }
 
-const cubeCache = new WeakMap<Tvist, CubeCache>()
+const cubeCache = new WeakMap<Tvist, CubeCache>();
 
 function getCachedSlides(tvist: Tvist): HTMLElement[] {
-    const { slides } = tvist
-    let cache = cubeCache.get(tvist)
+  const { slides } = tvist;
+  let cache = cubeCache.get(tvist);
 
-    if (!cache?.lastSlidesList || cache.lastSlidesList !== slides) {
-        cache = {
-            slides: Array.from(slides),
-            shadows: cache?.shadows ?? new WeakMap(),
-            lastSlidesList: slides
-        }
-        cubeCache.set(tvist, cache)
-    }
+  if (!cache?.lastSlidesList || cache.lastSlidesList !== slides) {
+    cache = {
+      slides: Array.from(slides),
+      shadows: cache?.shadows ?? new WeakMap(),
+      lastSlidesList: slides,
+    };
+    cubeCache.set(tvist, cache);
+  }
 
-    return cache.slides
+  return cache.slides;
 }
 
-export function setCubeEffect(
-    tvist: Tvist,
-    translate: number,
-    options: TvistOptions
-): void {
-    const { container, track } = tvist
-    const cubeOptions = options.cubeEffect ?? {}
-    const slideSize = tvist.engine.slideSizeValue
+export function setCubeEffect(tvist: Tvist, translate: number, options: TvistOptions): void {
+  const { container, track } = tvist;
+  const cubeOptions = options.cubeEffect ?? {};
+  const slideSize = tvist.__tvistInternal_engine.__tvistInternal_slideSizeValue;
 
-    // Container must have explicit size when slides are absolute (otherwise it collapses to 0)
-    container.style.width = '100%'
-    container.style.height = '100%'
-    // Use actual rendered width for cube geometry — avoids gap when track has padding
-    const faceWidth = container.clientWidth > 0 ? container.clientWidth : slideSize
-    const zOffset = faceWidth / 2
-    
-    // Options
-    const slideShadows = cubeOptions.slideShadows ?? true
-    
-    // Container Perspective & Transform
-    // Perspective must be on the parent of the 3D transformed element.
-    // Smaller value = stronger depth (closer bigger, farther smaller).
-    const perspectivePx = cubeOptions.perspective ?? 800
-    track.style.perspective = `${perspectivePx}px`
-    track.style.webkitPerspective = `${perspectivePx}px`
-    // Lower perspective-origin so the join between cube faces appears lower (natural view from above)
-    const perspectiveOriginY = cubeOptions.perspectiveOriginY ?? 60
-    track.style.perspectiveOrigin = `50% ${perspectiveOriginY}%`
-    
-    // Note: track has overflow: hidden by default (from _base.scss).
-    // For cube effect we override it to visible via CSS class .tvist-v1--cube > .tvist-v1__track.
+  // Container must have explicit size when slides are absolute (otherwise it collapses to 0)
+  container.style.width = '100%';
+  container.style.height = '100%';
+  // Use actual rendered width for cube geometry — avoids gap when track has padding
+  const faceWidth = container.clientWidth > 0 ? container.clientWidth : slideSize;
+  const zOffset = faceWidth / 2;
 
+  // Options
+  const slideShadows = cubeOptions.slideShadows ?? true;
 
-    container.style.transformStyle = 'preserve-3d'
-    container.style.webkitTransformStyle = 'preserve-3d'
-    
-    const slidesList = getCachedSlides(tvist)
-    const numSlides = slidesList.length
-    const slidesInRange = getCubeSlidesInRange(translate, slideSize, numSlides)
+  // Container Perspective & Transform
+  // Perspective must be on the parent of the 3D transformed element.
+  // Smaller value = stronger depth (closer bigger, farther smaller).
+  const perspectivePx = cubeOptions.perspective ?? 800;
+  track.style.perspective = `${perspectivePx}px`;
+  track.style.webkitPerspective = `${perspectivePx}px`;
+  // Lower perspective-origin so the join between cube faces appears lower (natural view from above)
+  const perspectiveOriginY = cubeOptions.perspectiveOriginY ?? 60;
+  track.style.perspectiveOrigin = `50% ${perspectiveOriginY}%`;
 
-    // Calculate wrapper rotation
-    // translate corresponds to linear movement.
-    // Width = 90 degrees.
-    // We invert the rotation direction so that "next" slide (right) comes to front
-    const progressTotal = -translate / slideSize
-    const wrapperRotate = -(progressTotal * 90)
+  // Note: track has overflow: hidden by default (from _base.scss).
+  // For cube effect we override it to visible via CSS class .tvist-v1--cube > .tvist-v1__track.
 
-    // zOffset already computed from faceWidth above (cube radius = half of actual face width)
-    // Fix: Rotate around the center of the cube (which is at 0,0,0 in local space because slides are pushed out)
-    container.style.transformOrigin = `50% 50%`
-    
-    // Override engine's translate with rotate
-    // Move the whole cube back by zOffset so the front face aligns with the screen plane (Z=0)
-    container.style.transform = `translate3d(0,0,-${zOffset}px) rotateY(${wrapperRotate}deg)`
-    
-    slidesList.forEach((slide, i) => {
-        // Use the same wrapped position as visibility so the first/last slide
-        // closes the neighboring face during edge drag, even without loop.
-        const slideAngle = getCubeSlideIndex(i, progressTotal, numSlides) * 90
-        
-        // Fix for horizontal scroll and layout issues:
-        // Use position: absolute to collapse the container width and avoid page overflow.
-        // Moved to _cube.scss with !important
+  container.style.transformStyle = 'preserve-3d';
+  container.style.webkitTransformStyle = 'preserve-3d';
 
-        // Reset any margin that might be set by the engine
-        // Moved to _cube.scss with !important
-        
-        // Flatten the face's content and shadows into one plane to prevent
-        // Chrome from showing them through adjacent faces during rotation.
-        // Moved to _cube.scss
+  const slidesList = getCachedSlides(tvist);
+  const numSlides = slidesList.length;
+  const slidesInRange = getCubeSlidesInRange(translate, slideSize, numSlides);
 
-        // Set origin to center (standard rotation around own axis)
-        // Previous logic using -zOffset caused gaps between faces
-        // Moved to _cube.scss with !important
-        
-        // Z-Index and depth: angle relative to viewport (normalize to 0-360 range)
-        let netAngle = (slideAngle + wrapperRotate) % 360
-        if (netAngle < 0) netAngle += 360
-        
-        // Standard Cube Logic: Rotate around center, then push out by radius (zOffset)
-        const transform = `rotateY(${slideAngle}deg) translate3d(0, 0, ${zOffset}px)`
-        slide.style.transform = transform
-        
-        // Cosine = how "front" the face is. 0°→1, 180°→-1. Keep z-index for stacking fallback.
-        const zIndex = Math.round(Math.cos(netAngle * Math.PI / 180) * 100)
-        slide.style.zIndex = `${100 + zIndex}`
+  // Calculate wrapper rotation
+  // translate corresponds to linear movement.
+  // Width = 90 degrees.
+  // We invert the rotation direction so that "next" slide (right) comes to front
+  const progressTotal = -translate / slideSize;
+  const wrapperRotate = -(progressTotal * 90);
 
-        const isInRange = slidesInRange[i] ?? false
+  // zOffset already computed from faceWidth above (cube radius = half of actual face width)
+  // Fix: Rotate around the center of the cube (which is at 0,0,0 in local space because slides are pushed out)
+  container.style.transformOrigin = `50% 50%`;
 
-        // Chrome bug workaround: Sometimes Chrome fails to render content with hidden backface.
-        // However, for a proper cube effect, we MUST hide backfaces to avoid seeing inside the cube.
-        // We rely on z-index to handle sorting, but backface-visibility: hidden gives the cleanest look.
-        // Moved to _cube.scss
+  // Override engine's translate with rotate
+  // Move the whole cube back by zOffset so the front face aligns with the screen plane (Z=0)
+  container.style.transform = `translate3d(0,0,-${zOffset}px) rotateY(${wrapperRotate}deg)`;
 
-        // _base.scss sets content-visibility: auto. 
-        // Moved to _cube.scss with !important
+  slidesList.forEach((slide, i) => {
+    // Use the same wrapped position as visibility so the first/last slide
+    // closes the neighboring face during edge drag, even without loop.
+    const slideAngle = getCubeSlideIndex(i, progressTotal, numSlides) * 90;
 
-        // Show only slides in range
-        slide.style.visibility = isInRange ? 'visible' : 'hidden'
-        
-        // Shadows 
-        if (slideShadows && isInRange) {
-             // Вычисляем progress на основе угла поворота грани относительно фронтальной позиции
-             // Нормализуем угол в диапазон -180 до 180
-             let angleDiff = netAngle
-             if (angleDiff > 180) angleDiff -= 360
-             
-             // progress = угол поворота / 90 градусов
-             // При повороте от 0° к 90°: progress идёт от 0 к 1
-             // При повороте от 0° к -90°: progress идёт от 0 к -1
-             const progress = Math.max(Math.min(angleDiff / 90, 1), -1)
-             createSlideShadows(slide, progress, tvist)
-        }
-    })
+    // Fix for horizontal scroll and layout issues:
+    // Use position: absolute to collapse the container width and avoid page overflow.
+    // Moved to _cube.scss with !important
+
+    // Reset any margin that might be set by the engine
+    // Moved to _cube.scss with !important
+
+    // Flatten the face's content and shadows into one plane to prevent
+    // Chrome from showing them through adjacent faces during rotation.
+    // Moved to _cube.scss
+
+    // Set origin to center (standard rotation around own axis)
+    // Previous logic using -zOffset caused gaps between faces
+    // Moved to _cube.scss with !important
+
+    // Z-Index and depth: angle relative to viewport (normalize to 0-360 range)
+    let netAngle = (slideAngle + wrapperRotate) % 360;
+    if (netAngle < 0) netAngle += 360;
+
+    // Standard Cube Logic: Rotate around center, then push out by radius (zOffset)
+    const transform = `rotateY(${slideAngle}deg) translate3d(0, 0, ${zOffset}px)`;
+    slide.style.transform = transform;
+
+    // Cosine = how "front" the face is. 0°→1, 180°→-1. Keep z-index for stacking fallback.
+    const zIndex = Math.round(Math.cos((netAngle * Math.PI) / 180) * 100);
+    slide.style.zIndex = `${100 + zIndex}`;
+
+    const isInRange = slidesInRange[i] ?? false;
+
+    // Chrome bug workaround: Sometimes Chrome fails to render content with hidden backface.
+    // However, for a proper cube effect, we MUST hide backfaces to avoid seeing inside the cube.
+    // We rely on z-index to handle sorting, but backface-visibility: hidden gives the cleanest look.
+    // Moved to _cube.scss
+
+    // _base.scss sets content-visibility: auto.
+    // Moved to _cube.scss with !important
+
+    // Show only slides in range
+    slide.style.visibility = isInRange ? 'visible' : 'hidden';
+
+    // Shadows
+    if (slideShadows && isInRange) {
+      // Вычисляем progress на основе угла поворота грани относительно фронтальной позиции
+      // Нормализуем угол в диапазон -180 до 180
+      let angleDiff = netAngle;
+      if (angleDiff > 180) angleDiff -= 360;
+
+      // progress = угол поворота / 90 градусов
+      // При повороте от 0° к 90°: progress идёт от 0 к 1
+      // При повороте от 0° к -90°: progress идёт от 0 к -1
+      const progress = Math.max(Math.min(angleDiff / 90, 1), -1);
+      createSlideShadows(slide, progress, tvist);
+    }
+  });
 }
 
 /**
@@ -154,34 +149,34 @@ export function setCubeEffect(
  * Две тени: left (видна при повороте влево) и right (видна при повороте вправо)
  */
 function createSlideShadows(slide: HTMLElement, progress: number, tvist: Tvist) {
-    const cache = cubeCache.get(tvist)
-    if (!cache) return
-    
-    let shadows = cache.shadows.get(slide)
-    
-    // Создаём тени если их ещё нет
-    if (!shadows) {
-        const shadowLeft = document.createElement('div')
-        const shadowRight = document.createElement('div')
-        
-        const prefix = TVIST_CLASSES.block
-        shadowLeft.className = `${prefix}-slide-shadow-cube ${prefix}-slide-shadow-left`
-        shadowRight.className = `${prefix}-slide-shadow-cube ${prefix}-slide-shadow-right`
-        
-        // Все стили определены в _cube.scss, только добавляем элементы в DOM
-        slide.appendChild(shadowLeft)
-        slide.appendChild(shadowRight)
-        
-        shadows = { left: shadowLeft, right: shadowRight }
-        cache.shadows.set(slide, shadows)
-    }
-    
-    // Обновляем opacity:
-    // - Левая тень видна когда progress < 0 (слайд поворачивается влево/приходит)
-    // - Правая тень видна когда progress > 0 (слайд поворачивается вправо/уходит)
-    const leftOpacity = Math.max(-progress, 0)
-    const rightOpacity = Math.max(progress, 0)
-    
-    shadows.left.style.opacity = leftOpacity.toString()
-    shadows.right.style.opacity = rightOpacity.toString()
+  const cache = cubeCache.get(tvist);
+  if (!cache) return;
+
+  let shadows = cache.shadows.get(slide);
+
+  // Создаём тени если их ещё нет
+  if (!shadows) {
+    const shadowLeft = document.createElement('div');
+    const shadowRight = document.createElement('div');
+
+    const prefix = TVIST_CLASSES.block;
+    shadowLeft.className = `${prefix}-slide-shadow-cube ${prefix}-slide-shadow-left`;
+    shadowRight.className = `${prefix}-slide-shadow-cube ${prefix}-slide-shadow-right`;
+
+    // Все стили определены в _cube.scss, только добавляем элементы в DOM
+    slide.appendChild(shadowLeft);
+    slide.appendChild(shadowRight);
+
+    shadows = { left: shadowLeft, right: shadowRight };
+    cache.shadows.set(slide, shadows);
+  }
+
+  // Обновляем opacity:
+  // - Левая тень видна когда progress < 0 (слайд поворачивается влево/приходит)
+  // - Правая тень видна когда progress > 0 (слайд поворачивается вправо/уходит)
+  const leftOpacity = Math.max(-progress, 0);
+  const rightOpacity = Math.max(progress, 0);
+
+  shadows.left.style.opacity = leftOpacity.toString();
+  shadows.right.style.opacity = rightOpacity.toString();
 }

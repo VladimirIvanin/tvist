@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Marquee Module Tests
  */
@@ -6,7 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '@core/Tvist'
 import '../../../src/modules/marquee' // Импортируем для регистрации
-import { MarqueeModule } from '../../../src/modules/marquee'
+import { createMarqueeModule as MarqueeModule } from '../../../src/modules/marquee'
 
 describe('MarqueeModule', () => {
   let root: HTMLElement
@@ -39,7 +40,7 @@ describe('MarqueeModule', () => {
       marquee: true
     })
 
-    const module = slider.modules.get('marquee')
+    const module = getRuntime(slider).modules.get('marquee')
     expect(module).toBeDefined()
     expect(module?.name).toBe('marquee')
   })
@@ -69,9 +70,9 @@ describe('MarqueeModule', () => {
       }
     })
 
-    const module = slider.modules.get('marquee') as MarqueeModule
+    const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
     const api = module?.getMarquee()
-    
+
     expect(api?.getSpeed()).toBe(100)
     expect(api?.getDirection()).toBe('right')
   })
@@ -81,9 +82,9 @@ describe('MarqueeModule', () => {
       marquee: true
     })
 
-    const module = slider.modules.get('marquee') as MarqueeModule
+    const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
     const api = module?.getMarquee()
-    
+
     expect(api?.getSpeed()).toBe(50) // дефолтная скорость
     expect(api?.getDirection()).toBe('left') // дефолтное направление для horizontal
   })
@@ -94,9 +95,9 @@ describe('MarqueeModule', () => {
       marquee: true
     })
 
-    const module = slider.modules.get('marquee') as MarqueeModule
+    const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
     const api = module?.getMarquee()
-    
+
     expect(api?.getDirection()).toBe('up') // дефолтное направление для vertical
   })
 
@@ -105,7 +106,7 @@ describe('MarqueeModule', () => {
       marquee: true
     })
 
-    const module = slider.modules.get('marquee') as MarqueeModule
+    const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
     const api = module?.getMarquee()
 
     expect(api).toBeDefined()
@@ -124,7 +125,7 @@ describe('MarqueeModule', () => {
       }
     })
 
-    const module = slider.modules.get('marquee') as MarqueeModule
+    const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
     const api = module?.getMarquee()
 
     api?.setSpeed(200)
@@ -138,7 +139,7 @@ describe('MarqueeModule', () => {
       }
     })
 
-    const module = slider.modules.get('marquee') as MarqueeModule
+    const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
     const api = module?.getMarquee()
 
     api?.setDirection('right')
@@ -160,7 +161,7 @@ describe('MarqueeModule', () => {
     // Start вызывается автоматически при init
     expect(onMarqueeStart).toHaveBeenCalled()
 
-    const module = slider.modules.get('marquee') as MarqueeModule
+    const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
     const api = module?.getMarquee()
 
     api?.stop()
@@ -232,9 +233,9 @@ describe('MarqueeModule', () => {
       gap: 20
     })
 
-    const module = slider.modules.get('marquee')
+    const module = getRuntime(slider).modules.get('marquee')
     expect(module).toBeDefined()
-    
+
     // Проверяем что модуль инициализирован
     const api = (module as MarqueeModule)?.getMarquee()
     expect(api).toBeDefined()
@@ -247,7 +248,7 @@ describe('MarqueeModule', () => {
       }
     })
 
-    const module = slider.modules.get('marquee') as MarqueeModule
+    const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
     const api = module?.getMarquee()
 
     expect(api?.getDirection()).toBe('left')
@@ -267,14 +268,14 @@ describe('MarqueeModule', () => {
       }
     })
 
-    const module = slider.modules.get('marquee') as MarqueeModule
+    const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
     const api = module?.getMarquee()
     const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
     // Для left: transform начинается с translate3d(-0px, 0, 0) = translate3d(0px, 0, 0)
     const initialTransform = container.style.transform
     expect(initialTransform).toMatch(/translate3d\((0px|-0px), 0, 0\)/)
-    
+
     // Меняем направление на right
     api?.setDirection('right')
 
@@ -294,25 +295,25 @@ describe('MarqueeModule', () => {
       }
     })
 
-    const module = slider.modules.get('marquee') as MarqueeModule
+    const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
     const api = module?.getMarquee()
-    
+
     // Симулируем что marquee прокрутился на некоторое расстояние
     // Устанавливаем currentPosition = 150 для direction: 'left'
     if (module?.setCurrentPosition) {
       module.setCurrentPosition(150)
     }
-    
+
     const positionBeforeChange = module?.getCurrentPosition()
     expect(positionBeforeChange).toBe(150)
-    
+
     // Меняем направление на right
     api?.setDirection('right')
-    
+
     // После смены направления визуальная позиция должна остаться на месте
     // currentPosition остаётся тем же (150), так как он определяет визуальный offset
     const positionAfterChange = module?.getCurrentPosition()
-    
+
     // В JSDOM totalSize = 0, поэтому позиция нормализуется к 0
     // В реальном браузере позиция останется той же (150)
     // Проверяем что позиция либо осталась той же, либо нормализовалась
@@ -337,14 +338,14 @@ describe('MarqueeModule', () => {
         gap: 20
       })
 
-      const module = slider.modules.get('marquee') as MarqueeModule
+      const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
       const api = module?.getMarquee()
       const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       // Симулируем что marquee прокрутился на некоторое расстояние
       // Устанавливаем позицию 100px
       module.setCurrentPosition(100)
-      
+
       // Получаем transform до смены направления
       const transformBefore = container.style.transform
       const translateXBefore = parseFloat(transformBefore.match(/translate3d\(([^,]+)/)?.[1] || '0')
@@ -358,7 +359,7 @@ describe('MarqueeModule', () => {
 
       // Разница между позициями не должна быть большой (не больше одного слайда + gap)
       const diff = Math.abs(translateXAfter - translateXBefore)
-      
+
       // totalSize = (300 + 20) * 3 = 960
       // При смене с left на right не должно быть скачка на весь totalSize
       // Позиция должна остаться примерно на месте (разница должна быть минимальной)
@@ -381,7 +382,7 @@ describe('MarqueeModule', () => {
         gap: 20
       })
 
-      const module = slider.modules.get('marquee') as MarqueeModule
+      const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
       const api = module?.getMarquee()
       const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
@@ -389,7 +390,7 @@ describe('MarqueeModule', () => {
       // Для right начальная позиция = totalSize
       // Устанавливаем позицию на 860 (прокрутились на 100px)
       module.setCurrentPosition(860)
-      
+
       const transformBefore = container.style.transform
       const translateXBefore = parseFloat(transformBefore.match(/translate3d\(([^,]+)/)?.[1] || '0')
 
@@ -421,13 +422,13 @@ describe('MarqueeModule', () => {
         gap: 10
       })
 
-      const module = slider.modules.get('marquee') as MarqueeModule
+      const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
       const api = module?.getMarquee()
       const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       // Устанавливаем позицию 80px
       module.setCurrentPosition(80)
-      
+
       const transformBefore = container.style.transform
       const translateYBefore = parseFloat(transformBefore.match(/translate3d\([^,]+,\s*([^,]+)/)?.[1] || '0')
 
@@ -459,14 +460,14 @@ describe('MarqueeModule', () => {
         gap: 10
       })
 
-      const module = slider.modules.get('marquee') as MarqueeModule
+      const module = getRuntime(slider).modules.get('marquee') as MarqueeModule
       const api = module?.getMarquee()
       const container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
 
       // totalSize = (150 + 10) * 3 = 480
       // Устанавливаем позицию на 400 (прокрутились на 80px от totalSize)
       module.setCurrentPosition(400)
-      
+
       const transformBefore = container.style.transform
       const translateYBefore = parseFloat(transformBefore.match(/translate3d\([^,]+,\s*([^,]+)/)?.[1] || '0')
 

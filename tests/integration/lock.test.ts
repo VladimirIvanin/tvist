@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '../../src/core/Tvist'
@@ -41,7 +42,7 @@ describe('Lock functionality', () => {
       }
     })
 
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
     expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(true)
     expect(onLock).toHaveBeenCalled()
     expect(onUnlock).not.toHaveBeenCalled()
@@ -61,7 +62,7 @@ describe('Lock functionality', () => {
       gap: 0
     })
 
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
     expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(false)
   })
 
@@ -75,10 +76,10 @@ describe('Lock functionality', () => {
       perPage: 3 // Все влезают
     })
 
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
 
     // Пытаемся симулировать драг
-    const dragModule = slider.getModule('drag') as any
+    const dragModule = getRuntime(slider).getModule('drag') as any
     // Мокаем метод onPointerDown
     const event = new MouseEvent('mousedown', {
       bubbles: true,
@@ -90,7 +91,7 @@ describe('Lock functionality', () => {
     // Вручную вызываем приватный метод onPointerDown через dispatchEvent
     // Но проще проверить через состояние isDragging после события
     fixture.root.dispatchEvent(event)
-    
+
     // Перемещаем мышь
     const moveEvent = new MouseEvent('mousemove', {
       bubbles: true,
@@ -134,7 +135,7 @@ describe('Lock functionality', () => {
     slider.container.style.margin = '0 auto'
     slider.container.style.width = 'max-content'
 
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
     slider.scrollTo(1, true)
     expect(slider.container.style.transform).toContain('translate3d')
 
@@ -159,7 +160,7 @@ describe('Lock functionality', () => {
     window.innerWidth = 1000
     slider.update()
 
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
     expect(slider.container.style.transform).toBe('')
     expect(slider.container.style.margin).toBe('0px auto')
     expect(slider.container.style.width).toBe('max-content')
@@ -186,7 +187,7 @@ describe('Lock functionality', () => {
       }
     })
 
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
     expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(false)
   })
 
@@ -201,17 +202,17 @@ describe('Lock functionality', () => {
     const slider = new Tvist(fixture.root, {
       slideMinSize: 200,
       gap: 0,
-      perPage: 5 // Явно задаем или даем slideMinSize сработать. 
+      perPage: 5 // Явно задаем или даем slideMinSize сработать.
                  // Если задать slideMinSize, perPage пересчитается.
                  // При width 1000 и slideMinSize 200 -> perPage = 5.
     })
 
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
 
     // Ресайзим до 400px.
     // perPage станет 2 (400 / 200).
     // Слайдов 5. 2 на экране. 3 за кадром. -> Unlock.
-    
+
     // Мокаем resize
     fixture.root.style.width = '400px'
     const track = fixture.track
@@ -234,7 +235,7 @@ describe('Lock functionality', () => {
 
     slider.update()
 
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
     expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(false)
   })
 
@@ -257,18 +258,18 @@ describe('Lock functionality', () => {
 
     // Проверяем, что Grid модуль отработал (для fixed grid используется flexbox)
     expect(fixture.container.style.display).toBe('flex')
-    
+
     // При fixed grid создается 1 wrapper-слайд для 4 оригинальных слайдов
     // Теперь нужно мокать wrapper-слайд
     const wrapperSlides = slider.slides
     expect(wrapperSlides.length).toBe(1) // 1 страница для 4 слайдов (2x2)
-    
+
     // Мокаем wrapper-слайд
     Object.defineProperty(wrapperSlides[0], 'offsetWidth', {
       configurable: true,
       value: 1000
     })
-    
+
     Object.defineProperty(wrapperSlides[0], 'offsetLeft', {
       configurable: true,
       value: 0
@@ -279,7 +280,7 @@ describe('Lock functionality', () => {
 
     // Проверяем блокировку
     // 1 страница, которая занимает всю ширину контейнера -> Locked
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
   })
 
   it('should unlock Grid when content exceeds container', () => {
@@ -294,14 +295,14 @@ describe('Lock functionality', () => {
     // Tvist Grid обычно делает grid-auto-flow: column или row.
     // Текущая реализация GridModule просто ставит gridTemplateColumns/Rows.
     // И контейнер скроллится.
-    
+
     // Если у нас 8 слайдов в сетке 2x2 (фиксированной), то они будут вылезать вниз или вправо?
     // Реализация GridModule:
     // styles.gridTemplateRows = `repeat(${rows}, 1fr)`
     // styles.gridTemplateColumns = `repeat(${cols}, 1fr)`
     // Это жесткая сетка. Остальные слайды будут в implicit tracks.
     // Если direction horizontal (default), implicit columns добавляются справа.
-    
+
     fixture = createSliderFixture({
       slidesCount: 8,
       width: 1000
@@ -309,17 +310,17 @@ describe('Lock functionality', () => {
 
     // Mock sizes for 8 slides.
     // Col 1: 0, 2, 4, 6
-    // Col 2: 1, 3, 5, 7 
+    // Col 2: 1, 3, 5, 7
     // Col 3: ... (implicit)
-    
-    // GridModule logic for positions: 
+
+    // GridModule logic for positions:
     // newPositions = slides.map(slide => slide.offsetLeft)
-    
+
     // Допустим у нас переполнение.
     // Слайд 0, 1 -> page 1 (visible)
     // Слайд 2, 3 -> page 1 (visible) if rows=2
     // Слайд 4, 5 -> page 2 (hidden)
-    
+
     // Mock offsets
     // Page 1 (0-1000px): Slides 0,1,2,3
     fixture.slides.slice(0, 4).forEach((slide, i) => {
@@ -327,7 +328,7 @@ describe('Lock functionality', () => {
         Object.defineProperty(slide, 'offsetLeft', { configurable: true, value: col * 500 })
         Object.defineProperty(slide, 'offsetWidth', { configurable: true, value: 500 })
     })
-    
+
     // Page 2 (1000-2000px): Slides 4,5,6,7
     // Они будут смещены на width контейнера (или как CSS Grid их расположит)
     // Допустим они справа.
@@ -343,7 +344,7 @@ describe('Lock functionality', () => {
         cols: 2
       }
     })
-    
+
     // Force update to read mocks
     slider.update()
 
@@ -352,8 +353,8 @@ describe('Lock functionality', () => {
     // MaxScroll = 1000 - 2000 = -1000.
     // MinScroll = 0.
     // -1000 < 0 -> Not locked.
-    
-    expect(slider.engine.isLocked).toBe(false)
+
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
   })
 
   it('should not lock loop slider when content exceeds (slideCount > perPage)', () => {
@@ -369,7 +370,7 @@ describe('Lock functionality', () => {
       gap: 0
     })
 
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
   })
 
   it('should NOT lock small loop slider even when scroll range is too small', () => {
@@ -394,7 +395,7 @@ describe('Lock functionality', () => {
     // Форсируем перерасчёт после применения peek и gap
     slider.update()
 
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
   })
 
   it('should not lock loop slider with peek when last slide is only partially visible', () => {
@@ -419,7 +420,7 @@ describe('Lock functionality', () => {
 
     // После исправления эвристики smallLoopCarousel такой слайдер НЕ блокируется,
     // что позволяет LoopModule корректно переставлять слайды и избегать дыр.
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
   })
 
   // loop.withClones: prev с первого слайда не должен прыгать на «дальний» клон
@@ -440,12 +441,12 @@ describe('Lock functionality', () => {
       },
     })
 
-    const slideSize = slider.engine.getSlideSize(0)
-    const locationBefore = slider.engine.location.get()
+    const slideSize = getRuntime(slider).engine.getSlideSize(0)
+    const locationBefore = getRuntime(slider).engine.location.get()
 
     slider.prev()
 
-    const locationAfter = slider.engine.location.get()
+    const locationAfter = getRuntime(slider).engine.location.get()
 
     expect(slider.realIndex).toBe(3)
     expect(Math.abs(locationAfter - locationBefore)).toBeLessThanOrEqual(slideSize + 1)
@@ -468,14 +469,14 @@ describe('Lock functionality', () => {
       },
     })
 
-    const slideSize = slider.engine.getSlideSize(0)
-    const locationBefore = slider.engine.location.get()
+    const slideSize = getRuntime(slider).engine.getSlideSize(0)
+    const locationBefore = getRuntime(slider).engine.location.get()
 
     slider.prev()
 
     await waitForAnimation(speed)
 
-    const locationAfter = slider.engine.location.get()
+    const locationAfter = getRuntime(slider).engine.location.get()
 
     expect(slider.realIndex).toBe(3)
     expect(Math.abs(locationAfter - locationBefore)).toBeLessThanOrEqual(slideSize + 1)
@@ -501,7 +502,7 @@ describe('Lock functionality', () => {
       }
     })
 
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
     expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(true)
     expect(onLock).toHaveBeenCalled()
     expect(slider.canScrollNext).toBe(false)
@@ -521,7 +522,7 @@ describe('Lock functionality', () => {
       gap: 0
     })
 
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
     expect(slider.canScrollNext).toBe(false)
     expect(slider.canScrollPrev).toBe(false)
   })
@@ -539,7 +540,7 @@ describe('Lock functionality', () => {
     })
 
     // Все влезает, никуда скроллить не нужно
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
     expect(slider.canScrollNext).toBe(false)
     expect(slider.canScrollPrev).toBe(false)
   })
@@ -557,7 +558,7 @@ describe('Lock functionality', () => {
     })
 
     // Не все слайды видны, есть куда скроллить
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
     expect(slider.canScrollNext).toBe(true)
   })
 
@@ -583,7 +584,7 @@ describe('Lock functionality', () => {
     })
 
     // Loop режим никогда не должен блокироваться
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
     expect(slider.canScrollNext).toBe(true)
     expect(slider.canScrollPrev).toBe(true)
   })
@@ -608,7 +609,7 @@ describe('Lock functionality', () => {
     })
 
     // Loop режим никогда не должен блокироваться
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
     expect(slider.canScrollNext).toBe(true)
     expect(slider.canScrollPrev).toBe(true)
   })
@@ -650,7 +651,7 @@ describe('Lock functionality', () => {
     slider.update()
 
     // Все слайды влезают - должен быть locked
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
 
     // Пытаемся драгнуть
     const mouseDown = new MouseEvent('mousedown', {
@@ -680,7 +681,7 @@ describe('Lock functionality', () => {
     document.dispatchEvent(mouseUp)
 
     // Позиция не должна измениться (может быть -0 или 0)
-    expect(Math.abs(slider.engine.location.get())).toBe(0)
+    expect(Math.abs(getRuntime(slider).engine.location.get())).toBe(0)
   })
 
 })

@@ -265,19 +265,6 @@ slider.disable()
 slider.enable()
 ```
 
-## method:getModule
-
-Без активного модуля возвращает `undefined`. Для autoplay и video удобнее использовать свойства `slider.autoplay` и `slider.video`.
-
-```javascript
-import { LazyLoadModule } from 'tvist'
-
-const lazy = slider.getModule('lazyload')
-lazy?.loadAll()
-```
-
-В TypeScript укажите тип: `slider.getModule<LazyLoadModule>('lazyload')`.
-
 ## method:sync
 
 Для двусторонней связи вызовите метод на обоих экземплярах. Настройка `syncOnDrag` управляет синхронизацией при перетаскивании.
@@ -367,28 +354,6 @@ slider.on('slideChangeEnd', () => console.log(slider.realIndex))
 ## property:video
 
 Доступно при активном модуле video. [Методы управления](#module-video).
-
-## static:registerModule
-
-Модули экспортируются из основного пакета `tvist`. Полная ESM-сборка уже регистрирует встроенные модули; регистрация нужна для собственных модулей или работы с core-сборкой.
-
-```javascript
-Tvist.registerModule('custom', CustomModule)
-```
-
-## static:unregisterModule
-
-Удаляет регистрацию для будущих экземпляров. Уже созданные экземпляры продолжают работать.
-
-```javascript
-Tvist.unregisterModule('custom')
-```
-
-## static:getRegisteredModules
-
-```javascript
-console.log(Tvist.getRegisteredModules())
-```
 
 ## event:created
 
@@ -573,32 +538,32 @@ slider.on('lazyLoaded', (img, slideIndex) => {
 ## module:marquee
 
 ```javascript
-const marquee = slider.getModule('marquee')?.getMarquee()
+const marquee = slider.marquee
 marquee?.pause()
 marquee?.resume()
 ```
 
-В TypeScript используйте `getModule<MarqueeModule>('marquee')`, импортировав `MarqueeModule` из `tvist`.
+Тип интерфейса управления выводится из `slider.marquee`.
 
 ## module:lazyload
 
 ```javascript
-const lazy = slider.getModule('lazyload')
+const lazy = slider.lazyload
 lazy?.loadSlide(2)
 lazy?.loadAll()
 ```
 
-В TypeScript используйте `getModule<LazyLoadModule>('lazyload')`.
+Используйте `slider.lazyload` без импорта внутренних компонентов.
 
 ## module:breakpoints
 
-Текущий breakpoint можно получить через `slider.getModule<BreakpointsModule>('breakpoints')?.getCurrentBreakpoint()`.
+Текущий breakpoint доступен в `slider.currentBreakpoint`; без совпадения возвращается `null`.
 
 [Подробное руководство](/api/breakpoints).
 
 ## module:visibility
 
-Метод `getVisibility()` доступен через `slider.getModule<VisibilityModule>('visibility')`. Используйте события `sliderVisible` и `sliderHidden`, чтобы реагировать на изменения.
+Управление видимостью доступно через `slider.visibility`. Используйте события `sliderVisible` и `sliderHidden`, чтобы реагировать на изменения.
 
 ## module:thumbs
 
@@ -634,3 +599,19 @@ const slider = new Tvist('.slider', {
 ## module:slide-states
 
 Выставляет классы активного и видимого слайда, а также состояния root. Для нестандартного оформления используйте `Tvist.CLASSES`.
+
+## property:marquee
+
+`slider.marquee` возвращает управление непрерывной прокруткой: start/stop, pause/resume, проверки состояния, setSpeed/getSpeed и setDirection/getDirection. Если marquee отключён, возвращается `undefined`.
+
+## property:lazyload
+
+`slider.lazyload?.loadSlide(2)` загружает изображения выбранного слайда, `slider.lazyload?.loadAll()` — всех слайдов. Если lazy отключён, возвращается `undefined`.
+
+## property:visibility
+
+`slider.visibility?.isVisible()` возвращает состояние видимости; `slider.visibility?.check()` принудительно проверяет видимость. При отключённой опции возвращается `undefined`.
+
+## property:currentBreakpoint
+
+Номер активного брейкпоинта либо `null`, если совпадений нет.

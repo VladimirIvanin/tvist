@@ -1,2 +1,1 @@
-import './init'
-export { SlideStatesModule } from './SlideStatesModule'
+export { createSlideStatesModule, type SlideStatesModule } from './SlideStatesModule';

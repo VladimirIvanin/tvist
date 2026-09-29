@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тесты для BreakpointsModule
  *
@@ -210,7 +211,7 @@ describe('BreakpointsModule', () => {
       resizeSlider(root, 450)
 
       // Вызываем onResize на модуле напрямую (т.к. ResizeObserver не работает в тестах)
-      const breakpointsModule = (slider as any).modules.get('breakpoints')
+      const breakpointsModule = getRuntime((slider as any)).modules.get('breakpoints')
       if (breakpointsModule) {
         breakpointsModule.onResize()
       }
@@ -309,7 +310,7 @@ describe('BreakpointsModule', () => {
       })
 
       // На десктопе (perPage: 2, 2 слайда) -> locked
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       slider.destroy()
     })
@@ -331,7 +332,7 @@ describe('BreakpointsModule', () => {
       })
 
       // Изначально locked (perPage: 2, 2 слайда)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       // Меняем ширину на мобильную
       resizeSlider(root, 600)
@@ -340,7 +341,7 @@ describe('BreakpointsModule', () => {
       slider.update()
 
       // Должен разблокироваться (perPage: 1, 2 слайда)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
       expect(slider.options.perPage).toBe(1)
 
       slider.destroy()
@@ -366,7 +367,7 @@ describe('BreakpointsModule', () => {
       })
 
       // Мокаем onResize
-      const breakpointsModule = (slider as any).modules.get('breakpoints')
+      const breakpointsModule = getRuntime((slider as any)).modules.get('breakpoints')
       if (breakpointsModule) {
         const originalOnResize = breakpointsModule.onResize.bind(breakpointsModule)
         breakpointsModule.onResize = () => {
@@ -411,7 +412,7 @@ describe('BreakpointsModule', () => {
       resizeSlider(root, 450)
 
       // Вызываем onResize напрямую
-      const breakpointsModule = (slider as any).modules.get('breakpoints')
+      const breakpointsModule = getRuntime((slider as any)).modules.get('breakpoints')
       if (breakpointsModule) {
         const checkBreakpointsSpy = vi.spyOn(breakpointsModule as any, 'checkBreakpoints')
         breakpointsModule.onResize()
@@ -481,7 +482,7 @@ describe('BreakpointsModule', () => {
       })
 
       // Изначально locked (perPage: 2, 2 слайда)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       // Имитируем сужение окна
       resizeSlider(root, 600)
@@ -490,7 +491,7 @@ describe('BreakpointsModule', () => {
       slider.update()
 
       // Должен разблокироваться и показать навигацию
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
       expect(slider.options.perPage).toBe(1)
 
       slider.destroy()
@@ -525,7 +526,7 @@ describe('BreakpointsModule', () => {
       resizeSlider(root, 600)
 
       // Вызываем onResize на модуле напрямую
-      const breakpointsModule = (slider as any).modules.get('breakpoints')
+      const breakpointsModule = getRuntime((slider as any)).modules.get('breakpoints')
       if (breakpointsModule) {
         breakpointsModule.onResize()
       }
@@ -655,7 +656,7 @@ describe('BreakpointsModule', () => {
       resizeSlider(root, 1200)
 
       // Вызываем onResize на модуле напрямую
-      const breakpointsModule = (slider as any).modules.get('breakpoints')
+      const breakpointsModule = getRuntime((slider as any)).modules.get('breakpoints')
       if (breakpointsModule) {
         breakpointsModule.onResize()
       }

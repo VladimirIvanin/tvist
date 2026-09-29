@@ -1,8 +1,9 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
- * 
+ *
  * Тест для проверки бага с transitionByAutoplay флагом на границе слайдера без loop
- * 
+ *
  * Баг: Когда autoplay пытается перейти на границе (без loop), индекс не меняется,
  * но флаг transitionByAutoplay остаётся true. Если пользователь вручную переключает
  * слайд в течение 1500ms fallback окна, slideChangeEnd неправильно считает это
@@ -46,7 +47,7 @@ describe('AutoplayModule - Boundary Bug Fix', () => {
     await vi.waitFor(() => expect(slider.activeIndex).toBe(2))
 
     // Получаем модуль autoplay
-    const autoplayModule = slider['modules'].get('autoplay') as any
+    const autoplayModule = getRuntime(slider)['modules'].get('autoplay') as any
     expect(autoplayModule).toBeDefined()
 
     // Ждём, пока autoplay попытается перейти дальше (на границе)
@@ -92,7 +93,7 @@ describe('AutoplayModule - Boundary Bug Fix', () => {
 
     // Сразу после boundary attempt (в пределах 100ms) пользователь вручную переходит
     vi.advanceTimersByTime(100)
-    
+
     slider.scrollTo(0)
     vi.advanceTimersByTime(300)
     await vi.waitFor(() => expect(slider.activeIndex).toBe(0))
@@ -122,7 +123,7 @@ describe('AutoplayModule - Boundary Bug Fix', () => {
     vi.advanceTimersByTime(300)
     await vi.waitFor(() => expect(slider.activeIndex).toBe(2))
 
-    const autoplayModule = slider['modules'].get('autoplay') as any
+    const autoplayModule = getRuntime(slider)['modules'].get('autoplay') as any
 
     // Первая попытка autoplay на границе
     vi.advanceTimersByTime(500)

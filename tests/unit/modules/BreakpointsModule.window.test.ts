@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  *
@@ -163,7 +164,7 @@ describe('BreakpointsModule — window-based и resize', () => {
         breakpoints: { 768: { perPage: 1 } }
       })
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
       slider.destroy()
     })
 
@@ -174,7 +175,7 @@ describe('BreakpointsModule — window-based и resize', () => {
         breakpoints: { 768: { perPage: 1 } }
       })
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
       slider.destroy()
     })
 
@@ -185,7 +186,7 @@ describe('BreakpointsModule — window-based и resize', () => {
         breakpoints: { 768: { perPage: 1 } }
       })
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
       slider.destroy()
     })
 
@@ -196,7 +197,7 @@ describe('BreakpointsModule — window-based и resize', () => {
         breakpoints: { 768: { perPage: 1 } }
       })
       expect(slider.options.perPage).toBe(1)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
       slider.destroy()
     })
 
@@ -207,7 +208,7 @@ describe('BreakpointsModule — window-based и resize', () => {
         breakpoints: { 768: { perPage: 1 } }
       })
       expect(slider.options.perPage).toBe(1)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
       slider.destroy()
     })
   })
@@ -231,13 +232,13 @@ describe('BreakpointsModule — window-based и resize', () => {
       })
 
       expect(slider.options.perPage).toBe(1)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
 
       setWindowWidth(792)
       slider.update()
 
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       slider.destroy()
     })
@@ -255,7 +256,7 @@ describe('BreakpointsModule — window-based и resize', () => {
       slider.update()
 
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       slider.destroy()
     })
@@ -268,15 +269,15 @@ describe('BreakpointsModule — window-based и resize', () => {
         breakpoints: { 768: { perPage: 1, gap: 0 } }
       })
 
-      expect(slider._originalOptions).toBeDefined()
-      expect(slider._originalOptions?.perPage).toBe(2)
-      expect(slider._originalOptions?.gap).toBe(16)
+      expect(getRuntime(slider)._originalOptions).toBeDefined()
+      expect(getRuntime(slider)._originalOptions?.perPage).toBe(2)
+      expect(getRuntime(slider)._originalOptions?.gap).toBe(16)
 
       setWindowWidth(800)
       slider.update()
 
-      expect(slider._originalOptions?.perPage).toBe(2)
-      expect(slider._originalOptions?.gap).toBe(16)
+      expect(getRuntime(slider)._originalOptions?.perPage).toBe(2)
+      expect(getRuntime(slider)._originalOptions?.gap).toBe(16)
       expect(slider.options.perPage).toBe(2)
       expect(slider.options.gap).toBe(16)
 
@@ -303,13 +304,13 @@ describe('BreakpointsModule — window-based и resize', () => {
       })
 
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       setWindowWidth(768)
       slider.update()
 
       expect(slider.options.perPage).toBe(1)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
 
       slider.destroy()
     })
@@ -327,7 +328,7 @@ describe('BreakpointsModule — window-based и resize', () => {
       slider.update()
 
       expect(slider.options.perPage).toBe(1)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
 
       slider.destroy()
     })
@@ -354,19 +355,19 @@ describe('BreakpointsModule — window-based и resize', () => {
 
       expect(slider.options.perPage).toBe(2)
       expect(slider.options.gap).toBe(16)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       setWindowWidth(700)
       slider.update()
       expect(slider.options.perPage).toBe(1)
       expect(slider.options.gap).toBe(0)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
 
       setWindowWidth(800)
       slider.update()
       expect(slider.options.perPage).toBe(2)
       expect(slider.options.gap).toBe(16)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       slider.destroy()
     })
@@ -412,7 +413,7 @@ describe('BreakpointsModule — window-based и resize', () => {
 
       expect(slider.options.perPage).toBe(2)
 
-      const bpModule = (slider as any).modules.get('breakpoints')
+      const bpModule = getRuntime((slider as any)).modules.get('breakpoints')
       expect(bpModule).toBeDefined()
 
       setWindowWidth(700)
@@ -430,14 +431,14 @@ describe('BreakpointsModule — window-based и resize', () => {
         breakpoints: { 768: { perPage: 1 } }
       })
 
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       setWindowWidth(700)
-      const bpMod = (slider as any).modules.get('breakpoints')
+      const bpMod = getRuntime((slider as any)).modules.get('breakpoints')
       ;(bpMod as any).handleMediaChange()
 
       expect(slider.options.perPage).toBe(1)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
 
       slider.destroy()
     })
@@ -449,13 +450,13 @@ describe('BreakpointsModule — window-based и resize', () => {
         breakpoints: { 768: { perPage: 1 } }
       })
 
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       setWindowWidth(700)
       slider.update()
 
       expect(slider.options.perPage).toBe(1)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
 
       slider.destroy()
     })
@@ -480,10 +481,10 @@ describe('BreakpointsModule — window-based и resize', () => {
       })
 
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       setWindowWidth(700)
-      const bpModule = (slider as any).modules.get('breakpoints')
+      const bpModule = getRuntime((slider as any)).modules.get('breakpoints')
       ;(bpModule as any).handleMediaChange()
 
       expect(slider.options.perPage).toBe(1)
@@ -491,7 +492,7 @@ describe('BreakpointsModule — window-based и resize', () => {
       slider.update()
 
       expect(slider.options.perPage).toBe(1)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
 
       slider.destroy()
     })
@@ -503,15 +504,15 @@ describe('BreakpointsModule — window-based и resize', () => {
         breakpoints: { 768: { perPage: 1 } }
       })
 
-      const engineUpdateSpy = vi.spyOn(slider.engine, 'update')
+      const engineUpdateSpy = vi.spyOn(getRuntime(slider).engine, '__tvistInternal_update')
 
       setWindowWidth(700)
-      const bpModule = (slider as any).modules.get('breakpoints')
+      const bpModule = getRuntime((slider as any)).modules.get('breakpoints')
       ;(bpModule as any).handleMediaChange()
 
       expect(engineUpdateSpy).toHaveBeenCalled()
       expect(slider.options.perPage).toBe(1)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
 
       slider.destroy()
     })
@@ -537,7 +538,7 @@ describe('BreakpointsModule — window-based и resize', () => {
 
       expect(slider.options.perPage).toBe(1)
 
-      const bpModule = (slider as any).modules.get('breakpoints')
+      const bpModule = getRuntime((slider as any)).modules.get('breakpoints')
       expect(bpModule.getCurrentBreakpoint()).toBe(768)
 
       slider.destroy()
@@ -552,7 +553,7 @@ describe('BreakpointsModule — window-based и resize', () => {
 
       expect(slider.options.perPage).toBe(2)
 
-      const bpModule = (slider as any).modules.get('breakpoints')
+      const bpModule = getRuntime((slider as any)).modules.get('breakpoints')
       expect(bpModule.getCurrentBreakpoint()).toBeNull()
 
       slider.destroy()
@@ -584,7 +585,7 @@ describe('BreakpointsModule — window-based и resize', () => {
       })
 
       expect(slider.options.perPage).toBe(1)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
 
       for (const w of [742, 743, 746, 758, 768]) {
         setWindowWidth(w)
@@ -595,12 +596,12 @@ describe('BreakpointsModule — window-based и resize', () => {
       setWindowWidth(775)
       slider.update()
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       setWindowWidth(792)
       slider.update()
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       slider.destroy()
     })
@@ -616,17 +617,17 @@ describe('BreakpointsModule — window-based и resize', () => {
       })
 
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       setWindowWidth(767)
       slider.update()
       expect(slider.options.perPage).toBe(1)
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
 
       setWindowWidth(792)
       slider.update()
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
 
       slider.destroy()
     })
@@ -638,12 +639,12 @@ describe('BreakpointsModule — window-based и resize', () => {
         breakpoints: { 768: { perPage: 1 } }
       })
 
-      expect(slider.engine.index.endIndex).toBe(1)
+      expect(getRuntime(slider).engine.index.endIndex).toBe(1)
 
       setWindowWidth(800)
       slider.update()
 
-      expect(slider.engine.index.endIndex).toBe(0)
+      expect(getRuntime(slider).engine.index.endIndex).toBe(0)
 
       slider.destroy()
     })
@@ -656,12 +657,12 @@ describe('BreakpointsModule — window-based и resize', () => {
         breakpoints: { 768: { perPage: 1, gap: 0 } }
       })
 
-      const sizeMobile = slider.engine.slideSize
+      const sizeMobile = getRuntime(slider).engine.slideSize
 
       setWindowWidth(800)
       slider.update()
 
-      const sizeDesktop = slider.engine.slideSize
+      const sizeDesktop = getRuntime(slider).engine.slideSize
 
       expect(sizeDesktop).toBeLessThan(sizeMobile)
 

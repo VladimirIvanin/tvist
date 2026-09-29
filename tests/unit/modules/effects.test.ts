@@ -1,15 +1,16 @@
+import { getRuntime } from '../../../src/core/runtime'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import Tvist from '@core/Tvist'
-import { EffectModule } from '@modules/effects/EffectModule'
+import { createEffectModule as EffectModule } from '@modules/effects/EffectModule'
 import '@modules/breakpoints'
 
 // Manually register for test isolation or import the index
-Tvist.registerModule('effect', EffectModule)
+
 
 describe('EffectModule', () => {
   let container: HTMLElement
-  
+
   beforeEach(() => {
     document.body.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
@@ -23,7 +24,7 @@ describe('EffectModule', () => {
       </div>
     `
     container = document.querySelector(`.${TVIST_CLASSES.block}`) as HTMLElement
-    
+
     // Mock offsetWidth to allow calculation of slideWidth
     Object.defineProperty(container, 'offsetWidth', {
       configurable: true,
@@ -40,9 +41,9 @@ describe('EffectModule', () => {
     const slider = new Tvist(container, {
       effect: 'fade'
     })
-    
-    const module = slider.getModule('effect')
-    expect(module).toBeInstanceOf(EffectModule)
+
+    const module = getRuntime(slider).getModule('effect')
+    expect(module?.name).toBe('effect')
   })
 
   it('должен принудительно устанавливать perPage: 1 для эффектов', () => {
@@ -50,7 +51,7 @@ describe('EffectModule', () => {
       effect: 'fade',
       perPage: 3
     })
-    
+
     expect(slider.options.perPage).toBe(1)
   })
 
@@ -58,16 +59,16 @@ describe('EffectModule', () => {
     const slider = new Tvist(container, {
       effect: 'fade'
     })
-    
+
     // Эмулируем прокрутку
     slider.scrollTo(1, true)
-    
+
     const slides = slider.slides
-    
+
     // Проверяем что opacity проставлены корректно и не равны NaN
     const opacity0 = slides[0].style.opacity
     const opacity1 = slides[1].style.opacity
-    
+
     // Не проверяем точные значения, важно, что стили вообще проставляются
     expect(opacity0).not.toBe('')
     expect(opacity1).not.toBe('')
@@ -77,7 +78,7 @@ describe('EffectModule', () => {
     const slider = new Tvist(container, {
       effect: 'cube'
     })
-    
+
     expect(slider.container.style.transformStyle).toBe('preserve-3d')
   })
 

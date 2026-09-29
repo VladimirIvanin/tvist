@@ -1,24 +1,3 @@
-/**
- * Модули Tvist
- * Экспорт всех модулей
- */
-
-export { Module, type ModuleConstructor } from './Module'
-export { DragModule } from './drag'
-export { NavigationModule } from './navigation'
-export { PaginationModule } from './pagination'
-export { AutoplayModule } from './autoplay'
-export { BreakpointsModule } from './breakpoints'
-export { LoopModule } from './loop'
-export { SlideStatesModule } from './slide-states'
-export { ThumbsModule } from './thumbs'
-export { EffectModule } from './effects'
-export { GridModule } from './grid'
-export { ScrollControlModule } from './scroll-control'
-export { ScrollbarModule } from './scrollbar'
-export { MarqueeModule } from './marquee'
-export { LazyLoadModule } from './lazyload'
-export { VideoModule } from './video'
-export { VisibilityModule } from './visibility'
-
-
+/** Internal built-in components. Import the complete slider from tvist. */
+export { BUILTINS } from './builtins';
+export type { Component, ComponentFactory } from './Component';

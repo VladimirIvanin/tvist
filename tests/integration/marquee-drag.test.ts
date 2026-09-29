@@ -1,6 +1,7 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * Marquee + Drag Integration Tests
- * 
+ *
  * Проверяем корректное взаимодействие Marquee и Drag модулей
  */
 
@@ -88,10 +89,10 @@ describe('Marquee + Drag Integration', () => {
   const getTranslateX = (element: HTMLElement): number => {
     const transform = element.style.transform
     if (!transform) return 0
-    
+
     const match = transform.match(/translate3d\(([^,]+)/)
     if (!match) return 0
-    
+
     return parseFloat(match[1])
   }
 
@@ -108,24 +109,24 @@ describe('Marquee + Drag Integration', () => {
 
     // Получаем начальный transform от marquee
     const initialTransform = getTranslateX(container)
-    
+
     // Симулируем что marquee успел сдвинуть контейнер
     // Устанавливаем transform вручную (эмулируем работу marquee)
     container.style.transform = 'translate3d(-150px, 0, 0)'
-    
+
     // Также обновляем внутреннее состояние marquee модуля
-    const marqueeModule = slider.getModule('marquee') as any
+    const marqueeModule = getRuntime(slider).getModule('marquee') as any
     if (marqueeModule?.setCurrentPosition) {
       marqueeModule.setCurrentPosition(150) // currentPosition хранится как положительное значение
     }
-    
+
     const marqueePosition = getTranslateX(container)
     expect(marqueePosition).toBe(-150)
 
     // Начинаем драг с центра экрана
     const startX = 300
     const dragDistance = 50
-    
+
     // Симулируем начало драга (только pointerdown + первое движение)
     const pointerDown = new PointerEvent('pointerdown', {
       clientX: startX,
@@ -156,7 +157,7 @@ describe('Marquee + Drag Integration', () => {
 
     // КРИТИЧНО: После начала драга позиция не должна "откатиться" к 0
     const positionAfterDragStart = getTranslateX(container)
-    
+
     // Проверяем что позиция изменилась от marqueePosition (примерно +5px от dragStart)
     expect(positionAfterDragStart).toBeGreaterThan(marqueePosition)
     expect(Math.abs(positionAfterDragStart - marqueePosition)).toBeLessThan(20)
@@ -184,26 +185,26 @@ describe('Marquee + Drag Integration', () => {
 
     // Устанавливаем начальную позицию marquee
     container.style.transform = 'translate3d(-200px, 0, 0)'
-    
+
     // Обновляем внутреннее состояние marquee модуля
-    const marqueeModule = slider.getModule('marquee') as any
+    const marqueeModule = getRuntime(slider).getModule('marquee') as any
     if (marqueeModule?.setCurrentPosition) {
       marqueeModule.setCurrentPosition(200)
     }
-    
+
     const initialMarqueePosition = getTranslateX(container)
     expect(initialMarqueePosition).toBe(-200)
 
     // Выполняем драг на 100px вправо
     const startX = 300
     const dragDistance = 100
-    
+
     simulateDrag(root, startX, startX + dragDistance)
 
     // После драга позиция должна быть примерно -200 + 100 = -100
     // (с учетом возможного snap к слайду)
     const finalPosition = getTranslateX(container)
-    
+
     // В данном случае может произойти snap к ближайшему слайду
     // Но главное - позиция НЕ должна быть около 0 (что было бы ошибкой)
     // Проверяем что финальная позиция учитывает начальную позицию marquee
@@ -223,38 +224,38 @@ describe('Marquee + Drag Integration', () => {
       loop: true
     })
 
-    const marqueeModule = slider.getModule('marquee') as any
+    const marqueeModule = getRuntime(slider).getModule('marquee') as any
 
     // Устанавливаем позицию marquee
     container.style.transform = 'translate3d(-150px, 0, 0)'
     if (marqueeModule?.setCurrentPosition) {
       marqueeModule.setCurrentPosition(150)
     }
-    
+
     // Драг вправо
     simulateDrag(root, 300, 400)
     const positionAfterRightDrag = getTranslateX(container)
-    
+
     // Позиция должна сместиться вправо (стать менее отрицательной)
     expect(positionAfterRightDrag).toBeGreaterThan(-150)
-    
+
     // Устанавливаем позицию marquee снова
     container.style.transform = 'translate3d(-150px, 0, 0)'
     if (marqueeModule?.setCurrentPosition) {
       marqueeModule.setCurrentPosition(150)
     }
-    
+
     // Драг влево
     simulateDrag(root, 300, 200)
     const positionAfterLeftDrag = getTranslateX(container)
-    
+
     // Позиция должна сместиться влево (стать более отрицательной)
     expect(positionAfterLeftDrag).toBeLessThan(-150)
   })
 
   it('drag должен приостанавливать marquee', () => {
     const onMarqueePause = vi.fn()
-    
+
     slider = new Tvist(root, {
       marquee: {
         speed: 100,
@@ -283,7 +284,7 @@ describe('Marquee + Drag Integration', () => {
 
   it('marquee должен возобновляться после завершения драга', () => {
     const onMarqueeResume = vi.fn()
-    
+
     slider = new Tvist(root, {
       marquee: {
         speed: 100,
@@ -315,19 +316,19 @@ describe('Marquee + Drag Integration', () => {
 
     // Устанавливаем позицию
     container.style.transform = 'translate3d(-100px, 0, 0)'
-    
-    const marqueeModule = slider.getModule('marquee') as any
+
+    const marqueeModule = getRuntime(slider).getModule('marquee') as any
     if (marqueeModule?.setCurrentPosition) {
       marqueeModule.setCurrentPosition(100)
     }
-    
+
     const initialPosition = getTranslateX(container)
-    
+
     // Драг вправо на 50px
     simulateDrag(root, 300, 350)
-    
+
     const finalPosition = getTranslateX(container)
-    
+
     // После драга позиция должна быть примерно -100 + 50 = -50
     // (marquee управляет позицией свободно, без snap)
     // Проверяем что позиция изменилась относительно начальной
@@ -355,7 +356,7 @@ describe('Marquee + Drag Integration', () => {
 
     // Устанавливаем vertical transform
     container.style.transform = 'translate3d(0, -150px, 0)'
-    
+
     // Симулируем vertical drag
     const pointerDown = new PointerEvent('pointerdown', {
       clientX: 0,
@@ -389,7 +390,7 @@ describe('Marquee + Drag Integration', () => {
       loop: true
     })
 
-    const marqueeModule = slider.getModule('marquee') as any
+    const marqueeModule = getRuntime(slider).getModule('marquee') as any
 
     // Для направления right: currentPosition уменьшается от totalSize к 0
     // Устанавливаем позицию marquee (например, на середине пути)
@@ -404,7 +405,7 @@ describe('Marquee + Drag Integration', () => {
     simulateDrag(root, 300, 350)
 
     const finalPosition = getTranslateX(container)
-    
+
     // При драге вправо позиция должна стать менее отрицательной
     expect(finalPosition).toBeGreaterThan(initialPosition)
   })
@@ -427,14 +428,14 @@ describe('Marquee + Drag Integration', () => {
       loop: true
     })
 
-    const marqueeModule = slider.getModule('marquee') as any
+    const marqueeModule = getRuntime(slider).getModule('marquee') as any
 
     // Устанавливаем vertical transform
     container.style.transform = 'translate3d(0, -100px, 0)'
     if (marqueeModule?.setCurrentPosition) {
       marqueeModule.setCurrentPosition(100)
     }
-    
+
     const getTranslateY = (element: HTMLElement): number => {
       const transform = element.style.transform
       if (!transform) return 0
@@ -481,7 +482,7 @@ describe('Marquee + Drag Integration', () => {
     document.dispatchEvent(pointerUp)
 
     const finalPosition = getTranslateY(container)
-    
+
     // При драге вниз Y позиция должна стать менее отрицательной
     expect(finalPosition).toBeGreaterThan(initialPosition)
   })

@@ -1,6 +1,6 @@
 /**
  * Autoplay Module
- * 
+ *
  * Возможности:
  * - Автопрокрутка с настраиваемой задержкой
  * - Пауза при hover
@@ -10,24 +10,22 @@
  * - Ожидание окончания видео вместо таймера (waitForVideo)
  * - Прогресс автопрокрутки (autoplayProgress)
  * - Публичное API: start, stop, pause, resume
- * 
+ *
  * Использует рекурсивный setTimeout вместо setInterval:
  * - setTimeout вызывается ПОСЛЕ завершения переключения слайда
  * - Предотвращает накопление событий когда браузер неактивен
  * - Более надежная работа с паузами и возобновлением
- * 
+ *
  * Опция autoplay принимает:
  * - false / undefined — выключен
  * - true — включен с delay: 3000
  * - number — включен с указанной задержкой
  * - AutoplayOptions — полный контроль
  */
-
-import { Module } from '../Module'
-import { findSlideByRealIndex } from '../../utils/slideRealIndex'
-import type { Tvist } from '../../core/Tvist'
-import type { AutoplayProgressEvent, TvistOptions, AutoplayOptions } from '../../core/types'
-
+import { createComponent, type Component } from '../Component';
+import { findSlideByRealIndex } from '../../utils/slideRealIndex';
+import type { TvistRuntime as Tvist } from '../../core/runtime';
+import type { AutoplayProgressEvent, TvistOptions, AutoplayOptions } from '../../core/types';
 /** Дефолтные значения для AutoplayOptions */
 const AUTOPLAY_DEFAULTS: Required<AutoplayOptions> = {
   delay: 3000,
@@ -36,23 +34,19 @@ const AUTOPLAY_DEFAULTS: Required<AutoplayOptions> = {
   pauseOnInteraction: true,
   disableOnInteraction: false,
   waitForVideo: false,
-}
-
+};
 /**
  * Нормализация autoplay опций в объект AutoplayOptions.
  * Возвращает null если autoplay выключен.
  */
 function normalizeAutoplay(raw: TvistOptions['autoplay']): Required<AutoplayOptions> | null {
-  if (raw === false || raw === undefined) return null
-
+  if (raw === false || raw === undefined) return null;
   if (raw === true) {
-    return { ...AUTOPLAY_DEFAULTS }
+    return { ...AUTOPLAY_DEFAULTS };
   }
-
   if (typeof raw === 'number') {
-    return { ...AUTOPLAY_DEFAULTS, delay: raw }
+    return { ...AUTOPLAY_DEFAULTS, delay: raw };
   }
-
   // Object form
   return {
     delay: raw.delay ?? AUTOPLAY_DEFAULTS.delay,
@@ -61,897 +55,881 @@ function normalizeAutoplay(raw: TvistOptions['autoplay']): Required<AutoplayOpti
     pauseOnInteraction: raw.pauseOnInteraction ?? AUTOPLAY_DEFAULTS.pauseOnInteraction,
     disableOnInteraction: raw.disableOnInteraction ?? AUTOPLAY_DEFAULTS.disableOnInteraction,
     waitForVideo: raw.waitForVideo ?? AUTOPLAY_DEFAULTS.waitForVideo,
-  }
+  };
 }
 
-export class AutoplayModule extends Module {
-  readonly name = 'autoplay'
+/** Internal component; state lives in this factory's closure. */
+export interface AutoplayModule extends Component {
+  readonly name: 'autoplay';
 
-  private timer: number | null = null
-  private paused = false
-  private stopped = false
-  
-  /** Нормализованные опции autoplay */
-  private config: Required<AutoplayOptions> | null = null
+  init(): void;
 
-  private mouseEnterHandler?: () => void
-  private mouseLeaveHandler?: () => void
-  private focusInHandler?: () => void
-  private focusOutHandler?: (event: FocusEvent) => void
-  private visibilityChangeHandler?: () => void
-  private pausedByHover = false
-  private pausedByFocus = false
+  destroy(): void;
 
-  // Флаг для отслеживания состояния drag
-  private isDragging = false
-  // Таймаут для fallback resume после drag (если transitionEnd не сработает)
-  private dragEndTimeout: number | null = null
-  // Флаг для отслеживания паузы из-за потери видимости вкладки
-  private pausedByVisibility = false
-
-  // Для корректного возобновления после паузы
-  private timeLeft: number | null = null
-  private currentDuration = 0
-  private currentChunkDuration = 0
-
-  // Для autoplayProgress
-  private progressRAF: number | null = null
-  private progressStartTime: number | null = null
-  private progressStartOffset = 0
-
-  // Для waitForVideo — слушаем videoEnded
-  private waitingForVideo = false
-  private videoEndedWhilePaused = false  // видео закончилось пока autoplay на паузе (hover)
-  private videoEndedHandler?: () => void
-  private videoProgressHandler?: (data: { progress: number; index: number }) => void
-
-  /** Переход был инициирован autoplay (next() из таймера или videoEnded). Не сбрасываем таймер на slideChangeEnd. */
-  private transitionByAutoplay = false
-  /** Таймаут для сброса transitionByAutoplay, если next() не привёл к переходу (например, слайдер на границе). */
-  private clearTransitionByAutoplayTimeout: number | null = null
-  /** Проверка, что autoplay next() реально привёл к смене слайда. */
-  private boundaryCheckTimeout: number | null = null
-  /** Момент последнего slideChangeEnd (нужен для корректного boundary тайминга). */
-  private lastSlideChangeEndAt: number | null = null
-  /** Момент последнего autoplay next(). */
-  private lastAutoplayNextAt: number | null = null
-  /** Диагностика последовательности autoplayProgress */
-  private lastProgressIndex: number | null = null
-  private lastProgressValue: number | null = null
-  private lastProgressAt: number | null = null
-
-  constructor(tvist: Tvist, options: TvistOptions) {
-    super(tvist, options)
-    this.config = normalizeAutoplay(this.options.autoplay)
-  }
-
-  private isDebugEnabled(): boolean {
-    return this.options.debug === true
-  }
-
-  private debugLog(message: string, data: Record<string, unknown> = {}): void {
-    if (!this.isDebugEnabled()) return
-    console.warn('[AutoplayModule]', message, data)
-  }
-
-  override init(): void {
-    if (!this.shouldBeActive()) return
-
-    this.setupEvents()
-    this.attachVisibilityEvents()
-    this.start()
-  }
-
-  override destroy(): void {
-    this.stopped = true
-    this.stop()
-    this.clearDragEndTimeout()
-    this.clearTransitionByAutoplayFallback()
-    this.clearBoundaryCheckTimeout()
-    this.stopProgressTracking()
-    this.detachHoverEvents()
-    this.detachFocusEvents()
-    this.detachVisibilityEvents()
-    this.detachVideoEndedListener()
-    this.detachVideoProgressListener()
-  }
-
-  public override shouldBeActive(): boolean {
-    return this.config !== null
-  }
-
+  shouldBeActive(): boolean;
   /**
    * Обработка обновления опций
    */
-  override onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
+  onOptionsUpdate(newOptions: Partial<TvistOptions>): void;
+  /**
+   * Старт autoplay
+   */
+  start(): void;
+  /**
+   * Остановка autoplay
+   */
+  stop(): void;
+  /**
+   * Пауза autoplay
+   * Очищаем таймер, чтобы callback не сработал во время паузы
+   */
+  pause(): void;
+  /**
+   * Возобновление autoplay
+   * Перезапускает таймер с полной задержкой
+   */
+  resume(): void;
+  /**
+   * Публичное API - получить модуль и использовать методы
+   */
+  getAutoplay(): {
+    start: () => void;
+    stop: () => void;
+    pause: () => void;
+    resume: () => void;
+    isRunning: () => boolean;
+    isPaused: () => boolean;
+    isStopped: () => boolean;
+  };
+}
+
+export function createAutoplayModule(tvist: Tvist, options: TvistOptions): AutoplayModule {
+  const base = createComponent(tvist, options);
+
+  const local_name = 'autoplay' as const;
+
+  let local_timer: number | null = null;
+
+  let local_paused = false;
+
+  let local_stopped = false;
+  /** Нормализованные опции autoplay */
+  let local_config: Required<AutoplayOptions> | null = null;
+
+  let local_mouseEnterHandler: (() => void) | undefined;
+
+  let local_mouseLeaveHandler: (() => void) | undefined;
+
+  let local_focusInHandler: (() => void) | undefined;
+
+  let local_focusOutHandler: ((event: FocusEvent) => void) | undefined;
+
+  let local_visibilityChangeHandler: (() => void) | undefined;
+
+  let local_pausedByHover = false;
+
+  let local_pausedByFocus = false;
+  // Флаг для отслеживания состояния drag
+  let local_isDragging = false;
+  // Таймаут для fallback resume после drag (если transitionEnd не сработает)
+  let local_dragEndTimeout: number | null = null;
+  // Флаг для отслеживания паузы из-за потери видимости вкладки
+  let local_pausedByVisibility = false;
+  // Для корректного возобновления после паузы
+  let local_timeLeft: number | null = null;
+
+  let local_currentDuration = 0;
+
+  let local_currentChunkDuration = 0;
+  // Для autoplayProgress
+  let local_progressRAF: number | null = null;
+
+  let local_progressStartTime: number | null = null;
+
+  let local_progressStartOffset = 0;
+  // Для waitForVideo — слушаем videoEnded
+  let local_waitingForVideo = false;
+
+  let local_videoEndedWhilePaused = false; // видео закончилось пока autoplay на паузе (hover)
+  let local_videoEndedHandler: (() => void) | undefined;
+
+  let local_videoProgressHandler: ((data: { progress: number; index: number }) => void) | undefined;
+  /** Переход был инициирован autoplay (next() из таймера или videoEnded). Не сбрасываем таймер на slideChangeEnd. */
+  let local_transitionByAutoplay = false;
+  /** Таймаут для сброса transitionByAutoplay, если next() не привёл к переходу (например, слайдер на границе). */
+  let local_clearTransitionByAutoplayTimeout: number | null = null;
+  /** Проверка, что autoplay next() реально привёл к смене слайда. */
+  let local_boundaryCheckTimeout: number | null = null;
+  /** Момент последнего slideChangeEnd (нужен для корректного boundary тайминга). */
+  let local_lastSlideChangeEndAt: number | null = null;
+  /** Момент последнего autoplay next(). */
+  let local_lastAutoplayNextAt: number | null = null;
+  /** Диагностика последовательности autoplayProgress */
+
+  function local_init(): void {
+    if (!local_shouldBeActive()) return;
+    local_setupEvents();
+    local_attachVisibilityEvents();
+    local_start();
+  }
+
+  function local_destroy(): void {
+    local_stopped = true;
+    local_stop();
+    local_clearDragEndTimeout();
+    local_clearTransitionByAutoplayFallback();
+    local_clearBoundaryCheckTimeout();
+    local_stopProgressTracking();
+    local_detachHoverEvents();
+    local_detachFocusEvents();
+    local_detachVisibilityEvents();
+    local_detachVideoEndedListener();
+    local_detachVideoProgressListener();
+  }
+
+  function local_shouldBeActive(): boolean {
+    return local_config !== null;
+  }
+  /**
+   * Обработка обновления опций
+   */
+  function local_onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
     // Если autoplay изменился
     if (newOptions.autoplay !== undefined) {
-      const wasActive = this.config !== null
-      const oldConfig = this.config
-      
+      const wasActive = local_config !== null;
+      const oldConfig = local_config;
       // Перенормализуем
-      this.config = normalizeAutoplay(newOptions.autoplay)
-
-      const isNowActive = this.config !== null
-
+      local_config = normalizeAutoplay(newOptions.autoplay);
+      const isNowActive = local_config !== null;
       // Если autoplay был выключен, а теперь включен
       if (!wasActive && isNowActive) {
-        this.stopped = false
-        this.setupEvents()
-        this.attachVisibilityEvents()
-        this.start()
+        local_stopped = false;
+        local_setupEvents();
+        local_attachVisibilityEvents();
+        local_start();
       }
       // Если autoplay был включен, а теперь выключен
       else if (wasActive && !isNowActive) {
-        this.stop()
-        this.detachHoverEvents()
-        this.detachFocusEvents()
-        this.detachVisibilityEvents()
-        this.detachVideoEndedListener()
-        this.detachVideoProgressListener()
-        this.stopped = true
+        local_stop();
+        local_detachHoverEvents();
+        local_detachFocusEvents();
+        local_detachVisibilityEvents();
+        local_detachVideoEndedListener();
+        local_detachVideoProgressListener();
+        local_stopped = true;
       }
       // Если autoplay был включен и остается включен (но изменились настройки)
-      else if (wasActive && isNowActive && this.config) {
+      else if (wasActive && isNowActive && local_config) {
         // Переинициализируем hover events при изменении pauseOnHover
-        this.detachHoverEvents()
-        this.detachFocusEvents()
-        if (this.config.pauseOnHover) {
-          this.attachHoverEvents()
+        local_detachHoverEvents();
+        local_detachFocusEvents();
+        if (local_config.pauseOnHover) {
+          local_attachHoverEvents();
         }
-        if (this.config.pauseOnFocus) {
-          this.attachFocusEvents()
+        if (local_config.pauseOnFocus) {
+          local_attachFocusEvents();
         }
-        
         // Если waitForVideo был отключен, сбрасываем связанные флаги
-        if (oldConfig?.waitForVideo && !this.config.waitForVideo && this.waitingForVideo) {
-          this.waitingForVideo = false
-          this.videoEndedWhilePaused = false
-          this.detachVideoEndedListener()
+        if (oldConfig?.waitForVideo && !local_config.waitForVideo && local_waitingForVideo) {
+          local_waitingForVideo = false;
+          local_videoEndedWhilePaused = false;
+          local_detachVideoEndedListener();
         }
-        if (this.config.waitForVideo) {
-          this.attachVideoProgressBridge()
+        if (local_config.waitForVideo) {
+          local_attachVideoProgressBridge();
         } else {
-          this.detachVideoProgressListener()
+          local_detachVideoProgressListener();
         }
-        
-        this.start() // Перезапускаем с новой задержкой
+        local_start(); // Перезапускаем с новой задержкой
       }
     }
   }
-
   /**
    * Отменить отложенный сброс transitionByAutoplay.
    * Вызываем при destroy и когда slideChangeEnd сбрасывает флаг (переход действительно произошёл).
    */
-  private clearTransitionByAutoplayFallback(): void {
-    if (this.clearTransitionByAutoplayTimeout !== null) {
-      window.clearTimeout(this.clearTransitionByAutoplayTimeout)
-      this.clearTransitionByAutoplayTimeout = null
+  function local_clearTransitionByAutoplayFallback(): void {
+    if (local_clearTransitionByAutoplayTimeout !== null) {
+      base.resources.cancelTimeout(local_clearTransitionByAutoplayTimeout);
+      local_clearTransitionByAutoplayTimeout = null;
     }
   }
 
-  private clearBoundaryCheckTimeout(): void {
-    if (this.boundaryCheckTimeout !== null) {
-      window.clearTimeout(this.boundaryCheckTimeout)
-      this.boundaryCheckTimeout = null
+  function local_clearBoundaryCheckTimeout(): void {
+    if (local_boundaryCheckTimeout !== null) {
+      base.resources.cancelTimeout(local_boundaryCheckTimeout);
+      local_boundaryCheckTimeout = null;
     }
   }
-
   /**
    * Запланировать сброс transitionByAutoplay через (speed * множитель) мс.
    * Если к тому моменту transitionEnd не сработал (next() не привёл к переходу, напр. граница без loop),
    * флаг сбросится и следующая ручная навигация корректно сбросит таймер.
-   * 
+   *
    * Множитель 5 обеспечивает надёжный запас времени даже для очень медленных анимаций,
    * сложных CSS transitions или при сильной загрузке браузера. В нормальных условиях
    * флаг сбрасывается через transitionEnd задолго до срабатывания fallback.
    */
-  private static readonly TRANSITION_FALLBACK_MULTIPLIER = 5
+  const local_TRANSITION_FALLBACK_MULTIPLIER = 5 as const;
 
-  private scheduleTransitionByAutoplayFallback(): void {
-    this.clearTransitionByAutoplayFallback()
-    const speed = this.options.speed ?? 300
-    this.clearTransitionByAutoplayTimeout = window.setTimeout(() => {
-      this.clearTransitionByAutoplayTimeout = null
-      if (this.transitionByAutoplay) {
-        this.transitionByAutoplay = false
+  function local_scheduleTransitionByAutoplayFallback(): void {
+    local_clearTransitionByAutoplayFallback();
+    const speed = options.speed ?? 300;
+    local_clearTransitionByAutoplayTimeout = base.resources.timeout(() => {
+      local_clearTransitionByAutoplayTimeout = null;
+      if (local_transitionByAutoplay) {
+        local_transitionByAutoplay = false;
       }
-    }, speed * AutoplayModule.TRANSITION_FALLBACK_MULTIPLIER)
+    }, speed * local_TRANSITION_FALLBACK_MULTIPLIER);
   }
-
   /**
    * Очистка таймаута fallback resume
    */
-  private clearDragEndTimeout(): void {
-    if (this.dragEndTimeout !== null) {
-      window.clearTimeout(this.dragEndTimeout)
-      this.dragEndTimeout = null
+  function local_clearDragEndTimeout(): void {
+    if (local_dragEndTimeout !== null) {
+      base.resources.cancelTimeout(local_dragEndTimeout);
+      local_dragEndTimeout = null;
     }
   }
-
   /**
    * Возобновление autoplay после drag
    * Вызывается из transitionEnd или fallback timeout.
    * Сбрасываем timeLeft, чтобы следующий цикл шёл с полной задержкой (delay),
    * а не с остатком до переключения — иначе слайдер перелистнётся сразу после отпускания.
    */
-  private resumeAfterDrag(): void {
-    if (!this.isDragging) return
-    
-    this.isDragging = false
-    this.clearDragEndTimeout()
-    this.timeLeft = null
-    this.progressStartOffset = 0
-
-    if (!this.config?.disableOnInteraction && !this.stopped && this.paused && !this.hasPassivePauseReason()) {
-      this.resume()
+  function local_resumeAfterDrag(): void {
+    if (!local_isDragging) return;
+    local_isDragging = false;
+    local_clearDragEndTimeout();
+    local_timeLeft = null;
+    local_progressStartOffset = 0;
+    if (
+      !local_config?.disableOnInteraction &&
+      !local_stopped &&
+      local_paused &&
+      !local_hasPassivePauseReason()
+    ) {
+      local_resume();
     }
   }
-
   /**
    * Настройка событий
    */
-  private setupEvents(): void {
-    if (!this.config) return
-
-    if (this.config.pauseOnHover) {
-      this.attachHoverEvents()
+  function local_setupEvents(): void {
+    if (!local_config) return;
+    if (local_config.pauseOnHover) {
+      local_attachHoverEvents();
     }
-    if (this.config.pauseOnFocus) {
-      this.attachFocusEvents()
+    if (local_config.pauseOnFocus) {
+      local_attachFocusEvents();
     }
-
-    this.attachVideoProgressBridge()
-
+    local_attachVideoProgressBridge();
     // Всегда ставим на паузу при драге (не только при pauseOnInteraction),
     // иначе таймер может вызвать next() во время/сразу после драга (rewind к 0)
     // и перебить snap к нужному слайду — пагинация тогда расходится с кадром
-    this.on('dragStart', () => {
-      if (this.stopped) return
-      this.isDragging = true
-      this.clearDragEndTimeout()
-      
-      if (this.config?.disableOnInteraction) {
-        this.stop()
-        this.stopped = true
+    base.on('dragStart', () => {
+      if (local_stopped) return;
+      local_isDragging = true;
+      local_clearDragEndTimeout();
+      if (local_config?.disableOnInteraction) {
+        local_stop();
+        local_stopped = true;
       } else {
-        this.pause()
+        local_pause();
       }
-    })
-    
+    });
     // dragEnd: запускаем fallback таймаут на случай если transitionEnd не сработает
     // (например, если snap вернул на тот же слайд и indexChanged === false)
-    this.on('dragEnd', () => {
-      if (this.stopped) return
-      if (!this.isDragging) return
-      
-      const speed = this.options.speed ?? 300
+    base.on('dragEnd', () => {
+      if (local_stopped) return;
+      if (!local_isDragging) return;
+      const speed = options.speed ?? 300;
       // Fallback: resume через speed + буфер, если transitionEnd не сработает
-      this.dragEndTimeout = window.setTimeout(() => {
-        this.resumeAfterDrag()
-      }, speed + 100)
-    })
-    
+      local_dragEndTimeout = base.resources.timeout(() => {
+        local_resumeAfterDrag();
+      }, speed + 100);
+    });
     // ВАЖНО: resume() вызываем НЕ на dragEnd, а на transitionEnd.
     // Причина: dragEnd срабатывает ДО завершения snap-анимации.
     // Если вызвать resume() сразу, setInterval начнёт отсчёт,
     // и next() может сработать во время или сразу после snap,
     // что приводит к багу с пагинацией (activeBullet != activeIndex).
-    this.on('transitionEnd', () => {
-      if (this.stopped) return
+    base.on('transitionEnd', () => {
+      if (local_stopped) return;
       // НЕ сбрасываем transitionByAutoplay здесь!
       // transitionEnd срабатывает РАНЬШЕ slideChangeEnd (см. Engine.ts:650-653),
       // поэтому если сбросить флаг здесь, slideChangeEnd всегда увидит его как false.
       // Это приводит к тому, что каждый autoplay-переход обрабатывается как ручная навигация,
       // вызывая cancelTimer() + run(), что добавляет animation duration к каждому циклу.
-      
       // Если был drag — resume через resumeAfterDrag
-      if (this.isDragging) {
-        this.resumeAfterDrag()
-        return
+      if (local_isDragging) {
+        local_resumeAfterDrag();
+        return;
       }
-      
       // Для обычной навигации (не drag) — resume если на паузе
-      if (!this.config?.disableOnInteraction && !this.stopped && this.paused && !this.hasPassivePauseReason()) {
-        this.resume()
+      if (
+        !local_config?.disableOnInteraction &&
+        !local_stopped &&
+        local_paused &&
+        !local_hasPassivePauseReason()
+      ) {
+        local_resume();
       }
-    })
-
+    });
     // При смене слайда:
     // - при ручной навигации (стрелки, пагинация и т.д.) сбрасываем таймер,
     //   чтобы новый слайд показывался полное время delay, а не остаток от предыдущего счётчика
     // - при autoplay-переходах не трогаем таймер, чтобы не ломать рекурсивный цикл run()
-    this.on('slideChangeEnd', (index: number) => {
-      if (this.stopped) return
-      const byAutoplay = this.transitionByAutoplay
-      const now = performance.now()
-      if (byAutoplay && this.lastAutoplayNextAt !== null) {
-        const speed = this.options.speed ?? 300
-        this.lastSlideChangeEndAt = Math.max(now, this.lastAutoplayNextAt + speed)
+    base.on('slideChangeEnd', (index: number) => {
+      if (local_stopped) return;
+      const byAutoplay = local_transitionByAutoplay;
+      const now = performance.now();
+      if (byAutoplay && local_lastAutoplayNextAt !== null) {
+        const speed = options.speed ?? 300;
+        local_lastSlideChangeEndAt = Math.max(now, local_lastAutoplayNextAt + speed);
       } else {
-        this.lastSlideChangeEndAt = now
+        local_lastSlideChangeEndAt = now;
       }
-      
       // Сбрасываем флаг и отменяем fallback
-      if (this.transitionByAutoplay) {
-        this.transitionByAutoplay = false
-        this.clearTransitionByAutoplayFallback()
-        this.clearBoundaryCheckTimeout()
+      if (local_transitionByAutoplay) {
+        local_transitionByAutoplay = false;
+        local_clearTransitionByAutoplayFallback();
+        local_clearBoundaryCheckTimeout();
       }
-      
       // Для ручной навигации новый цикл стартует здесь.
       // Для autoplay-переходов цикл продолжается рекурсивно в run(),
       // чтобы delay не зависел от длительности анимации, и мы не сбрасывали таймер зря.
       // Исключение: non-loop с очень коротким delay (< speed) — там следующий шаг
       // намеренно запускается из slideChangeEnd, чтобы тик не сработал до окончания перехода.
-      if (!this.paused && !this.stopped) {
+      if (!local_paused && !local_stopped) {
         if (!byAutoplay) {
           // Ручная навигация: сбрасываем текущий цикл и запускаем новый от текущего слайда.
-          this.cancelTimer()
-          this.timeLeft = null
-          this.progressStartOffset = 0
-          this.stopProgressTracking()
-          if (this.config?.waitForVideo) {
-            this.handleSlideChangedForVideo(index)
+          local_cancelTimer();
+          local_timeLeft = null;
+          local_progressStartOffset = 0;
+          local_stopProgressTracking();
+          if (local_config?.waitForVideo) {
+            local_handleSlideChangedForVideo(index);
           } else {
-            this.run()
+            local_run();
           }
-        } else if (byAutoplay && this.config && !(this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)) && this.config.delay < (this.options.speed ?? 300)) {
+        } else if (
+          byAutoplay &&
+          local_config &&
+          !(
+            options.loop === true ||
+            (typeof options.loop === 'object' && options.loop.enabled !== false)
+          ) &&
+          local_config.delay < (options.speed ?? 300)
+        ) {
           // Non-loop + очень короткий delay: следующий autoplay-тик запускаем
           // после завершения перехода.
-          this.run()
-        } else if (this.config?.waitForVideo) {
+          local_run();
+        } else if (local_config?.waitForVideo) {
           // Автоплей в режиме ожидания видео: обновляем слушатель для нового слайда.
-          this.handleSlideChangedForVideo(index)
+          local_handleSlideChangedForVideo(index);
         }
-      } else if (!byAutoplay && this.config?.waitForVideo) {
-        this.handleSlideChangedForVideo(index)
+      } else if (!byAutoplay && local_config?.waitForVideo) {
+        local_handleSlideChangedForVideo(index);
       }
-    })
+    });
   }
 
-  private attachVideoProgressBridge(): void {
-    if (!this.config?.waitForVideo) return
-
-    this.detachVideoProgressListener()
-    this.videoProgressHandler = (data: { progress: number; index: number }) => {
-      if (!this.waitingForVideo || this.stopped) return
-      this.emitAutoplayProgress(data.index, Math.min(Math.max(data.progress, 0), 1))
-    }
-    this.on('videoProgress', this.videoProgressHandler)
+  function local_attachVideoProgressBridge(): void {
+    if (!local_config?.waitForVideo) return;
+    local_detachVideoProgressListener();
+    local_videoProgressHandler = (data: { progress: number; index: number }) => {
+      if (!local_waitingForVideo || local_stopped) return;
+      local_emitAutoplayProgress(data.index, Math.min(Math.max(data.progress, 0), 1));
+    };
+    base.on('videoProgress', local_videoProgressHandler);
   }
 
-  private detachVideoProgressListener(): void {
-    if (!this.videoProgressHandler) return
-    this.off('videoProgress', this.videoProgressHandler)
-    this.videoProgressHandler = undefined
+  function local_detachVideoProgressListener(): void {
+    if (!local_videoProgressHandler) return;
+    base.off('videoProgress', local_videoProgressHandler);
+    local_videoProgressHandler = undefined;
   }
-
   /**
    * Обработка смены слайда для режима waitForVideo.
    * index из slideChangeEnd — это normalizedIndex (= realIndex), НЕ DOM-позиция.
    * В loop-режиме DOM-позиция может отличаться, поэтому ищем слайд по data-tvist-slide-index.
    */
-  private handleSlideChangedForVideo(index: number): void {
+  function local_handleSlideChangedForVideo(index: number): void {
     // Снимаем предыдущий videoEnded listener
-    this.detachVideoEndedListener()
-    this.waitingForVideo = false
-    this.videoEndedWhilePaused = false
-
+    local_detachVideoEndedListener();
+    local_waitingForVideo = false;
+    local_videoEndedWhilePaused = false;
     // index = realIndex. Ищем слайд по data-tvist-slide-index (loop) или по DOM-позиции (обычный)
-    const slide = findSlideByRealIndex(this.tvist.slides, index)
-
+    const slide = findSlideByRealIndex(tvist.slides, index);
     // Если слайд не найден (некорректный индекс или проблема с DOM), запускаем обычный таймер
     // чтобы autoplay продолжил работу, а не остановился навсегда
     if (!slide) {
-      this.cancelTimer()
-      this.stopProgressTracking()
-      this.timeLeft = null
-      this.progressStartOffset = 0
-      this.run()
-      return
+      local_cancelTimer();
+      local_stopProgressTracking();
+      local_timeLeft = null;
+      local_progressStartOffset = 0;
+      local_run();
+      return;
     }
-
-    const video = slide.querySelector('video')
+    const video = slide.querySelector('video');
     if (!video) {
       // Нет видео — запускаем таймер. Отменяем существующий, чтобы не было двух таймеров:
       // при переходе по autoplay с waitForVideo run() уже вызван в колбеке таймера, затем
       // slideChangeEnd вызывает handleSlideChangedForVideo → run() — без отмены остался бы
       // «сиротский» таймер и лишний next().
-      this.cancelTimer()
-      this.stopProgressTracking()
-      this.timeLeft = null
-      this.progressStartOffset = 0
-      this.run()
-      return
+      local_cancelTimer();
+      local_stopProgressTracking();
+      local_timeLeft = null;
+      local_progressStartOffset = 0;
+      local_run();
+      return;
     }
-
     // Есть видео — останавливаем таймер, ждём videoEnded
-    this.waitingForVideo = true
-    this.cancelTimer()
-    this.stopProgressTracking()
-    this.emitAutoplayProgress(index, 0)
-
-    this.videoEndedHandler = () => {
-      if (this.stopped || !this.waitingForVideo) {
-        return
+    local_waitingForVideo = true;
+    local_cancelTimer();
+    local_stopProgressTracking();
+    local_emitAutoplayProgress(index, 0);
+    local_videoEndedHandler = () => {
+      if (local_stopped || !local_waitingForVideo) {
+        return;
       }
-      if (this.paused) {
+      if (local_paused) {
         // Видео закончилось пока autoplay на паузе (hover).
         // Запоминаем — при resume() обработаем.
-        this.videoEndedWhilePaused = true
-        return
+        local_videoEndedWhilePaused = true;
+        return;
       }
-      this.emitAutoplayProgress(this.tvist.realIndex ?? this.tvist.activeIndex, 1)
-      this.waitingForVideo = false
-      
+      local_emitAutoplayProgress(tvist.realIndex ?? tvist.activeIndex, 1);
+      local_waitingForVideo = false;
       // Запоминаем индекс до навигации
-      const indexBefore = this.tvist.activeIndex
-      
-      this.transitionByAutoplay = true
-      this.tvist.next()
-      
+      const indexBefore = tvist.activeIndex;
+      local_transitionByAutoplay = true;
+      tvist.next();
       // Проверяем, изменился ли индекс (произошла ли навигация)
       // Если индекс не изменился (граница без loop), сбрасываем флаг немедленно
-      if (this.tvist.activeIndex === indexBefore) {
-        this.transitionByAutoplay = false
+      if (tvist.activeIndex === indexBefore) {
+        local_transitionByAutoplay = false;
         // Не планируем fallback, т.к. переход не произошёл
       } else {
-        this.scheduleTransitionByAutoplayFallback()
+        local_scheduleTransitionByAutoplayFallback();
       }
-    }
-
-    this.on('videoEnded', this.videoEndedHandler)
+    };
+    base.on('videoEnded', local_videoEndedHandler);
   }
-
   /**
    * Снять слушатель videoEnded
    */
-  private detachVideoEndedListener(): void {
-    if (this.videoEndedHandler) {
-      this.off('videoEnded', this.videoEndedHandler)
-      this.videoEndedHandler = undefined
+  function local_detachVideoEndedListener(): void {
+    if (local_videoEndedHandler) {
+      base.off('videoEnded', local_videoEndedHandler);
+      local_videoEndedHandler = undefined;
     }
   }
-
   /**
    * Подключение hover событий
    */
-  private attachHoverEvents(): void {
-    this.mouseEnterHandler = () => {
-      if (this.stopped) return
-      this.pausedByHover = true
-      this.pause()
+  function local_attachHoverEvents(): void {
+    local_mouseEnterHandler = () => {
+      if (local_stopped) return;
+      local_pausedByHover = true;
+      local_pause();
       // Только hover: VideoModule синхронизирует HTML-video (не путать с pause() от drag/вкладки)
-      this.emit('autoplayHoverPause')
-    }
-    this.mouseLeaveHandler = () => {
-      if (this.stopped) return
-      this.pausedByHover = false
-      if (!this.hasPassivePauseReason()) this.resume()
-      this.emit('autoplayHoverResume')
-    }
-
-    this.tvist.root.addEventListener('mouseenter', this.mouseEnterHandler)
-    this.tvist.root.addEventListener('mouseleave', this.mouseLeaveHandler)
+      base.emit('autoplayHoverPause');
+    };
+    local_mouseLeaveHandler = () => {
+      if (local_stopped) return;
+      local_pausedByHover = false;
+      if (!local_hasPassivePauseReason()) local_resume();
+      base.emit('autoplayHoverResume');
+    };
+    base.resources.listen(tvist.root, 'mouseenter', local_mouseEnterHandler);
+    base.resources.listen(tvist.root, 'mouseleave', local_mouseLeaveHandler);
   }
-
   /**
    * Отключение hover событий
    */
-  private detachHoverEvents(): void {
-    if (this.mouseEnterHandler) {
-      this.tvist.root.removeEventListener('mouseenter', this.mouseEnterHandler)
-      this.mouseEnterHandler = undefined
+  function local_detachHoverEvents(): void {
+    if (local_mouseEnterHandler) {
+      base.resources.unlisten(tvist.root, 'mouseenter', local_mouseEnterHandler);
+      local_mouseEnterHandler = undefined;
     }
-    if (this.mouseLeaveHandler) {
-      this.tvist.root.removeEventListener('mouseleave', this.mouseLeaveHandler)
-      this.mouseLeaveHandler = undefined
+    if (local_mouseLeaveHandler) {
+      base.resources.unlisten(tvist.root, 'mouseleave', local_mouseLeaveHandler);
+      local_mouseLeaveHandler = undefined;
     }
-    this.pausedByHover = false
+    local_pausedByHover = false;
   }
-
   /** Пауза при фокусе */
-  private attachFocusEvents(): void {
-    this.focusInHandler = () => {
-      if (this.stopped) return
-      this.pausedByFocus = true
-      this.pause()
-    }
-    this.focusOutHandler = (event: FocusEvent) => {
-      const nextTarget = event.relatedTarget
-      if (nextTarget instanceof Node && this.tvist.root.contains(nextTarget)) return
-
-      this.pausedByFocus = false
-      if (!this.stopped && !this.hasPassivePauseReason()) this.resume()
-    }
-
-    this.tvist.root.addEventListener('focusin', this.focusInHandler)
-    this.tvist.root.addEventListener('focusout', this.focusOutHandler)
+  function local_attachFocusEvents(): void {
+    local_focusInHandler = () => {
+      if (local_stopped) return;
+      local_pausedByFocus = true;
+      local_pause();
+    };
+    local_focusOutHandler = (event: FocusEvent) => {
+      const nextTarget = event.relatedTarget;
+      if (nextTarget instanceof Node && tvist.root.contains(nextTarget)) return;
+      local_pausedByFocus = false;
+      if (!local_stopped && !local_hasPassivePauseReason()) local_resume();
+    };
+    base.resources.listen(tvist.root, 'focusin', local_focusInHandler);
+    base.resources.listen(tvist.root, 'focusout', local_focusOutHandler);
   }
 
-  private detachFocusEvents(): void {
-    if (this.focusInHandler) {
-      this.tvist.root.removeEventListener('focusin', this.focusInHandler)
-      this.focusInHandler = undefined
+  function local_detachFocusEvents(): void {
+    if (local_focusInHandler) {
+      base.resources.unlisten(tvist.root, 'focusin', local_focusInHandler);
+      local_focusInHandler = undefined;
     }
-    if (this.focusOutHandler) {
-      this.tvist.root.removeEventListener('focusout', this.focusOutHandler)
-      this.focusOutHandler = undefined
+    if (local_focusOutHandler) {
+      base.resources.unlisten(tvist.root, 'focusout', local_focusOutHandler);
+      local_focusOutHandler = undefined;
     }
-    this.pausedByFocus = false
+    local_pausedByFocus = false;
   }
 
-  private hasPassivePauseReason(): boolean {
-    return this.pausedByHover || this.pausedByFocus
+  function local_hasPassivePauseReason(): boolean {
+    return local_pausedByHover || local_pausedByFocus;
   }
-
   /**
    * Подключение события visibilitychange
    * Ставит автоплей на паузу при скрытии вкладки
    */
-  private attachVisibilityEvents(): void {
-    this.visibilityChangeHandler = () => {
-      if (this.stopped) return
+  function local_attachVisibilityEvents(): void {
+    local_visibilityChangeHandler = () => {
+      if (local_stopped) return;
       if (document.visibilityState === 'hidden') {
-        this.pausedByVisibility = true
-        this.pause()
+        local_pausedByVisibility = true;
+        local_pause();
       } else if (document.visibilityState === 'visible') {
-        if (this.pausedByVisibility) {
-          this.pausedByVisibility = false
-          this.resume()
+        if (local_pausedByVisibility) {
+          local_pausedByVisibility = false;
+          local_resume();
         }
       }
-    }
-
-    document.addEventListener('visibilitychange', this.visibilityChangeHandler)
+    };
+    base.resources.listen(document, 'visibilitychange', local_visibilityChangeHandler);
   }
-
   /**
    * Отключение события visibilitychange
    */
-  private detachVisibilityEvents(): void {
-    if (this.visibilityChangeHandler) {
-      document.removeEventListener('visibilitychange', this.visibilityChangeHandler)
-      this.visibilityChangeHandler = undefined
+  function local_detachVisibilityEvents(): void {
+    if (local_visibilityChangeHandler) {
+      base.resources.unlisten(document, 'visibilitychange', local_visibilityChangeHandler);
+      local_visibilityChangeHandler = undefined;
     }
   }
-
   /**
    * Рекурсивная функция для автоплея
    * Вызывается через setTimeout после каждого переключения
    */
-  private run(): void {
-    if (this.paused || this.stopped || !this.config) return
-
+  function local_run(): void {
+    if (local_paused || local_stopped || !local_config) return;
     // Если ждём видео — не запускаем таймер
-    if (this.waitingForVideo) return
-
+    if (local_waitingForVideo) return;
     // Если timeLeft есть, значит мы возобновляем после паузы
     // Иначе начинаем новый цикл (полная задержка)
-    const delay = this.timeLeft ?? this.config.delay
-    
+    const delay = local_timeLeft ?? local_config.delay;
     // Если это новый цикл, сбрасываем параметры
-    if (this.timeLeft === null) {
-      this.currentDuration = this.config.delay
-      this.progressStartOffset = 0
+    if (local_timeLeft === null) {
+      local_currentDuration = local_config.delay;
+      local_progressStartOffset = 0;
     }
-    
     // Запоминаем длительность текущего отрезка для расчёта паузы
-    this.currentChunkDuration = delay
-
+    local_currentChunkDuration = delay;
     // Запуск отслеживания прогресса
-    this.startProgressTracking(delay, this.currentDuration, this.progressStartOffset)
-
-    this.timer = window.setTimeout(() => {
-      if (!this.paused && !this.stopped) {
-        this.timeLeft = null // Сбрасываем timeLeft для следующего шага
-        this.progressStartOffset = 0
-        this.stopProgressTracking()
-        
+    local_startProgressTracking(delay, local_currentDuration, local_progressStartOffset);
+    local_timer = base.resources.timeout(() => {
+      if (!local_paused && !local_stopped) {
+        local_timeLeft = null; // Сбрасываем timeLeft для следующего шага
+        local_progressStartOffset = 0;
+        local_stopProgressTracking();
         // Запоминаем индекс до навигации
-        const indexBefore = this.tvist.activeIndex
-        const slidesPerPage = this.options.perPage ?? 1
-        const endIndex = Math.max(0, this.tvist.slides.length - slidesPerPage)
-        const loopEnabled = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-        const boundaryAttempt = !loopEnabled && !this.options.rewind && indexBefore >= endIndex
-        
-        this.transitionByAutoplay = true
-        this.lastAutoplayNextAt = performance.now()
-        this.tvist.next()
-        
+        const indexBefore = tvist.activeIndex;
+        const slidesPerPage = options.perPage ?? 1;
+        const endIndex = Math.max(0, tvist.slides.length - slidesPerPage);
+        const loopEnabled =
+          options.loop === true ||
+          (typeof options.loop === 'object' && options.loop.enabled !== false);
+        const boundaryAttempt = !loopEnabled && !options.rewind && indexBefore >= endIndex;
+        local_transitionByAutoplay = true;
+        local_lastAutoplayNextAt = performance.now();
+        tvist.next();
         // На заведомой границе (без loop/rewind) next() не изменит индекс.
         // Флаг нужно сбросить сразу, иначе ручная навигация попадёт в false-positive "autoplay".
         if (boundaryAttempt) {
-          this.transitionByAutoplay = false
-          this.clearTransitionByAutoplayFallback()
+          local_transitionByAutoplay = false;
+          local_clearTransitionByAutoplayFallback();
         } else {
-          this.scheduleTransitionByAutoplayFallback()
+          local_scheduleTransitionByAutoplayFallback();
         }
         // Продолжаем autoplay цикл рекурсивно сразу после попытки перехода.
         // В не-loop режиме при delay < speed продолжаем цикл из slideChangeEnd.
-        const speed = this.options.speed ?? 300
-        if (!this.config?.waitForVideo) {
-          const loopEnabledDelay = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-          if (this.config && !loopEnabledDelay && this.config.delay < speed) {
+        const speed = options.speed ?? 300;
+        if (!local_config?.waitForVideo) {
+          const loopEnabledDelay =
+            options.loop === true ||
+            (typeof options.loop === 'object' && options.loop.enabled !== false);
+          if (local_config && !loopEnabledDelay && local_config.delay < speed) {
             // no-op: continue from slideChangeEnd
           } else {
-            this.run()
+            local_run();
           }
         }
-
-        this.clearBoundaryCheckTimeout()
-        const boundaryDelay = speed === 0 ? 0 : speed + 20
-        this.boundaryCheckTimeout = window.setTimeout(() => {
-          this.boundaryCheckTimeout = null
-          if (this.paused || this.stopped) return
-
+        local_clearBoundaryCheckTimeout();
+        const boundaryDelay = speed === 0 ? 0 : speed + 20;
+        local_boundaryCheckTimeout = base.resources.timeout(() => {
+          local_boundaryCheckTimeout = null;
+          if (local_paused || local_stopped) return;
           // Если после ожидаемой длительности перехода индекс всё ещё тот же,
           // считаем, что next() уткнулся в границу без loop.
-          if (this.tvist.activeIndex !== indexBefore) return
-
+          if (tvist.activeIndex !== indexBefore) return;
           // reachEnd должен приходить только после полного показа последнего слайда:
           // delay + время проверки границы от момента slideChangeEnd.
-          if (this.lastSlideChangeEndAt !== null && this.config) {
-            const minElapsed = this.config.delay + boundaryDelay
-            const elapsed = performance.now() - this.lastSlideChangeEndAt
+          if (local_lastSlideChangeEndAt !== null && local_config) {
+            const minElapsed = local_config.delay + boundaryDelay;
+            const elapsed = performance.now() - local_lastSlideChangeEndAt;
             if (elapsed < minElapsed) {
-              this.boundaryCheckTimeout = window.setTimeout(() => {
-                this.boundaryCheckTimeout = null
-                if (this.paused || this.stopped) return
-                if (this.tvist.activeIndex !== indexBefore) return
-                this.transitionByAutoplay = false
-                this.clearTransitionByAutoplayFallback()
-                this.emitAutoplayProgress(this.tvist.realIndex ?? this.tvist.activeIndex, 1)
-                if (!(this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
-                  this.tvist.emit('reachEnd')
-                }
-                this.stop()
-              }, Math.max(0, Math.ceil(minElapsed - elapsed)))
-              return
+              local_boundaryCheckTimeout = base.resources.timeout(
+                () => {
+                  local_boundaryCheckTimeout = null;
+                  if (local_paused || local_stopped) return;
+                  if (tvist.activeIndex !== indexBefore) return;
+                  local_transitionByAutoplay = false;
+                  local_clearTransitionByAutoplayFallback();
+                  local_emitAutoplayProgress(tvist.realIndex ?? tvist.activeIndex, 1);
+                  if (
+                    !(
+                      options.loop === true ||
+                      (typeof options.loop === 'object' && options.loop.enabled !== false)
+                    )
+                  ) {
+                    tvist.emit('reachEnd');
+                  }
+                  local_stop();
+                },
+                Math.max(0, Math.ceil(minElapsed - elapsed))
+              );
+              return;
             }
           }
-
-          this.transitionByAutoplay = false
-          this.clearTransitionByAutoplayFallback()
-          this.emitAutoplayProgress(this.tvist.realIndex ?? this.tvist.activeIndex, 1)
-          if (!(this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false))) {
-            this.tvist.emit('reachEnd')
+          local_transitionByAutoplay = false;
+          local_clearTransitionByAutoplayFallback();
+          local_emitAutoplayProgress(tvist.realIndex ?? tvist.activeIndex, 1);
+          if (
+            !(
+              options.loop === true ||
+              (typeof options.loop === 'object' && options.loop.enabled !== false)
+            )
+          ) {
+            tvist.emit('reachEnd');
           }
-          this.stop()
-          this.debugLog('autoplay boundary reached (no index change)', {
-            indexBefore,
-            loop: this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false),
-          })
-        }, boundaryDelay)
+          local_stop();
+        }, boundaryDelay);
       }
-    }, delay)
+    }, delay);
   }
 
-  private startProgressTracking(timeLeft: number, totalDuration: number, startOffset: number): void {
-    this.stopProgressTracking()
-
+  function local_startProgressTracking(
+    timeLeft: number,
+    totalDuration: number,
+    startOffset: number
+  ): void {
+    local_stopProgressTracking();
     if (timeLeft <= 0) {
-      this.emitAutoplayProgress(this.tvist.activeIndex, 1)
-      return
+      local_emitAutoplayProgress(tvist.activeIndex, 1);
+      return;
     }
-
-    this.progressStartTime = performance.now()
-
+    local_progressStartTime = performance.now();
     const tick = () => {
-      if (this.paused || this.stopped || this.progressStartTime === null) return
-
-      const elapsed = performance.now() - this.progressStartTime
+      if (local_paused || local_stopped || local_progressStartTime === null) return;
+      const elapsed = performance.now() - local_progressStartTime;
       // Прогресс текущего отрезка (от 0 до 1)
-      const chunkProgress = Math.min(elapsed / timeLeft, 1)
-      
+      const chunkProgress = Math.min(elapsed / timeLeft, 1);
       // Общий прогресс = смещение + (часть отрезка * доля отрезка в общем времени)
       // Доля отрезка = timeLeft / totalDuration
-      let progress = startOffset + (chunkProgress * (timeLeft / totalDuration))
-      progress = Math.min(progress, 1)
-
-      this.emitAutoplayProgress(this.tvist.activeIndex, progress)
-
-      if (progress < 1 && !this.paused && !this.stopped) {
-        this.progressRAF = requestAnimationFrame(tick)
+      let progress = startOffset + chunkProgress * (timeLeft / totalDuration);
+      progress = Math.min(progress, 1);
+      local_emitAutoplayProgress(tvist.activeIndex, progress);
+      if (progress < 1 && !local_paused && !local_stopped) {
+        local_progressRAF = base.resources.frame(tick);
       }
-    }
-
-    this.progressRAF = requestAnimationFrame(tick)
+    };
+    local_progressRAF = base.resources.frame(tick);
   }
 
-  private emitAutoplayProgress(index: number, progress: number): void {
-    const now = performance.now()
-    const previousIndex = this.lastProgressIndex
-    const previousValue = this.lastProgressValue
-    const previousAt = this.lastProgressAt
-
-    if (previousIndex !== null && previousValue !== null && previousAt !== null) {
-      const deltaMs = now - previousAt
-      const decreasedInSameIndex = previousIndex === index && progress + 0.001 < previousValue
-      const sameIndexWrap = previousIndex === index && previousValue > 0.95 && progress < 0.05
-
-      if (decreasedInSameIndex) {
-        this.debugLog('progress decreased in same index', {
-          index,
-          prev: Number(previousValue.toFixed(4)),
-          next: Number(progress.toFixed(4)),
-          deltaMs: Number(deltaMs.toFixed(2)),
-          waitingForVideo: this.waitingForVideo,
-          paused: this.paused,
-          stopped: this.stopped,
-          sameIndexWrap,
-        })
-      }
-    }
-
-    this.lastProgressIndex = index
-    this.lastProgressValue = progress
-    this.lastProgressAt = now
-
+  function local_emitAutoplayProgress(index: number, progress: number): void {
     const payload: AutoplayProgressEvent = {
       progress,
       index,
       segmentIndex: index,
       segmentProgress: progress,
-      totalSegments: this.tvist.slides.length,
-    }
-    this.emit('autoplayProgress', payload)
+      totalSegments: tvist.slides.length,
+    };
+    base.emit('autoplayProgress', payload);
   }
-
   /**
    * Остановка отслеживания прогресса
    */
-  private stopProgressTracking(): void {
-    if (this.progressRAF !== null) {
-      cancelAnimationFrame(this.progressRAF)
-      this.progressRAF = null
+  function local_stopProgressTracking(): void {
+    if (local_progressRAF !== null) {
+      base.resources.cancelFrame(local_progressRAF);
+      local_progressRAF = null;
     }
-    this.progressStartTime = null
+    local_progressStartTime = null;
   }
-
   /**
    * Очистить только таймер (без остановки всего autoplay)
    */
-  private cancelTimer(): void {
-    if (this.timer !== null) {
-      window.clearTimeout(this.timer)
-      this.timer = null
+  function local_cancelTimer(): void {
+    if (local_timer !== null) {
+      base.resources.cancelTimeout(local_timer);
+      local_timer = null;
     }
   }
-
   /**
    * Старт autoplay
    */
-  start(): void {
-    if (this.stopped) return
-
-    this.stop() // Очищаем предыдущий таймер
-    this.paused = false
-
+  function local_start(): void {
+    if (local_stopped) return;
+    local_stop(); // Очищаем предыдущий таймер
+    local_paused = false;
     // Если включен режим ожидания видео, проверяем текущий слайд сразу при старте
-    if (this.config?.waitForVideo) {
+    if (local_config?.waitForVideo) {
       // Используем realIndex для loop режима, иначе activeIndex
-      const currentIndex = this.tvist.realIndex ?? this.tvist.activeIndex
-      this.handleSlideChangedForVideo(currentIndex)
+      const currentIndex = tvist.realIndex ?? tvist.activeIndex;
+      local_handleSlideChangedForVideo(currentIndex);
     } else {
-      this.run() // Запускаем рекурсивный цикл
+      local_run(); // Запускаем рекурсивный цикл
     }
-
-    this.emit('autoplayStart')
+    base.emit('autoplayStart');
   }
-
   /**
    * Остановка autoplay
    */
-  stop(): void {
-    this.cancelTimer()
-    this.clearTransitionByAutoplayFallback()
-    this.clearBoundaryCheckTimeout()
-    this.stopProgressTracking()
-    this.emit('autoplayStop')
+  function local_stop(): void {
+    local_cancelTimer();
+    local_clearTransitionByAutoplayFallback();
+    local_clearBoundaryCheckTimeout();
+    local_stopProgressTracking();
+    base.emit('autoplayStop');
   }
-
   /**
    * Пауза autoplay
    * Очищаем таймер, чтобы callback не сработал во время паузы
    */
-  pause(): void {
-    if (!this.paused) {
-      this.paused = true
-      
+  function local_pause(): void {
+    if (!local_paused) {
+      local_paused = true;
       // Вычисляем оставшееся время и текущий прогресс
-      if (this.timer !== null && this.progressStartTime !== null && !this.waitingForVideo) {
-        const elapsed = performance.now() - this.progressStartTime
-        
+      if (local_timer !== null && local_progressStartTime !== null && !local_waitingForVideo) {
+        const elapsed = performance.now() - local_progressStartTime;
         // Сколько осталось от ТЕКУЩЕГО отрезка
-        this.timeLeft = Math.max(0, this.currentChunkDuration - elapsed)
-        
+        local_timeLeft = Math.max(0, local_currentChunkDuration - elapsed);
         // Накопленный прогресс = стартовый + пройденный за этот отрезок
-        const chunkElapsedRatio = elapsed / this.currentDuration
-        this.progressStartOffset = Math.min(1, this.progressStartOffset + chunkElapsedRatio)
+        const chunkElapsedRatio = elapsed / local_currentDuration;
+        local_progressStartOffset = Math.min(1, local_progressStartOffset + chunkElapsedRatio);
       }
-
       // Очищаем таймер — иначе callback может сработать между pause() и resume()
-      this.cancelTimer()
-      this.stopProgressTracking()
-      this.emit('autoplayPause')
+      local_cancelTimer();
+      local_stopProgressTracking();
+      base.emit('autoplayPause');
     }
   }
-
   /**
    * Возобновление autoplay
    * Перезапускает таймер с полной задержкой
    */
-  resume(): void {
+  function local_resume(): void {
     // Не возобновляем, если вкладка скрыта
-    if (this.pausedByVisibility) {
-      return
+    if (local_pausedByVisibility) {
+      return;
     }
-    
-    if (this.paused && !this.stopped) {
-      this.paused = false
-      
+    if (local_paused && !local_stopped) {
+      local_paused = false;
       // Если видео закончилось пока мы были на паузе — обрабатываем сейчас
-      if (this.videoEndedWhilePaused && this.waitingForVideo) {
-        this.videoEndedWhilePaused = false
-        this.waitingForVideo = false
-        
+      if (local_videoEndedWhilePaused && local_waitingForVideo) {
+        local_videoEndedWhilePaused = false;
+        local_waitingForVideo = false;
         // Запоминаем индекс до навигации
-        const indexBefore = this.tvist.activeIndex
-        
-        this.transitionByAutoplay = true
-        this.tvist.next()
-        
+        const indexBefore = tvist.activeIndex;
+        local_transitionByAutoplay = true;
+        tvist.next();
         // Проверяем, изменился ли индекс (произошла ли навигация)
         // Если индекс не изменился (граница без loop), сбрасываем флаг немедленно
-        if (this.tvist.activeIndex === indexBefore) {
-          this.transitionByAutoplay = false
+        if (tvist.activeIndex === indexBefore) {
+          local_transitionByAutoplay = false;
           // Не планируем fallback, т.к. переход не произошёл
-          
           // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Если навигация не произошла (граница без loop),
           // нужно перезапустить autoplay, иначе он останется застрявшим.
           // slideChangeEnd не будет эмититься, т.к. индекс не изменился,
           // поэтому handleSlideChangedForVideo не будет вызван.
           // Если включен waitForVideo, вызываем handleSlideChangedForVideo для текущего слайда,
           // иначе просто запускаем таймер.
-          if (this.config?.waitForVideo) {
-            this.handleSlideChangedForVideo(this.tvist.realIndex ?? this.tvist.activeIndex)
+          if (local_config?.waitForVideo) {
+            local_handleSlideChangedForVideo(tvist.realIndex ?? tvist.activeIndex);
           } else {
-            this.run()
+            local_run();
           }
         } else {
-          this.scheduleTransitionByAutoplayFallback()
+          local_scheduleTransitionByAutoplayFallback();
         }
-        
-        this.emit('autoplayResume')
-        return
+        base.emit('autoplayResume');
+        return;
       }
-      this.videoEndedWhilePaused = false
-      
+      local_videoEndedWhilePaused = false;
       // Перезапускаем с полной задержкой
       // Это предотвращает немедленное переключение после паузы
-      this.run()
-      this.emit('autoplayResume')
+      local_run();
+      base.emit('autoplayResume');
     }
   }
-
   /**
    * Публичное API - получить модуль и использовать методы
    */
-  getAutoplay() {
+  function local_getAutoplay(): {
+    start: () => void;
+    stop: () => void;
+    pause: () => void;
+    resume: () => void;
+    isRunning: () => boolean;
+    isPaused: () => boolean;
+    isStopped: () => boolean;
+  } {
     return {
       start: () => {
-        this.stopped = false
-        this.start()
+        local_stopped = false;
+        local_start();
       },
-      stop: () => this.stop(),
-      pause: () => this.pause(),
-      resume: () => this.resume(),
-      isRunning: () => this.timer !== null && !this.paused,
-      isPaused: () => this.paused,
-      isStopped: () => this.stopped
-    }
+      stop: () => local_stop(),
+      pause: () => local_pause(),
+      resume: () => local_resume(),
+      isRunning: () => local_timer !== null && !local_paused,
+      isPaused: () => local_paused,
+      isStopped: () => local_stopped,
+    };
   }
+  const component: AutoplayModule = {
+    get name() {
+      return local_name;
+    },
+    init: local_init,
+    destroy: () => {
+      try {
+        local_destroy();
+      } finally {
+        base.dispose();
+      }
+    },
+    shouldBeActive: local_shouldBeActive,
+    onOptionsUpdate: local_onOptionsUpdate,
+    start: local_start,
+    stop: local_stop,
+    pause: local_pause,
+    resume: local_resume,
+    getAutoplay: local_getAutoplay,
+  };
+  local_config = normalizeAutoplay(options.autoplay);
+  return component;
 }

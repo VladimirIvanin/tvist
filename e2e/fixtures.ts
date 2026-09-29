@@ -1,6 +1,9 @@
-import { Tvist } from 'tvist';
+import type { Tvist as Slider } from 'tvist';
 
-function bindIndexDisplay(slider: Tvist, selector: string): void {
+// All browser checks exercise the freshly built, minified distribution.
+const Tvist = (window as typeof window & { TvistV1: typeof Slider }).TvistV1;
+
+function bindIndexDisplay(slider: Slider, selector: string): void {
   const el = document.querySelector<HTMLElement>(selector);
   if (!el) return;
 

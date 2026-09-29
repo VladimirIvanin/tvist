@@ -243,54 +243,45 @@ export function generateApiMetadata(projectRoot = resolve('.')): ApiMetadata {
     }
 
   // Facades returned by public getters, rather than module lifecycle/implementation methods.
-  for (const [interfaceName, facade, getter] of [
-    ['AutoplayModuleAPI', 'autoplay', 'getAutoplay'],
-    ['VideoModuleAPI', 'video', 'getVideo'],
-    ['MarqueeModuleAPI', 'marquee', 'getMarquee'],
+  for (const [interfaceName, facade] of [
+    ['AutoplayControls', 'autoplay'],
+    ['VideoControls', 'video'],
+    ['MarqueeControls', 'marquee'],
   ]) {
     const declaration = typesFile.statements.find(
       (node) => ts.isInterfaceDeclaration(node) && node.name.text === interfaceName
     ) as ts.InterfaceDeclaration;
-    const accessor = declaration.members.find(
-      (node) => node.name?.getText(typesFile) === getter
-    ) as ts.MethodSignature;
-    const result =
-      accessor.type &&
-      (ts.isUnionTypeNode(accessor.type)
-        ? accessor.type.types.find(ts.isTypeLiteralNode)
-        : accessor.type);
-    if (result && ts.isTypeLiteralNode(result))
-      for (const node of result.members) {
-        if (ts.isMethodSignature(node))
-          meta.moduleMethods.push(
-            method(
-              node,
-              `${facade}.${node.name.getText(typesFile)}`,
-              `method:${facade}.${node.name.getText(typesFile)}`
-            )
-          );
+    for (const node of declaration.members) {
+      if (ts.isMethodSignature(node)) {
+        const name = `${facade}.${node.name.getText(typesFile)}`;
+        meta.moduleMethods.push(method(node, name, `method:${name}`));
       }
+    }
   }
-  for (const [path, className, names] of [
-    ['lazyload/LazyLoadModule.ts', 'LazyLoadModule', ['loadAll', 'loadSlide']],
-    ['breakpoints/BreakpointsModule.ts', 'BreakpointsModule', ['getCurrentBreakpoint']],
-    ['visibility/VisibilityModule.ts', 'VisibilityModule', ['getVisibility']],
-  ] as const) {
-    const file = program.getSourceFile(resolve(projectRoot, 'src/modules', path))!;
-    const declaration = file.statements.find(
-      (node) => ts.isClassDeclaration(node) && node.name?.text === className
-    ) as ts.ClassDeclaration;
-    for (const node of declaration.members)
-      if (ts.isMethodDeclaration(node) && names.some((name) => name === node.name.getText(file))) {
-        const prefix = path.split('/')[0]!;
-        meta.moduleMethods.push(
-          method(
-            node,
-            `${prefix}.${node.name.getText(file)}`,
-            `method:${prefix}.${node.name.getText(file)}`
-          )
-        );
-      }
+  for (const facade of ['lazyload', 'visibility']) {
+    const getter = slider.members.find(
+      (node) => node.name?.getText(classFile) === facade
+    ) as ts.GetAccessorDeclaration;
+    const signature = checker.getSignatureFromDeclaration(getter)!;
+    const result = checker.getNonNullableType(checker.getReturnTypeOfSignature(signature));
+    for (const property of result.getProperties()) {
+      const declaration = property.valueDeclaration || property.declarations?.[0];
+      if (!declaration) continue;
+      const type = checker.getTypeOfSymbolAtLocation(property, declaration);
+      const call = type.getCallSignatures()[0];
+      if (!call) continue;
+      const name = `${facade}.${property.name}`;
+      const key = `method:${name}`;
+      meta.moduleMethods.push({
+        key,
+        id: entryId(key),
+        name,
+        type: typeText(type),
+        signature: `${name}${checker.signatureToString(call, declaration, flags)}`,
+        returns: typeText(checker.getReturnTypeOfSignature(call)),
+        description: '',
+      });
+    }
   }
 
   for (const declaration of typesFile.statements)

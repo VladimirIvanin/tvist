@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '../../src/index'
@@ -46,9 +47,9 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Изменяем ширину на мобильную
       resizeSlider(fixture.root, 500)
-      
+
       // Триггерим resize вручную для теста
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       // Теперь должен быть включен
       expect(slider.isEnabled).toBe(true)
@@ -84,9 +85,9 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Изменяем ширину на десктопную
       resizeSlider(mobileFixture.root, 1000)
-      
+
       // Триггерим resize
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       // Теперь должен быть отключен
       expect(slider.isEnabled).toBe(false)
@@ -120,12 +121,12 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Планшет (700px) - должен отключиться
       resizeSlider(fixture.root, 700)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(false)
 
       // Мобильный (400px) - должен включиться
       resizeSlider(fixture.root, 400)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(true)
     })
   })
@@ -141,7 +142,7 @@ describe('Tvist - enabled with breakpoints', () => {
       })
 
       // Breakpoints модуль должен быть активен даже при disabled
-      expect(slider['modules'].has('breakpoints')).toBe(true)
+      expect(getRuntime(slider)['modules'].has('breakpoints')).toBe(true)
     })
 
     it('should respond to breakpoint changes even when disabled', () => {
@@ -163,7 +164,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Изменяем ширину
       resizeSlider(fixture.root, 500)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       // Событие breakpoint должно сработать
       expect(onBreakpoint).toHaveBeenCalledWith(767)
@@ -193,7 +194,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Переключаемся на мобильный
       resizeSlider(fixture.root, 500)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       expect(slider.isEnabled).toBe(true)
       expect(slider.options.perPage).toBe(1)
@@ -223,7 +224,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Переключаемся на мобильный
       resizeSlider(fixture.root, 500)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       expect(slider.isEnabled).toBe(false)
       expect(slider.options.perPage).toBe(1)
@@ -231,7 +232,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Возвращаемся на десктоп
       resizeSlider(fixture.root, 1000)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       expect(slider.isEnabled).toBe(true)
       expect(slider.options.perPage).toBe(3)
@@ -330,7 +331,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Мобильный — отключён
       resizeSlider(fixture.root, 500)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(false)
 
       // Стили width должны быть очищены
@@ -349,12 +350,12 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Возвращаемся на десктоп — включён снова
       resizeSlider(fixture.root, 1000)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(true)
 
       // Снова на мобильный — классы снова должны очищаться
       resizeSlider(fixture.root, 500)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(false)
 
       slider.slides.forEach(slide => {
@@ -380,17 +381,17 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Мобильный — transform должен сброситься
       resizeSlider(fixture.root, 500)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(false)
       expect(slider.container.style.transform).toBe('')
 
       // Снова десктоп → мобильный
       resizeSlider(fixture.root, 1000)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       slider.next()
 
       resizeSlider(fixture.root, 500)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(false)
       expect(slider.container.style.transform).toBe('')
     })
@@ -418,7 +419,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Переходим на мобильный breakpoint с enabled: false
       resizeSlider(fixture.root, 500)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       // Слайдер должен быть отключён
       expect(slider.isEnabled).toBe(false)
@@ -457,7 +458,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Переходим на мобильный
       resizeSlider(fixture.root, 600)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       expect(slider.isEnabled).toBe(false)
 
@@ -487,7 +488,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Мобильный — отключён, стили очищены
       resizeSlider(fixture.root, 500)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(false)
       slider.slides.forEach(slide => {
         expect(slide.style.width).toBe('')
@@ -495,7 +496,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Возвращаемся на десктоп — включён, стили восстановлены
       resizeSlider(fixture.root, 1000)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(true)
       expect(slider.slides[0].style.width).not.toBe('')
     })
@@ -517,7 +518,7 @@ describe('Tvist - enabled with breakpoints', () => {
       expect(slider.isEnabled).toBe(true)
 
       resizeSlider(fixture.root, 500)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       // Должен остаться включенным
       expect(slider.isEnabled).toBe(true)
@@ -535,19 +536,19 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Быстрые изменения ширины
       resizeSlider(fixture.root, 500)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(true)
 
       resizeSlider(fixture.root, 400)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(false)
 
       resizeSlider(fixture.root, 600)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(true)
 
       resizeSlider(fixture.root, 1000)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(false)
     })
 
@@ -566,7 +567,7 @@ describe('Tvist - enabled with breakpoints', () => {
 
       // Breakpoint пытается отключить
       resizeSlider(fixture.root, 1000)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       expect(slider.isEnabled).toBe(false)
 
       // Вручную включаем снова

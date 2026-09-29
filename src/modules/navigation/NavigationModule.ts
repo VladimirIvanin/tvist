@@ -1,6 +1,7 @@
+import { loopEnabled, pageCount } from '../../utils/positions';
 /**
  * Navigation Module
- * 
+ *
  * Возможности:
  * - Стрелки prev/next
  * - Disabled состояния на границах
@@ -8,198 +9,194 @@
  * - Accessibility (aria-label)
  * - Кастомные элементы, поиск и автоматическое создание
  */
-
-import { Module } from '../Module'
+import { createComponent, type Component } from '../Component';
 import {
   TVIST_CLASSES,
   NAVIGATION_ARROW_NEXT_SVG,
   NAVIGATION_ARROW_PREV_SVG,
-} from '../../core/constants'
-import type { Tvist } from '../../core/Tvist'
-import type { TvistOptions } from '../../core/types'
+} from '../../core/constants';
+import type { TvistRuntime as Tvist } from '../../core/runtime';
+import type { TvistOptions } from '../../core/types';
 
-export class NavigationModule extends Module {
-  readonly name = 'navigation'
+/** Internal component; state lives in this factory's closure. */
+export interface NavigationModule extends Component {
+  readonly name: 'navigation';
 
-  private prevButton: HTMLElement | null = null
-  private nextButton: HTMLElement | null = null
-  private readonly createdButtons: HTMLButtonElement[] = []
-  private readonly stateChangeHandler = () => this.updateArrowsState()
+  init(): void;
 
-  private prevClickHandler?: () => void
-  private nextClickHandler?: () => void
+  destroy(): void;
 
-  constructor(tvist: Tvist, options: TvistOptions) {
-    super(tvist, options)
-  }
+  shouldBeActive(): boolean;
+  /**
+   * Хук при обновлении
+   */
+  onUpdate(): void;
+}
 
-  override init(): void {
-    if (!this.shouldBeActive()) return
+export function createNavigationModule(tvist: Tvist, options: TvistOptions): NavigationModule {
+  const base = createComponent(tvist, options);
 
-    this.findOrCreateArrows()
+  const local_name = 'navigation' as const;
 
-    if (!this.prevButton || !this.nextButton) {
-      if (this.options.debug) {
-        console.warn('Tvist Navigation: arrows not found')
+  let local_prevButton: HTMLElement | null = null;
+
+  let local_nextButton: HTMLElement | null = null;
+
+  const local_createdButtons: HTMLButtonElement[] = [];
+
+  const local_stateChangeHandler: () => void = () => local_updateArrowsState();
+
+  let local_prevClickHandler: (() => void) | undefined;
+
+  let local_nextClickHandler: (() => void) | undefined;
+
+  function local_init(): void {
+    if (!local_shouldBeActive()) return;
+    local_findOrCreateArrows();
+    if (!local_prevButton || !local_nextButton) {
+      if (options.debug) {
+        console.warn('Tvist Navigation: arrows not found');
       }
-      return
+      return;
     }
-
-    this.injectArrowIcons()
-    this.attachEvents()
-    this.updateArrowsState()
-    this.emit('navigation:mounted')
-
+    local_injectArrowIcons();
+    local_attachEvents();
+    local_updateArrowsState();
+    base.emit('navigation:mounted');
     // Обновляем состояние при изменении слайда
-    this.on('slideChangeEnd', this.stateChangeHandler)
-
+    base.on('slideChangeEnd', local_stateChangeHandler);
     // После анимации (в т.ч. когда индекс не менялся, но translate дошёл до упора)
-    this.on('transitionEnd', this.stateChangeHandler)
-    
+    base.on('transitionEnd', local_stateChangeHandler);
     // Обновляем состояние при lock/unlock (для breakpoints)
-    this.on('lock', this.stateChangeHandler)
-    this.on('unlock', this.stateChangeHandler)
+    base.on('lock', local_stateChangeHandler);
+    base.on('unlock', local_stateChangeHandler);
   }
 
-  override destroy(): void {
-    this.detachEvents()
-    this.off('slideChangeEnd', this.stateChangeHandler)
-    this.off('transitionEnd', this.stateChangeHandler)
-    this.off('lock', this.stateChangeHandler)
-    this.off('unlock', this.stateChangeHandler)
-    this.createdButtons.forEach(button => button.remove())
-    this.createdButtons.length = 0
-    this.prevButton = null
-    this.nextButton = null
-    this.prevClickHandler = undefined
-    this.nextClickHandler = undefined
+  function local_destroy(): void {
+    local_detachEvents();
+    base.off('slideChangeEnd', local_stateChangeHandler);
+    base.off('transitionEnd', local_stateChangeHandler);
+    base.off('lock', local_stateChangeHandler);
+    base.off('unlock', local_stateChangeHandler);
+    local_createdButtons.forEach((button) => button.remove());
+    local_createdButtons.length = 0;
+    local_prevButton = null;
+    local_nextButton = null;
+    local_prevClickHandler = undefined;
+    local_nextClickHandler = undefined;
   }
 
-  public override shouldBeActive(): boolean {
-    const { arrows } = this.options
-    return !!arrows
+  function local_shouldBeActive(): boolean {
+    const { arrows } = options;
+    return !!arrows;
   }
-
   /**
    * Поиск или создание стрелок
    */
-  private findOrCreateArrows(): void {
-    const arrows = this.options.arrows
-
+  function local_findOrCreateArrows(): void {
+    const arrows = options.arrows;
     if (typeof arrows === 'object' && arrows !== null) {
       // Кастомные элементы из опций
       if (arrows.prev) {
         if (typeof arrows.prev === 'string') {
-          this.prevButton = document.querySelector(arrows.prev)
+          local_prevButton = document.querySelector(arrows.prev);
         } else if (arrows.prev instanceof HTMLElement) {
-          this.prevButton = arrows.prev
+          local_prevButton = arrows.prev;
         }
       }
       if (arrows.next) {
         if (typeof arrows.next === 'string') {
-          this.nextButton = document.querySelector(arrows.next)
+          local_nextButton = document.querySelector(arrows.next);
         } else if (arrows.next instanceof HTMLElement) {
-          this.nextButton = arrows.next
+          local_nextButton = arrows.next;
         }
       }
     }
-
     // Ищем по стандартным классам только элементы этого слайдера.
-    this.prevButton ??= this.findOwnElement(`.${TVIST_CLASSES.arrowPrev}`)
-    this.nextButton ??= this.findOwnElement(`.${TVIST_CLASSES.arrowNext}`)
-
-    this.prevButton ??= this.createArrow('prev')
-    this.nextButton ??= this.createArrow('next')
+    local_prevButton ??= base.findOwnElement(`.${TVIST_CLASSES.arrowPrev}`);
+    local_nextButton ??= base.findOwnElement(`.${TVIST_CLASSES.arrowNext}`);
+    local_prevButton ??= local_createArrow('prev');
+    local_nextButton ??= local_createArrow('next');
   }
-
   /** Создаёт недостающую стрелку вне трека и запоминает её для удаления. */
-  private createArrow(direction: 'prev' | 'next'): HTMLButtonElement {
-    const button = document.createElement('button')
-    button.type = 'button'
-    button.className = `${TVIST_CLASSES.block}__arrow ${direction === 'prev' ? TVIST_CLASSES.arrowPrev : TVIST_CLASSES.arrowNext}`
-    button.setAttribute('aria-label', direction === 'prev' ? 'Предыдущий слайд' : 'Следующий слайд')
-    this.tvist.root.appendChild(button)
-    this.createdButtons.push(button)
-    return button
+  function local_createArrow(direction: 'prev' | 'next'): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = `${TVIST_CLASSES.block}__arrow ${direction === 'prev' ? TVIST_CLASSES.arrowPrev : TVIST_CLASSES.arrowNext}`;
+    button.setAttribute(
+      'aria-label',
+      direction === 'prev' ? 'Предыдущий слайд' : 'Следующий слайд'
+    );
+    tvist.root.appendChild(button);
+    local_createdButtons.push(button);
+    return button;
   }
-
   /**
    * Вставка SVG иконок в кнопки навигации
    * 1. Проверяем опцию addIcons (по умолчанию true)
    * 2. Проверяем, что кнопка имеет класс стрелки (prev/next)
    * 3. Проверяем, что в кнопке нет дочерних элементов (пользователь не добавил свой контент)
    */
-  private injectArrowIcons(): void {
-    const arrows = this.options.arrows
-    const addIcons = typeof arrows === 'object' && arrows !== null
-      ? arrows.addIcons ?? true
-      : true
-
-    if (!addIcons) return
-
-    this.injectIconIntoButton(this.prevButton, 'prev')
-    this.injectIconIntoButton(this.nextButton, 'next')
+  function local_injectArrowIcons(): void {
+    const arrows = options.arrows;
+    const addIcons =
+      typeof arrows === 'object' && arrows !== null ? (arrows.addIcons ?? true) : true;
+    if (!addIcons) return;
+    local_injectIconIntoButton(local_prevButton, 'prev');
+    local_injectIconIntoButton(local_nextButton, 'next');
   }
-
   /**
    * Вставка иконки в конкретную кнопку
    */
-  private injectIconIntoButton(button: HTMLElement | null, direction: 'prev' | 'next'): void {
-    if (!button) return
-
-    const arrowClass = direction === 'prev' ? TVIST_CLASSES.arrowPrev : TVIST_CLASSES.arrowNext
-
+  function local_injectIconIntoButton(
+    button: HTMLElement | null,
+    direction: 'prev' | 'next'
+  ): void {
+    if (!button) return;
+    const arrowClass = direction === 'prev' ? TVIST_CLASSES.arrowPrev : TVIST_CLASSES.arrowNext;
     // Проверяем что кнопка имеет класс стрелки
-    if (!button.classList.contains(arrowClass)) return
-
+    if (!button.classList.contains(arrowClass)) return;
     // Проверяем что в кнопке нет дочерних элементов (пользователь не добавил свой контент)
-    if (button.children.length > 0) return
-
+    if (button.children.length > 0) return;
     // Проверяем что в кнопке нет текстового контента
-    const textContent = button.textContent?.trim()
-    if (textContent && textContent.length > 0) return
-
+    const textContent = button.textContent?.trim();
+    if (textContent && textContent.length > 0) return;
     // Вставляем SVG
-    const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = direction === 'prev' ? NAVIGATION_ARROW_PREV_SVG : NAVIGATION_ARROW_NEXT_SVG
-    const svgElement = tempDiv.querySelector('svg')
-    
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML =
+      direction === 'prev' ? NAVIGATION_ARROW_PREV_SVG : NAVIGATION_ARROW_NEXT_SVG;
+    const svgElement = tempDiv.querySelector('svg');
     if (svgElement) {
-      button.appendChild(svgElement)
+      button.appendChild(svgElement);
     }
   }
-
   /**
    * Подключение обработчиков
    */
-  private attachEvents(): void {
-    if (!this.prevButton || !this.nextButton) return
-
-    this.prevClickHandler = () => this.onPrevClick()
-    this.nextClickHandler = () => this.onNextClick()
-
-    this.prevButton.addEventListener('click', this.prevClickHandler)
-    this.nextButton.addEventListener('click', this.nextClickHandler)
+  function local_attachEvents(): void {
+    if (!local_prevButton || !local_nextButton) return;
+    local_prevClickHandler = () => local_onPrevClick();
+    local_nextClickHandler = () => local_onNextClick();
+    base.resources.listen(local_prevButton, 'click', local_prevClickHandler);
+    base.resources.listen(local_nextButton, 'click', local_nextClickHandler);
   }
-
   /**
    * Отключение обработчиков
    */
-  private detachEvents(): void {
-    if (this.prevButton && this.prevClickHandler) {
-      this.prevButton.removeEventListener('click', this.prevClickHandler)
+  function local_detachEvents(): void {
+    if (local_prevButton && local_prevClickHandler) {
+      base.resources.unlisten(local_prevButton, 'click', local_prevClickHandler);
     }
-    if (this.nextButton && this.nextClickHandler) {
-      this.nextButton.removeEventListener('click', this.nextClickHandler)
+    if (local_nextButton && local_nextClickHandler) {
+      base.resources.unlisten(local_nextButton, 'click', local_nextClickHandler);
     }
   }
-
   /**
    * Атрибут `disabled` в HTML допустим для button/input/select/textarea и др.
    * Для ссылок и div с классом стрелки он невалиден — опираемся на aria-disabled и класс.
    */
-  private supportsNativeDisabled(el: HTMLElement): boolean {
-    const t = el.tagName.toLowerCase()
+  function local_supportsNativeDisabled(el: HTMLElement): boolean {
+    const t = el.tagName.toLowerCase();
     return (
       t === 'button' ||
       t === 'input' ||
@@ -208,181 +205,170 @@ export class NavigationModule extends Module {
       t === 'optgroup' ||
       t === 'option' ||
       t === 'fieldset'
-    )
+    );
   }
 
-  private isArrowDisabled(arrow: HTMLElement | null): boolean {
-    return arrow?.getAttribute('aria-disabled') === 'true'
+  function local_isArrowDisabled(arrow: HTMLElement | null): boolean {
+    return arrow?.getAttribute('aria-disabled') === 'true';
   }
-
   /**
    * Клик на prev
    */
-  private onPrevClick(): void {
-    if (this.isArrowDisabled(this.prevButton)) return
-    this.tvist.prev()
+  function local_onPrevClick(): void {
+    if (local_isArrowDisabled(local_prevButton)) return;
+    tvist.prev();
   }
-
   /**
    * Клик на next
    */
-  private onNextClick(): void {
-    if (this.isArrowDisabled(this.nextButton)) return
-    this.tvist.next()
+  function local_onNextClick(): void {
+    if (local_isArrowDisabled(local_nextButton)) return;
+    tvist.next();
   }
-
   /**
    * Вычисляет количество страниц с учетом perPage и slidesPerGroup
    */
-  private calculatePageCount(): number {
-    const { slides, options } = this.tvist
-    const perPage = options.perPage ?? 1
-    const slidesPerGroup = options.slidesPerGroup ?? 1
-    const slideCount = slides.length
-    const isLoop = options.loop === true || (typeof options.loop === 'object' && options.loop.enabled !== false)
-
-    if (slideCount === 0) return 0
-
-    // В loop режиме можно листать по всем слайдам
-    if (isLoop) {
-      return Math.ceil(slideCount / slidesPerGroup)
-    }
-
-    // Без loop: вычисляем количество возможных позиций
-    const endIndex = Math.max(0, slideCount - perPage)
-    return Math.ceil((endIndex + 1) / slidesPerGroup)
+  function local_calculatePageCount(): number {
+    return pageCount(
+      tvist.slides.length,
+      options.perPage ?? 1,
+      options.slidesPerGroup ?? 1,
+      loopEnabled(options.loop)
+    );
   }
-
   /**
    * Обновление состояния стрелок
    */
-  private updateArrowsState(): void {
-    if (!this.prevButton || !this.nextButton) return
-
-    const { canScrollPrev, canScrollNext } = this.tvist
-    const arrows = this.options.arrows
-    const disabledClass = typeof arrows === 'object' && arrows !== null
-      ? arrows.disabledClass ?? TVIST_CLASSES.arrowDisabled
-      : TVIST_CLASSES.arrowDisabled
-    const hiddenClass = typeof arrows === 'object' && arrows !== null
-      ? arrows.hiddenClass ?? TVIST_CLASSES.arrowHidden
-      : TVIST_CLASSES.arrowHidden
-    const hideWhenSinglePage = typeof arrows === 'object' && arrows !== null
-      ? arrows.hideWhenSinglePage ?? true
-      : true
-
+  function local_updateArrowsState(): void {
+    if (!local_prevButton || !local_nextButton) return;
+    const { canScrollPrev, canScrollNext } = tvist;
+    const arrows = options.arrows;
+    const disabledClass =
+      typeof arrows === 'object' && arrows !== null
+        ? (arrows.disabledClass ?? TVIST_CLASSES.arrowDisabled)
+        : TVIST_CLASSES.arrowDisabled;
+    const hiddenClass =
+      typeof arrows === 'object' && arrows !== null
+        ? (arrows.hiddenClass ?? TVIST_CLASSES.arrowHidden)
+        : TVIST_CLASSES.arrowHidden;
+    const hideWhenSinglePage =
+      typeof arrows === 'object' && arrows !== null ? (arrows.hideWhenSinglePage ?? true) : true;
     // Если слайдер заблокирован (контент влезает), отключаем стрелки
-    if (this.tvist.engine.isLocked) {
-      this.disableArrow(this.prevButton, disabledClass)
-      this.disableArrow(this.nextButton, disabledClass)
-      
+    if (tvist.__tvistInternal_engine.__tvistInternal_isLocked) {
+      local_disableArrow(local_prevButton, disabledClass);
+      local_disableArrow(local_nextButton, disabledClass);
       // Скрываем только если hideWhenSinglePage включен
       if (hideWhenSinglePage) {
-        this.hideArrow(this.prevButton, hiddenClass)
-        this.hideArrow(this.nextButton, hiddenClass)
-        this.updateRootClass(true)
+        local_hideArrow(local_prevButton, hiddenClass);
+        local_hideArrow(local_nextButton, hiddenClass);
+        local_updateRootClass(true);
       } else {
-        this.showArrow(this.prevButton, hiddenClass)
-        this.showArrow(this.nextButton, hiddenClass)
-        this.updateRootClass(false)
+        local_showArrow(local_prevButton, hiddenClass);
+        local_showArrow(local_nextButton, hiddenClass);
+        local_updateRootClass(false);
       }
-      return
+      return;
     }
-
     // Проверяем количество страниц для hideWhenSinglePage
-    const pageCount = this.calculatePageCount()
+    const pageCount = local_calculatePageCount();
     if (hideWhenSinglePage && pageCount <= 1) {
-      this.hideArrow(this.prevButton, hiddenClass)
-      this.hideArrow(this.nextButton, hiddenClass)
-      this.updateRootClass(true)
-      return
+      local_hideArrow(local_prevButton, hiddenClass);
+      local_hideArrow(local_nextButton, hiddenClass);
+      local_updateRootClass(true);
+      return;
     }
-
     // Показываем стрелки (убираем класс single-page)
-    this.updateRootClass(false)
-
-    const loopEnabled = this.options.loop === true || (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
-
+    local_updateRootClass(false);
+    const loopEnabled =
+      options.loop === true || (typeof options.loop === 'object' && options.loop.enabled !== false);
     // С loop или rewind всегда можно листать (если не заблокирован)
-    if (loopEnabled || this.options.rewind) {
-      this.enableArrow(this.prevButton, disabledClass)
-      this.enableArrow(this.nextButton, disabledClass)
-      this.showArrow(this.prevButton, hiddenClass)
-      this.showArrow(this.nextButton, hiddenClass)
-      return
+    if (loopEnabled || options.rewind) {
+      local_enableArrow(local_prevButton, disabledClass);
+      local_enableArrow(local_nextButton, disabledClass);
+      local_showArrow(local_prevButton, hiddenClass);
+      local_showArrow(local_nextButton, hiddenClass);
+      return;
     }
-
     // Показываем обе стрелки (они не single-page и не locked)
-    this.showArrow(this.prevButton, hiddenClass)
-    this.showArrow(this.nextButton, hiddenClass)
-
+    local_showArrow(local_prevButton, hiddenClass);
+    local_showArrow(local_nextButton, hiddenClass);
     // Без loop и rewind проверяем границы для disabled состояния
     if (canScrollPrev) {
-      this.enableArrow(this.prevButton, disabledClass)
+      local_enableArrow(local_prevButton, disabledClass);
     } else {
-      this.disableArrow(this.prevButton, disabledClass)
+      local_disableArrow(local_prevButton, disabledClass);
     }
-
     if (canScrollNext) {
-      this.enableArrow(this.nextButton, disabledClass)
+      local_enableArrow(local_nextButton, disabledClass);
     } else {
-      this.disableArrow(this.nextButton, disabledClass)
+      local_disableArrow(local_nextButton, disabledClass);
     }
   }
-
   /**
    * Обновление класса single-page на root элементе
    */
-  private updateRootClass(isSinglePage: boolean): void {
+  function local_updateRootClass(isSinglePage: boolean): void {
     if (isSinglePage) {
-      this.tvist.root.classList.add(TVIST_CLASSES.singlePage)
+      tvist.root.classList.add(TVIST_CLASSES.singlePage);
     } else {
-      this.tvist.root.classList.remove(TVIST_CLASSES.singlePage)
+      tvist.root.classList.remove(TVIST_CLASSES.singlePage);
     }
   }
-
   /**
    * Включить стрелку
    */
-  private enableArrow(arrow: HTMLElement, disabledClass: string): void {
-    arrow.removeAttribute('disabled')
-    arrow.classList.remove(disabledClass)
-    arrow.setAttribute('aria-disabled', 'false')
+  function local_enableArrow(arrow: HTMLElement, disabledClass: string): void {
+    arrow.removeAttribute('disabled');
+    arrow.classList.remove(disabledClass);
+    arrow.setAttribute('aria-disabled', 'false');
   }
-
   /**
    * Выключить стрелку
    */
-  private disableArrow(arrow: HTMLElement, disabledClass: string): void {
-    if (this.supportsNativeDisabled(arrow)) {
-      arrow.setAttribute('disabled', '')
+  function local_disableArrow(arrow: HTMLElement, disabledClass: string): void {
+    if (local_supportsNativeDisabled(arrow)) {
+      arrow.setAttribute('disabled', '');
     } else {
-      arrow.removeAttribute('disabled')
+      arrow.removeAttribute('disabled');
     }
-    arrow.classList.add(disabledClass)
-    arrow.setAttribute('aria-disabled', 'true')
+    arrow.classList.add(disabledClass);
+    arrow.setAttribute('aria-disabled', 'true');
   }
-
   /**
    * Показать стрелку
    */
-  private showArrow(arrow: HTMLElement, hiddenClass: string): void {
-    arrow.classList.remove(hiddenClass)
-    arrow.setAttribute('aria-hidden', 'false')
+  function local_showArrow(arrow: HTMLElement, hiddenClass: string): void {
+    arrow.classList.remove(hiddenClass);
+    arrow.setAttribute('aria-hidden', 'false');
   }
-
   /**
    * Скрыть стрелку
    */
-  private hideArrow(arrow: HTMLElement, hiddenClass: string): void {
-    arrow.classList.add(hiddenClass)
-    arrow.setAttribute('aria-hidden', 'true')
+  function local_hideArrow(arrow: HTMLElement, hiddenClass: string): void {
+    arrow.classList.add(hiddenClass);
+    arrow.setAttribute('aria-hidden', 'true');
   }
-
   /**
    * Хук при обновлении
    */
-  override onUpdate(): void {
-    this.updateArrowsState()
+  function local_onUpdate(): void {
+    local_updateArrowsState();
   }
+  const component: NavigationModule = {
+    get name() {
+      return local_name;
+    },
+    init: local_init,
+    destroy: () => {
+      try {
+        local_destroy();
+      } finally {
+        base.dispose();
+      }
+    },
+    shouldBeActive: local_shouldBeActive,
+    onUpdate: local_onUpdate,
+  };
+
+  return component;
 }

@@ -1,3 +1,5 @@
+import { createSliderFixture } from '../../fixtures'
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  */
@@ -45,7 +47,7 @@ describe('LazyLoadModule', () => {
       })
 
       const images = container.querySelectorAll('img')
-      
+
       // Третье изображение не должно быть загружено (только первые два с preloadPrevNext=1)
       const thirdImg = images[2] as HTMLImageElement
       expect(thirdImg.src).toBe('')
@@ -155,7 +157,7 @@ describe('LazyLoadModule', () => {
       // С preloadPrevNext: 2 должны загрузиться первые 3 изображения (0, 1, 2)
       const images = container.querySelectorAll('img')
       const fourthImg = images[3] as HTMLImageElement
-      
+
       // Четвёртое изображение не должно быть загружено
       expect(fourthImg.hasAttribute('data-src')).toBe(true)
     })
@@ -179,7 +181,7 @@ describe('LazyLoadModule', () => {
         lazy: true
       })
 
-      const lazyModule = slider.modules.get('lazyload')
+      const lazyModule = getRuntime(slider).modules.get('lazyload')
       expect(lazyModule).toBeTruthy()
       expect(typeof lazyModule?.loadAll).toBe('function')
     })
@@ -200,7 +202,7 @@ describe('LazyLoadModule', () => {
         lazy: true
       })
 
-      const lazyModule = slider.modules.get('lazyload')
+      const lazyModule = getRuntime(slider).modules.get('lazyload')
       expect(lazyModule).toBeTruthy()
       expect(typeof lazyModule?.loadSlide).toBe('function')
     })
@@ -228,14 +230,18 @@ describe('LazyLoadModule', () => {
         lazy: true
       })
 
-      const lazyModule = slider.modules.get('lazyload')
+      const lazyModule = getRuntime(slider).modules.get('lazyload')
       expect(lazyModule).toBeTruthy()
     })
   })
 
   describe('Module Registration', () => {
-    it('should be registered in Tvist.MODULES', () => {
-      expect(Tvist.MODULES.has('lazyload')).toBe(true)
+    it('activates the built-in lazyload component', () => {
+      const fixture = createSliderFixture({ slidesCount: 3, width: 600 })
+      const slider = new Tvist(fixture.root, { lazy: true })
+      expect(slider.lazyload).toBeDefined()
+      slider.destroy()
+      fixture.cleanup()
     })
 
     it('should not activate when lazy is undefined', () => {

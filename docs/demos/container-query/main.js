@@ -28,14 +28,14 @@ function displayInfo() {
   ]
 
   const infoOutput = document.getElementById('info-output')
-  
+
   const infoHtml = sliders.map(({ id, instance }) => {
     const root = document.getElementById(id)
     const slide = root.querySelector('.tvist-v1__slide')
     const rootWidth = root.offsetWidth
     const slideWidth = slide ? slide.offsetWidth : 0
-    const containerSize = instance.engine.containerSizeValue
-    const slideSize = instance.engine.slideSizeValue
+    const containerSize = instance.track.clientWidth
+    const slideSize = instance.slides[0]?.getBoundingClientRect().width ?? 0
 
     return `
       <div class="info-item">

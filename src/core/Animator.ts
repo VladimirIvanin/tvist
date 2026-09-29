@@ -1,9 +1,10 @@
+import type { createResources } from '../utils/resources';
 /**
  * RAF-based анимации с easing функциями
  * Основано на паттернах из Keen Slider и Embla
  */
 
-export type EasingFunction = (t: number) => number
+export type EasingFunction = (t: number) => number;
 
 /**
  * Встроенные easing функции
@@ -17,19 +18,19 @@ export const easings = {
   /** Как easing в Splide Scroll (free + snap) */
   easeOutQuart: (t: number) => 1 - Math.pow(1 - t, 4),
   easeOutQuint: (t: number) => 1 + --t * t * t * t * t,
-} as const
+} as const;
 
 export class Animator {
-  private animationId: number | null = null
-  private startTime = 0
-  private isRunning = false
-  private externalIsAnimating?: () => boolean
-  private externalStop?: () => void
+  private animationId: number | null = null;
+  private startTime = 0;
+  private isRunning = false;
+  private externalIsAnimating?: () => boolean;
+  private externalStop?: () => void;
 
   /** Подключить переход, которым управляет браузер, к прежнему состоянию Animator. */
   setExternalController(isAnimating: () => boolean, stop: () => void): void {
-    this.externalIsAnimating = isAnimating
-    this.externalStop = stop
+    this.externalIsAnimating = isAnimating;
+    this.externalStop = stop;
   }
 
   /**
@@ -50,62 +51,62 @@ export class Animator {
     easing: EasingFunction = easings.easeOutQuad
   ): void {
     // Останавливаем предыдущую анимацию
-    this.stop()
+    this.stop();
 
     // Если duration = 0, сразу устанавливаем конечное значение
     if (duration === 0) {
-      onUpdate(to)
-      onComplete?.()
-      return
+      onUpdate(to);
+      onComplete?.();
+      return;
     }
 
-    this.isRunning = true
-    const distance = to - from
+    this.isRunning = true;
+    const distance = to - from;
 
     const animate = (currentTime: number) => {
       if (!this.startTime) {
-        this.startTime = currentTime
+        this.startTime = currentTime;
       }
 
-      const elapsed = currentTime - this.startTime
-      const progress = Math.min(elapsed / duration, 1)
+      const elapsed = currentTime - this.startTime;
+      const progress = Math.min(elapsed / duration, 1);
 
       // Применяем easing
-      const easedProgress = easing(progress)
-      const currentValue = from + distance * easedProgress
+      const easedProgress = easing(progress);
+      const currentValue = from + distance * easedProgress;
 
-      onUpdate(currentValue)
+      onUpdate(currentValue);
 
       if (progress < 1) {
-        this.animationId = requestAnimationFrame(animate)
+        this.animationId = requestAnimationFrame(animate);
       } else {
-        this.isRunning = false
-        this.startTime = 0
-        onComplete?.()
+        this.isRunning = false;
+        this.startTime = 0;
+        onComplete?.();
       }
-    }
+    };
 
-    this.animationId = requestAnimationFrame(animate)
+    this.animationId = requestAnimationFrame(animate);
   }
 
   /**
    * Остановить текущую анимацию
    */
   stop(): void {
-    this.externalStop?.()
+    this.externalStop?.();
     if (this.animationId !== null) {
-      cancelAnimationFrame(this.animationId)
-      this.animationId = null
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
     }
-    this.isRunning = false
-    this.startTime = 0
+    this.isRunning = false;
+    this.startTime = 0;
   }
 
   /**
    * Проверить, выполняется ли анимация
    */
   isAnimating(): boolean {
-    return this.isRunning || this.externalIsAnimating?.() === true
+    return this.isRunning || this.externalIsAnimating?.() === true;
   }
 }
 
@@ -115,31 +116,34 @@ export class Animator {
  */
 export function throttle<Args extends unknown[]>(
   fn: (...args: Args) => unknown,
-  delay: number
+  delay: number,
+  resources?: Pick<ReturnType<typeof createResources>, 'timeout' | 'cancelTimeout'>
 ): (...args: Args) => void {
-  let lastCall = 0
-  let timeout: number | null = null
+  let lastCall = 0;
+  let timeout: number | null = null;
 
   return function throttled(...args: Args) {
-    const now = Date.now()
-    const timeSinceLastCall = now - lastCall
+    const now = Date.now();
+    const timeSinceLastCall = now - lastCall;
 
     const callFunction = () => {
-      lastCall = Date.now() // Обновляем время вызова
-      fn(...args)
-    }
+      lastCall = Date.now(); // Обновляем время вызова
+      fn(...args);
+    };
 
     if (timeSinceLastCall >= delay) {
-      callFunction()
+      callFunction();
     } else {
       // Планируем вызов на конец периода
       if (timeout !== null) {
-        clearTimeout(timeout)
+        if (resources) resources.cancelTimeout(timeout);
+        else clearTimeout(timeout);
       }
-      timeout = window.setTimeout(() => {
-        callFunction()
-        timeout = null
-      }, delay - timeSinceLastCall)
+      const schedule = resources?.timeout ?? window.setTimeout.bind(window);
+      timeout = schedule(() => {
+        callFunction();
+        timeout = null;
+      }, delay - timeSinceLastCall);
     }
-  }
+  };
 }

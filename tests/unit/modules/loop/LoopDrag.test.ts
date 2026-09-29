@@ -1,11 +1,12 @@
+import { getRuntime } from '../../../../src/core/runtime'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createSliderFixture, simulateDrag, createPointerOrMouseEvent, type SliderFixture } from '../../../fixtures'
 import { Tvist } from '@core/Tvist'
-import { LoopModule } from '@modules/loop/LoopModule'
-import { DragModule } from '@modules/drag/DragModule'
+import { createLoopModule as LoopModule } from '@modules/loop/LoopModule'
+import { createDragModule as DragModule } from '@modules/drag/DragModule'
 
-Tvist.registerModule('loop', LoopModule)
-Tvist.registerModule('drag', DragModule)
+
+
 
 describe('LoopModule + DragModule Integration', () => {
   let fixture: SliderFixture
@@ -23,11 +24,11 @@ describe('LoopModule + DragModule Integration', () => {
   describe('Базовое поведение drag', () => {
     it('не начинает drag при движении меньше threshold (5px)', async () => {
       slider = new Tvist(fixture.root, { loop: true, drag: true })
-      const startPos = slider.engine.location.get()
+      const startPos = getRuntime(slider).engine.location.get()
 
       await simulateDrag({ element: fixture.container, startX: 100, deltaX: 3, steps: 1 })
 
-      expect(slider.engine.location.get()).toBe(startPos)
+      expect(getRuntime(slider).engine.location.get()).toBe(startPos)
     })
 
     it('начинает drag при превышении threshold', async () => {
@@ -46,7 +47,7 @@ describe('LoopModule + DragModule Integration', () => {
       slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
       const locations: number[] = []
 
-      slider.on('drag', () => { locations.push(slider.engine.location.get()) })
+      slider.on('drag', () => { locations.push(getRuntime(slider).engine.location.get()) })
 
       await simulateDrag({ element: fixture.container, startX: 500, deltaX: 20, steps: 3, duration: 100 })
 
@@ -63,7 +64,7 @@ describe('LoopModule + DragModule Integration', () => {
 
       await simulateDrag({ element: fixture.container, startX: 500, deltaX: 100, steps: 10, duration: 300 })
 
-      expect(slider.engine.location.get()).toBeLessThanOrEqual(0)
+      expect(getRuntime(slider).engine.location.get()).toBeLessThanOrEqual(0)
     })
 
     it('location не становится положительным при малом drag вправо (30px)', async () => {
@@ -71,7 +72,7 @@ describe('LoopModule + DragModule Integration', () => {
 
       await simulateDrag({ element: fixture.container, startX: 500, deltaX: 30, steps: 3, duration: 100 })
 
-      expect(slider.engine.location.get()).toBeLessThanOrEqual(0)
+      expect(getRuntime(slider).engine.location.get()).toBeLessThanOrEqual(0)
     })
 
     it('location не становится положительным при drag влево, затем вправо', async () => {
@@ -80,7 +81,7 @@ describe('LoopModule + DragModule Integration', () => {
       await simulateDrag({ element: fixture.container, startX: 500, deltaX: -50, steps: 5, duration: 200 })
       await simulateDrag({ element: fixture.container, startX: 500, deltaX: 100, steps: 10, duration: 300 })
 
-      expect(slider.engine.location.get()).toBeLessThanOrEqual(0)
+      expect(getRuntime(slider).engine.location.get()).toBeLessThanOrEqual(0)
     })
 
     it('location не становится положительным при drag вправо (perPage=1)', async () => {
@@ -88,7 +89,7 @@ describe('LoopModule + DragModule Integration', () => {
 
       await simulateDrag({ element: fixture.container, startX: 500, deltaX: 80, steps: 8, duration: 250 })
 
-      expect(slider.engine.location.get()).toBeLessThanOrEqual(0)
+      expect(getRuntime(slider).engine.location.get()).toBeLessThanOrEqual(0)
     })
 
     it('translateX не положительный после drag вправо', async () => {
@@ -107,7 +108,7 @@ describe('LoopModule + DragModule Integration', () => {
   describe('loopFix при drag', () => {
     it('вызывает loopFix при первом движении', async () => {
       slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-      const loopModule = slider.getModule('loop') as any
+      const loopModule = getRuntime(slider).getModule('loop') as any
       let loopFixCalled = false
 
       const originalFix = loopModule.fix.bind(loopModule)
@@ -123,7 +124,7 @@ describe('LoopModule + DragModule Integration', () => {
 
     it('при drag вправо первый loopFix вызывается с direction=prev', async () => {
       slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-      const loopModule = slider.getModule('loop') as any
+      const loopModule = getRuntime(slider).getModule('loop') as any
       const loopFixCalls: any[] = []
 
       const originalFix = loopModule.fix.bind(loopModule)
@@ -140,7 +141,7 @@ describe('LoopModule + DragModule Integration', () => {
 
     it('при drag вправо слайды перестраиваются (prepend)', async () => {
       slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-      const loopModule = slider.getModule('loop') as any
+      const loopModule = getRuntime(slider).getModule('loop') as any
       const loopFixCalls: any[] = []
 
       const originalFix = loopModule.fix.bind(loopModule)
@@ -162,8 +163,8 @@ describe('LoopModule + DragModule Integration', () => {
 
       await simulateDrag({ element: fixture.container, startX: 500, deltaX: 50, steps: 5, duration: 200 })
 
-      const location = slider.engine.location.get()
-      const slideSize = slider.engine.getSlideSize(0)
+      const location = getRuntime(slider).engine.location.get()
+      const slideSize = getRuntime(slider).engine.getSlideSize(0)
       const slideWithGap = slideSize + 20
 
       expect(location).toBeGreaterThan(-slideWithGap * slider.slides.length)
@@ -174,7 +175,7 @@ describe('LoopModule + DragModule Integration', () => {
   describe('Смена направления drag во время жеста', () => {
     it('корректно перестраивает слайды при смене направления без отпускания', async () => {
       slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 1 })
-      const loopModule = slider.getModule('loop') as any
+      const loopModule = getRuntime(slider).getModule('loop') as any
       const loopFixCalls: any[] = []
 
       const originalFix = loopModule.fix.bind(loopModule)
@@ -209,7 +210,7 @@ describe('LoopModule + DragModule Integration', () => {
       expect(loopFixCalls.length).toBeGreaterThanOrEqual(1)
       expect(loopFixCalls[0].params.direction).toBe('prev')
       expect(loopFixCalls[0].reordered).toBe(true)
-      expect(Number.isFinite(slider.engine.location.get())).toBe(true)
+      expect(Number.isFinite(getRuntime(slider).engine.location.get())).toBe(true)
     })
 
     it('нет дырки при смене направления drag', async () => {

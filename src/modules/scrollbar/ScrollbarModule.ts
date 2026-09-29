@@ -2,603 +2,554 @@
  * Scrollbar - модуль кастомного скроллбара для навигации слайдера
  * Поддерживает горизонтальное и вертикальное направление
  */
-
-import { Module } from '../Module'
-import { TVIST_CLASSES } from '../../core/constants'
-import type { Tvist } from '../../core/Tvist'
-import type { TvistOptions } from '../../core/types'
-
+import { createComponent, type Component } from '../Component';
+import { TVIST_CLASSES } from '../../core/constants';
+import type { TvistRuntime as Tvist } from '../../core/runtime';
+import type { TvistOptions } from '../../core/types';
 interface ScrollbarOptions {
   /** Селектор или элемент для контейнера скроллбара */
-  container?: string | HTMLElement
+  container?: string | HTMLElement;
   /** Автоматически скрывать скроллбар при бездействии */
-  hide?: boolean
+  hide?: boolean;
   /** Задержка перед скрытием (мс) */
-  hideDelay?: number
+  hideDelay?: number;
   /** CSS класс для скроллбара */
-  scrollbarClass?: string
+  scrollbarClass?: string;
   /** CSS класс для трека скроллбара */
-  trackClass?: string
+  trackClass?: string;
   /** CSS класс для ползунка */
-  thumbClass?: string
+  thumbClass?: string;
   /** Возможность перетаскивания ползунка */
-  draggable?: boolean
+  draggable?: boolean;
 }
 
-export class ScrollbarModule extends Module {
-  readonly name = 'Scrollbar'
-
-  // DOM элементы
-  private scrollbarEl?: HTMLElement
-  private trackEl?: HTMLElement
-  private thumbEl?: HTMLElement
-  private isCustomContainer = false
-
-  // Настройки
-  private hide: boolean
-  private hideDelay: number
-  private draggable: boolean
-
-  // Состояние
-  private isDragging = false
-  private dragStartX = 0
-  private dragStartY = 0
-  private dragStartScroll = 0
-  private hideTimer?: number
-
-  // Мемоизация: последние применённые значения для пропуска лишних DOM-записей
-  private _lastPositionPercent = -1
-  private _lastThumbSizePercent = -1
-
-  constructor(tvist: Tvist, options: TvistOptions) {
-    super(tvist, options)
-
-    const scrollbarOptions = this.getScrollbarOptions()
-    this.hide = scrollbarOptions.hide ?? false
-    this.hideDelay = scrollbarOptions.hideDelay ?? 1000
-    this.draggable = scrollbarOptions.draggable ?? true
-  }
-
-  /**
-   * Получить опции scrollbar из конфигурации
-   */
-  private getScrollbarOptions(): ScrollbarOptions {
-    const scrollbar = this.options.scrollbar
-    
-    if (typeof scrollbar === 'boolean') {
-      return {}
-    }
-    
-    return scrollbar ?? {}
-  }
-
+/** Internal component; state lives in this factory's closure. */
+export interface ScrollbarModule extends Component {
+  readonly name: 'Scrollbar';
   /**
    * Проверить, должен ли модуль быть активен
    */
-  public override shouldBeActive(): boolean {
-    return this.options.scrollbar !== false && this.options.scrollbar !== undefined
-  }
+  shouldBeActive(): boolean;
 
-  override init(): void {
-    if (!this.shouldBeActive()) {
-      return
+  init(): void;
+  /**
+   * Хук обновления
+   */
+  onUpdate(): void;
+  /**
+   * Хук обновления опций
+   */
+  onOptionsUpdate(newOptions: Partial<TvistOptions>): void;
+
+  destroy(): void;
+}
+
+export function createScrollbarModule(tvist: Tvist, options: TvistOptions): ScrollbarModule {
+  const base = createComponent(tvist, options);
+
+  const local_name = 'Scrollbar' as const;
+  // DOM элементы
+  let local_scrollbarEl: HTMLElement | undefined;
+
+  let local_trackEl: HTMLElement | undefined;
+
+  let local_thumbEl: HTMLElement | undefined;
+
+  let local_isCustomContainer = false;
+  // Настройки
+  let local_hide: boolean;
+
+  let local_hideDelay: number;
+
+  let local_draggable: boolean;
+  // Состояние
+  let local_isDragging = false;
+
+  let local_dragStartX = 0;
+
+  let local_dragStartY = 0;
+
+  let local_dragStartScroll = 0;
+
+  let local_hideTimer: number | undefined;
+  // Мемоизация: последние применённые значения для пропуска лишних DOM-записей
+  let local__lastPositionPercent = -1;
+
+  let local__lastThumbSizePercent = -1;
+  /**
+   * Получить опции scrollbar из конфигурации
+   */
+  function local_getScrollbarOptions(): ScrollbarOptions {
+    const scrollbar = options.scrollbar;
+    if (typeof scrollbar === 'boolean') {
+      return {};
     }
-
-    this.createScrollbar()
-    this.attachEventListeners()
-    this.updateScrollbar()
+    return scrollbar ?? {};
+  }
+  /**
+   * Проверить, должен ли модуль быть активен
+   */
+  function local_shouldBeActive(): boolean {
+    return options.scrollbar !== false && options.scrollbar !== undefined;
   }
 
+  function local_init(): void {
+    if (!local_shouldBeActive()) {
+      return;
+    }
+    local_createScrollbar();
+    local_attachEventListeners();
+    local_updateScrollbar();
+  }
   /**
    * Создать элементы скроллбара
    */
-  private createScrollbar(): void {
-    const scrollbarOptions = this.getScrollbarOptions()
-    const isVertical = this.options.direction === 'vertical'
-
+  function local_createScrollbar(): void {
+    const scrollbarOptions = local_getScrollbarOptions();
+    const isVertical = options.direction === 'vertical';
     // Проверяем, указан ли кастомный контейнер
     if (scrollbarOptions.container) {
-      const container = typeof scrollbarOptions.container === 'string'
-        ? document.querySelector<HTMLElement>(scrollbarOptions.container)
-        : scrollbarOptions.container
-
+      const container =
+        typeof scrollbarOptions.container === 'string'
+          ? document.querySelector<HTMLElement>(scrollbarOptions.container)
+          : scrollbarOptions.container;
       if (container) {
-        this.scrollbarEl = container
-        this.isCustomContainer = true
+        local_scrollbarEl = container;
+        local_isCustomContainer = true;
       }
     }
-
     // Если кастомный контейнер не указан, создаём свой
-    if (!this.scrollbarEl) {
-      this.scrollbarEl = document.createElement('div')
-      this.scrollbarEl.className = scrollbarOptions.scrollbarClass ?? TVIST_CLASSES.scrollbar
-      
+    if (!local_scrollbarEl) {
+      local_scrollbarEl = document.createElement('div');
+      local_scrollbarEl.className = scrollbarOptions.scrollbarClass ?? TVIST_CLASSES.scrollbar;
       // Добавляем класс направления
       if (isVertical) {
-        this.scrollbarEl.classList.add(TVIST_CLASSES.scrollbarVertical)
+        local_scrollbarEl.classList.add(TVIST_CLASSES.scrollbarVertical);
       } else {
-        this.scrollbarEl.classList.add(TVIST_CLASSES.scrollbarHorizontal)
+        local_scrollbarEl.classList.add(TVIST_CLASSES.scrollbarHorizontal);
       }
-
-      this.tvist.root.appendChild(this.scrollbarEl)
+      tvist.root.appendChild(local_scrollbarEl);
     }
-
     // Создаём трек и ползунок
-    this.trackEl = document.createElement('div')
-    this.trackEl.className = scrollbarOptions.trackClass ?? TVIST_CLASSES.scrollbarTrack
-
-    this.thumbEl = document.createElement('div')
-    this.thumbEl.className = scrollbarOptions.thumbClass ?? TVIST_CLASSES.scrollbarThumb
-
-    this.trackEl.appendChild(this.thumbEl)
-    this.scrollbarEl.appendChild(this.trackEl)
-
+    local_trackEl = document.createElement('div');
+    local_trackEl.className = scrollbarOptions.trackClass ?? TVIST_CLASSES.scrollbarTrack;
+    local_thumbEl = document.createElement('div');
+    local_thumbEl.className = scrollbarOptions.thumbClass ?? TVIST_CLASSES.scrollbarThumb;
+    local_trackEl.appendChild(local_thumbEl);
+    local_scrollbarEl.appendChild(local_trackEl);
     // Применяем класс hide если нужно
-    if (this.hide) {
-      this.scrollbarEl.classList.add(TVIST_CLASSES.scrollbarHidden)
+    if (local_hide) {
+      local_scrollbarEl.classList.add(TVIST_CLASSES.scrollbarHidden);
     }
   }
-
   /**
    * Прикрепить обработчики событий
    */
-  private attachEventListeners(): void {
-    if (!this.scrollbarEl || !this.thumbEl || !this.trackEl) return
-
+  function local_attachEventListeners(): void {
+    if (!local_scrollbarEl || !local_thumbEl || !local_trackEl) return;
     // Клик по треку (переход к позиции)
-    this.trackEl.addEventListener('click', this.handleTrackClick)
-
+    base.resources.listen(local_trackEl, 'click', local_handleTrackClick);
     // Перетаскивание ползунка
-    if (this.draggable) {
+    if (local_draggable) {
       if ('PointerEvent' in window) {
-        this.thumbEl.addEventListener('pointerdown', this.handleThumbPointerDown)
+        base.resources.listen(local_thumbEl, 'pointerdown', local_handleThumbPointerDown);
       } else {
-        this.thumbEl.addEventListener('mousedown', this.handleThumbMouseDown)
-        this.thumbEl.addEventListener('touchstart', this.handleThumbTouchStart, { passive: false })
+        base.resources.listen(local_thumbEl, 'mousedown', local_handleThumbMouseDown);
+        base.resources.listen(local_thumbEl, 'touchstart', local_handleThumbTouchStart, {
+          passive: false,
+        });
       }
     }
-
     // События слайдера
-    this.on('scroll', this.handleScroll)
-    this.on('slideChangeEnd', this.handleSlideChanged)
-
+    base.on('scroll', local_handleScroll);
+    base.on('slideChangeEnd', local_handleSlideChanged);
     // Автоскрытие (показать при наведении, скрыть по таймеру)
-    this.updateAutoHideListeners()
+    local_updateAutoHideListeners();
   }
-
   /**
    * Обработчик клика по треку
    */
-  private handleTrackClick = (event: MouseEvent): void => {
-    if (!this.trackEl || !this.thumbEl) return
-    if (event.target === this.thumbEl) return // Игнорируем клик по ползунку
-
-    const isVertical = this.options.direction === 'vertical'
-    const rect = this.trackEl.getBoundingClientRect()
-    
-    let clickPosition: number
-    let trackSize: number
-
+  const local_handleTrackClick: (event: MouseEvent) => void = (event: MouseEvent): void => {
+    if (!local_trackEl || !local_thumbEl) return;
+    if (event.target === local_thumbEl) return; // Игнорируем клик по ползунку
+    const isVertical = options.direction === 'vertical';
+    const rect = local_trackEl.getBoundingClientRect();
+    let clickPosition: number;
+    let trackSize: number;
     if (isVertical) {
-      clickPosition = event.clientY - rect.top
-      trackSize = rect.height
+      clickPosition = event.clientY - rect.top;
+      trackSize = rect.height;
     } else {
-      clickPosition = event.clientX - rect.left
-      trackSize = rect.width
+      clickPosition = event.clientX - rect.left;
+      trackSize = rect.width;
     }
-
     // Вычисляем процент клика
-    const percent = clickPosition / trackSize
-    
+    const percent = clickPosition / trackSize;
     // Вычисляем целевой индекс
-    const slideCount = this.tvist.slides.length
-    const targetIndex = Math.round(percent * (slideCount - 1))
-
+    const slideCount = tvist.slides.length;
+    const targetIndex = Math.round(percent * (slideCount - 1));
     // Переходим к слайду
-    this.tvist.engine.scrollTo(targetIndex)
-  }
-
+    tvist.__tvistInternal_engine.__tvistInternal_scrollTo(targetIndex);
+  };
   /**
    * Обработчик начала перетаскивания (Pointer API — мышь + тач)
    */
-  private handleThumbPointerDown = (event: PointerEvent): void => {
-    if (event.button !== 0 && event.pointerType === 'mouse') return
+  const local_handleThumbPointerDown: (event: PointerEvent) => void = (
+    event: PointerEvent
+  ): void => {
+    if (event.button !== 0 && event.pointerType === 'mouse') return;
     // Останавливаем всплытие чтобы DragModule не перехватил событие
-    event.stopPropagation()
-    event.preventDefault()
-    this.startDrag(event.clientX, event.clientY)
-
-    document.addEventListener('pointermove', this.handleThumbPointerMove)
-    document.addEventListener('pointerup', this.handleThumbPointerUp)
-  }
-
+    event.stopPropagation();
+    event.preventDefault();
+    local_startDrag(event.clientX, event.clientY);
+    base.resources.listen(document, 'pointermove', local_handleThumbPointerMove);
+    base.resources.listen(document, 'pointerup', local_handleThumbPointerUp);
+  };
   /**
    * Обработчик движения (Pointer API)
    */
-  private handleThumbPointerMove = (event: PointerEvent): void => {
-    if (!this.isDragging) return
-    event.preventDefault()
-    this.updateDrag(event.clientX, event.clientY)
-  }
-
+  const local_handleThumbPointerMove: (event: PointerEvent) => void = (
+    event: PointerEvent
+  ): void => {
+    if (!local_isDragging) return;
+    event.preventDefault();
+    local_updateDrag(event.clientX, event.clientY);
+  };
   /**
    * Завершить перетаскивание (Pointer API)
    */
-  private handleThumbPointerUp = (): void => {
-    this.endDrag()
-    document.removeEventListener('pointermove', this.handleThumbPointerMove)
-    document.removeEventListener('pointerup', this.handleThumbPointerUp)
-  }
-
+  const local_handleThumbPointerUp: () => void = (): void => {
+    local_endDrag();
+    base.resources.unlisten(document, 'pointermove', local_handleThumbPointerMove);
+    base.resources.unlisten(document, 'pointerup', local_handleThumbPointerUp);
+  };
   /**
    * Обработчик начала перетаскивания (мышь)
    */
-  private handleThumbMouseDown = (event: MouseEvent): void => {
+  const local_handleThumbMouseDown: (event: MouseEvent) => void = (event: MouseEvent): void => {
     // Останавливаем всплытие чтобы DragModule не перехватил событие
-    event.stopPropagation()
-    event.preventDefault()
-    this.startDrag(event.clientX, event.clientY)
-
-    document.addEventListener('mousemove', this.handleThumbMouseMove)
-    document.addEventListener('mouseup', this.handleThumbMouseUp)
-  }
-
+    event.stopPropagation();
+    event.preventDefault();
+    local_startDrag(event.clientX, event.clientY);
+    base.resources.listen(document, 'mousemove', local_handleThumbMouseMove);
+    base.resources.listen(document, 'mouseup', local_handleThumbMouseUp);
+  };
   /**
    * Обработчик начала перетаскивания (тач)
    */
-  private handleThumbTouchStart = (event: TouchEvent): void => {
-    if (event.touches.length !== 1) return
-
-    const touch = event.touches[0]
-    if (!touch) return
-
+  const local_handleThumbTouchStart: (event: TouchEvent) => void = (event: TouchEvent): void => {
+    if (event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    if (!touch) return;
     // Останавливаем всплытие чтобы DragModule не перехватил событие
-    event.stopPropagation()
-    this.startDrag(touch.clientX, touch.clientY)
-
-    document.addEventListener('touchmove', this.handleThumbTouchMove, { passive: false })
-    document.addEventListener('touchend', this.handleThumbTouchEnd)
-  }
-
+    event.stopPropagation();
+    local_startDrag(touch.clientX, touch.clientY);
+    base.resources.listen(document, 'touchmove', local_handleThumbTouchMove, { passive: false });
+    base.resources.listen(document, 'touchend', local_handleThumbTouchEnd);
+  };
   /**
    * Начать перетаскивание
    */
-  private startDrag(clientX: number, clientY: number): void {
-    this.tvist.engine.animator.stop()
-    this.isDragging = true
-    this.dragStartX = clientX
-    this.dragStartY = clientY
-    this.dragStartScroll = this.tvist.engine.location.get()
-
-    this.scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarDragging)
+  function local_startDrag(clientX: number, clientY: number): void {
+    tvist.__tvistInternal_engine.__tvistInternal_animator.stop();
+    local_isDragging = true;
+    local_dragStartX = clientX;
+    local_dragStartY = clientY;
+    local_dragStartScroll = tvist.__tvistInternal_engine.__tvistInternal_location.get();
+    local_scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarDragging);
   }
-
   /**
    * Обработчик движения мыши при перетаскивании
    */
-  private handleThumbMouseMove = (event: MouseEvent): void => {
-    if (!this.isDragging) return
-    event.preventDefault()
-    this.updateDrag(event.clientX, event.clientY)
-  }
-
+  const local_handleThumbMouseMove: (event: MouseEvent) => void = (event: MouseEvent): void => {
+    if (!local_isDragging) return;
+    event.preventDefault();
+    local_updateDrag(event.clientX, event.clientY);
+  };
   /**
    * Обработчик движения тача при перетаскивании
    */
-  private handleThumbTouchMove = (event: TouchEvent): void => {
-    if (!this.isDragging || event.touches.length !== 1) return
-    event.preventDefault()
-
-    const touch = event.touches[0]
-    if (!touch) return
-    
-    this.updateDrag(touch.clientX, touch.clientY)
-  }
-
+  const local_handleThumbTouchMove: (event: TouchEvent) => void = (event: TouchEvent): void => {
+    if (!local_isDragging || event.touches.length !== 1) return;
+    event.preventDefault();
+    const touch = event.touches[0];
+    if (!touch) return;
+    local_updateDrag(touch.clientX, touch.clientY);
+  };
   /**
    * Обновить позицию при перетаскивании
    */
-  private updateDrag(clientX: number, clientY: number): void {
-    if (!this.trackEl) return
-
-    const isVertical = this.options.direction === 'vertical'
-    const rect = this.trackEl.getBoundingClientRect()
-
-    let delta: number
-    let trackSize: number
-
+  function local_updateDrag(clientX: number, clientY: number): void {
+    if (!local_trackEl) return;
+    const isVertical = options.direction === 'vertical';
+    const rect = local_trackEl.getBoundingClientRect();
+    let delta: number;
+    let trackSize: number;
     if (isVertical) {
-      delta = clientY - this.dragStartY
-      trackSize = rect.height
+      delta = clientY - local_dragStartY;
+      trackSize = rect.height;
     } else {
-      delta = clientX - this.dragStartX
-      trackSize = rect.width
+      delta = clientX - local_dragStartX;
+      trackSize = rect.width;
     }
-
     // Вычисляем процент перемещения
-    const percent = delta / trackSize
-    
+    const percent = delta / trackSize;
     // Вычисляем общий диапазон прокрутки
-    const slideCount = this.tvist.slides.length
-    
+    const slideCount = tvist.slides.length;
     // Получаем позицию первого и последнего слайда
-    const firstSlideScroll = this.tvist.engine.getScrollPositionForIndex(0)
-    const lastSlideScroll = this.tvist.engine.getScrollPositionForIndex(slideCount - 1)
-    
+    const firstSlideScroll =
+      tvist.__tvistInternal_engine.__tvistInternal_getScrollPositionForIndex(0);
+    const lastSlideScroll = tvist.__tvistInternal_engine.__tvistInternal_getScrollPositionForIndex(
+      slideCount - 1
+    );
     // Общий диапазон прокрутки (разница между первым и последним слайдом)
-    const scrollRange = lastSlideScroll - firstSlideScroll
-    
+    const scrollRange = lastSlideScroll - firstSlideScroll;
     // Вычисляем новую позицию скролла
-    const newScroll = this.dragStartScroll + (percent * scrollRange)
-    
+    const newScroll = local_dragStartScroll + percent * scrollRange;
     // Ограничиваем позицию в пределах допустимого диапазона
-    const minScroll = this.tvist.engine.getMinScrollPosition()
-    const maxScroll = this.tvist.engine.getMaxScrollPosition()
-    const clampedScroll = Math.max(maxScroll, Math.min(minScroll, newScroll))
-    
+    const minScroll = tvist.__tvistInternal_engine.__tvistInternal_getMinScrollPosition();
+    const maxScroll = tvist.__tvistInternal_engine.__tvistInternal_getMaxScrollPosition();
+    const clampedScroll = Math.max(maxScroll, Math.min(minScroll, newScroll));
     // Применяем позицию напрямую через engine (плавное следование)
-    this.tvist.engine.location.set(clampedScroll)
-    this.tvist.engine.target.set(clampedScroll)
-    this.tvist.engine.applyTransform()
-    
+    tvist.__tvistInternal_engine.__tvistInternal_location.set(clampedScroll);
+    tvist.__tvistInternal_engine.__tvistInternal_target.set(clampedScroll);
+    tvist.__tvistInternal_engine.__tvistInternal_applyTransform();
     // Обновляем визуальное положение ползунка
-    this.updateScrollbar()
-    
+    local_updateScrollbar();
     // Вычисляем ближайший индекс для обновления состояния
-    let closestIndex = 0
-    let minDistance = Infinity
-
+    let closestIndex = 0;
+    let minDistance = Infinity;
     for (let i = 0; i < slideCount; i++) {
-      const slidePos = this.tvist.engine.getScrollPositionForIndex(i)
-      const distance = Math.abs(slidePos - clampedScroll)
-      
+      const slidePos = tvist.__tvistInternal_engine.__tvistInternal_getScrollPositionForIndex(i);
+      const distance = Math.abs(slidePos - clampedScroll);
       if (distance < minDistance) {
-        minDistance = distance
-        closestIndex = i
+        minDistance = distance;
+        closestIndex = i;
       }
     }
-    
     // Обновляем индекс без анимации
-    this.tvist.engine.index.set(closestIndex)
-    
+    tvist.__tvistInternal_engine.__tvistInternal_index.set(closestIndex);
     // Генерируем события прокрутки
-    this.tvist.emit('scroll')
+    tvist.emit('scroll');
   }
-
   /**
    * Завершить перетаскивание (мышь)
    */
-  private handleThumbMouseUp = (): void => {
-    this.endDrag()
-    document.removeEventListener('mousemove', this.handleThumbMouseMove)
-    document.removeEventListener('mouseup', this.handleThumbMouseUp)
-  }
-
+  const local_handleThumbMouseUp: () => void = (): void => {
+    local_endDrag();
+    base.resources.unlisten(document, 'mousemove', local_handleThumbMouseMove);
+    base.resources.unlisten(document, 'mouseup', local_handleThumbMouseUp);
+  };
   /**
    * Завершить перетаскивание (тач)
    */
-  private handleThumbTouchEnd = (): void => {
-    this.endDrag()
-    document.removeEventListener('touchmove', this.handleThumbTouchMove)
-    document.removeEventListener('touchend', this.handleThumbTouchEnd)
-  }
-
+  const local_handleThumbTouchEnd: () => void = (): void => {
+    local_endDrag();
+    base.resources.unlisten(document, 'touchmove', local_handleThumbTouchMove);
+    base.resources.unlisten(document, 'touchend', local_handleThumbTouchEnd);
+  };
   /**
    * Завершить перетаскивание
    */
-  private endDrag(): void {
-    this.isDragging = false
-    this.scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarDragging)
-    
+  function local_endDrag(): void {
+    local_isDragging = false;
+    local_scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarDragging);
     // После завершения drag делаем snap к ближайшему слайду
-    const currentPos = this.tvist.engine.location.get()
-    const slideCount = this.tvist.slides.length
-    
-    let closestIndex = 0
-    let minDistance = Infinity
-
+    const currentPos = tvist.__tvistInternal_engine.__tvistInternal_location.get();
+    const slideCount = tvist.slides.length;
+    let closestIndex = 0;
+    let minDistance = Infinity;
     for (let i = 0; i < slideCount; i++) {
-      const slidePos = this.tvist.engine.getScrollPositionForIndex(i)
-      const distance = Math.abs(slidePos - currentPos)
-      
+      const slidePos = tvist.__tvistInternal_engine.__tvistInternal_getScrollPositionForIndex(i);
+      const distance = Math.abs(slidePos - currentPos);
       if (distance < minDistance) {
-        minDistance = distance
-        closestIndex = i
+        minDistance = distance;
+        closestIndex = i;
       }
     }
-    
     // Плавный переход к ближайшему слайду
-    this.tvist.engine.scrollTo(closestIndex)
+    tvist.__tvistInternal_engine.__tvistInternal_scrollTo(closestIndex);
   }
-
   /**
    * Обработчик скролла
    */
-  private handleScroll = (): void => {
-    this.updateScrollbar()
-  }
-
+  const local_handleScroll: () => void = (): void => {
+    local_updateScrollbar();
+  };
   /**
    * Обработчик изменения слайда
    */
-  private handleSlideChanged = (): void => {
-    this.updateScrollbar()
-  }
-
+  const local_handleSlideChanged: () => void = (): void => {
+    local_updateScrollbar();
+  };
   /**
    * Обновить позицию и размер скроллбара.
    * Разделяет обновление размера (редко меняется) и позиции (каждый кадр).
    * Мемоизирует оба значения: DOM не трогается, если ничего не изменилось.
    */
-  private updateScrollbar(): void {
-    if (!this.thumbEl || !this.trackEl) return
-
-    const isVertical = this.options.direction === 'vertical'
-    const slideCount = this.tvist.slides.length
-
-    if (slideCount <= 1) return
-
+  function local_updateScrollbar(): void {
+    if (!local_thumbEl || !local_trackEl) return;
+    const isVertical = options.direction === 'vertical';
+    const slideCount = tvist.slides.length;
+    if (slideCount <= 1) return;
     // Размер ползунка — меняется только при resize / смене perPage
-    const perPage = this.options.perPage ?? 1
-    const thumbSizePercent = (perPage / slideCount) * 100
-
+    const perPage = options.perPage ?? 1;
+    const thumbSizePercent = (perPage / slideCount) * 100;
     // Текущая позиция
-    const currentPosition = Math.abs(this.tvist.engine.location.get())
-    const lastSlidePosition = Math.abs(this.tvist.engine.getSlidePosition(slideCount - 1))
-    const progress = lastSlidePosition > 0 ? currentPosition / lastSlidePosition : 0
-    const availableRange = 100 - thumbSizePercent
+    const currentPosition = Math.abs(tvist.__tvistInternal_engine.__tvistInternal_location.get());
+    const lastSlidePosition = Math.abs(
+      tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(slideCount - 1)
+    );
+    const progress = lastSlidePosition > 0 ? currentPosition / lastSlidePosition : 0;
+    const availableRange = 100 - thumbSizePercent;
     // Округляем до 0.1% — на кадрах с субпиксельным движением это nochange
-    const positionPercent = Math.round(
-      Math.max(0, Math.min(availableRange, progress * availableRange)) * 10
-    ) / 10
-
-    const sizeChanged = thumbSizePercent !== this._lastThumbSizePercent
-    const posChanged = positionPercent !== this._lastPositionPercent
-
-    if (!sizeChanged && !posChanged) return
-
+    const positionPercent =
+      Math.round(Math.max(0, Math.min(availableRange, progress * availableRange)) * 10) / 10;
+    const sizeChanged = thumbSizePercent !== local__lastThumbSizePercent;
+    const posChanged = positionPercent !== local__lastPositionPercent;
+    if (!sizeChanged && !posChanged) return;
     if (isVertical) {
       if (sizeChanged) {
-        this.thumbEl.style.height = `${thumbSizePercent}%`
-        this.thumbEl.style.width = '100%'
-        this.thumbEl.style.left = '0'
+        local_thumbEl.style.height = `${thumbSizePercent}%`;
+        local_thumbEl.style.width = '100%';
+        local_thumbEl.style.left = '0';
       }
       if (posChanged) {
-        this.thumbEl.style.top = `${positionPercent}%`
+        local_thumbEl.style.top = `${positionPercent}%`;
       }
     } else {
       if (sizeChanged) {
-        this.thumbEl.style.width = `${thumbSizePercent}%`
-        this.thumbEl.style.height = '100%'
-        this.thumbEl.style.top = '0'
+        local_thumbEl.style.width = `${thumbSizePercent}%`;
+        local_thumbEl.style.height = '100%';
+        local_thumbEl.style.top = '0';
       }
       if (posChanged) {
-        this.thumbEl.style.left = `${positionPercent}%`
+        local_thumbEl.style.left = `${positionPercent}%`;
       }
     }
-
-    if (sizeChanged) this._lastThumbSizePercent = thumbSizePercent
-    if (posChanged) this._lastPositionPercent = positionPercent
+    if (sizeChanged) local__lastThumbSizePercent = thumbSizePercent;
+    if (posChanged) local__lastPositionPercent = positionPercent;
   }
-
   /**
    * Инвалидирует кеш скроллбара — вызывать при resize или смене опций.
    */
-  private invalidateScrollbarCache(): void {
-    this._lastPositionPercent = -1
-    this._lastThumbSizePercent = -1
+  function local_invalidateScrollbarCache(): void {
+    local__lastPositionPercent = -1;
+    local__lastThumbSizePercent = -1;
   }
-
   /**
    * Показать скроллбар
    */
-  private showScrollbar = (): void => {
-    if (!this.hide) return
-    
-    this.scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarHidden)
-    
+  const local_showScrollbar: () => void = (): void => {
+    if (!local_hide) return;
+    local_scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarHidden);
     // Сбрасываем таймер скрытия
-    if (this.hideTimer) {
-      window.clearTimeout(this.hideTimer)
-      this.hideTimer = undefined
+    if (local_hideTimer) {
+      base.resources.cancelTimeout(local_hideTimer);
+      local_hideTimer = undefined;
     }
-  }
-
+  };
   /**
    * Запустить таймер скрытия
    */
-  private startHideTimer = (): void => {
-    if (!this.hide || this.isDragging) return
-
-    this.hideTimer = window.setTimeout(() => {
-      this.scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarHidden)
-    }, this.hideDelay)
-  }
-
+  const local_startHideTimer: () => void = (): void => {
+    if (!local_hide || local_isDragging) return;
+    local_hideTimer = base.resources.timeout(() => {
+      local_scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarHidden);
+    }, local_hideDelay);
+  };
   /**
    * Хук обновления
    */
-  override onUpdate(): void {
-    this.invalidateScrollbarCache()
-    this.updateScrollbar()
+  function local_onUpdate(): void {
+    local_invalidateScrollbarCache();
+    local_updateScrollbar();
   }
-
   /**
    * Прикрепить/открепить обработчики автоскрытия в зависимости от this.hide
    */
-  private updateAutoHideListeners(): void {
+  function local_updateAutoHideListeners(): void {
     // Сначала всегда снимаем, чтобы не дублировать при повторном включении
-    this.tvist.root.removeEventListener('mouseenter', this.showScrollbar)
-    this.tvist.root.removeEventListener('mouseleave', this.startHideTimer)
-    if (this.hideTimer) {
-      window.clearTimeout(this.hideTimer)
-      this.hideTimer = undefined
+    base.resources.unlisten(tvist.root, 'mouseenter', local_showScrollbar);
+    base.resources.unlisten(tvist.root, 'mouseleave', local_startHideTimer);
+    if (local_hideTimer) {
+      base.resources.cancelTimeout(local_hideTimer);
+      local_hideTimer = undefined;
     }
-
-    if (this.hide) {
-      this.tvist.root.addEventListener('mouseenter', this.showScrollbar)
-      this.tvist.root.addEventListener('mouseleave', this.startHideTimer)
+    if (local_hide) {
+      base.resources.listen(tvist.root, 'mouseenter', local_showScrollbar);
+      base.resources.listen(tvist.root, 'mouseleave', local_startHideTimer);
     } else {
-      this.scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarHidden)
+      local_scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarHidden);
     }
   }
-
   /**
    * Хук обновления опций
    */
-  override onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
+  function local_onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
     if (newOptions.scrollbar !== undefined) {
-      const scrollbarOptions = typeof newOptions.scrollbar === 'boolean' 
-        ? {} 
-        : (newOptions.scrollbar ?? {})
-      
-      this.hide = scrollbarOptions.hide ?? false
-      this.hideDelay = scrollbarOptions.hideDelay ?? 1000
-      this.draggable = scrollbarOptions.draggable ?? true
-
+      const scrollbarOptions =
+        typeof newOptions.scrollbar === 'boolean' ? {} : (newOptions.scrollbar ?? {});
+      local_hide = scrollbarOptions.hide ?? false;
+      local_hideDelay = scrollbarOptions.hideDelay ?? 1000;
+      local_draggable = scrollbarOptions.draggable ?? true;
       // Обновляем слушатели автоскрытия (добавить при hide: true, убрать при hide: false)
-      this.updateAutoHideListeners()
-
+      local_updateAutoHideListeners();
       // Если автоскрытие включено — скроллбар изначально скрыт
-      if (this.hide) {
-        this.scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarHidden)
+      if (local_hide) {
+        local_scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarHidden);
       }
-
-      this.invalidateScrollbarCache()
-      this.updateScrollbar()
+      local_invalidateScrollbarCache();
+      local_updateScrollbar();
     }
   }
 
-  override destroy(): void {
+  function local_destroy(): void {
     // Очищаем таймеры
-    if (this.hideTimer) {
-      window.clearTimeout(this.hideTimer)
+    if (local_hideTimer) {
+      base.resources.cancelTimeout(local_hideTimer);
     }
-
     // Удаляем обработчики событий
-    if (this.trackEl) {
-      this.trackEl.removeEventListener('click', this.handleTrackClick)
+    if (local_trackEl) {
+      base.resources.unlisten(local_trackEl, 'click', local_handleTrackClick);
     }
-
-    if (this.thumbEl) {
-      this.thumbEl.removeEventListener('pointerdown', this.handleThumbPointerDown)
-      this.thumbEl.removeEventListener('mousedown', this.handleThumbMouseDown)
-      this.thumbEl.removeEventListener('touchstart', this.handleThumbTouchStart)
+    if (local_thumbEl) {
+      base.resources.unlisten(local_thumbEl, 'pointerdown', local_handleThumbPointerDown);
+      base.resources.unlisten(local_thumbEl, 'mousedown', local_handleThumbMouseDown);
+      base.resources.unlisten(local_thumbEl, 'touchstart', local_handleThumbTouchStart);
     }
-
-    document.removeEventListener('pointermove', this.handleThumbPointerMove)
-    document.removeEventListener('pointerup', this.handleThumbPointerUp)
-    document.removeEventListener('mousemove', this.handleThumbMouseMove)
-    document.removeEventListener('mouseup', this.handleThumbMouseUp)
-    document.removeEventListener('touchmove', this.handleThumbTouchMove)
-    document.removeEventListener('touchend', this.handleThumbTouchEnd)
-
-    this.tvist.root.removeEventListener('mouseenter', this.showScrollbar)
-    this.tvist.root.removeEventListener('mouseleave', this.startHideTimer)
-
+    base.resources.unlisten(document, 'pointermove', local_handleThumbPointerMove);
+    base.resources.unlisten(document, 'pointerup', local_handleThumbPointerUp);
+    base.resources.unlisten(document, 'mousemove', local_handleThumbMouseMove);
+    base.resources.unlisten(document, 'mouseup', local_handleThumbMouseUp);
+    base.resources.unlisten(document, 'touchmove', local_handleThumbTouchMove);
+    base.resources.unlisten(document, 'touchend', local_handleThumbTouchEnd);
+    base.resources.unlisten(tvist.root, 'mouseenter', local_showScrollbar);
+    base.resources.unlisten(tvist.root, 'mouseleave', local_startHideTimer);
     // Удаляем DOM элементы (если не кастомный контейнер)
-    if (!this.isCustomContainer && this.scrollbarEl) {
-      this.scrollbarEl.remove()
+    if (!local_isCustomContainer && local_scrollbarEl) {
+      local_scrollbarEl.remove();
     }
   }
+  const component: ScrollbarModule = {
+    get name() {
+      return local_name;
+    },
+    shouldBeActive: local_shouldBeActive,
+    init: local_init,
+    onUpdate: local_onUpdate,
+    onOptionsUpdate: local_onOptionsUpdate,
+    destroy: () => {
+      try {
+        local_destroy();
+      } finally {
+        base.dispose();
+      }
+    },
+  };
+  const scrollbarOptions = local_getScrollbarOptions();
+  local_hide = scrollbarOptions.hide ?? false;
+  local_hideDelay = scrollbarOptions.hideDelay ?? 1000;
+  local_draggable = scrollbarOptions.draggable ?? true;
+  return component;
 }

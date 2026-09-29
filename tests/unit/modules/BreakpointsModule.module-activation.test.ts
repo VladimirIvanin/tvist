@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тесты реактивности модулей при смене брейкпоинта
  *
@@ -66,16 +67,16 @@ describe('BreakpointsModule — реактивность модулей', () => 
       const paginationEl = root.querySelector(`.${TVIST_CLASSES.pagination}`) as HTMLElement
 
       // На десктопе — pagination: false, модуль не активен, буллеты не созданы
-      expect(slider['modules'].has('pagination')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(false)
       const bulletsDesktop = paginationEl?.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       expect(bulletsDesktop?.length ?? 0).toBe(0)
 
       // Сужаем экран — попадаем в брейкпоинт с pagination: true
       resizeSlider(root, 600)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       // Модуль пагинации должен быть инициализирован
-      expect(slider['modules'].has('pagination')).toBe(true)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(true)
 
       // Буллеты должны быть созданы (3 слайда, perPage: 1)
       const bulletsMobile = paginationEl?.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
@@ -103,16 +104,16 @@ describe('BreakpointsModule — реактивность модулей', () => 
       const paginationEl = root.querySelector(`.${TVIST_CLASSES.pagination}`) as HTMLElement
 
       // На мобиле — pagination: true, модуль активен
-      expect(slider['modules'].has('pagination')).toBe(true)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(true)
       const bulletsMobile = paginationEl?.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       expect(bulletsMobile?.length).toBe(3)
 
       // Расширяем экран — возвращаемся к pagination: false
       resizeSlider(root, 1200)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       // Модуль пагинации должен быть уничтожен
-      expect(slider['modules'].has('pagination')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(false)
 
       // Буллеты должны быть очищены
       const bulletsDesktop = paginationEl?.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
@@ -139,24 +140,24 @@ describe('BreakpointsModule — реактивность модулей', () => 
       const paginationEl = root.querySelector(`.${TVIST_CLASSES.pagination}`) as HTMLElement
 
       // Десктоп — нет пагинации
-      expect(slider['modules'].has('pagination')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(false)
 
       // Мобиле — есть пагинация
       resizeSlider(root, 600)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
-      expect(slider['modules'].has('pagination')).toBe(true)
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(true)
       expect(paginationEl?.querySelectorAll(`.${TVIST_CLASSES.bullet}`).length).toBe(3)
 
       // Снова десктоп — нет пагинации
       resizeSlider(root, 1200)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
-      expect(slider['modules'].has('pagination')).toBe(false)
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(false)
       expect(paginationEl?.querySelectorAll(`.${TVIST_CLASSES.bullet}`).length ?? 0).toBe(0)
 
       // Снова мобиле — пагинация снова появляется
       resizeSlider(root, 600)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
-      expect(slider['modules'].has('pagination')).toBe(true)
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(true)
       expect(paginationEl?.querySelectorAll(`.${TVIST_CLASSES.bullet}`).length).toBe(3)
 
       slider.destroy()
@@ -180,14 +181,14 @@ describe('BreakpointsModule — реактивность модулей', () => 
       })
 
       // На десктопе — arrows: false, модуль не активен
-      expect(slider['modules'].has('navigation')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('navigation')).toBe(false)
 
       // Сужаем экран — попадаем в брейкпоинт с arrows: true
       resizeSlider(root, 600)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       // Модуль навигации должен быть инициализирован
-      expect(slider['modules'].has('navigation')).toBe(true)
+      expect(getRuntime(slider)['modules'].has('navigation')).toBe(true)
 
       slider.destroy()
     })
@@ -209,14 +210,14 @@ describe('BreakpointsModule — реактивность модулей', () => 
       })
 
       // На мобиле — arrows: true, модуль активен
-      expect(slider['modules'].has('navigation')).toBe(true)
+      expect(getRuntime(slider)['modules'].has('navigation')).toBe(true)
 
       // Расширяем экран — возвращаемся к arrows: false
       resizeSlider(root, 1200)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       // Модуль навигации должен быть уничтожен
-      expect(slider['modules'].has('navigation')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('navigation')).toBe(false)
 
       slider.destroy()
     })
@@ -241,20 +242,20 @@ describe('BreakpointsModule — реактивность модулей', () => 
       })
 
       // Десктоп — оба модуля неактивны
-      expect(slider['modules'].has('navigation')).toBe(false)
-      expect(slider['modules'].has('pagination')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('navigation')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(false)
 
       // Мобиле — оба модуля активны
       resizeSlider(root, 600)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
-      expect(slider['modules'].has('navigation')).toBe(true)
-      expect(slider['modules'].has('pagination')).toBe(true)
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(getRuntime(slider)['modules'].has('navigation')).toBe(true)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(true)
 
       // Снова десктоп — оба модуля деактивированы
       resizeSlider(root, 1200)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
-      expect(slider['modules'].has('navigation')).toBe(false)
-      expect(slider['modules'].has('pagination')).toBe(false)
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
+      expect(getRuntime(slider)['modules'].has('navigation')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(false)
 
       slider.destroy()
     })
@@ -276,15 +277,15 @@ describe('BreakpointsModule — реактивность модулей', () => 
       })
 
       // Слайдер отключён, autoplay не должен быть создан
-      expect(slider['modules'].has('autoplay')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('autoplay')).toBe(false)
 
       // Включаем через breakpoint
       resizeSlider(root, 600)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       expect(slider.isEnabled).toBe(true)
       // autoplay по-прежнему не должен быть создан — shouldBeActive() = false
-      expect(slider['modules'].has('autoplay')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('autoplay')).toBe(false)
 
       slider.destroy()
     })
@@ -304,14 +305,14 @@ describe('BreakpointsModule — реактивность модулей', () => 
         }
       })
 
-      expect(slider['modules'].has('pagination')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(false)
 
       resizeSlider(root, 600)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
       expect(slider.isEnabled).toBe(true)
       // pagination: false — модуль не должен быть создан через enable()
-      expect(slider['modules'].has('pagination')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(false)
 
       slider.destroy()
     })

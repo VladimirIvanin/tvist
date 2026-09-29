@@ -1,9 +1,10 @@
+import { getRuntime } from '../../src/core/runtime'
 import { describe, it, expect, afterEach, beforeEach } from 'vitest'
 import { Tvist } from '../../src/core/Tvist'
-import { DragModule } from '../../src/modules/drag/DragModule'
+import { createDragModule as DragModule } from '../../src/modules/drag/DragModule'
 import { createSliderFixture, simulateDrag, type SliderFixture } from '../fixtures'
 
-Tvist.registerModule('drag', DragModule)
+
 
 describe('rewindByDrag', () => {
   let fixture: SliderFixture
@@ -37,12 +38,12 @@ describe('rewindByDrag', () => {
     expect(slider.options.rewindByDrag).toBe(false)
 
     slider.scrollTo(4, true)
-    expect(slider.engine.activeIndex).toBe(4)
+    expect(getRuntime(slider).engine.activeIndex).toBe(4)
 
     await dragForwardPastLastSlide()
     await new Promise(resolve => setTimeout(resolve, 50))
 
-    expect(slider.engine.activeIndex).toBe(4)
+    expect(getRuntime(slider).engine.activeIndex).toBe(4)
   })
 
   it('should not rewind on drag when rewindByDrag is explicitly false', async () => {
@@ -57,7 +58,7 @@ describe('rewindByDrag', () => {
     await dragForwardPastLastSlide()
     await new Promise(resolve => setTimeout(resolve, 50))
 
-    expect(slider.engine.activeIndex).toBe(4)
+    expect(getRuntime(slider).engine.activeIndex).toBe(4)
   })
 
   it('should still rewind via next() when rewindByDrag is false', () => {
@@ -69,10 +70,10 @@ describe('rewindByDrag', () => {
     })
 
     slider.scrollTo(4, true)
-    expect(slider.engine.activeIndex).toBe(4)
+    expect(getRuntime(slider).engine.activeIndex).toBe(4)
 
     slider.next()
 
-    expect(slider.engine.activeIndex).toBe(0)
+    expect(getRuntime(slider).engine.activeIndex).toBe(0)
   })
 })

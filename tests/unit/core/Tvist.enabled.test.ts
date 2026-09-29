@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '../../../src/index' // Импортируем из index для регистрации модулей
@@ -56,7 +57,7 @@ describe('Tvist - enabled option', () => {
 
     it('should emit created event even when disabled', () => {
       const onCreated = vi.fn()
-      
+
       new Tvist(fixture.root, {
         enabled: false,
         on: {
@@ -121,7 +122,7 @@ describe('Tvist - enabled option', () => {
 
     it('should emit disabled event', () => {
       const onDisabled = vi.fn()
-      
+
       const slider = new Tvist(fixture.root, {
         on: {
           disabled: onDisabled
@@ -136,7 +137,7 @@ describe('Tvist - enabled option', () => {
 
     it('should not emit disabled event if already disabled', () => {
       const onDisabled = vi.fn()
-      
+
       const slider = new Tvist(fixture.root, {
         enabled: false,
         on: {
@@ -157,13 +158,13 @@ describe('Tvist - enabled option', () => {
       })
 
       // Проверяем, что breakpoints модуль инициализирован
-      const hasBreakpointsBeforeDisable = slider['modules'].has('breakpoints')
+      const hasBreakpointsBeforeDisable = getRuntime(slider)['modules'].has('breakpoints')
 
       slider.disable()
 
       // Breakpoints модуль должен остаться, если был
       if (hasBreakpointsBeforeDisable) {
-        expect(slider['modules'].has('breakpoints')).toBe(true)
+        expect(getRuntime(slider)['modules'].has('breakpoints')).toBe(true)
       }
     })
   })
@@ -211,7 +212,7 @@ describe('Tvist - enabled option', () => {
 
     it('should emit enabled event', () => {
       const onEnabled = vi.fn()
-      
+
       const slider = new Tvist(fixture.root, {
         enabled: false,
         on: {
@@ -227,7 +228,7 @@ describe('Tvist - enabled option', () => {
 
     it('should not emit enabled event if already enabled', () => {
       const onEnabled = vi.fn()
-      
+
       const slider = new Tvist(fixture.root, {
         on: {
           enabled: onEnabled
@@ -247,32 +248,32 @@ describe('Tvist - enabled option', () => {
       })
 
       // Debug: проверяем какие модули есть изначально
-      const initialModules = Array.from(slider['modules'].keys())
+      const initialModules = Array.from(getRuntime(slider)['modules'].keys())
       console.log('Initial modules:', initialModules)
 
       // Модули должны быть активны
-      expect(slider['modules'].has('drag')).toBe(true)
-      expect(slider['modules'].has('pagination')).toBe(true)
+      expect(getRuntime(slider)['modules'].has('drag')).toBe(true)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(true)
 
       // Отключаем
       slider.disable()
 
-      const afterDisableModules = Array.from(slider['modules'].keys())
+      const afterDisableModules = Array.from(getRuntime(slider)['modules'].keys())
       console.log('After disable modules:', afterDisableModules)
 
       // Модули должны быть удалены
-      expect(slider['modules'].has('drag')).toBe(false)
-      expect(slider['modules'].has('pagination')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('drag')).toBe(false)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(false)
 
       // Включаем снова
       slider.enable()
 
-      const afterEnableModules = Array.from(slider['modules'].keys())
+      const afterEnableModules = Array.from(getRuntime(slider)['modules'].keys())
       console.log('After enable modules:', afterEnableModules)
 
       // Модули должны быть переинициализированы
-      expect(slider['modules'].has('drag')).toBe(true)
-      expect(slider['modules'].has('pagination')).toBe(true)
+      expect(getRuntime(slider)['modules'].has('drag')).toBe(true)
+      expect(getRuntime(slider)['modules'].has('pagination')).toBe(true)
     })
   })
 
@@ -372,7 +373,7 @@ describe('Tvist - enabled option', () => {
   describe('destroy()', () => {
     it('should destroy disabled slider', () => {
       const onDestroyed = vi.fn()
-      
+
       const slider = new Tvist(fixture.root, {
         enabled: false,
         on: {
@@ -387,7 +388,7 @@ describe('Tvist - enabled option', () => {
 
     it('should destroy enabled slider', () => {
       const onDestroyed = vi.fn()
-      
+
       const slider = new Tvist(fixture.root, {
         on: {
           destroyed: onDestroyed

@@ -2,22 +2,12 @@
  * Базовые типы для Tvist
  */
 
-import type { Tvist } from './Tvist'
-
-/**
- * Расширение типа Tvist для модулей
- */
-declare module './Tvist' {
-  interface Tvist {
-    /** Направление прокрутки (внутреннее, для beforeTransitionStart) */
-    _scrollDirection?: 'next' | 'prev'
-  }
-}
+import type { Tvist } from './Tvist';
 
 /** `detail` для DOM CustomEvent long press на слайде (имена в `TVIST_DOM_EVENTS`) */
 export interface TvistLongPressDomEventDetail {
-  index: number
-  pointerType: string
+  index: number;
+  pointerType: string;
 }
 
 /** Аргументы метода {@link Tvist.destroy}. */
@@ -28,68 +18,82 @@ export interface TvistDestroyOptions {
    * По умолчанию `false` — вложенные слайдеры (например галереи в карточках) остаются активными.
    * @default false
    */
-  destroyNested?: boolean
+  destroyNested?: boolean;
 }
 
 /** API модуля loop для вызова fix из Tvist */
 export interface LoopModuleAPI {
-  fix(params: { direction?: 'next' | 'prev' }): number
+  fix(params: { direction?: 'next' | 'prev' }): number;
 }
 
 /** API модуля autoplay для публичного геттера */
+export interface AutoplayControls {
+  /** Запустить прокрутку. */
+  start(): void;
+  /** Остановить прокрутку. */
+  stop(): void;
+  /** Приостановить прокрутку. */
+  pause(): void;
+  /** Продолжить после паузы. */
+  resume(): void;
+  /** Проверить, запущена ли прокрутка. */
+  isRunning(): boolean;
+  /** Проверить состояние паузы. */
+  isPaused(): boolean;
+  /** Проверить, остановлена ли прокрутка. */
+  isStopped(): boolean;
+}
+
+/** Internal component adapter. */
 export interface AutoplayModuleAPI {
-  getAutoplay(): {
-    /** Запустить прокрутку. */
-    start(): void
-    /** Остановить прокрутку. */
-    stop(): void
-    /** Приостановить прокрутку. */
-    pause(): void
-    /** Продолжить после паузы. */
-    resume(): void
-    /** Проверить, запущена ли прокрутка. */
-    isRunning(): boolean
-    /** Проверить состояние паузы. */
-    isPaused(): boolean
-    /** Проверить, остановлена ли прокрутка. */
-    isStopped(): boolean
-  }
+  getAutoplay(): AutoplayControls;
 }
 
 /** API модуля marquee для публичного геттера */
+export interface MarqueeControls {
+  /** Запустить прокрутку. */
+  start(): void;
+  /** Остановить прокрутку. */
+  stop(): void;
+  /** Приостановить прокрутку. */
+  pause(): void;
+  /** Продолжить после паузы. */
+  resume(): void;
+  /** Проверить, запущена ли прокрутка. */
+  isRunning(): boolean;
+  /** Проверить состояние паузы. */
+  isPaused(): boolean;
+  /** Проверить, остановлена ли прокрутка. */
+  isStopped(): boolean;
+  /** Установить скорость в пикселях в секунду. */
+  setSpeed(speed: number): void;
+  getSpeed(): number;
+  setDirection(direction: 'left' | 'right' | 'up' | 'down'): void;
+  getDirection(): 'left' | 'right' | 'up' | 'down';
+}
+
+/** Internal component adapter. */
 export interface MarqueeModuleAPI {
-  getMarquee(): {
-    /** Запустить прокрутку. */
-    start(): void
-    /** Остановить прокрутку. */
-    stop(): void
-    /** Приостановить прокрутку. */
-    pause(): void
-    /** Продолжить после паузы. */
-    resume(): void
-    /** Проверить, запущена ли прокрутка. */
-    isRunning(): boolean
-    /** Проверить состояние паузы. */
-    isPaused(): boolean
-    /** Проверить, остановлена ли прокрутка. */
-    isStopped(): boolean
-  }
+  getMarquee(): MarqueeControls;
 }
 
 /** API модуля video для публичного геттера */
+export interface VideoControls {
+  /** Воспроизвести видео выбранного или активного слайда. */
+  play(index?: number): void;
+  /** Поставить видео выбранного или активного слайда на паузу. */
+  pause(index?: number): void;
+  /** Выключить звук всех видео. */
+  mute(): void;
+  /** Включить звук всех видео. */
+  unmute(): void;
+  /** Проверить, выключен ли звук. */
+  isMuted(): boolean;
+}
+
+/** Internal component adapter. */
 export interface VideoModuleAPI {
-  getVideo(): {
-    /** Воспроизвести видео выбранного или активного слайда. */
-    play(index?: number): void
-    /** Поставить видео выбранного или активного слайда на паузу. */
-    pause(index?: number): void
-    /** Выключить звук всех видео. */
-    mute(): void
-    /** Включить звук всех видео. */
-    unmute(): void
-    /** Проверить, выключен ли звук. */
-    isMuted(): boolean
-  } | undefined
+  getVideo(): VideoControls | undefined;
 }
 
 /**
@@ -100,38 +104,38 @@ export interface AutoplayOptions {
    * Задержка между переходами в миллисекундах
    * @default 3000
    */
-  delay?: number
+  delay?: number;
 
   /**
    * Ставить автопрокрутку на паузу при наведении курсора
    * @default true
    */
-  pauseOnHover?: boolean
+  pauseOnHover?: boolean;
 
   /**
    * Ставить автопрокрутку на паузу, пока фокус находится внутри слайдера
    * @default true
    */
-  pauseOnFocus?: boolean
+  pauseOnFocus?: boolean;
 
   /**
    * Ставить автопрокрутку на паузу при любом взаимодействии (drag, click)
    * @default true
    */
-  pauseOnInteraction?: boolean
+  pauseOnInteraction?: boolean;
 
   /**
    * Отключить автопрокрутку после первого взаимодействия пользователя
    * @default false
    */
-  disableOnInteraction?: boolean
+  disableOnInteraction?: boolean;
 
   /**
    * Для видео-слайдов: ждать окончания видео вместо таймера.
    * Для слайдов без видео используется обычный delay.
    * @default false
    */
-  waitForVideo?: boolean
+  waitForVideo?: boolean;
 }
 
 /**
@@ -142,43 +146,43 @@ export interface VideoOptions {
    * Воспроизводить видео при активации слайда
    * @default true
    */
-  autoplay?: boolean
+  autoplay?: boolean;
 
   /**
    * Начинать видео с выключенным звуком (обязательно для autoplay в браузерах)
    * @default true
    */
-  muted?: boolean
+  muted?: boolean;
 
   /**
    * Зациклить воспроизведение видео
    * @default false
    */
-  loop?: boolean
+  loop?: boolean;
 
   /**
    * Добавить атрибут playsinline для iOS (без этого видео открывается на весь экран)
    * @default true
    */
-  playsinline?: boolean
+  playsinline?: boolean;
 
   /**
    * Ставить видео на паузу при уходе со слайда
    * @default true
    */
-  pauseOnLeave?: boolean
+  pauseOnLeave?: boolean;
 
   /**
    * Сбрасывать видео на начало при уходе со слайда
    * @default false
    */
-  resetOnLeave?: boolean
+  resetOnLeave?: boolean;
 
   /**
    * Ставить активное видео на паузу во время long press и продолжать после отпускания
    * @default true (если включен holdToPause), иначе false
    */
-  pauseOnHold?: boolean
+  pauseOnHold?: boolean;
 }
 
 /**
@@ -189,14 +193,14 @@ export interface HoldToPauseOptions {
    * Включить long press удержание
    * @default true
    */
-  enabled?: boolean
+  enabled?: boolean;
 
   /**
    * Порог удержания в миллисекундах.
    * Дефолт при отсутствии поля — `HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS` из `core/constants`.
    * @default 100
    */
-  threshold?: number
+  threshold?: number;
 
   /**
    * Область, в которой отслеживается удержание:
@@ -205,26 +209,26 @@ export interface HoldToPauseOptions {
    * - HTMLElement — кастомный элемент
    * @default 'slider'
    */
-  root?: 'slider' | 'container' | HTMLElement
+  root?: 'slider' | 'container' | HTMLElement;
 
   /**
    * CSS-селектор элементов, которые нужно исключить из удержания
    * @default undefined
    */
-  exclude?: string
+  exclude?: string;
 
   /**
    * Отменять удержание при старте drag
    * @default true
    */
-  cancelOnDrag?: boolean
+  cancelOnDrag?: boolean;
 
   /**
    * Порог движения до отмены удержания (px).
    * Если не задан, используется внутренний порог drag.
    * @default undefined
    */
-  moveThreshold?: number
+  moveThreshold?: number;
 }
 
 /**
@@ -235,13 +239,13 @@ export interface VisibilityOptions {
    * Приостанавливать autoplay когда слайдер скрыт
    * @default true
    */
-  pauseAutoplay?: boolean
+  pauseAutoplay?: boolean;
 
   /**
    * Приостанавливать marquee когда слайдер скрыт
    * @default true
    */
-  pauseMarquee?: boolean
+  pauseMarquee?: boolean;
 
   /**
    * Порог видимости для IntersectionObserver (0..1)
@@ -249,7 +253,7 @@ export interface VisibilityOptions {
    * 1 = считается видимым только если виден полностью
    * @default 0
    */
-  threshold?: number
+  threshold?: number;
 }
 
 /**
@@ -261,47 +265,47 @@ export interface BrowserFixesOptions {
    * Предотвращает задержку отрисовки декодированных изображений в Firefox.
    * @default true
    */
-  firefoxImageDecoding?: boolean
+  firefoxImageDecoding?: boolean;
 }
 
 /** Payload события videoProgress */
 export interface VideoProgressEvent {
   /** DOM-элемент слайда */
-  slide: HTMLElement
+  slide: HTMLElement;
   /** DOM-элемент видео */
-  video: HTMLVideoElement
+  video: HTMLVideoElement;
   /** Индекс слайда */
-  index: number
+  index: number;
   /** Прогресс воспроизведения (0..1) */
-  progress: number
+  progress: number;
   /** Текущее время воспроизведения в секундах */
-  currentTime: number
+  currentTime: number;
   /** Полная длительность видео в секундах */
-  duration: number
+  duration: number;
 }
 
 /** Payload события autoplayProgress */
 export interface AutoplayProgressEvent {
   /** Прогресс активного сегмента (0..1) */
-  progress: number
+  progress: number;
   /** Индекс активного слайда */
-  index: number
+  index: number;
   /** Индекс активного сегмента (равен index) */
-  segmentIndex: number
+  segmentIndex: number;
   /** Прогресс активного сегмента (0..1), алиас progress */
-  segmentProgress: number
+  segmentProgress: number;
   /** Общее количество сегментов (слайдов) */
-  totalSegments: number
+  totalSegments: number;
 }
 
 /** Payload событий video (play, pause, ended, ready) */
 export interface VideoEvent {
   /** DOM-элемент слайда */
-  slide: HTMLElement
+  slide: HTMLElement;
   /** DOM-элемент видео */
-  video: HTMLVideoElement
+  video: HTMLVideoElement;
   /** Индекс слайда */
-  index: number
+  index: number;
 }
 
 /**
@@ -313,13 +317,13 @@ export interface NativeLazyAdjacentOptions {
    * Дополнительный трафик при загрузке страницы; по умолчанию выключено.
    * @default false (включите явно `onInit: true`)
    */
-  onInit?: boolean
+  onInit?: boolean;
 
   /**
    * В начале перехода к другому слайду (событие beforeSlideChange), до анимации; то же при speed: 0.
    * @default true при включённой опции (`true` или объект без `onTransitionStart: false`)
    */
-  onTransitionStart?: boolean
+  onTransitionStart?: boolean;
 }
 
 /**
@@ -331,7 +335,7 @@ export interface LoopOptions {
    * По умолчанию `true`, если указан объект.
    * @default true
    */
-  enabled?: boolean
+  enabled?: boolean;
 
   /**
    * Включить систему DOM-клонов для loop.
@@ -341,7 +345,7 @@ export interface LoopOptions {
    * как будто пользователь взаимодействует с оригинальными слайдами.
    * @default false
    */
-  withClones?: boolean
+  withClones?: boolean;
 }
 
 /**
@@ -349,45 +353,45 @@ export interface LoopOptions {
  */
 export interface CenterOptions {
   /** Центрирует активный слайд в viewport (аналог center: true). @default false */
-  active?: boolean
+  active?: boolean;
   /**
    * Центрирует активный слайд, когда есть место; у краёв обрезает позицию
    * (аналог Splide `focus: 'center'` + `trimSpace: true`).
    * @default false
    */
-  focus?: boolean
+  focus?: boolean;
   /** Центрирует все слайды визуально когда locked (justify-content: center). @default false */
-  justify?: boolean
+  justify?: boolean;
 }
 
 export interface TvistOptions {
   // Базовые настройки
-  
+
   /**
    * Количество слайдов на странице (видимых одновременно).
    * @default 1
    */
-  perPage?: number
+  perPage?: number;
 
   /**
    * Количество слайдов, пролистываемых за один раз.
    * @default 1
    */
-  slidesPerGroup?: number
-  
+  slidesPerGroup?: number;
+
   /**
    * Если true, ширина слайдов определяется их содержимым (не задаётся слайдером).
    * Рекомендуется perPage: 1.
    * @default false
    */
-  autoWidth?: boolean
-  
+  autoWidth?: boolean;
+
   /**
    * Если true, высота слайдов определяется их содержимым (для вертикального направления).
-   * Рекомендуется perPage: 1. 
+   * Рекомендуется perPage: 1.
    * @default false
    */
-  autoHeight?: boolean
+  autoHeight?: boolean;
 
   /**
    * Фиксированная ширина слайда (px или CSS, например `'12rem'`, `'30%'`).
@@ -395,7 +399,7 @@ export interface TvistOptions {
    * опция `perPage` перезаписывается при каждом пересчёте и не задаёт ширину слайда.
    * Для вертикального направления задаёт только ширину слайда (высота — как без этой опции).
    */
-  fixedWidth?: number | string
+  fixedWidth?: number | string;
 
   /**
    * Фиксированная высота слайда (px или CSS).
@@ -403,20 +407,20 @@ export interface TvistOptions {
    * `perPage` перезаписывается при пересчёте.
    * Для горизонтального направления задаёт только высоту слайда.
    */
-  fixedHeight?: number | string
-  
+  fixedHeight?: number | string;
+
   /**
    * Минимальный размер слайда (ширина или высота) для автоматического расчета perPage
    * @default undefined
    */
-  slideMinSize?: number
-  
+  slideMinSize?: number;
+
   /**
    * Расстояние между слайдами: число (px) или CSS-строка (например `'1rem'`, `'12px'`).
    * Строковые значения измеряются в DOM относительно трека слайдера.
    * @default 0
    */
-  gap?: number | string
+  gap?: number | string;
 
   /**
    * Округлять translate и размеры до целых пикселей при применении в DOM.
@@ -424,8 +428,8 @@ export interface TvistOptions {
    * Аналогично `roundLengths` в Swiper.
    * @default true
    */
-  roundLengths?: boolean
-  
+  roundLengths?: boolean;
+
   /**
    * Peek — отступы, показывающие часть соседних слайдов (чтобы было видно, что есть ещё слайды).
    * Для горизонтального слайдера: left/right, для вертикального: top/bottom.
@@ -436,26 +440,30 @@ export interface TvistOptions {
    * peek: { left: 10, right: 20 }
    * peek: { top: 10, bottom: 20 }
    */
-  peek?: number | string | { 
-    left?: number | string
-    right?: number | string 
-  } | { 
-    top?: number | string
-    bottom?: number | string 
-  }
+  peek?:
+    | number
+    | string
+    | {
+        left?: number | string;
+        right?: number | string;
+      }
+    | {
+        top?: number | string;
+        bottom?: number | string;
+      };
 
   /**
    * Peek trim: при true (по умолчанию) концовка прижимается к краю — последний слайд без дыры справа/снизу.
    * При включённом loop не применяется.
    * @default true
    */
-  peekTrim?: boolean
+  peekTrim?: boolean;
 
   /**
    * Скорость анимации перехода в миллисекундах
    * @default 300
    */
-  speed?: number
+  speed?: number;
 
   /**
    * Минимальный интервал (мс) между вызовами next()/prev().
@@ -463,13 +471,13 @@ export interface TvistOptions {
    * Полезно при speed: 0 или при серии программных вызовов.
    * @default 0
    */
-  navThrottleMs?: number
-  
+  navThrottleMs?: number;
+
   /**
    * Направление прокрутки слайдера
    * @default 'horizontal'
    */
-  direction?: 'horizontal' | 'vertical'
+  direction?: 'horizontal' | 'vertical';
 
   /**
    * Центрирование слайдов.
@@ -480,155 +488,159 @@ export interface TvistOptions {
    *   - `justify: true` — визуально центрирует все слайды когда locked (как `justify-content: center`)
    * @default false
    */
-  center?: boolean | CenterOptions
-  
+  center?: boolean | CenterOptions;
+
   /**
    * Режим отладки: вывод предупреждений в консоль (arrows not found, container not found и т.д.)
    * @default false
    */
-  debug?: boolean
-  
+  debug?: boolean;
+
   // Начальные значения
-  
+
   /**
    * Индекс начального слайда
    * @default 0
    */
-  start?: number
-  
+  start?: number;
+
   // Drag
-  
+
   /**
    * Включить перетаскивание слайдов. 'free' - свободная прокрутка без привязки к слайдам
    * @default true
    */
-  drag?: boolean | 'free'
-  
+  drag?: boolean | 'free';
+
   /**
    * Множитель скорости перетаскивания
    * @default 1
    */
-  dragSpeed?: number
-  
+  dragSpeed?: number;
+
   /**
    * Эффект "резинки" при перетаскивании за границы
    * @default true
    */
-  rubberband?: boolean
-  
+  rubberband?: boolean;
+
   /**
    * Привязка к слайдам в free режиме. Если true, после momentum scroll будет snap к ближайшему слайду
    * @default false
    */
-  freeSnap?: boolean
-  
+  freeSnap?: boolean;
+
   /**
    * Сила инерции (flick power). Множитель скорости при расчёте дистанции
    * momentum scroll и snap после drag в обычном режиме (`drag: true`)
    * @default 600
    */
-  flickPower?: number
-  
+  flickPower?: number;
+
   /**
    * Максимальное количество слайдов для короткого flick в обычном режиме.
    * Длинное перетаскивание может пройти больше слайдов.
    * @default 1
    */
-  flickMaxPages?: number
-  
+  flickMaxPages?: number;
+
   /**
    * CSS селектор для элементов, которые должны сохранять фокус при перетаскивании
    * @default 'input, textarea, select, [tabindex]'
    */
-  focusableElements?: string
-  
+  focusableElements?: string;
+
   /**
    * Предотвращать клики по слайдам во время перетаскивания
    * @default true
    */
-  preventClicks?: boolean
-  
+  preventClicks?: boolean;
+
   /**
    * Предотвращать распространение событий клика во время анимации
    * @default true
    */
-  preventClicksPropagation?: boolean
-  
+  preventClicksPropagation?: boolean;
+
   // Navigation
-  
+
   /**
    * Навигационные стрелки. true — поиск по стандартным классам и создание недостающих кнопок внутри root,
    * объект — кастомная настройка. Созданные кнопки удаляются при отключении опции или destroy().
    * @default false
    */
-  arrows?: boolean | {
-    /** Селектор или элемент для кнопки "назад". Может быть вне root — поиск по document */
-    prev?: string | HTMLElement
-    /** Селектор или элемент для кнопки "вперёд". Может быть вне root */
-    next?: string | HTMLElement
-    /** CSS класс для неактивных стрелок. @default Tvist.CLASSES.arrowDisabled */
-    disabledClass?: string
-    /** CSS класс для скрытых стрелок. @default Tvist.CLASSES.arrowHidden */
-    hiddenClass?: string
-    /** Автоматически добавлять SVG иконки в кнопки навигации. @default true */
-    addIcons?: boolean
-    /** Автоматически скрывать стрелки когда всего одна страница (нечего листать). @default true */
-    hideWhenSinglePage?: boolean
-  }
-  
+  arrows?:
+    | boolean
+    | {
+        /** Селектор или элемент для кнопки "назад". Может быть вне root — поиск по document */
+        prev?: string | HTMLElement;
+        /** Селектор или элемент для кнопки "вперёд". Может быть вне root */
+        next?: string | HTMLElement;
+        /** CSS класс для неактивных стрелок. @default Tvist.CLASSES.arrowDisabled */
+        disabledClass?: string;
+        /** CSS класс для скрытых стрелок. @default Tvist.CLASSES.arrowHidden */
+        hiddenClass?: string;
+        /** Автоматически добавлять SVG иконки в кнопки навигации. @default true */
+        addIcons?: boolean;
+        /** Автоматически скрывать стрелки когда всего одна страница (нечего листать). @default true */
+        hideWhenSinglePage?: boolean;
+      };
+
   // Pagination
-  
+
   /**
    * Пагинация. true — буллеты в стандартном контейнере внутри root (создаётся, если отсутствует),
    * объект — кастомная настройка. Созданный контейнер удаляется при отключении опции или destroy().
    * @default false
    */
-  pagination?: boolean | {
-    /** Селектор или элемент контейнера для пагинации. Может быть вне root */
-    container?: string | HTMLElement
-    /** Тип пагинации. @default 'bullets' */
-    type?: 'bullets' | 'fraction' | 'progress' | 'custom'
-    /** Включить клики по буллетам для навигации. @default true */
-    clickable?: boolean
-    /** CSS класс для буллета. @default Tvist.CLASSES.bullet */
-    bulletClass?: string
-    /** CSS класс для активного буллета. @default Tvist.CLASSES.bulletActive */
-    bulletActiveClass?: string
-    /** Функция рендеринга буллета */
-    renderBullet?: (index: number, className: string) => string
-    /** Функция рендеринга дробной пагинации */
-    renderFraction?: (current: number, total: number) => string
-    /** Функция рендеринга кастомной пагинации */
-    renderCustom?: (current: number, total: number) => string
-    /** Автоматически скрывать пагинацию когда всего одна страница (нечего листать). @default true */
-    hideWhenSinglePage?: boolean
-    
-    // Лимит точек
-    /** 
-     * Максимальное количество видимых точек (только для type: 'bullets')
-     * Если не указано - показываются все точки
-     * @default undefined
-     */
-    limit?: number
-    /** 
-     * Стратегия распределения слайдов по точкам при использовании limit
-     * - 'even': равномерное распределение - каждая точка представляет равное количество слайдов
-     * - 'center': центральное распределение - крайние точки по 1 слайду, остальные группируются в центре
-     * @default 'even'
-     */
-    strategy?: 'even' | 'center'
-    /**
-     * Стратегия распределения остатка при равномерном делении (только для strategy: 'even')
-     * - 'left': остаток добавляется к левым точкам
-     * - 'center': остаток добавляется к центральным точкам
-     * - 'right': остаток добавляется к правым точкам
-     * @default 'center'
-     */
-    remainderStrategy?: 'left' | 'center' | 'right'
-  }
-  
+  pagination?:
+    | boolean
+    | {
+        /** Селектор или элемент контейнера для пагинации. Может быть вне root */
+        container?: string | HTMLElement;
+        /** Тип пагинации. @default 'bullets' */
+        type?: 'bullets' | 'fraction' | 'progress' | 'custom';
+        /** Включить клики по буллетам для навигации. @default true */
+        clickable?: boolean;
+        /** CSS класс для буллета. @default Tvist.CLASSES.bullet */
+        bulletClass?: string;
+        /** CSS класс для активного буллета. @default Tvist.CLASSES.bulletActive */
+        bulletActiveClass?: string;
+        /** Функция рендеринга буллета */
+        renderBullet?: (index: number, className: string) => string;
+        /** Функция рендеринга дробной пагинации */
+        renderFraction?: (current: number, total: number) => string;
+        /** Функция рендеринга кастомной пагинации */
+        renderCustom?: (current: number, total: number) => string;
+        /** Автоматически скрывать пагинацию когда всего одна страница (нечего листать). @default true */
+        hideWhenSinglePage?: boolean;
+
+        // Лимит точек
+        /**
+         * Максимальное количество видимых точек (только для type: 'bullets')
+         * Если не указано - показываются все точки
+         * @default undefined
+         */
+        limit?: number;
+        /**
+         * Стратегия распределения слайдов по точкам при использовании limit
+         * - 'even': равномерное распределение - каждая точка представляет равное количество слайдов
+         * - 'center': центральное распределение - крайние точки по 1 слайду, остальные группируются в центре
+         * @default 'even'
+         */
+        strategy?: 'even' | 'center';
+        /**
+         * Стратегия распределения остатка при равномерном делении (только для strategy: 'even')
+         * - 'left': остаток добавляется к левым точкам
+         * - 'center': остаток добавляется к центральным точкам
+         * - 'right': остаток добавляется к правым точкам
+         * @default 'center'
+         */
+        remainderStrategy?: 'left' | 'center' | 'right';
+      };
+
   // Autoplay
-  
+
   /**
    * Автопрокрутка слайдов.
    * - `false` — выключена (по умолчанию)
@@ -637,10 +649,10 @@ export interface TvistOptions {
    * - `AutoplayOptions` — полный контроль: delay, pauseOnHover, pauseOnFocus, pauseOnInteraction, disableOnInteraction, waitForVideo
    * @default false
    */
-  autoplay?: boolean | number | AutoplayOptions
-  
+  autoplay?: boolean | number | AutoplayOptions;
+
   // Video
-  
+
   /**
    * Управление видео внутри слайдов (HTML `<video>` и iframe YouTube/Vimeo).
    * - `false` — выключено (по умолчанию)
@@ -648,7 +660,7 @@ export interface TvistOptions {
    * - `VideoOptions` — полный контроль
    * @default false
    */
-  video?: boolean | VideoOptions
+  video?: boolean | VideoOptions;
 
   /**
    * Удержание для сценариев историй:
@@ -657,10 +669,10 @@ export interface TvistOptions {
    * - `HoldToPauseOptions` — полный контроль
    * @default undefined
    */
-  holdToPause?: boolean | HoldToPauseOptions
-  
+  holdToPause?: boolean | HoldToPauseOptions;
+
   // Visibility
-  
+
   /**
    * Отслеживание видимости слайдера для приостановки autoplay/marquee.
    * - `false` — выключено
@@ -668,16 +680,16 @@ export interface TvistOptions {
    * - `VisibilityOptions` — полный контроль
    * @default true
    */
-  visibility?: boolean | VisibilityOptions
-  
+  visibility?: boolean | VisibilityOptions;
+
   /**
    * Специфичные фиксы для браузеров
    * @default { firefoxImageDecoding: true }
    */
-  browserFixes?: BrowserFixesOptions
-  
+  browserFixes?: BrowserFixesOptions;
+
   // Loop
-  
+
   /**
    * Бесконечная прокрутка. 'auto' - определяется автоматически на основе количества слайдов.
    *
@@ -689,31 +701,33 @@ export interface TvistOptions {
    *
    * @default false
    */
-  loop?: boolean | 'auto' | LoopOptions
-  
+  loop?: boolean | 'auto' | LoopOptions;
+
   /**
    * Автоматически возвращаться к первому слайду после достижения последнего (работает без loop)
    * Применяется к навигации, autoplay и другим способам перехода между слайдами
    * @default false
    */
-  rewind?: boolean
+  rewind?: boolean;
 
   /**
    * Разрешить перемотку карусели перетаскиванием, если включён `rewind`.
    * @default false
    */
-  rewindByDrag?: boolean
-  
+  rewindByDrag?: boolean;
+
   // Lazy loading
-  
+
   /**
    * Ленивая загрузка изображений
    * @default false
    */
-  lazy?: boolean | {
-    /** Количество соседних слайдов для предзагрузки с каждой стороны. @default 1 */
-    preloadPrevNext?: number
-  }
+  lazy?:
+    | boolean
+    | {
+        /** Количество соседних слайдов для предзагрузки с каждой стороны. @default 1 */
+        preloadPrevNext?: number;
+      };
 
   /**
    * Предзагрузка изображений с нативным `loading="lazy"` у соседних слайдов и/или целевого при переходе.
@@ -721,63 +735,63 @@ export interface TvistOptions {
    * `true` — по умолчанию только при начале перехода; соседи при init — `onInit: true`.
    * @default false (выключено)
    */
-  nativeLazyAdjacent?: boolean | NativeLazyAdjacentOptions
-  
+  nativeLazyAdjacent?: boolean | NativeLazyAdjacentOptions;
+
   // Effects
-  
+
   /**
    * Эффект перехода между слайдами
    * @default 'slide'
    */
-  effect?: 'slide' | 'fade' | 'cube'
-  
+  effect?: 'slide' | 'fade' | 'cube';
+
   /**
    * Настройки fade эффекта
    */
   fadeEffect?: {
     /** Настройка кросс-фейда; в текущей реализации fade не используется. */
-    crossFade?: boolean
-  }
-  
+    crossFade?: boolean;
+  };
+
   /**
    * Настройки cube эффекта
    */
   cubeEffect?: {
     /** Тени на гранях куба. @default true */
-    slideShadows?: boolean
+    slideShadows?: boolean;
     /** Общая тень куба; в текущей реализации не используется. */
-    shadow?: boolean
+    shadow?: boolean;
     /** Смещение общей тени; в текущей реализации не используется. */
-    shadowOffset?: number
+    shadowOffset?: number;
     /** Масштаб общей тени; в текущей реализации не используется. */
-    shadowScale?: number
+    shadowScale?: number;
     /** Расстояние перспективы (px). Меньше = сильнее эффект глубины. @default 800 */
-    perspective?: number
+    perspective?: number;
     /** Точка перспективы по Y (%). @default 60 */
-    perspectiveOriginY?: number
+    perspectiveOriginY?: number;
     /** Внутренний отступ для предотвращения обрезки вращающихся граней (px). @default 10 */
-    viewportPadding?: number
-  }
-  
+    viewportPadding?: number;
+  };
+
   // Thumbs & Navigation
-  
+
   /**
    * Связь с thumbnail-слайдером
    */
   thumbs?: {
     /** Экземпляр слайдера-миниатюр */
-    slider: Tvist
-  }
-  
+    slider: Tvist;
+  };
+
   /**
    * Если true, слайдер будет вести себя как навигация (клики по слайдам делают их активными).
    * Используется для создания thumbnail-слайдеров
    * @default false
    */
-  isNavigation?: boolean
-  
+  isNavigation?: boolean;
+
   // Grid
-  
+
   /**
    * Сетка слайдов
    * @default undefined
@@ -788,154 +802,165 @@ export interface TvistOptions {
      * Если задан только `cols`, по умолчанию 1 (как splide-extension-grid: rows 1, cols 1).
      * @default 1 при заданном cols
      */
-    rows?: number
+    rows?: number;
     /**
      * Количество колонок.
      * Если задан только `rows`, по умолчанию 1.
      * @default 1 при заданном rows
      */
-    cols?: number
-    /** 
+    cols?: number;
+    /**
      * Отступы сетки. Можно задать отдельно для строк и колонок.
      * Если не задано, используется глобальный gap.
      * @default gap
      */
-    gap?: {
-      /** Отступ между рядами. @default gap */
-      row?: number | string
-      /** Отступ между колонками. @default gap */
-      col?: number | string
-    } | number | string
+    gap?:
+      | {
+          /** Отступ между рядами. @default gap */
+          row?: number | string;
+          /** Отступ между колонками. @default gap */
+          col?: number | string;
+        }
+      | number
+      | string;
     /**
      * Размеры ячеек для каждого слайда [colSpan, rowSpan]
      * Массив повторяется, если слайдов больше, чем определений
      * @example [[2, 1], [1, 2]]
      */
-    dimensions?: [number, number][]
-  }
-  
+    dimensions?: [number, number][];
+  };
+
   // Marquee
-  
+
   /**
    * Режим бегущей строки (непрерывная прокрутка)
    * @default false
    */
-  marquee?: boolean | {
-    /** Скорость прокрутки в пикселях в секунду. @default 50 */
-    speed?: number
-    /** Направление прокрутки. @default 'left' для horizontal, 'up' для vertical */
-    direction?: 'left' | 'right' | 'up' | 'down'
-    /** Пауза при наведении. @default true для marquee: true; undefined для объекта */
-    pauseOnHover?: boolean
-  }
-  
+  marquee?:
+    | boolean
+    | {
+        /** Скорость прокрутки в пикселях в секунду. @default 50 */
+        speed?: number;
+        /** Направление прокрутки. @default 'left' для horizontal, 'up' для vertical */
+        direction?: 'left' | 'right' | 'up' | 'down';
+        /** Пауза при наведении. @default true для marquee: true; undefined для объекта */
+        pauseOnHover?: boolean;
+      };
+
   // Keyboard
-  
+
   /**
    * Настройки управления с клавиатуры; в текущей версии обработчики не реализованы.
    * @default false
    */
-  keyboard?: boolean | {
-    /** Включить управление с клавиатуры */
-    enabled?: boolean
-    /** Реагировать только когда слайдер в видимой области */
-    onlyInViewport?: boolean
-  }
-  
+  keyboard?:
+    | boolean
+    | {
+        /** Включить управление с клавиатуры */
+        enabled?: boolean;
+        /** Реагировать только когда слайдер в видимой области */
+        onlyInViewport?: boolean;
+      };
+
   // Wheel
-  
+
   /**
    * Управление колёсиком мыши
    * @default false
    */
-  wheel?: boolean | {
-    /** Чувствительность (количество пикселей на тик колёсика). @default 1 */
-    sensitivity?: number
-    /** Разрешить прокрутку страницы на краях слайдера. @default true */
-    releaseOnEdges?: boolean
-  }
-  
+  wheel?:
+    | boolean
+    | {
+        /** Чувствительность (количество пикселей на тик колёсика). @default 1 */
+        sensitivity?: number;
+        /** Разрешить прокрутку страницы на краях слайдера. @default true */
+        releaseOnEdges?: boolean;
+      };
+
   // Scrollbar
-  
+
   /**
    * Кастомный скроллбар для навигации
    * @default false
    */
-  scrollbar?: boolean | {
-    /** Селектор или элемент для контейнера скроллбара */
-    container?: string | HTMLElement
-    /** Автоматически скрывать скроллбар при бездействии. @default false */
-    hide?: boolean
-    /** Задержка перед скрытием (мс). @default 1000 */
-    hideDelay?: number
-    /** CSS класс для скроллбара. @default Tvist.CLASSES.scrollbar */
-    scrollbarClass?: string
-    /** CSS класс для трека скроллбара. @default Tvist.CLASSES.scrollbarTrack */
-    trackClass?: string
-    /** CSS класс для ползунка. @default Tvist.CLASSES.scrollbarThumb */
-    thumbClass?: string
-    /** Возможность перетаскивания ползунка. @default true */
-    draggable?: boolean
-  }
-  
+  scrollbar?:
+    | boolean
+    | {
+        /** Селектор или элемент для контейнера скроллбара */
+        container?: string | HTMLElement;
+        /** Автоматически скрывать скроллбар при бездействии. @default false */
+        hide?: boolean;
+        /** Задержка перед скрытием (мс). @default 1000 */
+        hideDelay?: number;
+        /** CSS класс для скроллбара. @default Tvist.CLASSES.scrollbar */
+        scrollbarClass?: string;
+        /** CSS класс для трека скроллбара. @default Tvist.CLASSES.scrollbarTrack */
+        trackClass?: string;
+        /** CSS класс для ползунка. @default Tvist.CLASSES.scrollbarThumb */
+        thumbClass?: string;
+        /** Возможность перетаскивания ползунка. @default true */
+        draggable?: boolean;
+      };
+
   // Responsive
-  
+
   /**
    * Адаптивные настройки по breakpoints. Ключ - ширина экрана в пикселях
    * @default undefined
    */
-  breakpoints?: Record<number, Partial<TvistOptions> & { enabled?: boolean }>
-  
+  breakpoints?: Record<number, Partial<TvistOptions> & { enabled?: boolean }>;
+
   /**
    * База для расчёта breakpoints
    * @default 'window'
    */
-  breakpointsBase?: 'window' | 'container'
-  
+  breakpointsBase?: 'window' | 'container';
+
   /**
    * Включить/выключить слайдер. При false слайдер не инициализируется (статичный контент)
    * @default true
    */
-  enabled?: boolean
-  
+  enabled?: boolean;
+
   /**
    * Синхронизировать ли слайдеры при перетаскивании (drag).
    * Если false, то при перетаскивании одного слайдера другой не будет переключаться,
    * синхронизация сработает только при клике или переключении стрелками.
    * @default true
    */
-  syncOnDrag?: boolean
-  
+  syncOnDrag?: boolean;
+
   // Обработчики событий
-  
+
   /**
    * Обработчики событий слайдера
    */
   on?: {
     /** После создания слайдера */
-    created?: (tvist: Tvist) => void
+    created?: (tvist: Tvist) => void;
     /** Перед уничтожением */
-    beforeDestroy?: (tvist: Tvist) => void
+    beforeDestroy?: (tvist: Tvist) => void;
     /** При уничтожении */
-    destroyed?: (tvist: Tvist) => void
+    destroyed?: (tvist: Tvist) => void;
     /** Клик по слайду */
-    click?: (index: number, slide: HTMLElement, event: MouseEvent) => void
+    click?: (index: number, slide: HTMLElement, event: MouseEvent) => void;
     /** Вызван update() — пересчитаны размеры/позиции */
-    refresh?: () => void
+    refresh?: () => void;
     /** Завершилось изменение размера контейнера */
-    resized?: () => void
+    resized?: () => void;
     /** Перед сменой слайда */
-    beforeSlideChange?: (index: number) => void
+    beforeSlideChange?: (index: number) => void;
     /** Начало смены слайда (старт анимации) */
-    slideChangeStart?: (index: number, data?: { isDrag?: boolean }) => void
+    slideChangeStart?: (index: number, data?: { isDrag?: boolean }) => void;
     /** Смена слайда завершена (после анимации) */
-    slideChangeEnd?: (index: number, data?: { isDrag?: boolean }) => void
+    slideChangeEnd?: (index: number, data?: { isDrag?: boolean }) => void;
     /** Перед началом анимации перехода (для loop fix) */
-    beforeTransitionStart?: (data: { index: number; direction: 'next' | 'prev' }) => void
+    beforeTransitionStart?: (data: { index: number; direction: 'next' | 'prev' }) => void;
     /** Начало анимации перехода */
-    transitionStart?: (index: number) => void
+    transitionStart?: (index: number) => void;
     /** Конец анимации перехода */
-    transitionEnd?: (index: number) => void
+    transitionEnd?: (index: number) => void;
     /**
      * Слайд вошёл в видимую область (по расчёту движка: пересечение с viewport; для effect cube —
      * та же геометрия граней, что и у эффекта куба).
@@ -944,52 +969,64 @@ export interface TvistOptions {
      * Для логики «текущий слайд» используйте slideChangeEnd / activeIndex, а не этот колбэк.
      * В обработчике опирайтесь на аргумент index, а не на activeIndex в момент вызова.
      */
-    visible?: (slide: HTMLElement, index: number) => void
+    visible?: (slide: HTMLElement, index: number) => void;
     /** Слайд вышел из видимой области (см. замечания к visible) */
-    hidden?: (slide: HTMLElement, index: number) => void
+    hidden?: (slide: HTMLElement, index: number) => void;
     /** Во время прокрутки (тики анимации / драг) */
-    scroll?: () => void
+    scroll?: () => void;
     /** Прогресс прокрутки 0..1, только при !loop */
-    progress?: (progress: number) => void
+    progress?: (progress: number) => void;
     /** Достигнут первый слайд */
-    reachBeginning?: () => void
+    reachBeginning?: () => void;
     /** Достигнут последний слайд */
-    reachEnd?: () => void
+    reachEnd?: () => void;
     /** Начало перетаскивания */
-    dragStart?: () => void
+    dragStart?: () => void;
     /** Во время перетаскивания */
-    drag?: () => void
+    drag?: () => void;
     /** Конец перетаскивания */
-    dragEnd?: () => void
+    dragEnd?: () => void;
     /** Смена breakpoint */
-    breakpoint?: (breakpoint: number | null) => void
+    breakpoint?: (breakpoint: number | null) => void;
     /** Слайдер заблокирован (контент помещается в область) */
-    lock?: () => void
+    lock?: () => void;
     /** Слайдер разблокирован */
-    unlock?: () => void
+    unlock?: () => void;
     /** Обновлены опции через updateOptions() */
-    optionsUpdated?: (tvist: Tvist, newOptions: Partial<TvistOptions>) => void
+    optionsUpdated?: (tvist: Tvist, newOptions: Partial<TvistOptions>) => void;
     /** Видео загрузило метаданные и готово к воспроизведению */
-    videoReady?: (data: VideoEvent) => void
+    videoReady?: (data: VideoEvent) => void;
     /** Видео начало воспроизведение */
-    videoPlay?: (data: VideoEvent) => void
+    videoPlay?: (data: VideoEvent) => void;
     /** Видео поставлено на паузу */
-    videoPause?: (data: VideoEvent) => void
+    videoPause?: (data: VideoEvent) => void;
     /** Видео завершило воспроизведение */
-    videoEnded?: (data: VideoEvent) => void
+    videoEnded?: (data: VideoEvent) => void;
     /** Прогресс воспроизведения видео (0..1) */
-    videoProgress?: (data: VideoProgressEvent) => void
+    videoProgress?: (data: VideoProgressEvent) => void;
     /** Прогресс активного сегмента (текущий слайд, 0..1) */
-    autoplayProgress?: (data: AutoplayProgressEvent) => void
+    autoplayProgress?: (data: AutoplayProgressEvent) => void;
     /** Начало long press удержания */
-    longPressStart?: (data: { index: number; pointerType: string }) => void
+    longPressStart?: (data: { index: number; pointerType: string }) => void;
     /** Конец long press удержания */
-    longPressEnd?: (data: { index: number; pointerType: string }) => void
+    longPressEnd?: (data: { index: number; pointerType: string }) => void;
     /** Слайдер стал видимым */
-    sliderVisible?: () => void
+    sliderVisible?: () => void;
     /** Слайдер скрыт */
-    sliderHidden?: () => void
+    sliderHidden?: () => void;
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
-    [key: string]: ((...args: any[]) => void) | undefined
-  }
+    [key: string]: ((...args: any[]) => void) | undefined;
+  };
+}
+
+/** Explicit image loading controls, available when lazy is enabled. */
+export interface LazyloadControls {
+  loadAll(): void;
+  loadSlide(index: number): void;
+}
+
+/** Visibility controls, available when visibility is enabled. */
+export interface VisibilityControls {
+  isVisible(): boolean;
+  check(): void;
 }

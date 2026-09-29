@@ -15,6 +15,7 @@
     "declarationMap": true,
     "sourceMap": false,
     "outDir": "./dist/types",
+    "rootDir": "./src",
     "removeComments": false,
     "emitDeclarationOnly": true,
     "noEmit": false,

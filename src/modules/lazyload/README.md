@@ -16,15 +16,19 @@
 
 ```javascript
 const slider = new Tvist('.slider', {
-  lazy: true // или { preloadPrevNext: 2 }
-})
+  lazy: true, // или { preloadPrevNext: 2 }
+});
 ```
 
 HTML разметка:
 
 ```html
 <div class="tvist-v1__slide">
-  <img data-src="image.jpg" data-srcset="image-400.jpg 400w, image-800.jpg 800w" alt="Description">
+  <img
+    data-src="image.jpg"
+    data-srcset="image-400.jpg 400w, image-800.jpg 800w"
+    alt="Description"
+  />
 </div>
 ```
 
@@ -37,11 +41,11 @@ HTML разметка:
 
 ```typescript
 // Включить с дефолтными настройками
-lazy: true
+lazy: true;
 
 // С кастомными настройками
 lazy: {
-  preloadPrevNext: 2 // Загружать 2 слайда до и после текущего
+  preloadPrevNext: 2; // Загружать 2 слайда до и после текущего
 }
 ```
 
@@ -53,8 +57,8 @@ lazy: {
 
 ```javascript
 slider.on('lazyLoaded', (img, slideIndex) => {
-  console.log('Загружено:', img, slideIndex)
-})
+  console.log('Загружено:', img, slideIndex);
+});
 ```
 
 ### `lazyLoadError`
@@ -63,22 +67,22 @@ slider.on('lazyLoaded', (img, slideIndex) => {
 
 ```javascript
 slider.on('lazyLoadError', (img, slideIndex) => {
-  console.error('Ошибка:', img, slideIndex)
+  console.error('Ошибка:', img, slideIndex);
   // Можно заменить на placeholder
-  img.src = '/placeholder.jpg'
-})
+  img.src = '/placeholder.jpg';
+});
 ```
 
 ## Публичное API
 
 ```javascript
-const lazyModule = slider.modules.get('lazyload')
+const lazyModule = slider.lazyload;
 
 // Загрузить все оставшиеся изображения
-lazyModule.loadAll()
+lazyModule.loadAll();
 
 // Загрузить изображения конкретного слайда
-lazyModule.loadSlide(5)
+lazyModule.loadSlide(5);
 ```
 
 ## CSS классы

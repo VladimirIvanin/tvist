@@ -11,14 +11,18 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'on-first-retry',
-    launchOptions: process.env.CHROME_PATH
-      ? { executablePath: process.env.CHROME_PATH }
-      : undefined,
   },
   projects: [
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: process.env.CHROME_PATH
+          ? { executablePath: process.env.CHROME_PATH }
+          : undefined,
+      },
     },
   ],
   webServer: {

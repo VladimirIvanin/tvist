@@ -1,6 +1,5 @@
 # Marquee (Бегущая строка)
 
-> **При использовании core требуется пакет modules.** Подключите `tvist.modules.min.js` и `tvist.modules.css` дополнительно к core **до создания слайдера**. Все дополнительные модули поставляются одним пакетом. Полная сборка `tvist.min.js` с `tvist.css` уже включает эти возможности. [Схема подключения](/guide/installation).
 
 Модуль `Marquee` реализует режим бегущей строки с непрерывной прокруткой контента.
 
@@ -82,7 +81,7 @@ const slider = new Tvist('.slider', {
 })
 
 // Получить модуль
-const marquee = slider.modules.get('marquee')?.getMarquee()
+const marquee = slider.marquee
 
 // Управление
 marquee.start()   // Запустить

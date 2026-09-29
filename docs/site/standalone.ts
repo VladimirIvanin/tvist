@@ -31,13 +31,11 @@ async function loadTvistAssets(base) {
     });
   }
   try {
-    await Promise.all([load('tvist.core.css'), load('tvist.modules.css')]);
-    await load('tvist.core.min.js');
-    await load('tvist.modules.min.js');
+    await load('tvist.css');
+    await load('tvist.min.js');
   } catch (error) {
     resources.forEach(element => element.remove());
     delete window.TvistV1;
-    delete window.__tvistV1Queue;
     throw error;
   }
 }

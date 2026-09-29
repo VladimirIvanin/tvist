@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * Вложенные слайдеры: drag на внутреннем экземпляре не должен запускать drag родителя.
  */
@@ -130,7 +131,7 @@ describe('nested sliders + drag', () => {
     parent.on('dragStart', parentSpy)
     child.on('dragStart', childSpy)
 
-    const parentLocBefore = parent.engine.location.get()
+    const parentLocBefore = getRuntime(parent).engine.location.get()
 
     const innerTarget = innerSlides[0]!
     innerTarget.dispatchEvent(
@@ -142,7 +143,7 @@ describe('nested sliders + drag', () => {
 
     expect(childSpy).toHaveBeenCalled()
     expect(parentSpy).not.toHaveBeenCalled()
-    expect(parent.engine.location.get()).toBe(parentLocBefore)
+    expect(getRuntime(parent).engine.location.get()).toBe(parentLocBefore)
   })
 
   it('drag на слайде родителя без вложенного слайдера вызывает dragStart у родителя', () => {

@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { Tvist } from '../../src'
 import { createSliderFixture, type SliderFixture } from '../fixtures'
@@ -47,8 +48,8 @@ describe('Loop + peek + perPage:3 — no right gap with 4 slides', () => {
     })
 
     const checkGaps = () => {
-      const location = slider!.engine.location.get()
-      const viewportSize = slider!.engine.containerSizeValue
+      const location = getRuntime(slider!).engine.location.get()
+      const viewportSize = getRuntime(slider!).engine.containerSizeValue
 
       const vpLeft = -location
       const vpRight = vpLeft + viewportSize
@@ -57,8 +58,8 @@ describe('Loop + peek + perPage:3 — no right gap with 4 slides', () => {
       let contentRight = -Infinity
 
       for (let i = 0; i < slider!.slides.length; i++) {
-        const pos = slider!.engine.getSlidePosition(i)
-        const size = slider!.engine.getSlideSize(i)
+        const pos = getRuntime(slider!).engine.getSlidePosition(i)
+        const size = getRuntime(slider!).engine.getSlideSize(i)
         if (pos < contentLeft) contentLeft = pos
         if (pos + size > contentRight) contentRight = pos + size
       }

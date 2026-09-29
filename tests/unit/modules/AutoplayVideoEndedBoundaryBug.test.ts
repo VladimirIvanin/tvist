@@ -1,8 +1,9 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
- * 
+ *
  * Тест для проверки бага с videoEndedWhilePaused на границе слайдера без loop
- * 
+ *
  * Баг: Когда resume() вызывается с videoEndedWhilePaused=true и слайдер на границе,
  * код устанавливает waitingForVideo=false, но не вызывает run() для перезапуска таймера.
  * Это оставляет autoplay застрявшим, т.к. индекс не меняется на границе,
@@ -77,7 +78,7 @@ describe('AutoplayModule - Video Ended While Paused at Boundary Bug', () => {
       speed: 0, // Мгновенный переход для упрощения тестирования
     })
 
-    const autoplayModule = slider['modules'].get('autoplay') as any
+    const autoplayModule = getRuntime(slider)['modules'].get('autoplay') as any
     expect(autoplayModule).toBeDefined()
 
     // Переходим к последнему слайду
@@ -91,13 +92,13 @@ describe('AutoplayModule - Video Ended While Paused at Boundary Bug', () => {
     const root = container.querySelector(`.${TVIST_CLASSES.block}`) as HTMLElement
     const mouseEnterEvent = new MouseEvent('mouseenter')
     root.dispatchEvent(mouseEnterEvent)
-    
+
     expect(autoplayModule.paused).toBe(true)
 
     // Симулируем окончание видео пока на паузе
     const video = container.querySelectorAll('video')[2] // Третье видео (индекс 2)
     expect(video).toBeDefined()
-    
+
     const videoEndedEvent = new Event('ended')
     video!.dispatchEvent(videoEndedEvent)
 
@@ -130,7 +131,7 @@ describe('AutoplayModule - Video Ended While Paused at Boundary Bug', () => {
     // Симулируем окончание видео
     const videoElement = container.querySelectorAll('video')[2]
     videoElement.dispatchEvent(new Event('ended'))
-    
+
     // Индекс не изменится (граница), но autoplay должен продолжить попытки
     expect(slider.activeIndex).toBe(2)
   })
@@ -169,7 +170,7 @@ describe('AutoplayModule - Video Ended While Paused at Boundary Bug', () => {
       speed: 0,
     })
 
-    const autoplayModule = slider['modules'].get('autoplay') as any
+    const autoplayModule = getRuntime(slider)['modules'].get('autoplay') as any
     const root = container.querySelector(`.${TVIST_CLASSES.block}`) as HTMLElement
 
     // Переходим к последнему слайду
@@ -189,18 +190,18 @@ describe('AutoplayModule - Video Ended While Paused at Boundary Bug', () => {
       const video = container.querySelectorAll('video')[2]
       const videoEndedEvent = new Event('ended')
       video!.dispatchEvent(videoEndedEvent)
-      
+
       await vi.waitFor(() => expect(autoplayModule.videoEndedWhilePaused).toBe(true))
 
       // Resume
       root.dispatchEvent(new MouseEvent('mouseleave'))
-      
+
       // Всё ещё на последнем слайде
       expect(slider.activeIndex).toBe(2)
-      
+
       // Проверяем, что waitingForVideo установлен (ждём видео)
       expect(autoplayModule.waitingForVideo).toBe(true)
-      
+
       // В режиме waitForVideo таймер не запущен, ждём окончания видео
       expect(autoplayModule.timer).toBeNull()
     }

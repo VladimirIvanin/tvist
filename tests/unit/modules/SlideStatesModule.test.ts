@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тесты для SlideStatesModule
  */
@@ -5,11 +6,11 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { TVIST_CSS_PREFIX } from '@core/constants'
 import { Tvist } from '@core/Tvist'
-import { SlideStatesModule } from '@modules/slide-states'
+import { createSlideStatesModule as SlideStatesModule } from '@modules/slide-states'
 import { createSliderFixture } from '../../fixtures'
 
 // Регистрируем модуль вручную для тестов
-Tvist.registerModule('slide-states', SlideStatesModule)
+
 
 describe('SlideStatesModule', () => {
   let root: HTMLElement
@@ -149,7 +150,7 @@ describe('SlideStatesModule', () => {
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const slides = tvist.slides
-      
+
       // Активный слайд (индекс 0) должен быть видимым
       const hasVisible = slides.some(s => s.classList.contains(`${TVIST_CSS_PREFIX}__slide--visible`))
       expect(hasVisible).toBe(true)
@@ -181,10 +182,10 @@ describe('SlideStatesModule', () => {
         speed: 0,
       })
 
-      const slideSize = tvist.engine.slideSizeValue
+      const slideSize = getRuntime(tvist).engine.slideSizeValue
       // Между соседними слайдами в 1D-модели пересекаются две «полосы» viewport
-      tvist.engine.location.set(-slideSize / 2)
-      tvist.engine.target.set(-slideSize / 2)
+      getRuntime(tvist).engine.location.set(-slideSize / 2)
+      getRuntime(tvist).engine.target.set(-slideSize / 2)
       tvist.emit('scroll')
 
       await new Promise<void>(resolve => {
@@ -198,7 +199,7 @@ describe('SlideStatesModule', () => {
       ).length
 
       expect(visibleCount).toBeGreaterThanOrEqual(2)
-      expect(tvist.engine.getVisibleSlides().filter(Boolean).length).toBeGreaterThanOrEqual(2)
+      expect(getRuntime(tvist).engine.getVisibleSlides().filter(Boolean).length).toBeGreaterThanOrEqual(2)
     })
   })
 
@@ -213,7 +214,7 @@ describe('SlideStatesModule', () => {
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const slides = tvist.slides
-      
+
       // Даже если prev/next слайды не видны в viewport (за пределами),
       // классы состояний должны быть проставлены
       expect(slides[1].classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`)).toBe(true)
@@ -231,13 +232,13 @@ describe('SlideStatesModule', () => {
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const slides = tvist.slides
-      
+
       // В режиме loop первый слайд активен, последний - prev, второй - next
       // Эти классы должны быть независимо от видимости
       const activeSlides = slides.filter(s => s.classList.contains(`${TVIST_CSS_PREFIX}__slide--active`))
       const prevSlides = slides.filter(s => s.classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`))
       const nextSlides = slides.filter(s => s.classList.contains(`${TVIST_CSS_PREFIX}__slide--next`))
-      
+
       expect(activeSlides.length).toBeGreaterThan(0)
       expect(prevSlides.length).toBeGreaterThan(0)
       expect(nextSlides.length).toBeGreaterThan(0)
@@ -254,7 +255,7 @@ describe('SlideStatesModule', () => {
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const slides = tvist.slides
-      
+
       // Начальное состояние: slide 1 активен
       expect(slides[0].classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`)).toBe(true)
       expect(slides[1].classList.contains(`${TVIST_CSS_PREFIX}__slide--active`)).toBe(true)
@@ -268,7 +269,7 @@ describe('SlideStatesModule', () => {
       expect(slides[1].classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`)).toBe(true)
       expect(slides[2].classList.contains(`${TVIST_CSS_PREFIX}__slide--active`)).toBe(true)
       expect(slides[3].classList.contains(`${TVIST_CSS_PREFIX}__slide--next`)).toBe(true)
-      
+
       // Старые классы должны быть удалены
       expect(slides[0].classList.contains(`${TVIST_CSS_PREFIX}__slide--prev`)).toBe(false)
       expect(slides[1].classList.contains(`${TVIST_CSS_PREFIX}__slide--active`)).toBe(false)
@@ -286,7 +287,7 @@ describe('SlideStatesModule', () => {
       await new Promise(resolve => setTimeout(resolve, 10))
 
       const slides = tvist.slides
-      
+
       // Проверяем, что классы применены (без visible, т.к. он требует getBoundingClientRect)
       const hasAnyClass = slides.some(slide =>
         slide.classList.contains(`${TVIST_CSS_PREFIX}__slide--active`) ||

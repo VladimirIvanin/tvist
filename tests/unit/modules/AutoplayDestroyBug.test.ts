@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  */
@@ -68,15 +69,15 @@ describe('AutoplayModule - Destroy Bug', () => {
     // Если старый таймер остался, он сработает и вызовет next() на СТАРОМ инстансе,
     // что приведет к смещению DOM-элементов и рассинхрону.
     // В нашем тесте мы просто проверим, что у старого слайдера не вызывается next().
-    
+
     // Но еще проще: мы можем зашпионить за методом next() старого слайдера
-    const nextSpy = vi.spyOn(slider, 'next')
-    
+    const nextSpy = vi.spyOn(getRuntime(slider), 'next')
+
     vi.advanceTimersByTime(1500)
-    
+
     // Старый слайдер не должен вызывать next() после своего destroy
     expect(nextSpy).not.toHaveBeenCalled()
-    
+
     // Новый слайдер тоже не должен переключиться, так как его задержка 5000мс
     expect(slider2.activeIndex).toBe(0)
 

@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../../src/core/runtime'
 import { afterEach, describe, expect, it } from 'vitest';
 import Tvist from '@core/Tvist';
 import '@modules/effects';
@@ -35,7 +36,7 @@ describe('Cube boundary faces', () => {
     'closes the face before the first of %i slides during edge drag',
     (slidesCount) => {
       createCube(slidesCount);
-      slider.emit('setTranslate', slider, slider.engine.slideSizeValue * 0.2);
+      slider.emit('setTranslate', slider, getRuntime(slider).engine.slideSizeValue * 0.2);
 
       const previousFace = slider.slides[slidesCount - 1];
       expect(previousFace.style.visibility).toBe('visible');
@@ -54,7 +55,7 @@ describe('Cube boundary faces', () => {
     (slidesCount) => {
       createCube(slidesCount);
       slider.scrollTo(slidesCount - 1, true);
-      slider.emit('setTranslate', slider, -slider.engine.slideSizeValue * (slidesCount - 1 + 0.2));
+      slider.emit('setTranslate', slider, -getRuntime(slider).engine.slideSizeValue * (slidesCount - 1 + 0.2));
 
       const nextFace = slider.slides[0];
       expect(nextFace.style.visibility).toBe('visible');

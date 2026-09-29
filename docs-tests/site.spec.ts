@@ -34,7 +34,7 @@ test('каталог фильтруется, пример показывает �
   expect(await page.evaluate(() => navigator.clipboard.readText())).toContain('new TvistV1')
   await page.locator('[data-demo-copy-all]').first().click()
   const copied = await page.evaluate(() => navigator.clipboard.readText())
-  for (const file of ['tvist.core.min.js', 'tvist.modules.min.js', 'tvist.core.css', 'tvist.modules.css']) {
+  for (const file of ['tvist.min.js', 'tvist.css']) {
     expect(copied).toContain(file)
   }
 })
@@ -139,7 +139,7 @@ test('конструктор выдаёт код пресета и полную 
   await expect(page.locator('#builder-code-output')).toContainText('slider.sync(thumbs)')
   await page.locator('[data-builder-copy-all]').click()
   const copied = await page.evaluate(() => navigator.clipboard.readText())
-  for (const file of ['tvist.core.min.js', 'tvist.modules.min.js', 'tvist.core.css', 'tvist.modules.css']) {
+  for (const file of ['tvist.min.js', 'tvist.css']) {
     expect(copied).toContain(file)
   }
   expect(copied).toContain('slider.sync(thumbs)')

@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '@core/Tvist'
@@ -45,7 +46,7 @@ describe('Engine Navigation Mode', () => {
 
     // endIndex = 8 - 4 = 4
     tvist.scrollTo(7)
-    
+
     expect(tvist.activeIndex).toBe(4)
   })
 
@@ -58,26 +59,26 @@ describe('Engine Navigation Mode', () => {
 
     // Пытаемся скроллить к последнему слайду
     tvist.scrollTo(7)
-    
+
     // Ожидаем, что индекс будет 7
     expect(tvist.activeIndex).toBe(7)
-    
+
     // Но позиция должна быть как у слайда 4 (начало последней группы)
     // slideWidth = 800 / 4 = 200
     // pos(4) = 4 * 200 = 800. Target = -800
     // pos(7) = 7 * 200 = 1400. Target = -1400
-    
+
     // Проверяем internal location через engine (нужно привести тип)
-    const location = (tvist.engine as any).location.get()
-    
+    const location = (getRuntime(tvist).engine as any).location.get()
+
     // Ожидаем, что слайдер остановился на позиции endIndex (4)
-    expect(location).toBe(-800) 
+    expect(location).toBe(-800)
   })
 
   it('should calculate bounds correctly with gap in navigation mode', () => {
     // 6 slides, 150px width, 10px gap
     // Container width = 4 * 150 + 3 * 10 = 630
-    
+
     // Override mocks for this test
     Object.defineProperties(HTMLElement.prototype, {
       clientWidth: { get: () => 630 },
@@ -94,7 +95,7 @@ describe('Engine Navigation Mode', () => {
       </div>
     `
     container = root.querySelector(`.${TVIST_CLASSES.container}`) as HTMLElement
-    
+
     tvist = new Tvist(root, {
       perPage: 4,
       gap: 10,
@@ -103,22 +104,22 @@ describe('Engine Navigation Mode', () => {
     })
 
     // (630 - 3 * 10) / 4 = 150
-    expect(tvist.engine.slideSizeValue).toBe(150)
+    expect(getRuntime(tvist).engine.slideSizeValue).toBe(150)
 
     // Scroll to last slide
     tvist.scrollTo(5)
-    
+
     expect(tvist.activeIndex).toBe(5)
-    
+
     // Content width = 6 * 150 + 5 * 10 = 900 + 50 = 950?
     // Wait. calculateSizes uses:
     // pos[i] = i * (slideSize + gap)
     // pos[5] = 5 * (150 + 10) = 800.
     // End of slide 5 = 800 + 150 = 950.
-    
+
     // Max scroll = RootSize - ContentSize = 630 - 950 = -320.
-    
-    const location = (tvist.engine as any).location.get()
+
+    const location = (getRuntime(tvist).engine as any).location.get()
     expect(location).toBe(-320)
   })
 })

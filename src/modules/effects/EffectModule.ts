@@ -1,123 +1,146 @@
-import { Module } from '../Module'
-import { TVIST_CLASSES } from '../../core/constants'
-import type { Tvist } from '../../core/Tvist'
-import type { TvistOptions } from '../../core/types'
-import { setFadeEffect } from './fade'
-import { setCubeEffect } from './cube'
+import { createComponent, type Component } from '../Component';
+import { TVIST_CLASSES } from '../../core/constants';
+import type { TvistRuntime as Tvist } from '../../core/runtime';
+import type { TvistOptions } from '../../core/types';
+import { setFadeEffect } from './fade';
+import { setCubeEffect } from './cube';
 
-export class EffectModule extends Module {
-  name = 'effect'
-  private slideProgress = new WeakMap<HTMLElement, number>()
-  private currentEffect: TvistOptions['effect'] = 'slide'
-  private readonly setTranslateHandler = this.onSetTranslate.bind(this)
+/** Internal component; state lives in this factory's closure. */
+export interface EffectModule extends Component {
+  name: string;
 
-  constructor(tvist: Tvist, options: TvistOptions) {
-    super(tvist, options)
+  shouldBeActive(): boolean;
+
+  init(): void;
+
+  destroy(): void;
+
+  onOptionsUpdate(): void;
+}
+
+export function createEffectModule(tvist: Tvist, options: TvistOptions): EffectModule {
+  const base = createComponent(tvist, options);
+
+  let local_name = 'effect';
+
+  const local_slideProgress: WeakMap<HTMLElement, number> = new WeakMap<HTMLElement, number>();
+
+  let local_currentEffect: TvistOptions['effect'] = 'slide';
+
+  const local_setTranslateHandler: (_tvist: Tvist, translate: number) => void =
+    local_onSetTranslate;
+
+  function local_shouldBeActive(): boolean {
+    return options.effect === 'fade' || options.effect === 'cube';
   }
 
-  override shouldBeActive(): boolean {
-    return this.options.effect === 'fade' || this.options.effect === 'cube'
-  }
-
-  init(): void {
-    if (!this.shouldBeActive()) {
-      return
+  function local_init(): void {
+    if (!local_shouldBeActive()) {
+      return;
     }
-
-    this.currentEffect = this.options.effect
-
+    local_currentEffect = options.effect;
     // Effects require perPage: 1
-    if (this.options.perPage !== 1) {
-      if (this.options.debug) {
-        console.warn(
-          'Tvist: Effects work only with perPage: 1. Automatically setting perPage: 1'
-        )
+    if (options.perPage !== 1) {
+      if (options.debug) {
+        console.warn('Tvist: Effects work only with perPage: 1. Automatically setting perPage: 1');
       }
-      this.options.perPage = 1
-      this.tvist.update()
+      options.perPage = 1;
+      tvist.update();
     }
-    
     // Set container styles for 3D
-    if (this.options.effect === 'cube') {
-      this.applyCubeRootStyles()
+    if (options.effect === 'cube') {
+      local_applyCubeRootStyles();
     }
-
-    this.tvist.on('setTranslate', this.setTranslateHandler)
+    tvist.on('setTranslate', local_setTranslateHandler);
   }
 
-  destroy(): void {
-    this.tvist.off('setTranslate', this.setTranslateHandler)
-    this.cleanupEffectStyles(this.currentEffect)
-    this.currentEffect = 'slide'
+  function local_destroy(): void {
+    tvist.off('setTranslate', local_setTranslateHandler);
+    local_cleanupEffectStyles(local_currentEffect);
+    local_currentEffect = 'slide';
   }
 
-  override onOptionsUpdate(): void {
-    const nextEffect = this.options.effect ?? 'slide'
-
-    if (nextEffect !== this.currentEffect) {
-      this.cleanupEffectStyles(this.currentEffect)
-      this.currentEffect = nextEffect
-
+  function local_onOptionsUpdate(): void {
+    const nextEffect = options.effect ?? 'slide';
+    if (nextEffect !== local_currentEffect) {
+      local_cleanupEffectStyles(local_currentEffect);
+      local_currentEffect = nextEffect;
       if (nextEffect === 'cube') {
-        this.applyCubeRootStyles()
+        local_applyCubeRootStyles();
       }
     }
   }
 
-  private onSetTranslate(_tvist: Tvist, translate: number): void {
-    const { slides } = this.tvist
-    const slideSize = this.tvist.engine.slideSizeValue
-    
+  function local_onSetTranslate(_tvist: Tvist, translate: number): void {
+    const { slides } = tvist;
+    const slideSize = tvist.__tvistInternal_engine.__tvistInternal_slideSizeValue;
     slides.forEach((slide, i) => {
-      const slidePosition = this.tvist.engine.getSlidePosition(i)
+      const slidePosition = tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(i);
       // translate is negative location
-      const offset = translate + slidePosition
-      const progress = offset / slideSize
-      this.slideProgress.set(slide, progress)
-
-      if (this.options.effect === 'fade') {
-        setFadeEffect(slide, progress, this.options)
+      const offset = translate + slidePosition;
+      const progress = offset / slideSize;
+      local_slideProgress.set(slide, progress);
+      if (options.effect === 'fade') {
+        setFadeEffect(slide, progress, options);
       }
-    })
-    
-    if (this.options.effect === 'cube') {
-      setCubeEffect(this.tvist, translate, this.options)
+    });
+    if (options.effect === 'cube') {
+      setCubeEffect(tvist, translate, options);
     }
   }
 
-  private applyCubeRootStyles(): void {
-    this.tvist.container.style.transformStyle = 'preserve-3d'
-    this.tvist.root.classList.add(TVIST_CLASSES.cube)
-    const padding = this.options.cubeEffect?.viewportPadding ?? 10
-    this.tvist.track.style.padding = `${padding}px`
-    this.tvist.track.style.boxSizing = 'border-box'
+  function local_applyCubeRootStyles(): void {
+    tvist.container.style.transformStyle = 'preserve-3d';
+    tvist.root.classList.add(TVIST_CLASSES.cube);
+    const padding = options.cubeEffect?.viewportPadding ?? 10;
+    tvist.track.style.padding = `${padding}px`;
+    tvist.track.style.boxSizing = 'border-box';
   }
 
-  private cleanupEffectStyles(effect: TvistOptions['effect']): void {
-    this.tvist.slides.forEach((slide) => {
-      slide.style.opacity = ''
-      slide.style.transform = ''
-      slide.style.zIndex = ''
-      slide.style.backfaceVisibility = ''
-      slide.style.contentVisibility = ''
-      slide.style.visibility = ''
+  function local_cleanupEffectStyles(effect: TvistOptions['effect']): void {
+    tvist.slides.forEach((slide) => {
+      slide.style.opacity = '';
+      slide.style.transform = '';
+      slide.style.zIndex = '';
+      slide.style.backfaceVisibility = '';
+      slide.style.contentVisibility = '';
+      slide.style.visibility = '';
       slide.querySelectorAll(`.${TVIST_CLASSES.block}-slide-shadow-cube`).forEach((shadow) => {
-        shadow.remove()
-      })
-    })
-
+        shadow.remove();
+      });
+    });
     if (effect === 'cube') {
-      this.tvist.container.style.transformStyle = ''
-      this.tvist.container.style.width = ''
-      this.tvist.container.style.height = ''
-      this.tvist.container.style.transformOrigin = ''
-      this.tvist.track.style.removeProperty('perspective')
-      this.tvist.track.style.removeProperty('-webkit-perspective')
-      this.tvist.track.style.removeProperty('perspective-origin')
-      this.tvist.track.style.removeProperty('overflow')
-      this.tvist.track.style.removeProperty('padding')
-      this.tvist.track.style.removeProperty('box-sizing')
-      this.tvist.root.classList.remove(TVIST_CLASSES.cube)
+      tvist.container.style.transformStyle = '';
+      tvist.container.style.width = '';
+      tvist.container.style.height = '';
+      tvist.container.style.transformOrigin = '';
+      tvist.track.style.removeProperty('perspective');
+      tvist.track.style.removeProperty('-webkit-perspective');
+      tvist.track.style.removeProperty('perspective-origin');
+      tvist.track.style.removeProperty('overflow');
+      tvist.track.style.removeProperty('padding');
+      tvist.track.style.removeProperty('box-sizing');
+      tvist.root.classList.remove(TVIST_CLASSES.cube);
     }
   }
+  const component: EffectModule = {
+    get name() {
+      return local_name;
+    },
+    set name(value) {
+      local_name = value;
+    },
+    shouldBeActive: local_shouldBeActive,
+    init: local_init,
+    destroy: () => {
+      try {
+        local_destroy();
+      } finally {
+        base.dispose();
+      }
+    },
+    onOptionsUpdate: local_onOptionsUpdate,
+  };
+
+  return component;
 }

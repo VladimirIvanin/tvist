@@ -1,6 +1,7 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тесты для DragModule Free Mode
- * 
+ *
  * Проверяем:
  * 1. Свободная прокрутка без snap
  * 2. Momentum scroll с инерцией
@@ -12,7 +13,7 @@
 
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest'
 import { Tvist } from '@core/Tvist'
-import { DragModule } from '@modules/drag/DragModule'
+import { createDragModule as DragModule } from '@modules/drag/DragModule'
 import {
   createSliderFixture,
   simulateDrag,
@@ -26,13 +27,13 @@ describe('DragModule Free Mode', () => {
   let slider: Tvist
 
   beforeEach(() => {
-    Tvist.registerModule('drag', DragModule)
+
   })
 
   afterEach(() => {
     slider?.destroy()
     fixture?.cleanup()
-    Tvist.unregisterModule('drag')
+
   })
 
   describe('Базовый Free Mode', () => {
@@ -56,7 +57,7 @@ describe('DragModule Free Mode', () => {
     })
 
     it('должен позволять остановиться между слайдами', async () => {
-      const initialPosition = slider.engine.location.get()
+      const initialPosition = getRuntime(slider).engine.location.get()
 
       // Делаем медленный drag на небольшое расстояние
       await simulateDrag({
@@ -69,14 +70,14 @@ describe('DragModule Free Mode', () => {
 
       await waitForAnimation(100)
 
-      const finalPosition = slider.engine.location.get()
-      
+      const finalPosition = getRuntime(slider).engine.location.get()
+
       // Позиция должна измениться
       expect(finalPosition).not.toBe(initialPosition)
       expect(finalPosition).toBeLessThan(initialPosition)
 
       // НЕ должно быть автоматического snap (остаёмся между слайдами)
-      const slidePositions = slider.engine.getSlidePositions()
+      const slidePositions = getRuntime(slider).engine.getSlidePositions()
       const isOnSlidePosition = slidePositions.some(
         pos => Math.abs(-finalPosition - pos) < 1
       )
@@ -96,14 +97,14 @@ describe('DragModule Free Mode', () => {
       // Ждём окончания momentum
       await waitForAnimation(1000)
 
-      const finalPosition = slider.engine.location.get()
+      const finalPosition = getRuntime(slider).engine.location.get()
 
       // Проверяем что НЕ на точной позиции слайда
-      const slidePositions = slider.engine.getSlidePositions()
+      const slidePositions = getRuntime(slider).engine.getSlidePositions()
       const isOnSlidePosition = slidePositions.some(
         pos => Math.abs(-finalPosition - pos) < 5
       )
-      
+
       // В free mode БЕЗ freeSnap не должно быть выравнивания
       expect(isOnSlidePosition).toBe(false)
     })
@@ -126,7 +127,7 @@ describe('DragModule Free Mode', () => {
     })
 
     it('должен продолжать движение после отпускания (momentum)', async () => {
-      const initialPosition = slider.engine.location.get()
+      const initialPosition = getRuntime(slider).engine.location.get()
 
       // Быстрый drag
       await simulateDrag({
@@ -138,12 +139,12 @@ describe('DragModule Free Mode', () => {
       })
 
       // Сразу после отпускания
-      const positionAfterDrag = slider.engine.location.get()
-      
+      const positionAfterDrag = getRuntime(slider).engine.location.get()
+
       // Небольшая пауза для momentum
       await waitForAnimation(100)
 
-      const positionAfterMomentum = slider.engine.location.get()
+      const positionAfterMomentum = getRuntime(slider).engine.location.get()
 
       // Должно быть дальнейшее движение за счёт momentum
       expect(positionAfterMomentum).toBeLessThan(positionAfterDrag)
@@ -161,7 +162,7 @@ describe('DragModule Free Mode', () => {
       })
 
       await waitForAnimation(300)
-      const fastDistance = Math.abs(slider.engine.location.get())
+      const fastDistance = Math.abs(getRuntime(slider).engine.location.get())
 
       // Сброс позиции
       slider.scrollTo(0, true)
@@ -177,7 +178,7 @@ describe('DragModule Free Mode', () => {
       })
 
       await waitForAnimation(300)
-      const slowDistance = Math.abs(slider.engine.location.get())
+      const slowDistance = Math.abs(getRuntime(slider).engine.location.get())
 
       // Медленный drag должен проехать меньше
       expect(slowDistance).toBeLessThan(fastDistance)
@@ -222,9 +223,9 @@ describe('DragModule Free Mode', () => {
       expect(finalIndex).toBeGreaterThan(initialIndex)
 
       // Должны быть точно на слайде
-      const finalPosition = slider.engine.location.get()
-      const expectedPosition = slider.engine.getScrollPositionForIndex(finalIndex)
-      
+      const finalPosition = getRuntime(slider).engine.location.get()
+      const expectedPosition = getRuntime(slider).engine.getScrollPositionForIndex(finalIndex)
+
       expect(Math.abs(finalPosition - expectedPosition)).toBeLessThan(5)
     })
 
@@ -246,9 +247,9 @@ describe('DragModule Free Mode', () => {
 
       // Может остаться на том же слайде или перейти на следующий
       // В любом случае должны быть точно на позиции слайда
-      const finalPosition = slider.engine.location.get()
-      const expectedPosition = slider.engine.getScrollPositionForIndex(finalIndex)
-      
+      const finalPosition = getRuntime(slider).engine.location.get()
+      const expectedPosition = getRuntime(slider).engine.getScrollPositionForIndex(finalIndex)
+
       expect(Math.abs(finalPosition - expectedPosition)).toBeLessThan(5)
     })
   })
@@ -269,7 +270,7 @@ describe('DragModule Free Mode', () => {
         flickPower: 1200, // Вдвое больше дефолтного
       })
 
-      const initialPosition1 = slider1.engine.location.get()
+      const initialPosition1 = getRuntime(slider1).engine.location.get()
 
       await simulateDrag({
         element: fixture1.container,
@@ -281,7 +282,7 @@ describe('DragModule Free Mode', () => {
 
       await waitForAnimation(500)
 
-      const highPowerDistance = Math.abs(slider1.engine.location.get() - initialPosition1)
+      const highPowerDistance = Math.abs(getRuntime(slider1).engine.location.get() - initialPosition1)
 
       slider1.destroy()
       fixture1.cleanup()
@@ -300,7 +301,7 @@ describe('DragModule Free Mode', () => {
         flickPower: 300, // Вдвое меньше дефолтного
       })
 
-      const initialPosition2 = slider2.engine.location.get()
+      const initialPosition2 = getRuntime(slider2).engine.location.get()
 
       await simulateDrag({
         element: fixture2.container,
@@ -312,7 +313,7 @@ describe('DragModule Free Mode', () => {
 
       await waitForAnimation(500)
 
-      const lowPowerDistance = Math.abs(slider2.engine.location.get() - initialPosition2)
+      const lowPowerDistance = Math.abs(getRuntime(slider2).engine.location.get() - initialPosition2)
 
       slider2.destroy()
       fixture2.cleanup()
@@ -377,7 +378,7 @@ describe('DragModule Free Mode', () => {
       slider.scrollTo(slider.slides.length - 1, true)
       await waitForAnimation(200)
 
-      const maxPosition = slider.engine.getMaxScrollPosition()
+      const maxPosition = getRuntime(slider).engine.getMaxScrollPosition()
 
       // Пытаемся продрагать дальше конца
       await simulateDrag({
@@ -390,7 +391,7 @@ describe('DragModule Free Mode', () => {
 
       await waitForAnimation(800)
 
-      const finalPosition = slider.engine.location.get()
+      const finalPosition = getRuntime(slider).engine.location.get()
 
       // Не должны уйти дальше maxPosition (с небольшой погрешностью)
       expect(finalPosition).toBeGreaterThanOrEqual(maxPosition - 50)
@@ -398,7 +399,7 @@ describe('DragModule Free Mode', () => {
     })
 
     it('должен останавливаться на начальной границе', async () => {
-      const minPosition = slider.engine.getMinScrollPosition()
+      const minPosition = getRuntime(slider).engine.getMinScrollPosition()
 
       // Пытаемся продрагать дальше начала
       await simulateDrag({
@@ -411,7 +412,7 @@ describe('DragModule Free Mode', () => {
 
       await waitForAnimation(800)
 
-      const finalPosition = slider.engine.location.get()
+      const finalPosition = getRuntime(slider).engine.location.get()
 
       // Не должны уйти дальше minPosition (с небольшой погрешностью)
       expect(finalPosition).toBeLessThanOrEqual(minPosition + 50)
@@ -444,10 +445,10 @@ describe('DragModule Free Mode', () => {
 
       await waitForAnimation(400)
 
-      const normalPosition = slider.engine.location.get()
+      const normalPosition = getRuntime(slider).engine.location.get()
       const normalIndex = slider.activeIndex
-      const normalExpected = slider.engine.getScrollPositionForIndex(normalIndex)
-      
+      const normalExpected = getRuntime(slider).engine.getScrollPositionForIndex(normalIndex)
+
       // Normal mode должен быть точно на слайде
       expect(Math.abs(normalPosition - normalExpected)).toBeLessThan(5)
 
@@ -470,14 +471,14 @@ describe('DragModule Free Mode', () => {
 
       await waitForAnimation(400)
 
-      const freePosition = slider.engine.location.get()
+      const freePosition = getRuntime(slider).engine.location.get()
 
       // Free mode может быть где угодно (не обязательно на слайде)
-      const slidePositions = slider.engine.getSlidePositions()
+      const slidePositions = getRuntime(slider).engine.getSlidePositions()
       const isOnSlidePosition = slidePositions.some(
         pos => Math.abs(-freePosition - pos) < 5
       )
-      
+
       expect(isOnSlidePosition).toBe(false)
     })
   })
@@ -514,7 +515,7 @@ describe('DragModule Free Mode', () => {
         createMouseEvent('mousemove', { clientX: 310, clientY: 100 })
       )
 
-      const positionDuringDrag = slider.engine.location.get()
+      const positionDuringDrag = getRuntime(slider).engine.location.get()
 
       // Должны немного двинуться, но с сопротивлением
       expect(positionDuringDrag).toBeGreaterThan(0)

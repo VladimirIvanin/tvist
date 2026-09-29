@@ -1,6 +1,5 @@
 # Scrollbar
 
-> **При использовании core требуется пакет modules.** Подключите `tvist.modules.min.js` и `tvist.modules.css` дополнительно к core **до создания слайдера**. Все дополнительные модули поставляются одним пакетом. Полная сборка `tvist.min.js` с `tvist.css` уже включает эти возможности. [Схема подключения](/guide/installation).
 
 Модуль кастомного скроллбара для навигации по слайдеру. Поддерживает горизонтальное и вертикальное направление, drag & drop, автоматическое скрытие.
 
@@ -57,16 +56,16 @@ const slider = new Tvist('.tvist', {
   scrollbar: {
     // Кастомный контейнер для скроллбара
     container: '.my-scrollbar',
-    
+
     // Автоматическое скрытие
     hide: true,
     hideDelay: 1500,
-    
+
     // Кастомные CSS классы
     scrollbarClass: 'my-scrollbar',
     trackClass: 'my-scrollbar__track',
     thumbClass: 'my-scrollbar__thumb',
-    
+
     // Возможность перетаскивания
     draggable: true
   }
@@ -257,7 +256,7 @@ const slider = new Tvist('.tvist', {
   perPage: 2,
   gap: 20,
   speed: 400,
-  
+
   // Scrollbar с полной настройкой
   scrollbar: {
     hide: true,
@@ -267,7 +266,7 @@ const slider = new Tvist('.tvist', {
     trackClass: 'my-scrollbar__track',
     thumbClass: 'my-scrollbar__thumb'
   },
-  
+
   // Другие модули
   drag: true,
   arrows: true,

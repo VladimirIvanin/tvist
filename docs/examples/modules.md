@@ -1,43 +1,17 @@
-# Modules Demo
+# Встроенные возможности
 
-> **Входит в браузерную сборку core.** Достаточно `tvist.core.min.js` и `tvist.core.css`; отдельное подключение этого модуля не требуется. [Схема подключения](/guide/installation).
+Все возможности входят в полный Tvist и активируются опциями. Для обычной карусели со стрелками, пагинацией и автопрокруткой достаточно одного экземпляра:
 
-Демонстрация различных модулей Tvist.
-
-
-## 1. Drag + Navigation
-
-<Demo id="modules" />
-
-**Код:**
 ```javascript
-const slider = new Tvist('.tvist', {
-  perPage: 1,
-  gap: 0,
-  drag: true,
+const slider = new TvistV1('.tvist-v1', {
+  perPage: 2,
+  gap: 16,
   arrows: true,
-  rubberband: true,
-  speed: 300
-});
-```
-
-## 2. Autoplay + Pagination
-
-<Demo id="modules-autoplay" />
-
-**Код:**
-```javascript
-const slider = new Tvist('.tvist', {
-  perPage: 1,
-  gap: 0,
+  pagination: true,
   autoplay: { delay: 3000, pauseOnHover: true },
-  pagination: {
-    type: 'bullets',
-    clickable: true
-  }
-});
-
-// Управление автопрокруткой
-slider.getModule('autoplay')?.getAutoplay().start();
-slider.getModule('autoplay')?.getAutoplay().stop();
+})
+slider.autoplay?.pause()
+slider.autoplay?.resume()
 ```
+
+Изменяйте опции через `updateOptions()`: компоненты активируются и очищают ресурсы автоматически. [Публичные интерфейсы и миграция](/api/modules).

@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  *
@@ -89,9 +90,9 @@ describe('Drag Free Mode + Pagination', () => {
 
     it('обновляет активный bullet при эмите scroll с позицией второго слайда', () => {
       // Устанавливаем позицию трека на второй слайд вручную
-      const pos2 = slider.engine.getScrollPositionForIndex(1)
-      slider.engine.location.set(pos2)
-      slider.engine.applyTransform()
+      const pos2 = getRuntime(slider).engine.getScrollPositionForIndex(1)
+      getRuntime(slider).engine.location.set(pos2)
+      getRuntime(slider).engine.applyTransform()
       // applyTransform эмитит 'setTranslate', но не 'scroll'
       // Эмитируем scroll напрямую как это делает DragModule в momentum
       slider.emit('scroll')
@@ -100,9 +101,9 @@ describe('Drag Free Mode + Pagination', () => {
     })
 
     it('обновляет активный bullet при эмите scroll с позицией третьего слайда', () => {
-      const pos3 = slider.engine.getScrollPositionForIndex(2)
-      slider.engine.location.set(pos3)
-      slider.engine.applyTransform()
+      const pos3 = getRuntime(slider).engine.getScrollPositionForIndex(2)
+      getRuntime(slider).engine.location.set(pos3)
+      getRuntime(slider).engine.applyTransform()
       slider.emit('scroll')
 
       expect(getActiveBulletIndex(root)).toBe(2)
@@ -110,24 +111,24 @@ describe('Drag Free Mode + Pagination', () => {
 
     it('обновляет активный bullet при промежуточной позиции (ближе к следующему)', () => {
       // Позиция между слайдом 0 и 1, чуть ближе к слайду 1
-      const pos0 = slider.engine.getScrollPositionForIndex(0)
-      const pos1 = slider.engine.getScrollPositionForIndex(1)
+      const pos0 = getRuntime(slider).engine.getScrollPositionForIndex(0)
+      const pos1 = getRuntime(slider).engine.getScrollPositionForIndex(1)
       const midPos = pos0 + (pos1 - pos0) * 0.6 // 60% пути к слайду 1
 
-      slider.engine.location.set(midPos)
-      slider.engine.applyTransform()
+      getRuntime(slider).engine.location.set(midPos)
+      getRuntime(slider).engine.applyTransform()
       slider.emit('scroll')
 
       expect(getActiveBulletIndex(root)).toBe(1)
     })
 
     it('не меняет активный bullet при промежуточной позиции ближе к текущему', () => {
-      const pos0 = slider.engine.getScrollPositionForIndex(0)
-      const pos1 = slider.engine.getScrollPositionForIndex(1)
+      const pos0 = getRuntime(slider).engine.getScrollPositionForIndex(0)
+      const pos1 = getRuntime(slider).engine.getScrollPositionForIndex(1)
       const midPos = pos0 + (pos1 - pos0) * 0.3 // 30% пути к слайду 1
 
-      slider.engine.location.set(midPos)
-      slider.engine.applyTransform()
+      getRuntime(slider).engine.location.set(midPos)
+      getRuntime(slider).engine.applyTransform()
       slider.emit('scroll')
 
       expect(getActiveBulletIndex(root)).toBe(0)
@@ -135,16 +136,16 @@ describe('Drag Free Mode + Pagination', () => {
 
     it('возвращается к первому bullet при возврате к начальной позиции', () => {
       // Сначала переходим ко второму
-      const pos1 = slider.engine.getScrollPositionForIndex(1)
-      slider.engine.location.set(pos1)
-      slider.engine.applyTransform()
+      const pos1 = getRuntime(slider).engine.getScrollPositionForIndex(1)
+      getRuntime(slider).engine.location.set(pos1)
+      getRuntime(slider).engine.applyTransform()
       slider.emit('scroll')
       expect(getActiveBulletIndex(root)).toBe(1)
 
       // Возвращаемся к первому
-      const pos0 = slider.engine.getScrollPositionForIndex(0)
-      slider.engine.location.set(pos0)
-      slider.engine.applyTransform()
+      const pos0 = getRuntime(slider).engine.getScrollPositionForIndex(0)
+      getRuntime(slider).engine.location.set(pos0)
+      getRuntime(slider).engine.applyTransform()
       slider.emit('scroll')
       expect(getActiveBulletIndex(root)).toBe(0)
     })
@@ -163,9 +164,9 @@ describe('Drag Free Mode + Pagination', () => {
       })
 
       // Эмитируем scroll — пагинация не должна реагировать
-      const pos1 = slider.engine.getScrollPositionForIndex(1)
-      slider.engine.location.set(pos1)
-      slider.engine.applyTransform()
+      const pos1 = getRuntime(slider).engine.getScrollPositionForIndex(1)
+      getRuntime(slider).engine.location.set(pos1)
+      getRuntime(slider).engine.applyTransform()
       slider.emit('scroll')
 
       // Активный bullet остаётся на 0 (нет slideChangeStart/End)
@@ -192,9 +193,9 @@ describe('Drag Free Mode + Pagination', () => {
     })
 
     it('обновляет fraction при scroll на второй слайд', () => {
-      const pos1 = slider.engine.getScrollPositionForIndex(1)
-      slider.engine.location.set(pos1)
-      slider.engine.applyTransform()
+      const pos1 = getRuntime(slider).engine.getScrollPositionForIndex(1)
+      getRuntime(slider).engine.location.set(pos1)
+      getRuntime(slider).engine.applyTransform()
       slider.emit('scroll')
 
       const current = root.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationCurrent}`)
@@ -216,9 +217,9 @@ describe('Drag Free Mode + Pagination', () => {
     })
 
     it('обновляет ширину progress bar при scroll', () => {
-      const pos1 = slider.engine.getScrollPositionForIndex(1)
-      slider.engine.location.set(pos1)
-      slider.engine.applyTransform()
+      const pos1 = getRuntime(slider).engine.getScrollPositionForIndex(1)
+      getRuntime(slider).engine.location.set(pos1)
+      getRuntime(slider).engine.applyTransform()
       slider.emit('scroll')
 
       const bar = root.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`)
@@ -259,15 +260,15 @@ describe('Drag Free Mode + Pagination', () => {
         pagination: { type: 'bullets', clickable: false },
       })
 
-      const pos1 = slider.engine.getScrollPositionForIndex(1)
-      slider.engine.location.set(pos1)
-      slider.engine.applyTransform()
+      const pos1 = getRuntime(slider).engine.getScrollPositionForIndex(1)
+      getRuntime(slider).engine.location.set(pos1)
+      getRuntime(slider).engine.applyTransform()
       slider.emit('scroll')
       expect(getActiveBulletIndex(root)).toBe(1)
 
       // Небольшое смещение — ближайший слайд остаётся 1
-      slider.engine.location.set(pos1 - 5)
-      slider.engine.applyTransform()
+      getRuntime(slider).engine.location.set(pos1 - 5)
+      getRuntime(slider).engine.applyTransform()
       slider.emit('scroll')
       expect(getActiveBulletIndex(root)).toBe(1)
     })

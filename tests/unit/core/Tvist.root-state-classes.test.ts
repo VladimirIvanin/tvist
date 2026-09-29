@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тесты классов состояний на root: created, destroyed, locked
  */
@@ -98,7 +99,7 @@ describe('Tvist root state classes', () => {
       fixture = createSliderFixture({ slidesCount: 3, width: 900 })
       const slider = new Tvist(fixture.root, { perPage: 3, gap: 0 })
 
-      expect(slider.engine.isLocked).toBe(true)
+      expect(getRuntime(slider).engine.isLocked).toBe(true)
       expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(true)
 
       slider.destroy()
@@ -108,7 +109,7 @@ describe('Tvist root state classes', () => {
       fixture = createSliderFixture({ slidesCount: 5, width: 1000 })
       const slider = new Tvist(fixture.root, { perPage: 2, gap: 0 })
 
-      expect(slider.engine.isLocked).toBe(false)
+      expect(getRuntime(slider).engine.isLocked).toBe(false)
       expect(fixture.root.classList.contains(TVIST_CLASSES.locked)).toBe(false)
 
       slider.destroy()

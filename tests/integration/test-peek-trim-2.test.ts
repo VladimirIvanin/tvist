@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { Tvist } from '../../src'
 import { createSliderFixture, type SliderFixture } from '../fixtures'
@@ -29,11 +30,11 @@ describe('peekTrim', () => {
     })
 
     console.log('peekTrim: true, index 0, transform:', slider.container.style.transform)
-    console.log('cachedMinScroll:', slider.engine.getMinScrollPosition())
+    console.log('cachedMinScroll:', getRuntime(slider).engine.getMinScrollPosition())
     console.log('paddingLeft:', fixture.track.style.paddingLeft)
-    
+
     slider.scrollTo(4, true)
     console.log('peekTrim: true, index 4, transform:', slider.container.style.transform)
-    console.log('cachedMaxScroll:', slider.engine.getMaxScrollPosition())
+    console.log('cachedMaxScroll:', getRuntime(slider).engine.getMaxScrollPosition())
   })
 })
