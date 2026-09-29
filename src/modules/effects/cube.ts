@@ -18,7 +18,7 @@ interface CubeCache {
 const cubeCache = new WeakMap<Tvist, CubeCache>();
 
 function getCachedSlides(tvist: Tvist): HTMLElement[] {
-  const { slides } = tvist;
+  const { __tvistInternal_slides: slides } = tvist;
   let cache = cubeCache.get(tvist);
 
   if (!cache?.lastSlidesList || cache.lastSlidesList !== slides) {
@@ -34,7 +34,7 @@ function getCachedSlides(tvist: Tvist): HTMLElement[] {
 }
 
 export function setCubeEffect(tvist: Tvist, translate: number, options: TvistOptions): void {
-  const { container, track } = tvist;
+  const { __tvistInternal_container: container, __tvistInternal_track: track } = tvist;
   const cubeOptions = options.cubeEffect ?? {};
   const slideSize = tvist.__tvistInternal_engine.__tvistInternal_slideSizeValue;
 

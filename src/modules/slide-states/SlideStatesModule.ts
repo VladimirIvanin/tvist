@@ -70,22 +70,22 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
       local_nativeLazyBeforeSlideChange = (targetRealIndex: number) => {
         const cfg = resolveNativeLazyAdjacentConfig(options.nativeLazyAdjacent);
         if (!cfg?.onTransitionStart) return;
-        const slide = findSlideByRealIndex(tvist.slides, targetRealIndex);
+        const slide = findSlideByRealIndex(tvist.__tvistInternal_slides, targetRealIndex);
         if (slide) {
           forceEagerLoadingForLazyImages(slide);
         }
       };
-      tvist.on('beforeSlideChange', local_nativeLazyBeforeSlideChange);
+      tvist.__tvistInternal_on('beforeSlideChange', local_nativeLazyBeforeSlideChange);
     }
     // slideChangeStart: обновляем active/prev/next + visible (синхронно)
-    tvist.on('slideChangeStart', () => {
+    tvist.__tvistInternal_on('slideChangeStart', () => {
       local_updateActiveClasses();
       local_updateVisibleClasses();
     });
     // slideChangeEnd: обновляем только visible (финальная позиция после анимации)
-    tvist.on('slideChangeEnd', () => local_updateVisibleClasses());
+    tvist.__tvistInternal_on('slideChangeEnd', () => local_updateVisibleClasses());
     // scroll (каждый тик анимации): обновляем visible через RAF-батчинг для экономии CPU
-    tvist.on('scroll', () => local_scheduleVisibilityUpdate());
+    tvist.__tvistInternal_on('scroll', () => local_scheduleVisibilityUpdate());
   }
 
   function local_onUpdate(): void {
@@ -100,7 +100,7 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
   function local_scheduleVisibilityUpdate(): void {
     if (local_visibilityUpdateScheduled) return;
     local_visibilityUpdateScheduled = true;
-    local_visibilityRafId = base.resources.frame(() => {
+    local_visibilityRafId = base.__tvistInternal_resources.__tvistInternal_frame(() => {
       local_visibilityUpdateScheduled = false;
       local_updateVisibleClasses();
     });
@@ -115,7 +115,7 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
       return;
     }
     // Проходим по всем слайдам и добавляем атрибут ко всем изображениям
-    tvist.slides.forEach((slide) => {
+    tvist.__tvistInternal_slides.forEach((slide) => {
       const images = slide.querySelectorAll<HTMLImageElement>('img');
       images.forEach((img) => {
         if (!local_hasImageSource(img)) {
@@ -131,8 +131,8 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
    * Принудительный eager для img[loading=lazy] у соседних слайдов после init.
    */
   function local_applyNativeLazyAdjacentOnInit(): void {
-    const slides = tvist.slides;
-    const activeIndex = tvist.activeIndex;
+    const slides = tvist.__tvistInternal_slides;
+    const activeIndex = tvist.__tvistInternal_activeIndex;
     const activeSlide = slides[activeIndex];
     if (!activeSlide) return;
     const len = slides.length;
@@ -225,8 +225,8 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
    * Обновление классов активного, предыдущего и следующего слайдов
    */
   function local_updateActiveClasses(): void {
-    const slides = tvist.slides;
-    const activeIndex = tvist.activeIndex;
+    const slides = tvist.__tvistInternal_slides;
+    const activeIndex = tvist.__tvistInternal_activeIndex;
     const activeSlide = slides[activeIndex];
     if (!activeSlide) return;
     // Массив для сбора промисов декодирования
@@ -314,7 +314,7 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
    * маска из getCubeSlidesInRange, как в setCubeEffect). emit('visible') — для каждого слайда отдельно.
    */
   function local_updateVisibleClasses(): void {
-    const slides = tvist.slides;
+    const slides = tvist.__tvistInternal_slides;
     const visibleFlags =
       options.effect === 'cube'
         ? getCubeSlidesInRange(
@@ -328,10 +328,10 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
       const hadVisible = slide.classList.contains(local_CLASS_VISIBLE);
       if (isVisible && !hadVisible) {
         slide.classList.add(local_CLASS_VISIBLE);
-        tvist.emit('visible', slide, index);
+        tvist.__tvistInternal_emit('visible', slide, index);
       } else if (!isVisible && hadVisible) {
         slide.classList.remove(local_CLASS_VISIBLE);
-        tvist.emit('hidden', slide, index);
+        tvist.__tvistInternal_emit('hidden', slide, index);
       }
     });
   }
@@ -348,14 +348,14 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
 
   function local_destroy(): void {
     if (local_visibilityRafId !== null) {
-      base.resources.cancelFrame(local_visibilityRafId);
+      base.__tvistInternal_resources.__tvistInternal_cancelFrame(local_visibilityRafId);
       local_visibilityRafId = null;
     }
     if (local_nativeLazyBeforeSlideChange) {
-      tvist.off('beforeSlideChange', local_nativeLazyBeforeSlideChange);
+      tvist.__tvistInternal_off('beforeSlideChange', local_nativeLazyBeforeSlideChange);
       local_nativeLazyBeforeSlideChange = null;
     }
-    tvist.slides.forEach((slide) => {
+    tvist.__tvistInternal_slides.forEach((slide) => {
       slide.classList.remove(
         local_CLASS_ACTIVE,
         local_CLASS_PREV,
@@ -366,7 +366,7 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
     // decodedImages и preloadedSlides (WeakMap) очистятся автоматически при удалении элементов
   }
   const component: SlideStatesModule = {
-    shouldBeActive: base.shouldBeActive,
+    shouldBeActive: base.__tvistInternal_shouldBeActive,
     get name() {
       return local_name;
     },
@@ -376,7 +376,7 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
   };

@@ -191,9 +191,9 @@ export function createGridModule(tvist: Tvist, options: TvistOptions): GridModul
     const { grid } = options;
     if (!grid) return;
     if (local_originalSlides.length === 0) {
-      local_originalSlides = Array.from(tvist.slides);
+      local_originalSlides = Array.from(tvist.__tvistInternal_slides);
     }
-    const container = tvist.container;
+    const container = tvist.__tvistInternal_container;
     container.innerHTML = '';
     container.style.display = 'flex';
     local_wrapperSlides = [];
@@ -220,7 +220,7 @@ export function createGridModule(tvist: Tvist, options: TvistOptions): GridModul
       local_wrapperSlides.push(pageRoot);
       fragment.appendChild(pageRoot);
     }
-    tvist.container.appendChild(fragment);
+    tvist.__tvistInternal_container.appendChild(fragment);
   }
 
   function local_buildDimensionsGrid(): void {
@@ -238,7 +238,7 @@ export function createGridModule(tvist: Tvist, options: TvistOptions): GridModul
       fragment.appendChild(pageRoot);
       specRound++;
     }
-    tvist.container.appendChild(fragment);
+    tvist.__tvistInternal_container.appendChild(fragment);
   }
   /**
    * Заполняет одну страницу сеткой rows×cols.
@@ -341,7 +341,7 @@ export function createGridModule(tvist: Tvist, options: TvistOptions): GridModul
   function local_applyInterPageGaps(): void {
     const trackGapCss = resolveTrackGapCssFromOptions(options);
     const isVertical = options.direction === 'vertical';
-    const slides = tvist.slides;
+    const slides = tvist.__tvistInternal_slides;
     slides.forEach((slide, i) => {
       const isLast = i === slides.length - 1;
       if (isVertical) {
@@ -356,7 +356,7 @@ export function createGridModule(tvist: Tvist, options: TvistOptions): GridModul
 
   function local_removeGrid(): void {
     if (local_originalSlides.length > 0) {
-      const container = tvist.container;
+      const container = tvist.__tvistInternal_container;
       container.style.display = '';
       container.innerHTML = '';
       const fragment = document.createDocumentFragment();
@@ -376,7 +376,7 @@ export function createGridModule(tvist: Tvist, options: TvistOptions): GridModul
 
   function local_fixEnginePositions(): void {
     const engine = tvist.__tvistInternal_engine;
-    const slides = tvist.slides;
+    const slides = tvist.__tvistInternal_slides;
     local_applyInterPageGaps();
     const newPositions = slides.map((slide) => slide.offsetLeft);
     engine.__tvistInternal_setSlidePositions(newPositions);
@@ -403,7 +403,7 @@ export function createGridModule(tvist: Tvist, options: TvistOptions): GridModul
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
     onUpdate: local_onUpdate,

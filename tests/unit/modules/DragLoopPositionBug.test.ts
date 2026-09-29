@@ -184,7 +184,7 @@ describe('DragModule + LoopModule: position preservation on drag start', () => {
     slider.scrollTo(2, true)
 
     // Шпионим за методом update
-    const updateSpy = vi.spyOn(getRuntime(slider), 'update')
+    const updateSpy = vi.spyOn(getRuntime(slider), '__tvistInternal_update')
 
     const loopModule = getRuntime(slider)['modules'].get('loop') as { fix?: (params: unknown) => void } | undefined
 
@@ -226,7 +226,7 @@ describe('DragModule + LoopModule: position preservation on drag start', () => {
     const loopedSlides = loopModule.loopedSlides ?? 1
     slider.scrollTo(loopedSlides - 1, true)
 
-    const updateSpy = vi.spyOn(getRuntime(slider), 'update')
+    const updateSpy = vi.spyOn(getRuntime(slider), '__tvistInternal_update')
     const reorderSpy = vi.spyOn(getRuntime(slider).engine, '__tvistInternal_updateAfterReorder')
 
     // Вызываем loopFix с direction: 'prev'

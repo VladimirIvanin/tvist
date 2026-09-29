@@ -76,7 +76,12 @@ export function createScrollControlModule(
    * Добавить обработчик wheel событий
    */
   function local_attachWheelListener(): void {
-    base.resources.listen(tvist.root, 'wheel', local_handleWheel, { passive: false });
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      tvist.__tvistInternal_root,
+      'wheel',
+      local_handleWheel,
+      { passive: false }
+    );
   }
   /**
    * Обработчик wheel события
@@ -140,18 +145,18 @@ export function createScrollControlModule(
     // Определяем направление и выполняем переход
     const delta = Math.sign(mainDelta) * local_sensitivity;
     if (delta > 0) {
-      tvist.next();
+      tvist.__tvistInternal_next();
     } else if (delta < 0) {
-      tvist.prev();
+      tvist.__tvistInternal_prev();
     }
     // Устанавливаем флаг прокрутки
     local_isScrolling = true;
     // Сбрасываем флаг после анимации
     if (local_scrollTimer) {
-      base.resources.cancelTimeout(local_scrollTimer);
+      base.__tvistInternal_resources.__tvistInternal_cancelTimeout(local_scrollTimer);
     }
     const speed = options.speed ?? 300;
-    local_scrollTimer = base.resources.timeout(() => {
+    local_scrollTimer = base.__tvistInternal_resources.__tvistInternal_timeout(() => {
       local_isScrolling = false;
     }, speed + 50);
   };
@@ -169,10 +174,14 @@ export function createScrollControlModule(
   function local_destroy(): void {
     // Очищаем таймеры
     if (local_scrollTimer) {
-      base.resources.cancelTimeout(local_scrollTimer);
+      base.__tvistInternal_resources.__tvistInternal_cancelTimeout(local_scrollTimer);
     }
     // Удаляем обработчик wheel событий
-    base.resources.unlisten(tvist.root, 'wheel', local_handleWheel);
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      tvist.__tvistInternal_root,
+      'wheel',
+      local_handleWheel
+    );
   }
   const component: ScrollControlModule = {
     get name() {
@@ -185,7 +194,7 @@ export function createScrollControlModule(
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
   };

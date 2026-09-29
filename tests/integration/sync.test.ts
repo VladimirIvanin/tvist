@@ -19,7 +19,7 @@ describe('Tvist.sync', () => {
     const thumbs = new Tvist(fb.root, { speed: 0, drag: false })
     main.sync(thumbs)
 
-    const spy = vi.spyOn(getRuntime(thumbs), 'scrollTo')
+    const spy = vi.spyOn(getRuntime(thumbs), '__tvistInternal_scrollTo')
     thumbs.scrollTo(1, true)
     spy.mockClear()
 
@@ -36,7 +36,7 @@ describe('Tvist.sync', () => {
     const thumbs = new Tvist(fb.root, { speed: 0, drag: false })
     main.sync(thumbs)
 
-    const spy = vi.spyOn(getRuntime(main), 'scrollTo')
+    const spy = vi.spyOn(getRuntime(main), '__tvistInternal_scrollTo')
     main.scrollTo(2, true)
     spy.mockClear()
 

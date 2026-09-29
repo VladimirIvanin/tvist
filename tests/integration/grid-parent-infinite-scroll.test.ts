@@ -97,7 +97,7 @@ describe('BUG: бесконечная прокрутка при display: grid у
     expect(observedTarget).toBe(fixture.track)
 
     // Отслеживаем вызовы update()
-    const updateSpy = vi.spyOn(getRuntime(slider), 'update')
+    const updateSpy = vi.spyOn(getRuntime(slider), '__tvistInternal_update')
 
     // Первый вызов ResizeObserver — throttle пропускает сразу (lastCall=0)
     resizeCallback?.([], {} as ResizeObserver)
@@ -139,7 +139,7 @@ describe('BUG: бесконечная прокрутка при display: grid у
 
     global.ResizeObserver = OriginalResizeObserver
 
-    const updateSpy = vi.spyOn(getRuntime(slider), 'update')
+    const updateSpy = vi.spyOn(getRuntime(slider), '__tvistInternal_update')
 
     // Симулируем 10 срабатываний ResizeObserver подряд
     // (как при бесконечном цикле в display: grid)

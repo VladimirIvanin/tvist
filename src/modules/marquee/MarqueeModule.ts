@@ -121,7 +121,7 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
       )
     ) {
       // Обновляем опции через updateOptions для корректной инициализации всех модулей
-      tvist.updateOptions({ loop: true });
+      tvist.__tvistInternal_updateOptions({ loop: true });
     }
     // Исправляем gap у последнего слайда
     local_fixLastSlideGap();
@@ -132,8 +132,8 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
     // Настраиваем события
     local_setupEvents();
     // Подписываемся на события драга для паузы/возобновления
-    base.on('dragStart', () => local_pause());
-    base.on('dragEnd', () => local_resume());
+    base.__tvistInternal_on('dragStart', () => local_pause());
+    base.__tvistInternal_on('dragEnd', () => local_resume());
     // Запускаем marquee
     local_start();
   }
@@ -141,8 +141,8 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
   function local_destroy(): void {
     local_stop();
     local_detachHoverEvents();
-    base.off('dragStart');
-    base.off('dragEnd');
+    base.__tvistInternal_off('dragStart');
+    base.__tvistInternal_off('dragEnd');
   }
 
   function local_shouldBeActive(): boolean {
@@ -217,7 +217,7 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
   function local_fixLastSlideGap(): void {
     const gapCss = gapCssForMargin(options.gap);
     if (!gapCss) return;
-    const slides = tvist.slides;
+    const slides = tvist.__tvistInternal_slides;
     if (slides.length === 0) return;
     // Engine убирает margin у последнего слайда.
     // Нам нужно, чтобы у ВСЕХ слайдов был margin, так как они зациклены.
@@ -232,14 +232,14 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
   function local_calculateTotalSize(): void {
     const isHorizontal = options.direction !== 'vertical';
     const gap = tvist.__tvistInternal_engine.__tvistInternal_gapPxValue;
-    const count = tvist.slides.length;
+    const count = tvist.__tvistInternal_slides.length;
     if (count === 0) {
       local_totalSize = 0;
       local_cachedSlideSizes = new WeakMap();
       return;
     }
     local_cachedSlideSizes = new WeakMap();
-    local_totalSize = tvist.slides.reduce((sum, slide) => {
+    local_totalSize = tvist.__tvistInternal_slides.reduce((sum, slide) => {
       const size = isHorizontal ? slide.offsetWidth : slide.offsetHeight;
       local_cachedSlideSizes.set(slide, size);
       return sum + size + gap;
@@ -261,18 +261,34 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
   function local_attachHoverEvents(): void {
     local_mouseEnterHandler = () => local_pause();
     local_mouseLeaveHandler = () => local_resume();
-    base.resources.listen(tvist.root, 'mouseenter', local_mouseEnterHandler);
-    base.resources.listen(tvist.root, 'mouseleave', local_mouseLeaveHandler);
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      tvist.__tvistInternal_root,
+      'mouseenter',
+      local_mouseEnterHandler
+    );
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      tvist.__tvistInternal_root,
+      'mouseleave',
+      local_mouseLeaveHandler
+    );
   }
   /**
    * Отключение hover событий
    */
   function local_detachHoverEvents(): void {
     if (local_mouseEnterHandler) {
-      base.resources.unlisten(tvist.root, 'mouseenter', local_mouseEnterHandler);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        tvist.__tvistInternal_root,
+        'mouseenter',
+        local_mouseEnterHandler
+      );
     }
     if (local_mouseLeaveHandler) {
-      base.resources.unlisten(tvist.root, 'mouseleave', local_mouseLeaveHandler);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        tvist.__tvistInternal_root,
+        'mouseleave',
+        local_mouseLeaveHandler
+      );
     }
   }
   /**
@@ -294,10 +310,10 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
         local_updatePosition(deltaTime);
       }
       // Продолжаем анимацию
-      local_rafId = base.resources.frame(animate);
+      local_rafId = base.__tvistInternal_resources.__tvistInternal_frame(animate);
     };
-    local_rafId = base.resources.frame(animate);
-    base.emit('marqueeStart');
+    local_rafId = base.__tvistInternal_resources.__tvistInternal_frame(animate);
+    base.__tvistInternal_emit('marqueeStart');
   }
   /**
    * Обновляет позицию прокрутки
@@ -306,16 +322,16 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
     const gap = tvist.__tvistInternal_engine.__tvistInternal_gapPxValue;
     const isReverse = local_direction === 'right' || local_direction === 'down';
     local_currentPosition += (isReverse ? -1 : 1) * local_speed * deltaTime;
-    while (tvist.slides.length > 0) {
-      const index = isReverse ? tvist.slides.length - 1 : 0;
-      const slide = tvist.slides[index];
+    while (tvist.__tvistInternal_slides.length > 0) {
+      const index = isReverse ? tvist.__tvistInternal_slides.length - 1 : 0;
+      const slide = tvist.__tvistInternal_slides[index];
       const size = (slide ? (local_cachedSlideSizes.get(slide) ?? 0) : 0) + gap;
       if (!slide || size <= 0) break;
       if (isReverse ? local_currentPosition > 0 : local_currentPosition < size) break;
       if (isReverse) {
-        tvist.container.prepend(slide);
+        tvist.__tvistInternal_container.prepend(slide);
       } else {
-        tvist.container.appendChild(slide);
+        tvist.__tvistInternal_container.appendChild(slide);
       }
       tvist.__tvistInternal_updateSlidesList();
       local_currentPosition += isReverse ? size : -size;
@@ -333,7 +349,7 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
     const transform = isHorizontal
       ? `translate3d(${-local_currentPosition}px, 0, 0)`
       : `translate3d(0, ${-local_currentPosition}px, 0)`;
-    tvist.container.style.transform = transform;
+    tvist.__tvistInternal_container.style.transform = transform;
   }
   /**
    * Остановка marquee (отменяет RAF, но не меняет флаг stopped)
@@ -341,11 +357,11 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
    */
   function local_stop(): void {
     if (local_rafId !== null) {
-      base.resources.cancelFrame(local_rafId);
+      base.__tvistInternal_resources.__tvistInternal_cancelFrame(local_rafId);
       local_rafId = null;
       local_lastTimestamp = null;
     }
-    base.emit('marqueeStop');
+    base.__tvistInternal_emit('marqueeStop');
   }
   /**
    * Пауза marquee
@@ -360,7 +376,7 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
       const visualPosition = -local_currentPosition;
       tvist.__tvistInternal_engine.__tvistInternal_location.set(visualPosition);
       tvist.__tvistInternal_engine.__tvistInternal_target.set(visualPosition);
-      base.emit('marqueePause');
+      base.__tvistInternal_emit('marqueePause');
     }
   }
   /**
@@ -374,7 +390,7 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
       local_currentPosition = -tvist.__tvistInternal_engine.__tvistInternal_location.get();
       local_paused = false;
       local_lastTimestamp = null; // Сбрасываем timestamp для корректного deltaTime
-      base.emit('marqueeResume');
+      base.__tvistInternal_emit('marqueeResume');
     }
   }
   /**
@@ -465,7 +481,7 @@ export function createMarqueeModule(tvist: Tvist, options: TvistOptions): Marque
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
     shouldBeActive: local_shouldBeActive,

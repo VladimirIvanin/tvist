@@ -3,55 +3,55 @@
  * Используется для хранения и манипуляции позициями в одномерном пространстве
  */
 export class Vector1D {
-  private value: number
-  private reader?: () => number
+  private __tvistInternal_value: number;
+  private __tvistInternal_reader?: () => number;
 
   constructor(initialValue: number) {
-    this.value = initialValue
+    this.__tvistInternal_value = initialValue;
   }
 
   /**
    * Устанавливает новое значение
    */
   set(value: number): this {
-    this.value = value
-    return this
+    this.__tvistInternal_value = value;
+    return this;
   }
 
   /**
    * Получает текущее значение
    */
   get(): number {
-    return this.reader?.() ?? this.value
+    return this.__tvistInternal_reader?.() ?? this.__tvistInternal_value;
   }
 
   /** Временный источник отображаемой позиции во время CSS-перехода. */
   setReader(reader?: () => number): void {
-    this.reader = reader
+    this.__tvistInternal_reader = reader;
   }
 
   /**
    * Добавляет значение к текущему
    */
   add(value: number): this {
-    this.value += value
-    return this
+    this.__tvistInternal_value += value;
+    return this;
   }
 
   /**
    * Вычитает значение из текущего
    */
   subtract(value: number): this {
-    this.value -= value
-    return this
+    this.__tvistInternal_value -= value;
+    return this;
   }
 
   /**
    * Умножает текущее значение на множитель
    */
   multiply(factor: number): this {
-    this.value *= factor
-    return this
+    this.__tvistInternal_value *= factor;
+    return this;
   }
 
   /**
@@ -60,8 +60,8 @@ export class Vector1D {
    * @param factor - коэффициент интерполяции (0-1)
    */
   lerp(target: number, factor: number): this {
-    this.value += (target - this.value) * factor
-    return this
+    this.__tvistInternal_value += (target - this.__tvistInternal_value) * factor;
+    return this;
   }
 
   /**
@@ -70,14 +70,14 @@ export class Vector1D {
    * @param max - максимальное значение диапазона
    */
   normalize(min: number, max: number): number {
-    if (max === min) return 0
-    return (this.value - min) / (max - min)
+    if (max === min) return 0;
+    return (this.__tvistInternal_value - min) / (max - min);
   }
 
   /**
    * Создаёт копию вектора
    */
   clone(): Vector1D {
-    return new Vector1D(this.value)
+    return new Vector1D(this.__tvistInternal_value);
   }
 }

@@ -162,7 +162,7 @@ export function createLayout(deps: LayoutContext): Layout {
    * Если атрибут отсутствует, возвращает domIndex как есть.
    */
   function local_getEventIndex(domIndex: number): number {
-    const slide = deps.__tvistInternal_tvist.slides[domIndex];
+    const slide = deps.__tvistInternal_tvist.__tvistInternal_slides[domIndex];
     if (!slide) return domIndex;
     const dataAttr = slide.getAttribute(TVIST_SLIDE_INDEX_ATTR);
     if (dataAttr !== null) {
@@ -183,8 +183,10 @@ export function createLayout(deps: LayoutContext): Layout {
     // Если LoopModule динамически включил клоны (например, мало слайдов),
     // первый слайд будет клоном.
     if (
-      deps.__tvistInternal_tvist.slides.length > 0 &&
-      deps.__tvistInternal_tvist.slides[0]?.classList.contains(TVIST_CLASSES.slideClone)
+      deps.__tvistInternal_tvist.__tvistInternal_slides.length > 0 &&
+      deps.__tvistInternal_tvist.__tvistInternal_slides[0]?.classList.contains(
+        TVIST_CLASSES.slideClone
+      )
     ) {
       return true;
     }
@@ -230,8 +232,8 @@ export function createLayout(deps: LayoutContext): Layout {
    * Обновляет кеш размера track элемента (viewport слайдера)
    */
   function local_updateTrackSizeCache(): void {
-    local_cachedTrackWidth = getOuterWidth(deps.__tvistInternal_tvist.track);
-    local_cachedTrackHeight = getOuterHeight(deps.__tvistInternal_tvist.track);
+    local_cachedTrackWidth = getOuterWidth(deps.__tvistInternal_tvist.__tvistInternal_track);
+    local_cachedTrackHeight = getOuterHeight(deps.__tvistInternal_tvist.__tvistInternal_track);
     local_trackSizeCacheValid = true;
   }
 
@@ -261,9 +263,9 @@ export function createLayout(deps: LayoutContext): Layout {
    */
   function local_getMarginPercentageBasePx(): number {
     for (const el of [
-      deps.__tvistInternal_tvist.root,
-      deps.__tvistInternal_tvist.track,
-      deps.__tvistInternal_tvist.container,
+      deps.__tvistInternal_tvist.__tvistInternal_root,
+      deps.__tvistInternal_tvist.__tvistInternal_track,
+      deps.__tvistInternal_tvist.__tvistInternal_container,
     ]) {
       const w = getOuterWidth(el);
       if (w > 0) return w;
@@ -274,9 +276,9 @@ export function createLayout(deps: LayoutContext): Layout {
   /** База для height в процентах (fixedHeight и т.п.) */
   function local_getVerticalPercentageBasePx(): number {
     for (const el of [
-      deps.__tvistInternal_tvist.root,
-      deps.__tvistInternal_tvist.track,
-      deps.__tvistInternal_tvist.container,
+      deps.__tvistInternal_tvist.__tvistInternal_root,
+      deps.__tvistInternal_tvist.__tvistInternal_track,
+      deps.__tvistInternal_tvist.__tvistInternal_container,
     ]) {
       const h = getOuterHeight(el);
       if (h > 0) return h;
@@ -309,7 +311,7 @@ export function createLayout(deps: LayoutContext): Layout {
   function local_resolveFixedDimensionsEarly(): void {
     local_fixedWidthPxResolved = 0;
     local_fixedHeightPxResolved = 0;
-    const slide = deps.__tvistInternal_tvist.slides[0];
+    const slide = deps.__tvistInternal_tvist.__tvistInternal_slides[0];
     if (!slide) return;
     const { fixedWidth: fw, fixedHeight: fh } = deps.__tvistInternal_options;
     if (local_isFixedDimensionOption(fw)) {
@@ -388,7 +390,8 @@ export function createLayout(deps: LayoutContext): Layout {
     }
     if (trimmed.endsWith('em')) {
       const parentFontSize =
-        parseFloat(getComputedStyle(deps.__tvistInternal_tvist.track).fontSize) || 16;
+        parseFloat(getComputedStyle(deps.__tvistInternal_tvist.__tvistInternal_track).fontSize) ||
+        16;
       local_gapPxResolved = n * parentFontSize;
       return;
     }
@@ -397,7 +400,7 @@ export function createLayout(deps: LayoutContext): Layout {
       return;
     }
     // vw/vh и прочие редкие единицы — применяем временно и читаем computed style (один reflow)
-    const slides = deps.__tvistInternal_tvist.slides;
+    const slides = deps.__tvistInternal_tvist.__tvistInternal_slides;
     const firstSlide = slides[0];
     if (!firstSlide) {
       local_gapPxResolved = 0;
@@ -427,15 +430,19 @@ export function createLayout(deps: LayoutContext): Layout {
     // slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
     const isVertical = deps.__tvistInternal_options.direction === 'vertical';
     const rootSize = isVertical
-      ? local_cachedTrackHeight || getOuterHeight(deps.__tvistInternal_tvist.root)
-      : local_cachedTrackWidth || getOuterWidth(deps.__tvistInternal_tvist.root);
+      ? local_cachedTrackHeight || getOuterHeight(deps.__tvistInternal_tvist.__tvistInternal_root)
+      : local_cachedTrackWidth || getOuterWidth(deps.__tvistInternal_tvist.__tvistInternal_root);
     const slideBaseSize = local_getSlideBaseSizeForPeekLayout(rootSize);
     const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : undefined;
-    applyPeek(deps.__tvistInternal_tvist.track, deps.__tvistInternal_options, maxPeek);
+    applyPeek(
+      deps.__tvistInternal_tvist.__tvistInternal_track,
+      deps.__tvistInternal_options,
+      maxPeek
+    );
   }
 
   function local_calculateSizes(isDisabled = false): void {
-    if (deps.__tvistInternal_tvist.slides.length === 0) {
+    if (deps.__tvistInternal_tvist.__tvistInternal_slides.length === 0) {
       local_resetSizes();
       return;
     }
@@ -474,7 +481,7 @@ export function createLayout(deps: LayoutContext): Layout {
    * calculateSizes не «раздувал» intrinsic-размер родителя.
    */
   function local_resetSlideStylesForMeasurement(): void {
-    for (const slide of deps.__tvistInternal_tvist.slides) {
+    for (const slide of deps.__tvistInternal_tvist.__tvistInternal_slides) {
       slide.style[axis.__tvistInternal_dimension] = '';
       slide.style[axis.__tvistInternal_margin] = '';
     }
@@ -508,10 +515,10 @@ export function createLayout(deps: LayoutContext): Layout {
     local_peekEnd = getPeekValueFromOptions(deps.__tvistInternal_options, endSide);
     if (deps.__tvistInternal_options.peek && !isDisabled) {
       if (local_peekStart === 0) {
-        local_peekStart = getPeekValue(deps.__tvistInternal_tvist.track, startSide);
+        local_peekStart = getPeekValue(deps.__tvistInternal_tvist.__tvistInternal_track, startSide);
       }
       if (local_peekEnd === 0) {
-        local_peekEnd = getPeekValue(deps.__tvistInternal_tvist.track, endSide);
+        local_peekEnd = getPeekValue(deps.__tvistInternal_tvist.__tvistInternal_track, endSide);
       }
     }
     // Дополнительно ограничиваем числовые peek значением не более 50% базового
@@ -559,10 +566,10 @@ export function createLayout(deps: LayoutContext): Layout {
   function local_applyAndMeasureAutoSize(isDisabled: boolean): void {
     const gapCss = gapCssForMargin(deps.__tvistInternal_options.gap);
     if (!isDisabled) {
-      deps.__tvistInternal_tvist.slides.forEach((slide, i) => {
+      deps.__tvistInternal_tvist.__tvistInternal_slides.forEach((slide, i) => {
         slide.style.marginRight = '';
         slide.style.marginBottom = '';
-        if (gapCss && i !== deps.__tvistInternal_tvist.slides.length - 1) {
+        if (gapCss && i !== deps.__tvistInternal_tvist.__tvistInternal_slides.length - 1) {
           slide.style[axis.__tvistInternal_margin] = gapCss;
         }
       });
@@ -571,10 +578,10 @@ export function createLayout(deps: LayoutContext): Layout {
       if (isDisabled) {
         // Стили не применены — оставляем предыдущие размеры или инициализируем нулями
         if (local_slideSizes.length === 0) {
-          local_slideSizes = deps.__tvistInternal_tvist.slides.map(() => 0);
+          local_slideSizes = deps.__tvistInternal_tvist.__tvistInternal_slides.map(() => 0);
         }
       } else {
-        local_slideSizes = deps.__tvistInternal_tvist.slides.map((slide) =>
+        local_slideSizes = deps.__tvistInternal_tvist.__tvistInternal_slides.map((slide) =>
           axis.__tvistInternal_measure(slide)
         );
       }
@@ -599,7 +606,7 @@ export function createLayout(deps: LayoutContext): Layout {
         : deps.__tvistInternal_options.fixedHeight
     );
     if (!isDisabled) {
-      deps.__tvistInternal_tvist.slides.forEach((slide, i) => {
+      deps.__tvistInternal_tvist.__tvistInternal_slides.forEach((slide, i) => {
         slide.style.width = '';
         slide.style.height = '';
         slide.style.marginRight = '';
@@ -613,7 +620,7 @@ export function createLayout(deps: LayoutContext): Layout {
         } else if (crossCss) {
           slide.style.height = crossCss;
         }
-        if (gapCss && i !== deps.__tvistInternal_tvist.slides.length - 1) {
+        if (gapCss && i !== deps.__tvistInternal_tvist.__tvistInternal_slides.length - 1) {
           slide.style[axis.__tvistInternal_margin] = gapCss;
         }
       });
@@ -626,7 +633,7 @@ export function createLayout(deps: LayoutContext): Layout {
    * Рассчитывает позиции всех слайдов
    */
   function local_calculatePositions(): void {
-    const slides = deps.__tvistInternal_tvist.slides;
+    const slides = deps.__tvistInternal_tvist.__tvistInternal_slides;
     const gap = local_gapPxResolved;
     local_slidePositions = [];
     if (local_slideSizes.length > 0) {
@@ -655,7 +662,7 @@ export function createLayout(deps: LayoutContext): Layout {
     local_cachedMinScroll = local_peekStart === 0 ? 0 : -local_peekStart;
     // maxScroll: правый/нижний край последнего слайда совпадает с краем root (без дыры справа/снизу).
     // Для этого используем cachedRootSize, а не containerSize, чтобы перекрыть peekEnd.
-    const lastIndex = deps.__tvistInternal_tvist.slides.length - 1;
+    const lastIndex = deps.__tvistInternal_tvist.__tvistInternal_slides.length - 1;
     if (lastIndex >= 0) {
       const lastPageRight = local_getSlidePosition(lastIndex) + local_getSlideSize(lastIndex);
       local_cachedMaxScroll = local_cachedRootSize - local_peekStart - lastPageRight;
@@ -692,7 +699,7 @@ export function createLayout(deps: LayoutContext): Layout {
    * Вычисляет последний допустимый индекс для скролла
    */
   function local_getEndIndex(): number {
-    const slideCount = deps.__tvistInternal_tvist.slides.length;
+    const slideCount = deps.__tvistInternal_tvist.__tvistInternal_slides.length;
     if (
       local_isLoopEnabled() ||
       local_isCenterMode() ||
@@ -745,7 +752,7 @@ export function createLayout(deps: LayoutContext): Layout {
    * Вычисляет endIndex для Counter на основе текущих опций
    */
   function local_calculateCounterEndIndex(): number {
-    const slideCount = deps.__tvistInternal_tvist.slides.length;
+    const slideCount = deps.__tvistInternal_tvist.__tvistInternal_slides.length;
     const perPage = deps.__tvistInternal_options.perPage ?? 1;
     return lastScrollIndex(
       slideCount,
@@ -759,7 +766,7 @@ export function createLayout(deps: LayoutContext): Layout {
    */
   function local_updateCounterLimits(): void {
     deps.__tvistInternal_index.endIndex = local_calculateCounterEndIndex();
-    deps.__tvistInternal_index.max = deps.__tvistInternal_tvist.slides.length;
+    deps.__tvistInternal_index.max = deps.__tvistInternal_tvist.__tvistInternal_slides.length;
   }
   const component: Layout = {
     __tvistInternal_getScrollPositionForIndex: local_getScrollPositionForIndex,

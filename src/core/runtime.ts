@@ -74,34 +74,34 @@ export function getRuntime(slider: Tvist): TvistRuntime {
   return runtime;
 }
 export interface TvistRuntime {
-  readonly id: Tvist['id'];
-  readonly root: Tvist['root'];
-  readonly track: Tvist['track'];
-  readonly container: Tvist['container'];
-  readonly options: Tvist['options'];
-  next: Tvist['next'];
-  prev: Tvist['prev'];
-  scrollTo: Tvist['scrollTo'];
-  update: Tvist['update'];
-  updateOptions: Tvist['updateOptions'];
-  disable: Tvist['disable'];
-  enable: Tvist['enable'];
-  readonly isEnabled: Tvist['isEnabled'];
-  destroy: Tvist['destroy'];
-  readonly slides: Tvist['slides'];
-  readonly originalSlideCount: Tvist['originalSlideCount'];
-  readonly slideCount: Tvist['slideCount'];
-  readonly activeIndex: Tvist['activeIndex'];
-  readonly realIndex: Tvist['realIndex'];
-  readonly canScrollNext: Tvist['canScrollNext'];
-  readonly canScrollPrev: Tvist['canScrollPrev'];
-  readonly autoplay: ReturnType<AutoplayModuleAPI['getAutoplay']> | undefined;
-  readonly video: ReturnType<VideoModuleAPI['getVideo']>;
-  on: Tvist['on'];
-  off: Tvist['off'];
-  emit: Tvist['emit'];
-  once: Tvist['once'];
-  sync: Tvist['sync'];
+  readonly __tvistInternal_id: Tvist['id'];
+  readonly __tvistInternal_root: Tvist['root'];
+  readonly __tvistInternal_track: Tvist['track'];
+  readonly __tvistInternal_container: Tvist['container'];
+  readonly __tvistInternal_options: Tvist['options'];
+  __tvistInternal_next: Tvist['next'];
+  __tvistInternal_prev: Tvist['prev'];
+  __tvistInternal_scrollTo: Tvist['scrollTo'];
+  __tvistInternal_update: Tvist['update'];
+  __tvistInternal_updateOptions: Tvist['updateOptions'];
+  __tvistInternal_disable: Tvist['disable'];
+  __tvistInternal_enable: Tvist['enable'];
+  readonly __tvistInternal_isEnabled: Tvist['isEnabled'];
+  __tvistInternal_destroy: Tvist['destroy'];
+  readonly __tvistInternal_slides: Tvist['slides'];
+  readonly __tvistInternal_originalSlideCount: Tvist['originalSlideCount'];
+  readonly __tvistInternal_slideCount: Tvist['slideCount'];
+  readonly __tvistInternal_activeIndex: Tvist['activeIndex'];
+  readonly __tvistInternal_realIndex: Tvist['realIndex'];
+  readonly __tvistInternal_canScrollNext: Tvist['canScrollNext'];
+  readonly __tvistInternal_canScrollPrev: Tvist['canScrollPrev'];
+  readonly __tvistInternal_autoplay: ReturnType<AutoplayModuleAPI['getAutoplay']> | undefined;
+  readonly __tvistInternal_video: ReturnType<VideoModuleAPI['getVideo']>;
+  __tvistInternal_on: Tvist['on'];
+  __tvistInternal_off: Tvist['off'];
+  __tvistInternal_emit: Tvist['emit'];
+  __tvistInternal_once: Tvist['once'];
+  __tvistInternal_sync: Tvist['sync'];
   __tvistInternal_engine: Engine;
   __tvistInternal__originalOptions?: TvistOptions;
   __tvistInternal__scrollDirection?: 'next' | 'prev';
@@ -232,7 +232,7 @@ export function createTvistRuntime(
     local_setupSlideClick();
   }
   function local_setupSlideClick(): void {
-    resources.listen(local_container, 'click', local_slideClickHandler);
+    resources.__tvistInternal_listen(local_container, 'click', local_slideClickHandler);
   }
   const local_slideClickHandler = (e: MouseEvent): void => {
     // Проверяем флаг allowClick (устанавливается в false при драге)
@@ -354,10 +354,10 @@ export function createTvistRuntime(
         local_resizeHandler?.();
       });
       local_resizeObserver.observe(local_track);
-      resources.add(() => local_resizeObserver?.disconnect());
+      resources.__tvistInternal_add(() => local_resizeObserver?.disconnect());
     } else {
       // Fallback для старых браузеров
-      resources.listen(window, 'resize', local_resizeHandler);
+      resources.__tvistInternal_listen(window, 'resize', local_resizeHandler);
     }
   }
   function local_next(): Tvist {
@@ -653,7 +653,7 @@ export function createTvistRuntime(
     local__isDestroyed = true;
     local_emit('beforeDestroy', slider);
     local_root.classList.add(TVIST_CLASSES.destroyed);
-    resources.clear();
+    resources.__tvistInternal_clear();
     local_emit('destroyed', slider);
     // Уничтожаем модули
     local_modules.forEach((module) => {
@@ -813,19 +813,19 @@ export function createTvistRuntime(
   }
   let local__scrollDirection: 'next' | 'prev' | undefined;
   const component: TvistRuntime = {
-    get id() {
+    get __tvistInternal_id() {
       return local_id;
     },
-    get root() {
+    get __tvistInternal_root() {
       return local_root;
     },
-    get track() {
+    get __tvistInternal_track() {
       return local_track;
     },
-    get container() {
+    get __tvistInternal_container() {
       return local_container;
     },
-    get options() {
+    get __tvistInternal_options() {
       return local_options;
     },
     get __tvistInternal__originalOptions() {
@@ -850,57 +850,57 @@ export function createTvistRuntime(
       local_allowClick = value;
     },
     __tvistInternal_syncModules: local_syncModules,
-    next: local_next,
-    prev: local_prev,
-    scrollTo: local_scrollTo,
-    update: local_update,
-    updateOptions: local_updateOptions,
-    disable: local_disable,
-    enable: local_enable,
-    get isEnabled() {
+    __tvistInternal_next: local_next,
+    __tvistInternal_prev: local_prev,
+    __tvistInternal_scrollTo: local_scrollTo,
+    __tvistInternal_update: local_update,
+    __tvistInternal_updateOptions: local_updateOptions,
+    __tvistInternal_disable: local_disable,
+    __tvistInternal_enable: local_enable,
+    get __tvistInternal_isEnabled() {
       return read_isEnabled();
     },
     __tvistInternal_checkAndResetManualEnabledChange: local_checkAndResetManualEnabledChange,
     get __tvistInternal_isTogglingEnabled() {
       return read_isTogglingEnabled();
     },
-    destroy: local_destroy,
+    __tvistInternal_destroy: local_destroy,
     __tvistInternal_getModule: local_getModule,
     __tvistInternal_removeModule: local_removeModule,
-    get slides() {
+    get __tvistInternal_slides() {
       return read_slides();
     },
     __tvistInternal_updateSlidesList: local_updateSlidesList,
-    get originalSlideCount() {
+    get __tvistInternal_originalSlideCount() {
       return read_originalSlideCount();
     },
-    get slideCount() {
+    get __tvistInternal_slideCount() {
       return read_slideCount();
     },
-    get activeIndex() {
+    get __tvistInternal_activeIndex() {
       return read_activeIndex();
     },
-    get realIndex() {
+    get __tvistInternal_realIndex() {
       return read_realIndex();
     },
-    get canScrollNext() {
+    get __tvistInternal_canScrollNext() {
       return read_canScrollNext();
     },
-    get canScrollPrev() {
+    get __tvistInternal_canScrollPrev() {
       return read_canScrollPrev();
     },
-    get autoplay() {
+    get __tvistInternal_autoplay() {
       return read_autoplay();
     },
-    get video() {
+    get __tvistInternal_video() {
       return read_video();
     },
-    on: local_on,
+    __tvistInternal_on: local_on,
     __tvistInternal_hasPositionListeners: local_hasPositionListeners,
-    off: local_off,
-    emit: local_emit,
-    once: local_once,
-    sync: local_sync,
+    __tvistInternal_off: local_off,
+    __tvistInternal_emit: local_emit,
+    __tvistInternal_once: local_once,
+    __tvistInternal_sync: local_sync,
     get __tvistInternal__scrollDirection() {
       return local__scrollDirection;
     },

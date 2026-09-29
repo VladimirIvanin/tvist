@@ -71,7 +71,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
       local_createClones();
       tvist.__tvistInternal_engine.__tvistInternal_update();
     }
-    const slidesCount = tvist.slides.length;
+    const slidesCount = tvist.__tvistInternal_slides.length;
     if (slidesCount < 1) return;
     local_isInitialized = true;
     const initialRealIndex = options.start ?? 0;
@@ -83,9 +83,12 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
       direction: bothDirections || hasPeek ? undefined : 'next',
       initial: true,
     });
-    base.on('beforeTransitionStart', (data: { index: number; direction: 'next' | 'prev' }) => {
-      local_loopFix({ direction: data.direction });
-    });
+    base.__tvistInternal_on(
+      'beforeTransitionStart',
+      (data: { index: number; direction: 'next' | 'prev' }) => {
+        local_loopFix({ direction: data.direction });
+      }
+    );
   }
 
   function local_onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
@@ -118,13 +121,13 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
     slidesText: string[];
     loopedSlides: number;
   } {
-    const slides = tvist.slides;
+    const slides = tvist.__tvistInternal_slides;
     return {
       location: tvist.__tvistInternal_engine.__tvistInternal_location.get(),
       target: tvist.__tvistInternal_engine.__tvistInternal_target.get(),
       activeIndex: tvist.__tvistInternal_engine.__tvistInternal_index.get(),
-      realIndex: tvist.realIndex,
-      transform: tvist.container.style.transform,
+      realIndex: tvist.__tvistInternal_realIndex,
+      transform: tvist.__tvistInternal_container.style.transform,
       slidesOrder: slides.map((s) => s.getAttribute('data-tvist-slide-index') ?? '?'),
       slidesText: slides.map((s) => s.textContent?.trim() || '?'),
       loopedSlides: local_loopedSlides,
@@ -146,9 +149,9 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
     const loopEnabled = local_getLoopConfig().enabled;
     const withClones = local__withClones;
     if (!loopEnabled) return tvist.__tvistInternal_engine.__tvistInternal_index.get();
-    base.emit('beforeLoopFix');
-    const slides = tvist.slides;
-    const container = tvist.container;
+    base.__tvistInternal_emit('beforeLoopFix');
+    const slides = tvist.__tvistInternal_slides;
+    const container = tvist.__tvistInternal_container;
     const slidesCount = slides.length;
     const bothDirections =
       tvist.__tvistInternal_engine.__tvistInternal_isCenterMode() || options.peek !== undefined;
@@ -215,7 +218,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
         // GridModule задаёт позиции по offsetLeft и требует своего onUpdate.
         const locationBeforeUpdate = tvist.__tvistInternal_engine.__tvistInternal_location.get();
         const targetBeforeUpdate = tvist.__tvistInternal_engine.__tvistInternal_target.get();
-        tvist.update();
+        tvist.__tvistInternal_update();
         tvist.__tvistInternal_engine.__tvistInternal_location.set(locationBeforeUpdate);
         tvist.__tvistInternal_engine.__tvistInternal_target.set(targetBeforeUpdate);
       } else {
@@ -232,7 +235,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
       (initial || prependIndexes.length > 0 || appendIndexes.length > 0) &&
       typeof slideRealIndex !== 'undefined'
     ) {
-      const found = findDomIndexByRealIndex(tvist.slides, slideRealIndex, {
+      const found = findDomIndexByRealIndex(tvist.__tvistInternal_slides, slideRealIndex, {
         preferNonClone: withClones,
       });
       if (found !== -1) {
@@ -244,7 +247,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
         tvist.__tvistInternal_engine.__tvistInternal_applyTransform();
       }
     }
-    base.emit('loopFix');
+    base.__tvistInternal_emit('loopFix');
     return tvist.__tvistInternal_engine.__tvistInternal_index.get();
   }
 
@@ -341,8 +344,8 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
   ): void {
     const safeZone = local__clonesPerSide > 0 ? local__clonesPerSide : slidesPerView;
     if (activeIndex >= safeZone && activeIndex < slidesCount - safeZone) return;
-    const currentRealIndex = tvist.realIndex;
-    const targetDomIndex = findDomIndexByRealIndex(tvist.slides, currentRealIndex, {
+    const currentRealIndex = tvist.__tvistInternal_realIndex;
+    const targetDomIndex = findDomIndexByRealIndex(tvist.__tvistInternal_slides, currentRealIndex, {
       preferNonClone: true,
     });
     if (targetDomIndex !== -1 && targetDomIndex !== activeIndex) {
@@ -373,9 +376,9 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
 
   function local_destroy(): void {
     if (!local_isInitialized) return;
-    const slides = tvist.slides;
-    const container = tvist.container;
-    const realIndex = tvist.realIndex;
+    const slides = tvist.__tvistInternal_slides;
+    const container = tvist.__tvistInternal_container;
+    const realIndex = tvist.__tvistInternal_realIndex;
     if (local__withClones) {
       // Удаляем все клоны
       slides.forEach((slideEl) => {
@@ -386,7 +389,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
       // Обновляем список слайдов, чтобы дальше работать только с оригиналами
       tvist.__tvistInternal_updateSlidesList();
     }
-    const currentSlides = tvist.slides;
+    const currentSlides = tvist.__tvistInternal_slides;
     const newSlidesOrder: (HTMLElement | undefined)[] = [];
     currentSlides.forEach((slideEl) => {
       const indexAttr = slideEl.getAttribute('data-tvist-slide-index');
@@ -401,8 +404,8 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
     });
     container.appendChild(fragment);
     tvist.__tvistInternal_updateSlidesList();
-    tvist.update();
-    tvist.scrollTo(realIndex, true);
+    tvist.__tvistInternal_update();
+    tvist.__tvistInternal_scrollTo(realIndex, true);
     local_isInitialized = false;
   }
 
@@ -418,7 +421,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
       withClones = raw.withClones === true;
     }
     if (enabled && !withClones) {
-      const slidesCount = tvist.slides.length;
+      const slidesCount = tvist.__tvistInternal_slides.length;
       const bothDirections =
         tvist.__tvistInternal_engine.__tvistInternal_isCenterMode() || options.peek !== undefined;
       const slidesPerView = local_getSlidesPerView(bothDirections);
@@ -437,8 +440,8 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
    * Создаёт DOM-клоны по краям для режима withClones.
    */
   function local_createClones(): void {
-    const slides = tvist.slides;
-    const container = tvist.container;
+    const slides = tvist.__tvistInternal_slides;
+    const container = tvist.__tvistInternal_container;
     const originalCount = slides.length;
     if (originalCount === 0) return;
     const perPage = options.perPage ?? 1;
@@ -473,7 +476,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
     tvist.__tvistInternal_updateSlidesList();
   }
   const component: LoopModule = {
-    shouldBeActive: base.shouldBeActive,
+    shouldBeActive: base.__tvistInternal_shouldBeActive,
     get name() {
       return local_name;
     },
@@ -491,7 +494,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
   };

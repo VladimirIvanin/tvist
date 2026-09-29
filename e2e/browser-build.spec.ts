@@ -86,6 +86,31 @@ test('ships one complete JS/CSS pair and gzip copy within the byte budget', () =
     expect(css).toContain(selector);
 });
 
+test('minified pagination preserves fractional totals with grouped navigation', async ({ page }) => {
+  const frame = await isolatedFrame(page);
+  await frame.addScriptTag({ path: bundlePath('tvist.min.js') });
+  await createSlider(frame, {
+    perPage: 1.5,
+    slidesPerGroup: 2,
+    speed: 0,
+    pagination: { type: 'fraction' },
+  });
+  await expect(frame.locator('.tvist-v1__pagination-total')).toHaveText('2.5');
+  const result = await frame.evaluate(() => {
+    const root = document.getElementById('browser-slider') as HTMLElement & { tvistInstance: Tvist };
+    const slider = root.tvistInstance;
+    slider.scrollTo(1, true);
+    const current = document.querySelector('.tvist-v1__pagination-current')?.textContent;
+    slider.updateOptions({ perPage: 2 });
+    slider.scrollTo(0, true);
+    return {
+      current,
+      total: document.querySelector('.tvist-v1__pagination-total')?.textContent,
+    };
+  });
+  expect(result).toEqual({ current: '2', total: '2' });
+});
+
 test('full browser pair includes all modules, navigation and Cube/Scrollbar styles', async ({
   page,
 }) => {

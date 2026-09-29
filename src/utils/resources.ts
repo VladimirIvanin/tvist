@@ -1,95 +1,111 @@
-/** Owns subscriptions and scheduled work for a single activation. */
-export function createResources() {
-  const cleanups = new Set<() => void>();
-  const listeners: {
-    target: EventTarget;
-    event: string;
-    handler: EventListener;
-    capture: boolean;
-    off: () => void;
-  }[] = [];
-  const timers = new Map<number, () => void>();
-  const frames = new Map<number, () => void>();
-  function add(cleanup: () => void): () => void {
-    cleanups.add(cleanup);
+interface Listener {
+  __tvistInternal_target: EventTarget;
+  __tvistInternal_event: string;
+  __tvistInternal_handler: EventListener;
+  __tvistInternal_capture: boolean;
+  __tvistInternal_off: () => void;
+}
+
+function capture(options?: boolean | AddEventListenerOptions): boolean {
+  return typeof options === 'boolean' ? options : (options?.capture ?? false);
+}
+
+/** Shared methods; each activation owns only its resource records. */
+export class Resources {
+  private readonly __tvistInternal_cleanups = new Set<() => void>();
+  private readonly __tvistInternal_listeners: Listener[] = [];
+  private __tvistInternal_timers?: Map<number, () => void>;
+  private __tvistInternal_frames?: Map<number, () => void>;
+
+  __tvistInternal_add(cleanup: () => void): () => void {
+    this.__tvistInternal_cleanups.add(cleanup);
     return () => {
-      if (cleanups.delete(cleanup)) cleanup();
+      if (this.__tvistInternal_cleanups.delete(cleanup)) cleanup();
     };
   }
-  function capture(options?: boolean | AddEventListenerOptions): boolean {
-    return typeof options === 'boolean' ? options : (options?.capture ?? false);
-  }
-  function unlisten<T extends Event>(
+
+  __tvistInternal_unlisten<T extends Event>(
     target: EventTarget,
     event: string,
     handler: (event: T) => unknown,
     options?: boolean | AddEventListenerOptions
   ): void {
-    const entry = listeners.find(
+    const entry = this.__tvistInternal_listeners.find(
       (item) =>
-        item.target === target &&
-        item.event === event &&
-        item.handler === (handler as EventListener) &&
-        item.capture === capture(options)
+        item.__tvistInternal_target === target &&
+        item.__tvistInternal_event === event &&
+        item.__tvistInternal_handler === (handler as EventListener) &&
+        item.__tvistInternal_capture === capture(options)
     );
-    entry?.off();
+    entry?.__tvistInternal_off();
   }
-  function listen<T extends Event>(
+
+  __tvistInternal_listen<T extends Event>(
     target: EventTarget,
     event: string,
     handler: (event: T) => unknown,
     options?: boolean | AddEventListenerOptions
   ): () => void {
-    unlisten(target, event, handler, options);
+    this.__tvistInternal_unlisten(target, event, handler, options);
     const listener = handler as EventListener;
     target.addEventListener(event, listener, options);
-    const entry = {
-      target,
-      event,
-      handler: listener,
-      capture: capture(options),
-      off: () => target.removeEventListener(event, listener, options),
+    const entry: Listener = {
+      __tvistInternal_target: target,
+      __tvistInternal_event: event,
+      __tvistInternal_handler: listener,
+      __tvistInternal_capture: capture(options),
+      __tvistInternal_off: this.__tvistInternal_add(() => {
+        target.removeEventListener(event, listener, options);
+        this.__tvistInternal_listeners.splice(this.__tvistInternal_listeners.indexOf(entry), 1);
+      }),
     };
-    entry.off = add(() => {
-      target.removeEventListener(event, listener, options);
-      listeners.splice(listeners.indexOf(entry), 1);
-    });
-    listeners.push(entry);
-    return entry.off;
+    this.__tvistInternal_listeners.push(entry);
+    return entry.__tvistInternal_off;
   }
-  function timeout(callback: () => void, delay: number): number {
+
+  __tvistInternal_timeout(callback: () => void, delay: number): number {
+    const timers = (this.__tvistInternal_timers ??= new Map());
     const id = window.setTimeout(() => {
       off();
       callback();
     }, delay);
-    const off = add(() => {
+    const off = this.__tvistInternal_add(() => {
       window.clearTimeout(id);
       timers.delete(id);
     });
     timers.set(id, off);
     return id;
   }
-  function frame(callback: FrameRequestCallback): number {
+
+  __tvistInternal_frame(callback: FrameRequestCallback): number {
+    const frames = (this.__tvistInternal_frames ??= new Map());
     const id = requestAnimationFrame((time) => {
       off();
       callback(time);
     });
-    const off = add(() => {
+    const off = this.__tvistInternal_add(() => {
       cancelAnimationFrame(id);
       frames.delete(id);
     });
     frames.set(id, off);
     return id;
   }
-  function cancelTimeout(id: number): void {
-    timers.get(id)?.();
+
+  __tvistInternal_cancelTimeout(id: number): void {
+    this.__tvistInternal_timers?.get(id)?.();
   }
-  function cancelFrame(id: number): void {
-    frames.get(id)?.();
+
+  __tvistInternal_cancelFrame(id: number): void {
+    this.__tvistInternal_frames?.get(id)?.();
   }
-  function clear(): void {
-    Array.from(cleanups).forEach((cleanup) => cleanup());
-    cleanups.clear();
+
+  __tvistInternal_clear(): void {
+    Array.from(this.__tvistInternal_cleanups).forEach((cleanup) => cleanup());
+    this.__tvistInternal_cleanups.clear();
   }
-  return { add, listen, unlisten, timeout, frame, cancelTimeout, cancelFrame, clear };
+}
+
+/** Owns subscriptions and scheduled work for a single activation. */
+export function createResources(): Resources {
+  return new Resources();
 }

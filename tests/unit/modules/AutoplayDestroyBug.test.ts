@@ -71,7 +71,7 @@ describe('AutoplayModule - Destroy Bug', () => {
     // В нашем тесте мы просто проверим, что у старого слайдера не вызывается next().
 
     // Но еще проще: мы можем зашпионить за методом next() старого слайдера
-    const nextSpy = vi.spyOn(getRuntime(slider), 'next')
+    const nextSpy = vi.spyOn(getRuntime(slider), '__tvistInternal_next')
 
     vi.advanceTimersByTime(1500)
 
