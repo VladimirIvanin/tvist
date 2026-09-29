@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  */
@@ -31,7 +32,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
             <div class="${TVIST_CLASSES.slide}">Slide 2</div>
             <div class="${TVIST_CLASSES.slide}">Slide 3</div>
           </div>
-        </div>        
+        </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
     `
@@ -107,7 +108,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
             <div class="${TVIST_CLASSES.slide}">Slide 2</div>
             <div class="${TVIST_CLASSES.slide}">Slide 3</div>
           </div>
-        </div>        
+        </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
     `
@@ -134,7 +135,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
       slider.scrollTo(1)
       console.log(`Cycle ${cycle}, Step 1:`, getSlideOrder())
       console.log(`  activeIndex=${slider.activeIndex}, realIndex=${slider.realIndex}`)
-      
+
       let activeSlide = slider.slides[slider.activeIndex]
       let dataIndex = activeSlide?.getAttribute('data-tvist-slide-index')
       expect(dataIndex).toBe(String(slider.realIndex))
@@ -142,7 +143,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
       slider.scrollTo(2)
       console.log(`Cycle ${cycle}, Step 2:`, getSlideOrder())
       console.log(`  activeIndex=${slider.activeIndex}, realIndex=${slider.realIndex}`)
-      
+
       activeSlide = slider.slides[slider.activeIndex]
       dataIndex = activeSlide?.getAttribute('data-tvist-slide-index')
       expect(dataIndex).toBe(String(slider.realIndex))
@@ -150,7 +151,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
       slider.scrollTo(0)
       console.log(`Cycle ${cycle}, Step 3:`, getSlideOrder())
       console.log(`  activeIndex=${slider.activeIndex}, realIndex=${slider.realIndex}`)
-      
+
       activeSlide = slider.slides[slider.activeIndex]
       dataIndex = activeSlide?.getAttribute('data-tvist-slide-index')
       expect(dataIndex).toBe(String(slider.realIndex))
@@ -166,7 +167,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
             <div class="${TVIST_CLASSES.slide}">Slide 2</div>
             <div class="${TVIST_CLASSES.slide}">Slide 3</div>
           </div>
-        </div>        
+        </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
     `
@@ -196,10 +197,10 @@ describe('PaginationModule - Loop Bug Investigation', () => {
 
     // Начинаем драг
     slider.emit('dragStart')
-    
+
     // Эмулируем slideChangeStart во время драга
     slider.emit('slideChangeStart', 2)
-    
+
     // Проверяем что пагинация НЕ обновилась
     console.log('During drag after slideChangeStart: activeBullet=', Array.from(bullets).findIndex(b => b.classList.contains(TVIST_CLASSES.bulletActive)))
     expect(bullets[1].classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
@@ -225,7 +226,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
             <div class="${TVIST_CLASSES.slide}">Slide 2</div>
             <div class="${TVIST_CLASSES.slide}">Slide 3</div>
           </div>
-        </div>        
+        </div>
         <div class="${TVIST_CLASSES.pagination}"></div>
       </div>
     `
@@ -240,7 +241,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
     })
 
     // Получаем доступ к PaginationModule для проверки getCurrentSlideIndex
-    const paginationModule = slider.getModule('pagination') as any
+    const paginationModule = getRuntime(slider).getModule('pagination') as any
 
     // Проходим полный первый цикл
     slider.scrollTo(1)
@@ -254,7 +255,7 @@ describe('PaginationModule - Loop Bug Investigation', () => {
     console.log('  activeIndex=', slider.activeIndex)
     console.log('  realIndex=', slider.realIndex)
     console.log('  getCurrentSlideIndex()=', paginationModule?.getCurrentSlideIndex?.())
-    
+
     // Проверяем что getCurrentSlideIndex возвращает правильный realIndex
     if (paginationModule?.getCurrentSlideIndex) {
       expect(paginationModule.getCurrentSlideIndex()).toBe(1)

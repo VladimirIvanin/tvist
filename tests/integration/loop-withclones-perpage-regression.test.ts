@@ -11,7 +11,7 @@ import { TVIST_CLASSES } from '../../src/core/constants'
 import { Tvist } from '../../src/core/Tvist'
 import { createSliderFixture } from '../fixtures'
 import '../../src/modules/loop'
-import '../../src/modules/slide-states/init'
+
 
 describe('loop withClones + perPage больше числа слайдов', () => {
   let fixture: ReturnType<typeof createSliderFixture>

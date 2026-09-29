@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  */
@@ -160,10 +161,10 @@ describe('Engine - endIndex logic', () => {
       })
 
       // endIndex = 2
-      expect(slider.engine.canScrollNext()).toBe(true)
+      expect(getRuntime(slider).engine.canScrollNext()).toBe(true)
 
       slider.scrollTo(2)
-      expect(slider.engine.canScrollNext()).toBe(false)
+      expect(getRuntime(slider).engine.canScrollNext()).toBe(false)
     })
 
     it('should return true in loop mode even at endIndex', () => {
@@ -189,7 +190,7 @@ describe('Engine - endIndex logic', () => {
       })
 
       slider.scrollTo(5)
-      expect(slider.engine.canScrollNext()).toBe(true)
+      expect(getRuntime(slider).engine.canScrollNext()).toBe(true)
     })
   })
 
@@ -220,7 +221,7 @@ describe('Engine - endIndex logic', () => {
       expect(slider.activeIndex).toBe(0)
 
       // Пытаемся проскроллить на 5 слайдов вперед
-      slider.engine.scrollBy(5)
+      getRuntime(slider).engine.scrollBy(5)
       expect(slider.activeIndex).toBe(2) // Должно остановиться на endIndex
     })
   })

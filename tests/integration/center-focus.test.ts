@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * center: { focus: true } — центрирование активного слайда с trim у краёв (как Splide focus:center).
  */
@@ -40,7 +41,7 @@ describe('center.focus', () => {
 
   it('первый слайд: позиция min scroll, не «чистый» center offset', () => {
     const s = createFocusSlider()
-    const engine = s.engine
+    const engine = getRuntime(s).engine
 
     const minScroll = engine.getMinScrollPosition()
     const pos0 = engine.getScrollPositionForIndex(0)
@@ -53,7 +54,7 @@ describe('center.focus', () => {
 
   it('средний слайд: центрирование без clamp', () => {
     const s = createFocusSlider()
-    const engine = s.engine
+    const engine = getRuntime(s).engine
     const index = 2
 
     const base = -engine.getSlidePosition(index)
@@ -66,7 +67,7 @@ describe('center.focus', () => {
 
   it('последний слайд: позиция max scroll', () => {
     const s = createFocusSlider()
-    const engine = s.engine
+    const engine = getRuntime(s).engine
     const lastIndex = slidesCount - 1
 
     expect(engine.getScrollPositionForIndex(lastIndex)).toBe(
@@ -76,7 +77,7 @@ describe('center.focus', () => {
 
   it('scrollTo на краях совпадает с getScrollPositionForIndex', () => {
     const s = createFocusSlider()
-    const engine = s.engine
+    const engine = getRuntime(s).engine
 
     s.scrollTo(0, true)
     expect(engine.location.get()).toBe(engine.getScrollPositionForIndex(0))
@@ -103,7 +104,7 @@ describe('center.focus', () => {
       speed: 0,
     })
 
-    const engine = slider.engine
+    const engine = getRuntime(slider).engine
     const centerOffset = engine.getCenterOffset(0)
     const pos0 = engine.getScrollPositionForIndex(0)
 
@@ -114,14 +115,14 @@ describe('center.focus', () => {
 
   it('isCenterFocus / isCenterMode', () => {
     const s = createFocusSlider()
-    expect(s.engine.isCenterFocus()).toBe(true)
-    expect(s.engine.isCenterActive()).toBe(false)
-    expect(s.engine.isCenterMode()).toBe(true)
+    expect(getRuntime(s).engine.isCenterFocus()).toBe(true)
+    expect(getRuntime(s).engine.isCenterActive()).toBe(false)
+    expect(getRuntime(s).engine.isCenterMode()).toBe(true)
   })
 
   it('clampCenterPosition ограничивает позицию', () => {
     const s = createFocusSlider()
-    const engine = s.engine
+    const engine = getRuntime(s).engine
     const min = engine.getMinScrollPosition()
     const max = engine.getMaxScrollPosition()
 

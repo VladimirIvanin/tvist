@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { Tvist } from '@core/Tvist'
 import { TVIST_CLASSES } from '@core/constants'
@@ -90,7 +91,7 @@ describe('Tvist', () => {
 
       // ID должны быть уникальными
       expect(id1).not.toBe(id2)
-      
+
       // ID должны быть в формате tvist-{UUID}
       const uuidRegex = /^tvist-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       expect(id1).toMatch(uuidRegex)
@@ -101,7 +102,7 @@ describe('Tvist', () => {
 
     it('should store instance in root.tvistInstance', () => {
       const slider = new Tvist(fixture.root)
-      
+
       expect(fixture.root.tvistInstance).toBe(slider)
     })
 
@@ -116,10 +117,10 @@ describe('Tvist', () => {
 
       // Старый инстанс должен быть уничтожен
       expect(destroySpy).toHaveBeenCalled()
-      
+
       // ID должны быть разными
       expect(id1).not.toBe(id2)
-      
+
       // В root должен быть новый инстанс
       expect(fixture.root.tvistInstance).toBe(slider2)
       expect(fixture.root.classList.contains(TVIST_CLASSES.destroyed)).toBe(false)
@@ -127,11 +128,11 @@ describe('Tvist', () => {
 
     it('should set tvistInstance to null after destroy', () => {
       const slider = new Tvist(fixture.root)
-      
+
       expect(fixture.root.tvistInstance).toBe(slider)
-      
+
       slider.destroy()
-      
+
       expect(fixture.root.tvistInstance).toBeNull()
     })
 
@@ -139,23 +140,23 @@ describe('Tvist', () => {
       // Создаём много слайдеров для проверки уникальности
       const ids = new Set<string>()
       const fixtures: Array<{ root: HTMLElement; cleanup: () => void }> = []
-      
+
       for (let i = 0; i < 100; i++) {
         const f = createSliderFixture({ slidesCount: 3, width: 800 })
         const slider = new Tvist(f.root)
         ids.add(slider.id)
         fixtures.push(f)
       }
-      
+
       // Все ID должны быть уникальными
       expect(ids.size).toBe(100)
-      
+
       // Все ID должны соответствовать формату UUID
       const uuidRegex = /^tvist-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       ids.forEach(id => {
         expect(id).toMatch(uuidRegex)
       })
-      
+
       fixtures.forEach(f => f.cleanup())
     })
 
@@ -163,7 +164,7 @@ describe('Tvist', () => {
       // Симулируем быстрое создание инстансов (как при двойном подключении скриптов)
       const ids: string[] = []
       const fixtures: Array<{ root: HTMLElement; cleanup: () => void }> = []
-      
+
       // Создаём 10 слайдеров практически одновременно
       for (let i = 0; i < 10; i++) {
         const f = createSliderFixture({ slidesCount: 3, width: 800 })
@@ -171,17 +172,17 @@ describe('Tvist', () => {
         ids.push(slider.id)
         fixtures.push(f)
       }
-      
+
       // Проверяем что все ID уникальны
       const uniqueIds = new Set(ids)
       expect(uniqueIds.size).toBe(10)
-      
+
       // Проверяем формат
       const uuidRegex = /^tvist-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       ids.forEach(id => {
         expect(id).toMatch(uuidRegex)
       })
-      
+
       fixtures.forEach(f => f.cleanup())
     })
   })
@@ -468,7 +469,7 @@ describe('Tvist', () => {
         perPage: 2,
       })
 
-      const initialWidth = slider.engine.slideSizeValue
+      const initialWidth = getRuntime(slider).engine.slideSizeValue
 
       fixture.root.style.width = '1200px'
       Object.defineProperty(fixture.root, 'offsetWidth', {
@@ -481,7 +482,7 @@ describe('Tvist', () => {
       })
       slider.update()
 
-      const newWidth = slider.engine.slideSizeValue
+      const newWidth = getRuntime(slider).engine.slideSizeValue
 
       expect(newWidth).not.toBe(initialWidth)
       expect(newWidth).toBe(600) // 1200 / 2 = 600
@@ -493,7 +494,7 @@ describe('Tvist', () => {
       slider.destroy()
 
       // После destroy не должно быть активных модулей
-      expect(slider.getModule('any')).toBeUndefined()
+      expect(getRuntime(slider).getModule('any')).toBeUndefined()
     })
 
     it('should be safe to call destroy multiple times', () => {
@@ -584,60 +585,19 @@ describe('Tvist', () => {
       const newSlide = document.createElement('div')
       newSlide.className = TVIST_CLASSES.slide
       fixture.container.appendChild(newSlide)
-      slider.updateSlidesList()
+      getRuntime(slider).updateSlidesList()
 
       expect(slider.originalSlideCount).toBe(6)
     })
   })
 
-  describe('module registration', () => {
-    it('should register module', () => {
-      class TestModule {
-        name = 'test'
-        init() {}
-        destroy() {}
-      }
-
-      Tvist.registerModule('test', TestModule as any)
-
-      expect(Tvist.getRegisteredModules()).toContain('test')
-
-      Tvist.unregisterModule('test')
-    })
-
-    it('should warn on duplicate registration', () => {
-      class TestModule {
-        name = 'test'
-        init() {}
-        destroy() {}
-      }
-
-      const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-
-      Tvist.registerModule('duplicate', TestModule as any)
-      Tvist.registerModule('duplicate', TestModule as any)
-
-      expect(consoleWarn).toHaveBeenCalledWith(
-        'Tvist: Module "duplicate" is already registered'
-      )
-
-      consoleWarn.mockRestore()
-      Tvist.unregisterModule('duplicate')
-    })
-
-    it('should unregister module', () => {
-      class TestModule {
-        name = 'test'
-        init() {}
-        destroy() {}
-      }
-
-      Tvist.registerModule('temp', TestModule as any)
-      expect(Tvist.getRegisteredModules()).toContain('temp')
-
-      Tvist.unregisterModule('temp')
-      expect(Tvist.getRegisteredModules()).not.toContain('temp')
-    })
+  it('keeps implementation and registration off the public instance', () => {
+    const slider = new Tvist(fixture.root)
+    expect('engine' in slider).toBe(false)
+    expect('getModule' in slider).toBe(false)
+    expect('registerModule' in Tvist).toBe(false)
+    expect('MODULES' in Tvist).toBe(false)
+    slider.destroy()
   })
 
   describe('resize handling', () => {
@@ -678,7 +638,7 @@ describe('Tvist', () => {
 
     it('should remove resize listener on destroy', () => {
       const slider = new Tvist(fixture.root)
-      
+
       slider.destroy()
 
       // После destroy не должно быть утечек памяти

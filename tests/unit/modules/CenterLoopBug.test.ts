@@ -1,9 +1,10 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тест для локализации бага с центрированием слайдов при loop
- * 
+ *
  * Проблема: при включенном loop + center слайды не центрируются корректно.
  * Из HTML видно что transform неправильный для центрирования активного слайда.
- * 
+ *
  * Ожидаемое поведение:
  * - Активный слайд должен быть в центре viewport
  * - getCenterOffset должен возвращать корректное смещение
@@ -20,9 +21,9 @@ describe('Center + Loop: centering bug', () => {
   let slider: Tvist
 
   beforeEach(() => {
-    fixture = createSliderFixture({ 
-      slidesCount: 7, 
-      width: 800 
+    fixture = createSliderFixture({
+      slidesCount: 7,
+      width: 800
     })
     root = fixture.root
   })
@@ -45,21 +46,21 @@ describe('Center + Loop: centering bug', () => {
 
       // Получаем размеры
       const rootWidth = root.offsetWidth // 800px
-      const slideWidth = slider.engine.getSlideSize(0)
+      const slideWidth = getRuntime(slider).engine.getSlideSize(0)
       const gap = 20
-      const containerSize = slider.engine.containerSizeValue
-      
+      const containerSize = getRuntime(slider).engine.containerSizeValue
+
       // При loop peek не применяется, поэтому:
       // containerSize должен быть равен rootWidth
       // centerOffset = (containerSize - slideWidth) / 2
       const expectedCenterOffset = (containerSize - slideWidth) / 2
-      
-      const actualCenterOffset = slider.engine.getCenterOffset(0)
-      
+
+      const actualCenterOffset = getRuntime(slider).engine.getCenterOffset(0)
+
       // Получаем peek значения через приватные поля (для отладки)
-      const peekStart = (slider.engine as any).peekStart
-      const peekEnd = (slider.engine as any).peekEnd
-      
+      const peekStart = (getRuntime(slider).engine as any).peekStart
+      const peekEnd = (getRuntime(slider).engine as any).peekEnd
+
       console.log('Debug centerOffset with loop:', {
         rootWidth,
         containerSize,
@@ -71,7 +72,7 @@ describe('Center + Loop: centering bug', () => {
         actualCenterOffset,
         peekApplied: rootWidth !== containerSize
       })
-      
+
       expect(actualCenterOffset).toBeCloseTo(expectedCenterOffset, 1)
     })
 
@@ -86,15 +87,15 @@ describe('Center + Loop: centering bug', () => {
       })
 
       const rootWidth = root.offsetWidth
-      const slideWidth = slider.engine.getSlideSize(0)
-      const containerSize = slider.engine.containerSizeValue
-      
+      const slideWidth = getRuntime(slider).engine.getSlideSize(0)
+      const containerSize = getRuntime(slider).engine.containerSizeValue
+
       // Без loop peek не применяется (если не задан явно)
       // centerOffset = (containerSize - slideWidth) / 2
       const expectedCenterOffset = (containerSize - slideWidth) / 2
-      
-      const actualCenterOffset = slider.engine.getCenterOffset(0)
-      
+
+      const actualCenterOffset = getRuntime(slider).engine.getCenterOffset(0)
+
       console.log('Debug centerOffset without loop:', {
         rootWidth,
         containerSize,
@@ -103,7 +104,7 @@ describe('Center + Loop: centering bug', () => {
         actualCenterOffset,
         peekApplied: rootWidth !== containerSize
       })
-      
+
       expect(actualCenterOffset).toBeCloseTo(expectedCenterOffset, 1)
     })
 
@@ -117,12 +118,12 @@ describe('Center + Loop: centering bug', () => {
         speed: 0
       })
 
-      const slideWidth = slider.engine.getSlideSize(3)
+      const slideWidth = getRuntime(slider).engine.getSlideSize(3)
       const rootWidth = root.offsetWidth
       const expectedCenterOffset = (rootWidth - slideWidth) / 2
-      
-      const actualCenterOffset = slider.engine.getCenterOffset(3)
-      
+
+      const actualCenterOffset = getRuntime(slider).engine.getCenterOffset(3)
+
       expect(actualCenterOffset).toBeCloseTo(expectedCenterOffset, 1)
     })
   })
@@ -139,12 +140,12 @@ describe('Center + Loop: centering bug', () => {
       })
 
       const index = 0
-      const basePosition = -slider.engine.getSlidePosition(index)
-      const centerOffset = slider.engine.getCenterOffset(index)
+      const basePosition = -getRuntime(slider).engine.getSlidePosition(index)
+      const centerOffset = getRuntime(slider).engine.getCenterOffset(index)
       const expectedPosition = basePosition + centerOffset
-      
-      const actualPosition = slider.engine.getScrollPositionForIndex(index)
-      
+
+      const actualPosition = getRuntime(slider).engine.getScrollPositionForIndex(index)
+
       console.log('Debug scrollPosition for index 0:', {
         index,
         basePosition,
@@ -152,7 +153,7 @@ describe('Center + Loop: centering bug', () => {
         expectedPosition,
         actualPosition
       })
-      
+
       expect(actualPosition).toBeCloseTo(expectedPosition, 1)
     })
 
@@ -167,12 +168,12 @@ describe('Center + Loop: centering bug', () => {
       })
 
       const index = 3
-      const basePosition = -slider.engine.getSlidePosition(index)
-      const centerOffset = slider.engine.getCenterOffset(index)
+      const basePosition = -getRuntime(slider).engine.getSlidePosition(index)
+      const centerOffset = getRuntime(slider).engine.getCenterOffset(index)
       const expectedPosition = basePosition + centerOffset
-      
-      const actualPosition = slider.engine.getScrollPositionForIndex(index)
-      
+
+      const actualPosition = getRuntime(slider).engine.getScrollPositionForIndex(index)
+
       console.log('Debug scrollPosition for index 3:', {
         index,
         basePosition,
@@ -180,7 +181,7 @@ describe('Center + Loop: centering bug', () => {
         expectedPosition,
         actualPosition
       })
-      
+
       expect(actualPosition).toBeCloseTo(expectedPosition, 1)
     })
   })
@@ -197,9 +198,9 @@ describe('Center + Loop: centering bug', () => {
       })
 
       // После инициализации с loop, activeIndex может отличаться от realIndex
-      const activeIndex = slider.engine.index.get()
+      const activeIndex = getRuntime(slider).engine.index.get()
       const activeSlide = slider.slides[activeIndex]
-      
+
       if (!activeSlide) {
         throw new Error(`Active slide not found at index ${activeIndex}`)
       }
@@ -236,10 +237,10 @@ describe('Center + Loop: centering bug', () => {
 
       // Переходим на другой слайд
       slider.scrollTo(3, true)
-      
-      const activeIndex = slider.engine.index.get()
+
+      const activeIndex = getRuntime(slider).engine.index.get()
       const activeSlide = slider.slides[activeIndex]
-      
+
       if (!activeSlide) {
         throw new Error(`Active slide not found at index ${activeIndex}`)
       }
@@ -256,8 +257,8 @@ describe('Center + Loop: centering bug', () => {
         slideCenter,
         rootCenter,
         diff: Math.abs(slideCenter - rootCenter),
-        location: slider.engine.location.get(),
-        target: slider.engine.target.get()
+        location: getRuntime(slider).engine.location.get(),
+        target: getRuntime(slider).engine.target.get()
       })
 
       expect(Math.abs(slideCenter - rootCenter)).toBeLessThan(5)
@@ -273,9 +274,9 @@ describe('Center + Loop: centering bug', () => {
         speed: 0
       })
 
-      const activeIndex = slider.engine.index.get()
+      const activeIndex = getRuntime(slider).engine.index.get()
       const activeSlide = slider.slides[activeIndex]
-      
+
       if (!activeSlide) {
         throw new Error(`Active slide not found at index ${activeIndex}`)
       }
@@ -292,8 +293,8 @@ describe('Center + Loop: centering bug', () => {
         slideCenter,
         rootCenter,
         diff: Math.abs(slideCenter - rootCenter),
-        location: slider.engine.location.get(),
-        target: slider.engine.target.get(),
+        location: getRuntime(slider).engine.location.get(),
+        target: getRuntime(slider).engine.target.get(),
         slideWidth: slideRect.width,
         slideLeft: slideRect.left,
         rootWidth: rootRect.width,
@@ -315,12 +316,12 @@ describe('Center + Loop: centering bug', () => {
         speed: 0
       })
 
-      const activeIndex = slider.engine.index.get()
-      const location = slider.engine.location.get()
-      
+      const activeIndex = getRuntime(slider).engine.index.get()
+      const location = getRuntime(slider).engine.location.get()
+
       // Ожидаемая позиция = basePosition + centerOffset
-      const expectedPosition = slider.engine.getScrollPositionForIndex(activeIndex)
-      
+      const expectedPosition = getRuntime(slider).engine.getScrollPositionForIndex(activeIndex)
+
       console.log('Initial position with center + loop:', {
         activeIndex,
         realIndex: (slider as any).realIndex,
@@ -328,7 +329,7 @@ describe('Center + Loop: centering bug', () => {
         expectedPosition,
         diff: Math.abs(location - expectedPosition)
       })
-      
+
       expect(location).toBeCloseTo(expectedPosition, 1)
     })
 
@@ -342,8 +343,8 @@ describe('Center + Loop: centering bug', () => {
         speed: 0
       })
 
-      const loopModule = slider['modules'].get('loop') as { 
-        fix?: (params: unknown) => void 
+      const loopModule = getRuntime(slider)['modules'].get('loop') as {
+        fix?: (params: unknown) => void
       } | undefined
 
       if (!loopModule?.fix) {
@@ -354,9 +355,9 @@ describe('Center + Loop: centering bug', () => {
       loopModule.fix({ direction: 'next' })
 
       // Проверяем что слайд все еще центрирован
-      const activeIndex = slider.engine.index.get()
+      const activeIndex = getRuntime(slider).engine.index.get()
       const activeSlide = slider.slides[activeIndex]
-      
+
       if (!activeSlide) {
         throw new Error(`Active slide not found at index ${activeIndex}`)
       }
@@ -390,9 +391,9 @@ describe('Center + Loop: centering bug', () => {
         speed: 0
       })
 
-      const activeIndex = slider.engine.index.get()
+      const activeIndex = getRuntime(slider).engine.index.get()
       const activeSlide = slider.slides[activeIndex]
-      
+
       if (!activeSlide) {
         throw new Error(`Active slide not found at index ${activeIndex}`)
       }
@@ -416,9 +417,9 @@ describe('Center + Loop: centering bug', () => {
         speed: 0
       })
 
-      const activeIndex = slider.engine.index.get()
+      const activeIndex = getRuntime(slider).engine.index.get()
       const activeSlide = slider.slides[activeIndex]
-      
+
       if (!activeSlide) {
         throw new Error(`Active slide not found at index ${activeIndex}`)
       }
@@ -442,9 +443,9 @@ describe('Center + Loop: centering bug', () => {
         speed: 0
       })
 
-      const activeIndex = slider.engine.index.get()
+      const activeIndex = getRuntime(slider).engine.index.get()
       const activeSlide = slider.slides[activeIndex]
-      
+
       if (!activeSlide) {
         throw new Error(`Active slide not found at index ${activeIndex}`)
       }

@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * Регрессия: center: { justify: true } не должен приводить к бесконечному
  * росту ширины слайдов и/или огромному translate3d.
@@ -90,7 +91,7 @@ describe('center.justify — feedback loop regression', () => {
       drag: true,
     })
 
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
 
     const firstSlideWidth = parseFloat(fixture.slides[0].style.width || '0')
 
@@ -159,7 +160,7 @@ describe('center.justify — feedback loop regression', () => {
       drag: true,
     })
 
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
 
     const widthsFirst = fixture.slides.map(s => parseFloat(s.style.width || '0'))
 
@@ -194,11 +195,11 @@ describe('center.justify — feedback loop regression', () => {
     slider.update()
     slider.update()
 
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
 
     // getTotalSize() считает суммарный размер контента по позициям и размерам.
     // В locked + justify он должен помещаться в viewport.
-    const totalSize = slider.engine.getTotalSize()
+    const totalSize = getRuntime(slider).engine.getTotalSize()
     expect(totalSize).toBeLessThanOrEqual(rootWidth)
     expect(Number.isFinite(totalSize)).toBe(true)
   })

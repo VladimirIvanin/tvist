@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  *
@@ -194,7 +195,7 @@ describe('NavigationModule + updateOptions (кастомные DOM-стрелк�
     })
 
     expect(slider.activeIndex).toBe(0)
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
 
     slider.updateOptions({
       slideMinSize: 400,

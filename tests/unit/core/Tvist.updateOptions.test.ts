@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тесты для метода updateOptions класса Tvist
  */
@@ -138,7 +139,7 @@ describe('Tvist.updateOptions()', () => {
     // Переходим к следующему слайду - должен сработать handler2
     handler1Called = false
     slider.scrollTo(0)
-    
+
     // Старый обработчик не должен вызываться (уже false)
     // Новый обработчик должен вызваться
     expect(handler2Called).toBe(true)
@@ -147,11 +148,11 @@ describe('Tvist.updateOptions()', () => {
   it('должен пересчитывать размеры при изменении perPage', () => {
     const slider = new Tvist(fixture.root, { perPage: 1 })
 
-    const initialSlideSize = slider.engine.slideSizeValue
+    const initialSlideSize = getRuntime(slider).engine.slideSizeValue
 
     slider.updateOptions({ perPage: 2 })
 
-    const updatedSlideSize = slider.engine.slideSizeValue
+    const updatedSlideSize = getRuntime(slider).engine.slideSizeValue
 
     // При perPage=2 размер слайда должен измениться
     // (в реальных условиях с размерами контейнера)
@@ -240,7 +241,7 @@ describe('Tvist.updateOptions()', () => {
     // Классы всё ещё не должны появиться
     expect(fixture.root.classList.contains(TVIST_CLASSES.draggable)).toBe(false)
     expect(fixture.slides[0].classList.contains(TVIST_CLASSES.slideActive)).toBe(false)
-    
+
     // Стили контейнера тоже не должны применяться
     expect(fixture.container.style.paddingLeft).toBe('')
     expect(fixture.container.style.paddingRight).toBe('')

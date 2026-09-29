@@ -1,6 +1,6 @@
 const slider = new TvistV1('.tvist-v1', { perPage: 3, gap: 16, marquee: { speed: 30, pauseOnHover: true } });
 
-const motion = slider.getModule('marquee')?.getMarquee();
+const motion = slider.marquee;
 const motionButton = document.querySelector('.demo-motion-toggle');
 if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
   motion?.pause();

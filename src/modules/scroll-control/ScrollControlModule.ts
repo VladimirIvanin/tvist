@@ -2,183 +2,195 @@
  * ScrollControl - модуль для управления слайдером через скролл
  * Поддерживает wheel events на десктопе
  */
-
-import { Module } from '../Module'
-import type { Tvist } from '../../core/Tvist'
-import type { TvistOptions } from '../../core/types'
-
+import { createComponent, type Component } from '../Component';
+import type { TvistRuntime as Tvist } from '../../core/runtime';
+import type { TvistOptions } from '../../core/types';
 interface ScrollControlOptions {
   /** Чувствительность (количество пикселей на тик колёсика) */
-  sensitivity?: number
+  sensitivity?: number;
   /** Разрешить прокрутку страницы на краях слайдера */
-  releaseOnEdges?: boolean
+  releaseOnEdges?: boolean;
 }
 
-export class ScrollControlModule extends Module {
-  readonly name = 'ScrollControl'
-
-  private sensitivity: number
-  private releaseOnEdges: boolean
-  private isScrolling = false
-  private scrollTimer?: number
-  private lastWheelTime = 0
-  private wheelThrottle = 50 // мс между обработкой событий
-
-  constructor(tvist: Tvist, options: TvistOptions) {
-    super(tvist, options)
-
-    const wheelOptions = this.getWheelOptions()
-    this.sensitivity = wheelOptions.sensitivity ?? 1
-    this.releaseOnEdges = wheelOptions.releaseOnEdges ?? true
-  }
-
-  /**
-   * Получить опции wheel из конфигурации
-   */
-  private getWheelOptions(): ScrollControlOptions {
-    const wheel = this.options.wheel
-    
-    if (typeof wheel === 'boolean') {
-      return {}
-    }
-    
-    return wheel ?? {}
-  }
-
+/** Internal component; state lives in this factory's closure. */
+export interface ScrollControlModule extends Component {
+  readonly name: 'ScrollControl';
   /**
    * Проверить, должен ли модуль быть активен
    */
-  public override shouldBeActive(): boolean {
-    return this.options.wheel !== false && this.options.wheel !== undefined
-  }
+  shouldBeActive(): boolean;
 
-  override init(): void {
-    if (!this.shouldBeActive()) {
-      return
+  init(): void;
+  /**
+   * Хук обновления опций
+   */
+  onOptionsUpdate(newOptions: Partial<TvistOptions>): void;
+
+  destroy(): void;
+}
+
+export function createScrollControlModule(
+  tvist: Tvist,
+  options: TvistOptions
+): ScrollControlModule {
+  const base = createComponent(tvist, options);
+
+  const local_name = 'ScrollControl' as const;
+
+  let local_sensitivity: number;
+
+  let local_releaseOnEdges: boolean;
+
+  let local_isScrolling = false;
+
+  let local_scrollTimer: number | undefined;
+
+  let local_lastWheelTime = 0;
+
+  const local_wheelThrottle = 50; // мс между обработкой событий
+  /**
+   * Получить опции wheel из конфигурации
+   */
+  function local_getWheelOptions(): ScrollControlOptions {
+    const wheel = options.wheel;
+    if (typeof wheel === 'boolean') {
+      return {};
     }
-
-    // Добавляем обработчик wheel событий
-    this.attachWheelListener()
+    return wheel ?? {};
+  }
+  /**
+   * Проверить, должен ли модуль быть активен
+   */
+  function local_shouldBeActive(): boolean {
+    return options.wheel !== false && options.wheel !== undefined;
   }
 
+  function local_init(): void {
+    if (!local_shouldBeActive()) {
+      return;
+    }
+    // Добавляем обработчик wheel событий
+    local_attachWheelListener();
+  }
   /**
    * Добавить обработчик wheel событий
    */
-  private attachWheelListener(): void {
-    this.tvist.root.addEventListener('wheel', this.handleWheel, { passive: false })
+  function local_attachWheelListener(): void {
+    base.resources.listen(tvist.root, 'wheel', local_handleWheel, { passive: false });
   }
-
   /**
    * Обработчик wheel события
    */
-  private handleWheel = (event: WheelEvent): void => {
-    const isVertical = this.options.direction === 'vertical'
-    
+  const local_handleWheel: (event: WheelEvent) => void = (event: WheelEvent): void => {
+    const isVertical = options.direction === 'vertical';
     // Для горизонтального слайдера используем deltaY (как обычный скролл вниз/вверх)
     // Для вертикального слайдера также используем deltaY
     // deltaX используется только если deltaY = 0 (трекпад, shift+wheel)
-    let mainDelta = event.deltaY
-    
+    let mainDelta = event.deltaY;
     // Если deltaY = 0, но есть deltaX (трекпад или shift+wheel)
     if (Math.abs(event.deltaY) < 1 && Math.abs(event.deltaX) > 0) {
       if (!isVertical) {
         // Для горизонтального слайдера используем deltaX
-        mainDelta = event.deltaX
+        mainDelta = event.deltaX;
       } else {
         // Для вертикального слайдера игнорируем горизонтальный скролл
-        return
+        return;
       }
     }
-    
     // Если вертикальный слайдер и есть горизонтальный скролл больше вертикального, игнорируем
     if (isVertical && Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
-      return
+      return;
     }
-    
     // Если горизонтальный слайдер и deltaX больше deltaY (трекпад), используем deltaX
-    if (!isVertical && Math.abs(event.deltaX) > Math.abs(event.deltaY) && Math.abs(event.deltaX) > 0) {
-      mainDelta = event.deltaX
+    if (
+      !isVertical &&
+      Math.abs(event.deltaX) > Math.abs(event.deltaY) &&
+      Math.abs(event.deltaX) > 0
+    ) {
+      mainDelta = event.deltaX;
     }
-
     // Если нет значимого скролла, игнорируем
     if (Math.abs(mainDelta) < 1) {
-      return
+      return;
     }
-
     // Throttle для предотвращения слишком частых срабатываний
-    const now = Date.now()
-    if (now - this.lastWheelTime < this.wheelThrottle) {
-      event.preventDefault()
-      return
+    const now = Date.now();
+    if (now - local_lastWheelTime < local_wheelThrottle) {
+      event.preventDefault();
+      return;
     }
-    this.lastWheelTime = now
-
+    local_lastWheelTime = now;
     // Проверяем границы слайдера
-    const isAtStart = !this.tvist.engine.canScrollPrev()
-    const isAtEnd = !this.tvist.engine.canScrollNext()
-    
-    const scrollingForward = mainDelta > 0
-    const scrollingBackward = mainDelta < 0
-
+    const isAtStart = !tvist.__tvistInternal_engine.__tvistInternal_canScrollPrev();
+    const isAtEnd = !tvist.__tvistInternal_engine.__tvistInternal_canScrollNext();
+    const scrollingForward = mainDelta > 0;
+    const scrollingBackward = mainDelta < 0;
     // Если releaseOnEdges включен и мы на краю, разрешаем нативный скролл
-    if (this.releaseOnEdges) {
+    if (local_releaseOnEdges) {
       if ((isAtStart && scrollingBackward) || (isAtEnd && scrollingForward)) {
-        return
+        return;
       }
     }
-
     // Предотвращаем нативный скролл
-    event.preventDefault()
-
+    event.preventDefault();
     // Если уже идёт прокрутка, игнорируем
-    if (this.isScrolling) {
-      return
+    if (local_isScrolling) {
+      return;
     }
-
     // Определяем направление и выполняем переход
-    const delta = Math.sign(mainDelta) * this.sensitivity
-
+    const delta = Math.sign(mainDelta) * local_sensitivity;
     if (delta > 0) {
-      this.tvist.next()
+      tvist.next();
     } else if (delta < 0) {
-      this.tvist.prev()
+      tvist.prev();
     }
-
     // Устанавливаем флаг прокрутки
-    this.isScrolling = true
-
+    local_isScrolling = true;
     // Сбрасываем флаг после анимации
-    if (this.scrollTimer) {
-      window.clearTimeout(this.scrollTimer)
+    if (local_scrollTimer) {
+      base.resources.cancelTimeout(local_scrollTimer);
     }
-
-    const speed = this.options.speed ?? 300
-    this.scrollTimer = window.setTimeout(() => {
-      this.isScrolling = false
-    }, speed + 50)
-  }
-
+    const speed = options.speed ?? 300;
+    local_scrollTimer = base.resources.timeout(() => {
+      local_isScrolling = false;
+    }, speed + 50);
+  };
   /**
    * Хук обновления опций
    */
-  override onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
+  function local_onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
     if (newOptions.wheel !== undefined) {
-      const wheelOptions = typeof newOptions.wheel === 'boolean' 
-        ? {} 
-        : (newOptions.wheel ?? {})
-      
-      this.sensitivity = wheelOptions.sensitivity ?? 1
-      this.releaseOnEdges = wheelOptions.releaseOnEdges ?? true
+      const wheelOptions = typeof newOptions.wheel === 'boolean' ? {} : (newOptions.wheel ?? {});
+      local_sensitivity = wheelOptions.sensitivity ?? 1;
+      local_releaseOnEdges = wheelOptions.releaseOnEdges ?? true;
     }
   }
 
-  override destroy(): void {
+  function local_destroy(): void {
     // Очищаем таймеры
-    if (this.scrollTimer) {
-      window.clearTimeout(this.scrollTimer)
+    if (local_scrollTimer) {
+      base.resources.cancelTimeout(local_scrollTimer);
     }
-
     // Удаляем обработчик wheel событий
-    this.tvist.root.removeEventListener('wheel', this.handleWheel)
+    base.resources.unlisten(tvist.root, 'wheel', local_handleWheel);
   }
+  const component: ScrollControlModule = {
+    get name() {
+      return local_name;
+    },
+    shouldBeActive: local_shouldBeActive,
+    init: local_init,
+    onOptionsUpdate: local_onOptionsUpdate,
+    destroy: () => {
+      try {
+        local_destroy();
+      } finally {
+        base.dispose();
+      }
+    },
+  };
+  const wheelOptions = local_getWheelOptions();
+  local_sensitivity = wheelOptions.sensitivity ?? 1;
+  local_releaseOnEdges = wheelOptions.releaseOnEdges ?? true;
+  return component;
 }

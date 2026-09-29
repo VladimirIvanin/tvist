@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Регрессионный тест: стрелки не получают disabled после перехода к границе
  *
@@ -54,7 +55,7 @@ describe('NavigationModule — arrows disabled state at boundaries', () => {
   })
 
   it('next disabled and prev enabled at end (instant scrollTo)', async () => {
-    const endIndex = slider.engine['getEndIndex']()
+    const endIndex = getRuntime(slider).engine['getEndIndex']()
     slider.scrollTo(endIndex, true)
     await Promise.resolve()
 
@@ -65,7 +66,7 @@ describe('NavigationModule — arrows disabled state at boundaries', () => {
 
   it('next disabled at end (animated scrollTo, speed:0)', async () => {
     // speed:0 → Animator вызывает onComplete синхронно → slideChangeEnd сразу
-    const endIndex = slider.engine['getEndIndex']()
+    const endIndex = getRuntime(slider).engine['getEndIndex']()
     slider.scrollTo(endIndex, false)
     await Promise.resolve()
 
@@ -77,7 +78,7 @@ describe('NavigationModule — arrows disabled state at boundaries', () => {
     // targetIndex > endIndex → clampedIndex = endIndex = previousIndex → indexChanged=false
     // needsAnimation=false (уже у цели после предыдущего scrollTo)
     // Баг: transitionEnd не эмитировался → updateArrowsState не вызывался
-    const endIndex = slider.engine['getEndIndex']()
+    const endIndex = getRuntime(slider).engine['getEndIndex']()
     slider.scrollTo(endIndex, true)
     await Promise.resolve()
 
@@ -102,7 +103,7 @@ describe('NavigationModule — arrows disabled state at boundaries', () => {
   })
 
   it('arrows re-enable after moving away from boundary', async () => {
-    const endIndex = slider.engine['getEndIndex']()
+    const endIndex = getRuntime(slider).engine['getEndIndex']()
     slider.scrollTo(endIndex, true)
     await Promise.resolve()
 
@@ -116,7 +117,7 @@ describe('NavigationModule — arrows disabled state at boundaries', () => {
   })
 
   it('both boundaries work in sequence', async () => {
-    const endIndex = slider.engine['getEndIndex']()
+    const endIndex = getRuntime(slider).engine['getEndIndex']()
 
     // Конец
     slider.scrollTo(endIndex, false)

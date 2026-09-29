@@ -1,21 +1,19 @@
 {
   "name": "tvist",
-  "version": "1.19.6",
+  "version": "1.19.7",
   "description": "Слайдер с широким API для современного веба",
   "type": "module",
-  "main": "./dist/tvist.cjs.js",
+  "main": "./dist/tvist.cjs",
   "module": "./dist/tvist.esm.js",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/tvist.esm.js",
-      "require": "./dist/tvist.cjs.js"
+      "require": "./dist/tvist.cjs"
     },
     "./dist/tvist.css": "./dist/tvist.css",
-    "./browser-build/tvist.css": "./browser-build/tvist.css",
-    "./browser-build/tvist.core.css": "./browser-build/tvist.core.css",
-    "./browser-build/tvist.modules.css": "./browser-build/tvist.modules.css"
+    "./browser-build/tvist.css": "./browser-build/tvist.css"
   },
   "files": [
     "browser-build",
@@ -27,9 +25,8 @@
   "scripts": {
     "dev": "vite --config vite.sandbox.config.ts",
     "dev:watch": "concurrently \"npm run dev\" \"npm run typecheck -- --watch\"",
-    "build": "tsc && vite build",
-    "build:browser": "npm run build:browser:split",
-    "build:browser:split": "npm run typecheck && tsx scripts/build-browser-split.ts",
+    "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\" && tsc && vite build",
+    "build:browser": "npm run typecheck && vite build --config vite.browser.config.ts",
     "build:watch": "tsc --watch",
     "docs:dev": "npm run docs:generate && vite --config vite.docs.config.ts",
     "docs:build": "npm run docs:generate && npm run docs:typecheck && vite build --config vite.docs.config.ts",
@@ -47,7 +44,8 @@
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx,scss}\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:browser-size": "tsx scripts/check-browser-size.ts"
   },
   "keywords": [
     "slider",
@@ -85,6 +83,7 @@
     "globals": "^16.4.0",
     "happy-dom": "^20.0.0",
     "jsdom": "^27.0.0",
+    "magic-string": "^1.4.2",
     "markdown-it": "^15.0.2",
     "prettier": "^3.6.2",
     "sass": "^1.93.2",

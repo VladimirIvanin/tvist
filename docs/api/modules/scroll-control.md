@@ -1,6 +1,5 @@
 # Scroll Control Module
 
-> **При использовании core требуется пакет modules.** Подключите `tvist.modules.min.js` и `tvist.modules.css` дополнительно к core **до создания слайдера**. Все дополнительные модули поставляются одним пакетом. Полная сборка `tvist.min.js` с `tvist.css` уже включает эти возможности. [Схема подключения](/guide/installation).
 
 Модуль для управления слайдером через скролл колесика мыши и touch-жесты на мобильных устройствах.
 
@@ -29,7 +28,7 @@ const slider = new Tvist('.tvist', {
 interface WheelOptions {
   // Чувствительность (множитель для скорости скролла)
   sensitivity?: number
-  
+
   // Разрешить нативный скролл на краях слайдера
   releaseOnEdges?: boolean
 }

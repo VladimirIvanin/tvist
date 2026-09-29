@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { Tvist } from '../../src'
 import { createSliderFixture, type SliderFixture } from '../fixtures'
@@ -30,7 +31,7 @@ describe('loop + peek', () => {
 
     console.log('loop: true, index:', slider.activeIndex, 'realIndex:', slider.realIndex)
     console.log('transform:', slider.container.style.transform)
-    console.log('slidePositions:', slider.engine.getSlidePositions())
+    console.log('slidePositions:', getRuntime(slider).engine.getSlidePositions())
     console.log('slides order:', Array.from(slider.slides).map(s => s.textContent))
   })
 })

@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * Тесты для локализации багов с пустотами (gaps) при drag
  *
@@ -37,7 +38,7 @@ import '../../src/modules/marquee'
  * - rightGap: viewport заканчивается после последнего слайда
  */
 function checkViewportCoverage(slider: Tvist, viewportWidth: number) {
-  const location = slider.engine.location.get()
+  const location = getRuntime(slider).engine.location.get()
   const slides = slider.slides
 
   const vpLeft = -location
@@ -48,8 +49,8 @@ function checkViewportCoverage(slider: Tvist, viewportWidth: number) {
   let contentRight = -Infinity
 
   for (let i = 0; i < slides.length; i++) {
-    const pos = slider.engine.getSlidePosition(i)
-    const size = slider.engine.getSlideSize(i)
+    const pos = getRuntime(slider).engine.getSlidePosition(i)
+    const size = getRuntime(slider).engine.getSlideSize(i)
     if (pos < contentLeft) contentLeft = pos
     if (pos + size > contentRight) contentRight = pos + size
   }
@@ -215,7 +216,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
 
       // ВАЖНО: coverage нужно считать по фактическому viewport слайдов,
       // а не по ширине root.
-      const viewport = slider.engine.containerSizeValue
+      const viewport = getRuntime(slider).engine.containerSizeValue
 
       // До drag viewport полностью покрыт контентом — дыр нет
       const coverageBefore = checkViewportCoverage(slider, viewport)
@@ -412,15 +413,15 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       })
 
       // Отслеживаем вызовы loopFix
-      const loopModule = slider.getModule('loop') as {
+      const loopModule = getRuntime(slider).getModule('loop') as {
         fix: (params: Record<string, unknown>) => number
       }
       const loopFixCalls: Array<{ params: Record<string, unknown>; locationBefore: number; locationAfter: number }> = []
       const originalFix = loopModule.fix.bind(loopModule)
       loopModule.fix = (params: Record<string, unknown>) => {
-        const before = slider!.engine.location.get()
+        const before = getRuntime(slider!).engine.location.get()
         const result = originalFix(params)
-        const after = slider!.engine.location.get()
+        const after = getRuntime(slider!).engine.location.get()
         loopFixCalls.push({ params, locationBefore: before, locationAfter: after })
         return result
       }
@@ -517,7 +518,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       })
 
       // Симулируем что marquee уже прокрутился на 300px
-      const marqueeModule = slider.getModule('marquee') as {
+      const marqueeModule = getRuntime(slider).getModule('marquee') as {
         setCurrentPosition?: (pos: number) => void
       }
       if (marqueeModule?.setCurrentPosition) {
@@ -599,12 +600,12 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       // Ждём snap анимацию
       await new Promise((r) => setTimeout(r, 500))
 
-      const locationAfterFirst = slider.engine.location.get()
+      const locationAfterFirst = getRuntime(slider).engine.location.get()
 
       console.log('[Bug 3] после первого drag:', {
         location: locationAfterFirst,
-        index: slider.engine.index.get(),
-        activeIndex: slider.engine.activeIndex,
+        index: getRuntime(slider).engine.index.get(),
+        activeIndex: getRuntime(slider).engine.activeIndex,
         slidesOrder: slider.slides
           .map((s) => s.getAttribute('data-tvist-slide-index'))
           .join(','),
@@ -640,13 +641,13 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       // После isFirstMove startPosition = engine.location (post-loopFix).
       // newPosition = startPosition + dragDelta (12px).
       // Разница между newPosition и startPosition должна быть ≈ 12px.
-      const locationDuringSecond = slider.engine.location.get()
+      const locationDuringSecond = getRuntime(slider).engine.location.get()
       const transformDuringSecond = getTranslateX(fixture.container)
 
       console.log('[Bug 3] начало второго drag (+12px):', {
         location: locationDuringSecond,
         transform: transformDuringSecond,
-        index: slider.engine.index.get(),
+        index: getRuntime(slider).engine.index.get(),
         slidesOrder: slider.slides
           .map((s) => s.getAttribute('data-tvist-slide-index'))
           .join(','),
@@ -691,13 +692,13 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       }> = []
 
       for (let dragNum = 1; dragNum <= 3; dragNum++) {
-        const locationBefore = slider.engine.location.get()
+        const locationBefore = getRuntime(slider).engine.location.get()
 
         // Drag 150px вправо → snap к prev слайду
         await completeDrag(fixture.root, 400, 150, 15)
         await new Promise((r) => setTimeout(r, 500))
 
-        const locationAfter = slider.engine.location.get()
+        const locationAfter = getRuntime(slider).engine.location.get()
         const coverage = checkViewportCoverage(slider!, VIEWPORT)
 
         snapData.push({
@@ -732,13 +733,13 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
         gap: GAP,
       })
 
-      const initialLocation = slider.engine.location.get()
+      const initialLocation = getRuntime(slider).engine.location.get()
 
       // Первый drag: 150px вправо (превышает threshold → snap к prev слайду)
       await completeDrag(fixture.root, 400, 150, 15)
       await new Promise((r) => setTimeout(r, 500))
 
-      const locationAfterFirst = slider.engine.location.get()
+      const locationAfterFirst = getRuntime(slider).engine.location.get()
 
       console.log('[Bug 3] после первого drag (150px вправо):', {
         initial: initialLocation,
@@ -749,7 +750,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       await completeDrag(fixture.root, 400, 150, 15)
       await new Promise((r) => setTimeout(r, 500))
 
-      const locationAfterSecond = slider.engine.location.get()
+      const locationAfterSecond = getRuntime(slider).engine.location.get()
       const transformAfterSecond = getTranslateX(fixture.container)
 
       console.log('[Bug 3] после второго drag (150px вправо):', {
@@ -779,10 +780,10 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       await new Promise((r) => setTimeout(r, 500))
 
       const stateAfterFirst = {
-        location: slider.engine.location.get(),
+        location: getRuntime(slider).engine.location.get(),
         transform: getTranslateX(fixture.container),
-        index: slider.engine.index.get(),
-        activeIndex: slider.engine.activeIndex,
+        index: getRuntime(slider).engine.index.get(),
+        activeIndex: getRuntime(slider).engine.activeIndex,
         slidesOrder: slider.slides
           .map((s) => s.getAttribute('data-tvist-slide-index'))
           .join(','),
@@ -794,10 +795,10 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       await new Promise((r) => setTimeout(r, 500))
 
       const stateAfterSecond = {
-        location: slider.engine.location.get(),
+        location: getRuntime(slider).engine.location.get(),
         transform: getTranslateX(fixture.container),
-        index: slider.engine.index.get(),
-        activeIndex: slider.engine.activeIndex,
+        index: getRuntime(slider).engine.index.get(),
+        activeIndex: getRuntime(slider).engine.activeIndex,
         slidesOrder: slider.slides
           .map((s) => s.getAttribute('data-tvist-slide-index'))
           .join(','),
@@ -853,8 +854,8 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
 
       console.log('[Short drag] начальное состояние:', {
         realIndex: initialRealIndex,
-        activeIndex: slider.engine.activeIndex,
-        location: slider.engine.location.get(),
+        activeIndex: getRuntime(slider).engine.activeIndex,
+        location: getRuntime(slider).engine.location.get(),
       })
 
       // Первый короткий drag вправо (50px < threshold 80px)
@@ -865,8 +866,8 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
 
       console.log('[Short drag] после первого drag 50px:', {
         realIndex: realIndexAfterFirst,
-        activeIndex: slider.engine.activeIndex,
-        location: slider.engine.location.get(),
+        activeIndex: getRuntime(slider).engine.activeIndex,
+        location: getRuntime(slider).engine.location.get(),
       })
 
       // Реальный слайд не изменился (loopFix может менять activeIndex, но не realIndex)
@@ -877,12 +878,12 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       await new Promise((r) => setTimeout(r, 500))
 
       const realIndexAfterSecond = slider.realIndex
-      const locationAfterSecond = slider.engine.location.get()
+      const locationAfterSecond = getRuntime(slider).engine.location.get()
       const transformAfterSecond = getTranslateX(fixture.container)
 
       console.log('[Short drag] после второго drag 50px:', {
         realIndex: realIndexAfterSecond,
-        activeIndex: slider.engine.activeIndex,
+        activeIndex: getRuntime(slider).engine.activeIndex,
         location: locationAfterSecond,
         transform: transformAfterSecond,
       })
@@ -919,12 +920,12 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
       await new Promise((r) => setTimeout(r, 500))
 
       const finalRealIndex = slider.realIndex
-      const finalLocation = slider.engine.location.get()
+      const finalLocation = getRuntime(slider).engine.location.get()
       const finalTransform = getTranslateX(fixture.container)
 
       console.log('[Short drag R+L] финальное состояние:', {
         realIndex: finalRealIndex,
-        activeIndex: slider.engine.activeIndex,
+        activeIndex: getRuntime(slider).engine.activeIndex,
         location: finalLocation,
         transform: finalTransform,
       })
@@ -958,7 +959,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
         const realIdx = slider.realIndex
         const coverage = checkViewportCoverage(slider!, VIEWPORT)
 
-        console.log(`[Short drag x3] #${i}: realIndex=${realIdx}, activeIndex=${slider.engine.activeIndex}, gaps=${coverage.hasGaps}`)
+        console.log(`[Short drag x3] #${i}: realIndex=${realIdx}, activeIndex=${getRuntime(slider).engine.activeIndex}, gaps=${coverage.hasGaps}`)
 
         // Реальный слайд не меняется
         expect(realIdx).toBe(initialRealIndex)
@@ -1088,7 +1089,7 @@ describe('BUG: Пустоты (gaps) при drag в loop/marquee режиме', 
         const realIdx = slider.realIndex
         const coverage = checkViewportCoverage(slider!, VIEWPORT)
 
-        console.log(`[4slides] drag #${i}: realIndex=${realIdx}, activeIndex=${slider.engine.activeIndex}, gaps=${coverage.hasGaps}, order=${slider.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(',')}`)
+        console.log(`[4slides] drag #${i}: realIndex=${realIdx}, activeIndex=${getRuntime(slider).engine.activeIndex}, gaps=${coverage.hasGaps}, order=${slider.slides.map(s => s.getAttribute('data-tvist-slide-index')).join(',')}`)
 
         // realIndex не дрейфует (0→1→2→3→0 — это баг!)
         expect(realIdx).toBe(initialRealIndex)

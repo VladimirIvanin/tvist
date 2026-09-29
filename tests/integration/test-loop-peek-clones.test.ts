@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { Tvist } from '../../src'
 import { createSliderFixture, type SliderFixture } from '../fixtures'
@@ -30,13 +31,13 @@ describe('loop + peek + clones', () => {
 
     const activeIndex = slider.activeIndex
     const realIndex = slider.realIndex
-    const location = slider.engine.location.get()
+    const location = getRuntime(slider).engine.location.get()
 
     console.log('activeIndex:', activeIndex, 'realIndex:', realIndex)
     console.log('location:', location)
-    console.log('slide position:', slider.engine.getSlidePosition(activeIndex))
+    console.log('slide position:', getRuntime(slider).engine.getSlidePosition(activeIndex))
 
     // Location should be exactly -slidePosition(activeIndex) because center is not active
-    expect(location).toBe(-slider.engine.getSlidePosition(activeIndex))
+    expect(location).toBe(-getRuntime(slider).engine.getSlidePosition(activeIndex))
   })
 })

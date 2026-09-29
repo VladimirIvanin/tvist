@@ -1,9 +1,10 @@
+import { getRuntime } from '../../src/core/runtime'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { Tvist } from '../../src/core/Tvist'
-import { DragModule } from '../../src/modules/drag/DragModule'
+import { createDragModule as DragModule } from '../../src/modules/drag/DragModule'
 import { createSliderFixture, simulateDrag, type SliderFixture } from '../fixtures'
 
-Tvist.registerModule('drag', DragModule)
+
 
 describe('Drag rewind duration', () => {
   let fixture: SliderFixture
@@ -29,7 +30,7 @@ describe('Drag rewind duration', () => {
 
     // Go to last slide
     slider.scrollTo(4, true)
-    expect(slider.engine.activeIndex).toBe(4)
+    expect(getRuntime(slider).engine.activeIndex).toBe(4)
 
     // Drag forward (deltaX < 0 is next) past the last slide
     // Drag forward (deltaX < 0 is next) past the last slide
@@ -44,7 +45,7 @@ describe('Drag rewind duration', () => {
     // Advance real timers to allow the snap logic to trigger scrollTo
     await new Promise(resolve => setTimeout(resolve, 50))
 
-    expect(slider.engine.activeIndex).toBe(0)
+    expect(getRuntime(slider).engine.activeIndex).toBe(0)
     expect(slider.container.style.transition).toContain('transform 300ms')
   })
 

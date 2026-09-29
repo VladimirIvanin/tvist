@@ -35,22 +35,22 @@ const slider2 = new Tvist('#slider2', config2)
 displayConfig('config2', config2)
 
 // Управление autoplay
-const autoplayModule = slider2.getModule('autoplay')
+const autoplayModule = slider2.autoplay
 document.getElementById('start-autoplay').addEventListener('click', () => {
   if (autoplayModule) {
-    autoplayModule.getAutoplay().start()
+    autoplayModule.start()
   }
 })
 document.getElementById('stop-autoplay').addEventListener('click', () => {
   if (autoplayModule) {
-    autoplayModule.getAutoplay().stop()
+    autoplayModule.stop()
   }
 })
 
 // Слайдер 3: Breakpoints (Container First + Auto Width)
 const config3 = {
   // Вместо фиксированного perPage указываем минимальную ширину слайда
-  slideMinWidth: 200, 
+  slideMinWidth: 200,
   perPage: 1, // Fallback
   gap: 20,
   drag: true,
@@ -84,15 +84,15 @@ displayConfig('config3', config3)
 // Отслеживаем breakpoints
 slider3.on('breakpoint', (bp) => {
   const info = document.getElementById('breakpoint-info')
-  const width = slider3.engine.containerWidthValue
+  const width = slider3.track.clientWidth
   info.innerHTML = `<strong>Container Width:</strong> ${Math.round(width)}px | <strong>Breakpoint:</strong> ${bp || 'default'} | <strong>PerPage:</strong> ${slider3.options.perPage}`
 })
 
 // Обновляем инфо при ресайзе
 slider3.on('resize', () => {
    const info = document.getElementById('breakpoint-info')
-   const width = slider3.engine.containerWidthValue
-   const bp = slider3.getModule('breakpoints')?.getCurrentBreakpoint()
+   const width = slider3.track.clientWidth
+   const bp = slider3.currentBreakpoint
    info.innerHTML = `<strong>Container Width:</strong> ${Math.round(width)}px | <strong>Breakpoint:</strong> ${bp || 'default'} | <strong>PerPage:</strong> ${slider3.options.perPage}`
 })
 

@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  */
@@ -173,7 +174,7 @@ describe('Engine - autoWidth / autoHeight', () => {
       const slider = createSliderWithAutoWidth(slideWidths)
 
       slideWidths.forEach((width, i) => {
-        expect(slider.engine.getSlideSize(i)).toBe(width)
+        expect(getRuntime(slider).engine.getSlideSize(i)).toBe(width)
       })
     })
 
@@ -182,16 +183,16 @@ describe('Engine - autoWidth / autoHeight', () => {
       const gap = 16
       const slider = createSliderWithAutoWidth(slideWidths, { gap })
 
-      expect(slider.engine.getSlidePosition(0)).toBe(0)
-      expect(slider.engine.getSlidePosition(1)).toBe(180 + gap)
-      expect(slider.engine.getSlidePosition(2)).toBe(180 + gap + 280 + gap)
+      expect(getRuntime(slider).engine.getSlidePosition(0)).toBe(0)
+      expect(getRuntime(slider).engine.getSlidePosition(1)).toBe(180 + gap)
+      expect(getRuntime(slider).engine.getSlidePosition(2)).toBe(180 + gap + 280 + gap)
     })
 
     it('slideSizeValue should return first slide size when autoWidth', () => {
       const slideWidths = [180, 280, 380]
       const slider = createSliderWithAutoWidth(slideWidths)
 
-      expect(slider.engine.slideSizeValue).toBe(180)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(180)
     })
 
     it('should allow scrolling to last slide (endIndex = slideCount - 1)', () => {
@@ -245,11 +246,11 @@ describe('Engine - autoWidth / autoHeight', () => {
       const slideWidths = [180, 280, 380]
       const slider = createSliderWithAutoWidth(slideWidths, { center: true })
 
-      const offset0 = slider.engine.getCenterOffset(0)
-      const offset1 = slider.engine.getCenterOffset(1)
+      const offset0 = getRuntime(slider).engine.getCenterOffset(0)
+      const offset1 = getRuntime(slider).engine.getCenterOffset(1)
 
-      const size0 = slider.engine.getSlideSize(0)
-      const size1 = slider.engine.getSlideSize(1)
+      const size0 = getRuntime(slider).engine.getSlideSize(0)
+      const size1 = getRuntime(slider).engine.getSlideSize(1)
 
       // Восстанавливаем эффективный размер viewport (rootSize) из offset0 и size0
       const effectiveRootSize = 2 * offset0 + size0
@@ -274,7 +275,7 @@ describe('Engine - autoWidth / autoHeight', () => {
       const slider = createSliderWithAutoHeight(slideHeights)
 
       slideHeights.forEach((height, i) => {
-        expect(slider.engine.getSlideSize(i)).toBe(height)
+        expect(getRuntime(slider).engine.getSlideSize(i)).toBe(height)
       })
     })
 
@@ -283,16 +284,16 @@ describe('Engine - autoWidth / autoHeight', () => {
       const gap = 12
       const slider = createSliderWithAutoHeight(slideHeights, { gap })
 
-      expect(slider.engine.getSlidePosition(0)).toBe(0)
-      expect(slider.engine.getSlidePosition(1)).toBe(100 + gap)
-      expect(slider.engine.getSlidePosition(2)).toBe(100 + gap + 180 + gap)
+      expect(getRuntime(slider).engine.getSlidePosition(0)).toBe(0)
+      expect(getRuntime(slider).engine.getSlidePosition(1)).toBe(100 + gap)
+      expect(getRuntime(slider).engine.getSlidePosition(2)).toBe(100 + gap + 180 + gap)
     })
 
     it('should resolve vertical gap % from track/root width (CSS margin % base), not viewport height', () => {
       const slider = createSliderWithAutoHeight([100, 100], { gap: '10%' })
       // root width 400px (фикстура), высота 500 — 10% gap должен быть 40px, не 50px
-      expect(slider.engine.gapPxValue).toBe(40)
-      expect(slider.engine.getSlidePosition(1)).toBe(100 + 40)
+      expect(getRuntime(slider).engine.gapPxValue).toBe(40)
+      expect(getRuntime(slider).engine.getSlidePosition(1)).toBe(100 + 40)
     })
 
     it('should scroll vertically with autoHeight', () => {
@@ -318,7 +319,7 @@ describe('Engine - autoWidth / autoHeight', () => {
       })
 
       // Целевой translate без «самопроверки» через getScrollPositionForIndex (тот же clamp).
-      const translateForSlideTop = (i: number) => -slider.engine.getSlidePosition(i)
+      const translateForSlideTop = (i: number) => -getRuntime(slider).engine.getSlidePosition(i)
 
       slider.scrollTo(2, true)
       expect(slider.activeIndex).toBe(2)
@@ -337,9 +338,9 @@ describe('Engine - autoWidth / autoHeight', () => {
       const slideWidths = [200, 300]
       const slider = createSliderWithAutoWidth(slideWidths)
 
-      expect(slider.engine.getSlideSize(0)).toBe(200)
-      expect(slider.engine.getSlideSize(1)).toBe(300)
-      expect(slider.engine.getSlidePosition(1)).toBe(200 + 16)
+      expect(getRuntime(slider).engine.getSlideSize(0)).toBe(200)
+      expect(getRuntime(slider).engine.getSlideSize(1)).toBe(300)
+      expect(getRuntime(slider).engine.getSlidePosition(1)).toBe(200 + 16)
     })
   })
 
@@ -348,17 +349,17 @@ describe('Engine - autoWidth / autoHeight', () => {
       const slideWidths = [180, 280]
       const slider = createSliderWithAutoWidth(slideWidths)
 
-      expect(slider.engine.getSlidePosition(0)).toBe(0)
-      expect(slider.engine.getSlidePosition(1)).toBe(196)
+      expect(getRuntime(slider).engine.getSlidePosition(0)).toBe(0)
+      expect(getRuntime(slider).engine.getSlidePosition(1)).toBe(196)
 
       Object.defineProperty(slides[0], 'offsetWidth', { configurable: true, value: 200 })
       Object.defineProperty(slides[1], 'offsetWidth', { configurable: true, value: 300 })
       slider.update()
 
-      expect(slider.engine.getSlideSize(0)).toBe(200)
-      expect(slider.engine.getSlideSize(1)).toBe(300)
-      expect(slider.engine.getSlidePosition(0)).toBe(0)
-      expect(slider.engine.getSlidePosition(1)).toBe(200 + 16)
+      expect(getRuntime(slider).engine.getSlideSize(0)).toBe(200)
+      expect(getRuntime(slider).engine.getSlideSize(1)).toBe(300)
+      expect(getRuntime(slider).engine.getSlidePosition(0)).toBe(0)
+      expect(getRuntime(slider).engine.getSlidePosition(1)).toBe(200 + 16)
     })
   })
 
@@ -386,8 +387,8 @@ describe('Engine - autoWidth / autoHeight', () => {
       const translateXAfterPrev = parseFloat(transformAfterPrev.match(/translate3d\((-?\d+\.?\d*)px/)?.[1] || '0')
 
       // Вычисляем правую границу последнего слайда
-      const lastSlidePosition = slider.engine.getSlidePosition(5)
-      const lastSlideSize = slider.engine.getSlideSize(5)
+      const lastSlidePosition = getRuntime(slider).engine.getSlidePosition(5)
+      const lastSlideSize = getRuntime(slider).engine.getSlideSize(5)
       const lastSlideRight = lastSlidePosition - translateXAfterPrev
 
       // Правая граница последнего слайда не должна быть меньше ширины контейнера
@@ -413,8 +414,8 @@ describe('Engine - autoWidth / autoHeight', () => {
         const translateX = parseFloat(transform.match(/translate3d\((-?\d+\.?\d*)px/)?.[1] || '0')
 
         // Проверяем, что последний слайд не выходит за правую границу контейнера
-        const lastSlidePos = slider.engine.getSlidePosition(5)
-        const lastSlideSize = slider.engine.getSlideSize(5)
+        const lastSlidePos = getRuntime(slider).engine.getSlidePosition(5)
+        const lastSlideSize = getRuntime(slider).engine.getSlideSize(5)
         const lastSlideRightEdge = lastSlidePos + lastSlideSize - translateX
 
         // Правая граница последнего слайда должна быть >= ширины контейнера
@@ -438,8 +439,8 @@ describe('Engine - autoWidth / autoHeight', () => {
       const transform = slider.container.style.transform
       const translateX = parseFloat(transform.match(/translate3d\((-?\d+\.?\d*)px/)?.[1] || '0')
 
-      const lastSlidePos = slider.engine.getSlidePosition(3)
-      const lastSlideSize = slider.engine.getSlideSize(3)
+      const lastSlidePos = getRuntime(slider).engine.getSlidePosition(3)
+      const lastSlideSize = getRuntime(slider).engine.getSlideSize(3)
       const lastSlideRightEdge = lastSlidePos + lastSlideSize - translateX
 
       expect(lastSlideRightEdge).toBeGreaterThanOrEqual(999) // 1000 - 1px погрешность

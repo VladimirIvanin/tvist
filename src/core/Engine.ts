@@ -1,1382 +1,132 @@
+import { createLayout } from './engine/Layout';
+import { createMotion } from './engine/Motion';
 /**
  * Engine - ядро расчётов позиций, размеров, прокрутки
  */
-
-import { Vector1D } from './Vector1D'
-import { Counter } from './Counter'
-import { Animator, easings, type EasingFunction } from './Animator'
-import { TVIST_CLASSES } from './constants'
-import type { Tvist } from './Tvist'
-import type { TvistOptions } from './types'
-import { getOuterWidth, getOuterHeight } from '../utils/dom'
-import { toCssValue, gapCssForMargin, resolveGapToPixels } from '../utils/gridGap'
-import { resolveCssLengthToPixels } from '../utils/cssLength'
-import { applyPeek, getPeekValue, getPeekValueFromOptions } from '../utils/peek'
-import {
-  findDomIndexByRealIndex,
-  findDomIndexByRealIndexForTransition,
-  TVIST_SLIDE_INDEX_ATTR,
-} from '../utils/slideRealIndex'
-
-/** Контекст для передачи между подметодами scrollTo */
-interface ScrollContext {
-  requestedIndex: number
-  clampedIndex: number
-  normalizedIndex: number
-  eventIndex: number
-  indexChanged: boolean
-}
-
-export class Engine {
-  readonly location: Vector1D
-  readonly target: Vector1D
-  readonly index: Counter
-  readonly animator: Animator
-
-  private containerSize = 0
-  private slideSize = 0
-  /** Размеры каждого слайда при autoWidth/autoHeight */
-  private slideSizes: number[] = []
-  private slidePositions: number[] = []
-  private peekStart = 0
-  private peekEnd = 0
-
-  private cachedMinScroll = 0
-  private cachedMaxScroll = 0
-  private cachedRootSize = 0
-  private scrollCacheValid = false
-
-  private cachedTrackWidth = 0
-  private cachedTrackHeight = 0
-  private trackSizeCacheValid = false
-  private slideSizesCacheValid = false
-
-  /** Последняя позиция, записанная в style.transform (после roundLengths). */
-  private _lastAppliedTransformPos: number | null = null
-  private cssTransitionActive = false
-  private transitionRaf: number | null = null
-  private transitionTimer: number | null = null
-  private transitionToken = 0
-
-  /** Размеры fixedWidth / fixedHeight в px после resolveFixedDimensionsEarly() */
-  private fixedWidthPxResolved = 0
-  private fixedHeightPxResolved = 0
-
-  /**
-   * gap из опций, приведённый к px через computed style браузера.
-   * Обновляется в resolveGap() после применения margin к DOM.
-   * Поддерживает rem, em, %, px и любые другие CSS-единицы.
-   */
-  private gapPxResolved = 0
-
-  private _isLocked = false
-
-  private tvist: Tvist
-  private options: TvistOptions
-
-  constructor(tvist: Tvist, options: TvistOptions) {
-    this.tvist = tvist
-    this.options = options
-
-    const startIndex = options.start ?? 0
-
-    this.location = new Vector1D(0)
-    this.target = new Vector1D(0)
-    this.index = new Counter(tvist.slides.length, startIndex, this.isLoopEnabled(), this.calculateCounterEndIndex())
-    this.animator = new Animator()
-    this.animator.setExternalController(
-      () => this.cssTransitionActive,
-      () => this.stopCssTransition()
-    )
-
-    this.resolveGap()
-    this.resolveFixedDimensionsEarly()
-    this.applyPeek()
-    this.calculateSizes()
-    this.calculatePositions()
-    this.checkLock()
-
-    const initialPos = this.getScrollPositionForIndex(startIndex)
-    this.location.set(initialPos)
-    this.target.set(initialPos)
-    this.applyTransform()
-  }
-
+import { Vector1D } from './Vector1D';
+import { Counter } from './Counter';
+import { Animator } from './Animator';
+import { TVIST_CLASSES } from './constants';
+import type { TvistRuntime as Tvist } from './runtime';
+import type { TvistOptions } from './types';
+import { gapCssForMargin } from '../utils/gridGap';
+/** Internal component; state lives in this factory's closure. */
+export interface Engine {
+  readonly __tvistInternal_location: Vector1D;
+  readonly __tvistInternal_target: Vector1D;
+  readonly __tvistInternal_index: Counter;
+  readonly __tvistInternal_animator: Animator;
   /**
    * Возвращает размер слайда по индексу (ширина или высота в зависимости от direction).
    * При autoWidth/autoHeight — измеренный размер из DOM, иначе — общий slideSize.
    */
-  public getSlideSize(index: number): number {
-    if (
-      this.slideSizes.length > 0 &&
-      index >= 0 &&
-      index < this.slideSizes.length
-    ) {
-      const size = this.slideSizes[index]
-      return size ?? this.slideSize
-    }
-    return this.slideSize
-  }
+  __tvistInternal_getSlideSize(index: number): number;
 
-  public isCenterActive(): boolean {
-    const c = this.options.center
-    if (!c) return false
-    if (c === true) return true
-    return c.active ?? false
-  }
+  __tvistInternal_isCenterActive(): boolean;
 
-  public isCenterFocus(): boolean {
-    const c = this.options.center
-    if (!c || c === true) return false
-    return c.focus ?? false
-  }
-
+  __tvistInternal_isCenterFocus(): boolean;
   /** Режим центрирования активного слайда (strict active или focus с trim у краёв). */
-  public isCenterMode(): boolean {
-    return this.isCenterActive() || this.isCenterFocus()
-  }
+  __tvistInternal_isCenterMode(): boolean;
 
-  public isCenterJustify(): boolean {
-    const c = this.options.center
-    if (!c || c === true) return false
-    return c.justify ?? false
-  }
-
+  __tvistInternal_isCenterJustify(): boolean;
   /**
    * Вычисляет offset для центрирования
    */
-  public getCenterOffset(index: number): number {
-    if (!this.isCenterMode()) {
-      return 0
-    }
-
-    if (!this.scrollCacheValid) this.updateScrollCache()
-    const rootSize = this.cachedRootSize
-    const size = this.getSlideSize(index)
-    return (rootSize - this.peekStart - this.peekEnd - size) / 2
-  }
-
+  __tvistInternal_getCenterOffset(index: number): number;
   /**
    * Ограничивает позицию скролла для center.focus (trim у краёв, как Splide trimSpace).
    */
-  public clampCenterPosition(position: number): number {
-    const minPos = this.getMinScrollPosition()
-    const maxPos = this.getMaxScrollPosition()
-    return Math.max(maxPos, Math.min(minPos, position))
-  }
-
-  /**
-   * Получить realIndex (из data-tvist-slide-index) для слайда на указанной DOM-позиции.
-   * Если атрибут отсутствует, возвращает domIndex как есть.
-   */
-  private getEventIndex(domIndex: number): number {
-    const slide = this.tvist.slides[domIndex]
-    if (!slide) return domIndex
-    const dataAttr = slide.getAttribute(TVIST_SLIDE_INDEX_ATTR)
-    if (dataAttr !== null) {
-      return parseInt(dataAttr, 10)
-    }
-    return domIndex
-  }
-
-  private isLoopEnabled(): boolean {
-    const l = this.options.loop
-    return l === true || (typeof l === 'object' && l !== null && l.enabled !== false)
-  }
-
-  private isLoopWithClonesEnabled(): boolean {
-    const l = this.options.loop
-    if (
-      typeof l === 'object' &&
-      l !== null &&
-      l.withClones === true &&
-      l.enabled !== false
-    ) {
-      return true
-    }
-    
-    // Если LoopModule динамически включил клоны (например, мало слайдов),
-    // первый слайд будет клоном.
-    if (this.tvist.slides.length > 0 && this.tvist.slides[0]?.classList.contains(TVIST_CLASSES.slideClone)) {
-      return true
-    }
-    
-    return false
-  }
-
+  __tvistInternal_clampCenterPosition(position: number): number;
   /**
    * Позиция скролла для индекса. При loop peekTrim не применяется.
    */
-  public getScrollPositionForIndex(index: number): number {
-    const basePosition = -this.getSlidePosition(index)
-    const centerOffset = this.getCenterOffset(index)
-
-    if (this.isLoopEnabled()) {
-      if (this.isCenterMode()) {
-        const pos = basePosition + centerOffset
-        return pos === 0 ? 0 : pos
-      }
-
-      return basePosition === 0 ? 0 : basePosition
-    }
-
-    if (this.isCenterFocus()) {
-      const pos = this.clampCenterPosition(basePosition + centerOffset)
-      return pos === 0 ? 0 : pos
-    }
-
-    if (this.isCenterActive()) {
-      const pos = basePosition + centerOffset
-      return pos === 0 ? 0 : pos
-    }
-
-    const endIndex = this.getEndIndex()
-    const peekTrim = this.options.peekTrim !== false
-
-    if (index === 0) return peekTrim ? this.getMinScrollPosition() : 0
-    if (index === endIndex) {
-      const pos = peekTrim ? this.getMaxScrollPosition() : basePosition
-      return pos === 0 ? 0 : pos
-    }
-
-    if (this.isAutoSize() && peekTrim) {
-      const maxScroll = this.getMaxScrollPosition()
-      if (basePosition < maxScroll) return maxScroll
-    }
-
-    return basePosition === 0 ? 0 : basePosition
-  }
-
-  /**
-   * Обновляет кеш размера track элемента (viewport слайдера)
-   */
-  private updateTrackSizeCache(): void {
-    this.cachedTrackWidth = getOuterWidth(this.tvist.track)
-    this.cachedTrackHeight = getOuterHeight(this.tvist.track)
-    this.trackSizeCacheValid = true
-  }
-
-  /**
-   * Получает размер root элемента (с кешированием)
-   */
-  private getRootSize(): number {
-    if (!this.trackSizeCacheValid) {
-      this.updateTrackSizeCache()
-    }
-    const isVertical = this.options.direction === 'vertical'
-    return isVertical ? this.cachedTrackHeight : this.cachedTrackWidth
-  }
-
-  /**
-   * Инвалидирует кеш размера root элемента
-   */
-  private invalidateRootSizeCache(): void {
-    this.trackSizeCacheValid = false
-  }
-
-  /**
-   * База для gap в процентах при переводе в px.
-   * По CSS margin/padding в % для любой стороны считаются от **ширины** содержащего блока,
-   * в т.ч. margin-top/bottom. Gap задаётся margin по оси скролла, поэтому для vertical
-   * нельзя умножать % на высоту viewport (containerSize).
-   */
-  private getMarginPercentageBasePx(): number {
-    for (const el of [this.tvist.root, this.tvist.track, this.tvist.container]) {
-      const w = getOuterWidth(el)
-      if (w > 0) return w
-    }
-    return this.containerSize
-  }
-
-  /** База для height в процентах (fixedHeight и т.п.) */
-  private getVerticalPercentageBasePx(): number {
-    for (const el of [this.tvist.root, this.tvist.track, this.tvist.container]) {
-      const h = getOuterHeight(el)
-      if (h > 0) return h
-    }
-    return this.containerSize
-  }
-
-  private isFixedDimensionOption(value: number | string | undefined): value is number | string {
-    if (value === undefined || value === '' || value === 0) return false
-    if (typeof value === 'number') return value > 0
-    return true
-  }
-
-  /** Переводит опцию fixedWidth/fixedHeight в px. Число → как есть, строка → через CSS-резолюцию. */
-  private resolveFixedDimensionPx(
-    value: number | string,
-    axis: 'width' | 'height',
-    probe: HTMLElement,
-    percentBasePx: number
-  ): number {
-    if (typeof value === 'number') return value
-    return resolveCssLengthToPixels(value, axis, { probe, percentBasePx })
-  }
-
-  /**
-   * Измеряет fixedWidth / fixedHeight в px до applyPeek (для лимита peek и perPage).
-   */
-  private resolveFixedDimensionsEarly(): void {
-    this.fixedWidthPxResolved = 0
-    this.fixedHeightPxResolved = 0
-    const slide = this.tvist.slides[0]
-    if (!slide) return
-
-    const { fixedWidth: fw, fixedHeight: fh } = this.options
-
-    if (this.isFixedDimensionOption(fw)) {
-      this.fixedWidthPxResolved = this.resolveFixedDimensionPx(
-        fw, 'width', slide, this.getMarginPercentageBasePx()
-      )
-    }
-
-    if (this.isFixedDimensionOption(fh)) {
-      this.fixedHeightPxResolved = this.resolveFixedDimensionPx(
-        fh, 'height', slide, this.getVerticalPercentageBasePx()
-      )
-    }
-  }
-
-  /** Базовый размер слайда для лимита peek (50%) и updatePeekValues */
-  private getSlideBaseSizeForPeekLayout(rootSize: number): number {
-    const isVertical = this.options.direction === 'vertical'
-    const gap = this.gapPxResolved
-    const perPage = this.options.perPage ?? 1
-
-    if (!isVertical && this.fixedWidthPxResolved > 0 && this.isFixedDimensionOption(this.options.fixedWidth)) {
-      return this.fixedWidthPxResolved
-    }
-    if (isVertical && this.fixedHeightPxResolved > 0 && this.isFixedDimensionOption(this.options.fixedHeight)) {
-      return this.fixedHeightPxResolved
-    }
-
-    return (rootSize - gap * (perPage - 1)) / perPage
-  }
-
-  /**
-   * Вычисляет gap в пикселях без DOM-мутаций:
-   * - число → уже px
-   * - "16px" → parseFloat
-   * - "1rem" → rootFontSize * n
-   * - "1em"  → parentFontSize * n (font-size трека)
-   * - "50%"  → ширина root/track/container * n (как margin % в CSS)
-   * - остальное → временный DOM-запрос (один reflow, без мутаций стиля)
-   */
-  private resolveGap(): void {
-    const gapValue = this.options.gap
-    if (!gapValue) {
-      this.gapPxResolved = 0
-      return
-    }
-
-    if (typeof gapValue === 'number') {
-      this.gapPxResolved = gapValue
-      return
-    }
-
-    const trimmed = gapValue.trim()
-    const n = parseFloat(trimmed)
-    if (!Number.isFinite(n)) {
-      this.gapPxResolved = 0
-      return
-    }
-
-    if (trimmed.endsWith('px')) {
-      this.gapPxResolved = n
-      return
-    }
-
-    if (trimmed.endsWith('rem')) {
-      const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
-      this.gapPxResolved = n * rootFontSize
-      return
-    }
-
-    if (trimmed.endsWith('em')) {
-      const parentFontSize = parseFloat(getComputedStyle(this.tvist.track).fontSize) || 16
-      this.gapPxResolved = n * parentFontSize
-      return
-    }
-
-    if (trimmed.endsWith('%')) {
-      this.gapPxResolved = (n / 100) * this.getMarginPercentageBasePx()
-      return
-    }
-
-    // vw/vh и прочие редкие единицы — применяем временно и читаем computed style (один reflow)
-    const slides = this.tvist.slides
-    const firstSlide = slides[0]
-    if (!firstSlide) {
-      this.gapPxResolved = 0
-      return
-    }
-    const isVertical = this.options.direction === 'vertical'
-    const prop = isVertical ? 'marginBottom' : 'marginRight'
-    firstSlide.style[prop] = gapCssForMargin(gapValue)
-    this.gapPxResolved = resolveGapToPixels(firstSlide, isVertical ? 'vertical' : 'horizontal')
-    firstSlide.style[prop] = ''
-  }
-
+  __tvistInternal_getScrollPositionForIndex(index: number): number;
   /**
    * Публичный геттер gap в пикселях (вычисленный через computed style браузера).
    * Используется модулями (DragModule, GridModule) для расчётов.
    */
-  get gapPxValue(): number {
-    return this.gapPxResolved
-  }
-
+  readonly __tvistInternal_gapPxValue: number;
   /**
    * Применяет peek к контейнеру слайдов
    */
-  applyPeek(): void {
-    // Ограничиваем peek так, чтобы он не превышал 50% базовой ширины/высоты слайда.
-    // Базовый размер считаем по root без учёта peek:
-    // slideBaseSize = (rootSize - gap * (perPage - 1)) / perPage
-    const isVertical = this.options.direction === 'vertical'
-    const rootSize = isVertical ? this.cachedTrackHeight || getOuterHeight(this.tvist.root)
-      : this.cachedTrackWidth || getOuterWidth(this.tvist.root)
-    const slideBaseSize = this.getSlideBaseSizeForPeekLayout(rootSize)
-    const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : undefined
-
-    applyPeek(this.tvist.track, this.options, maxPeek)
-  }
-
-  private calculateSizes(isDisabled = false): void {
-    if (this.tvist.slides.length === 0) {
-      this.resetSizes()
-      return
-    }
-
-    const isAutoSize = this.isAutoSize()
-
-    // ⚠️ Сбрасываем размеры слайдов ДО измерения track.
-    //
-    // Иначе в grid/flex-родителях без `min-width: 0` слайды со style.width
-    // из прошлого прогона увеличивают intrinsic-размер контейнера, контейнер
-    // тянет track (overflow:hidden не всегда обрезает intrinsic sizing),
-    // ResizeObserver видит рост, зовёт update — и calculateFixedSlideSize
-    // считает всё большие и большие значения. Итог — ширина слайда и
-    // translate3d уходят в миллионы пикселей при center: { justify: true }
-    // и других лейаутах. См. tests/integration/center-justify-feedback.test.ts.
-    //
-    // Сброс делаем только в fixed-size режиме: в autoSize размеры слайдов
-    // задаёт пользователь/контент, сбрасывать их нельзя.
-    if (!isDisabled && !isAutoSize) {
-      this.resetSlideStylesForMeasurement()
-      this.invalidateRootSizeCache()
-      this.trackSizeCacheValid = false
-    }
-
-    this.updatePeekValues(isDisabled)
-    this.containerSize = this.getRootSize() - this.peekStart - this.peekEnd
-
-    if (isAutoSize) {
-      this.slideSize = 0
-      this.applyAndMeasureAutoSize(isDisabled)
-    } else {
-      this.calculateFixedSlideSize()
-      this.applyFixedSize(isDisabled)
-    }
-  }
-
-
-  /**
-   * Сбрасывает inline-размеры и margin по основной оси у всех слайдов.
-   * Нужно вызывать перед измерением track/root, чтобы предыдущий прогон
-   * calculateSizes не «раздувал» intrinsic-размер родителя.
-   */
-  private resetSlideStylesForMeasurement(): void {
-    const isVertical = this.options.direction === 'vertical'
-    for (const slide of this.tvist.slides) {
-      if (isVertical) {
-        slide.style.height = ''
-        slide.style.marginBottom = ''
-      } else {
-        slide.style.width = ''
-        slide.style.marginRight = ''
-      }
-    }
-  }
-
-  private resetSizes(): void {
-    this.containerSize = 0
-    this.slideSize = 0
-    this.peekStart = 0
-    this.peekEnd = 0
-  }
-
-  private isAutoSize(): boolean {
-    const isVertical = this.options.direction === 'vertical'
-    if (isVertical) {
-      if (this.isFixedDimensionOption(this.options.fixedHeight)) {
-        return false
-      }
-      return this.options.autoHeight === true
-    }
-    if (this.isFixedDimensionOption(this.options.fixedWidth)) {
-      return false
-    }
-    return this.options.autoWidth === true
-  }
-
-  private updatePeekValues(isDisabled: boolean): void {
-    const isVertical = this.options.direction === 'vertical'
-    const startSide = isVertical ? 'top' : 'left'
-    const endSide = isVertical ? 'bottom' : 'right'
-
-    this.peekStart = getPeekValueFromOptions(this.options, startSide)
-    this.peekEnd = getPeekValueFromOptions(this.options, endSide)
-
-    if (this.options.peek && !isDisabled) {
-      if (this.peekStart === 0) {
-        this.peekStart = getPeekValue(this.tvist.track, startSide)
-      }
-      if (this.peekEnd === 0) {
-        this.peekEnd = getPeekValue(this.tvist.track, endSide)
-      }
-    }
-
-    // Дополнительно ограничиваем числовые peek значением не более 50% базового
-    // размера слайда (как и в applyPeek), чтобы математическая модель
-    // соответствовала DOM.
-    const rootSize = this.getRootSize()
-    const slideBaseSize = this.getSlideBaseSizeForPeekLayout(rootSize)
-    const maxPeek = slideBaseSize > 0 && isFinite(slideBaseSize) ? slideBaseSize / 2 : 0
-
-    if (maxPeek > 0) {
-      if (this.peekStart > maxPeek) this.peekStart = maxPeek
-      if (this.peekEnd > maxPeek) this.peekEnd = maxPeek
-    }
-  }
-
-  private calculateFixedSlideSize(): void {
-    // Только верхнеуровневый gap: межстраничные отступы grid задаёт GridModule в DOM,
-    // позиции для grid перезаписываются в fixEnginePositions по offsetLeft.
-    const gap = this.gapPxResolved
-    const isVertical = this.options.direction === 'vertical'
-
-    // Фиксированный размер по основной оси: fixedWidth для горизонтали, fixedHeight для вертикали.
-    const fixedPx = isVertical ? this.fixedHeightPxResolved : this.fixedWidthPxResolved
-
-    if (!fixedPx && this.options.slideMinSize) {
-      this.options.perPage = Math.max(
-        1,
-        Math.floor((this.containerSize + gap) / (this.options.slideMinSize + gap))
-      )
-    }
-
-    if (fixedPx > 0) {
-      this.options.perPage = Math.max(1, Math.floor((this.containerSize + gap) / (fixedPx + gap)))
-      this.slideSize = fixedPx
-      this.slideSizes = []
-      return
-    }
-
-    const perPage = this.options.perPage ?? 1
-    this.slideSize = (this.containerSize - gap * (perPage - 1)) / perPage
-
-    if (this.slideSize < 0 || !isFinite(this.slideSize)) {
-      this.slideSize = 0
-    }
-
-    this.slideSizes = []
-  }
-
-  private applyAndMeasureAutoSize(isDisabled: boolean): void {
-    const isVertical = this.options.direction === 'vertical'
-    const gapCss = gapCssForMargin(this.options.gap)
-
-    if (!isDisabled) {
-      this.tvist.slides.forEach((slide, i) => {
-        slide.style.marginRight = ''
-        slide.style.marginBottom = ''
-        
-        if (gapCss && i !== this.tvist.slides.length - 1) {
-          if (isVertical) {
-            slide.style.marginBottom = gapCss
-          } else {
-            slide.style.marginRight = gapCss
-          }
-        }
-      })
-    }
-    
-    if (!this.slideSizesCacheValid) {
-      if (isDisabled) {
-        // Стили не применены — оставляем предыдущие размеры или инициализируем нулями
-        if (this.slideSizes.length === 0) {
-          this.slideSizes = this.tvist.slides.map(() => 0)
-        }
-      } else {
-        this.slideSizes = this.tvist.slides.map((slide) =>
-          isVertical ? getOuterHeight(slide) : getOuterWidth(slide)
-        )
-      }
-      this.slideSizesCacheValid = true
-    }
-  }
-
-  private applyFixedSize(isDisabled: boolean): void {
-    const isVertical = this.options.direction === 'vertical'
-    const gapCss = toCssValue(this.options.gap)
-
-    // CSS-значения по основной и поперечной осям.
-    // Основная ось: fixedWidth для горизонтали, fixedHeight для вертикали.
-    // Поперечная ось: fixedHeight для горизонтали, fixedWidth для вертикали.
-    const primaryCss = toCssValue(isVertical ? this.options.fixedHeight : this.options.fixedWidth)
-    const crossCss = toCssValue(isVertical ? this.options.fixedWidth : this.options.fixedHeight)
-
-    if (!isDisabled) {
-      this.tvist.slides.forEach((slide, i) => {
-        slide.style.width = ''
-        slide.style.height = ''
-        slide.style.marginRight = ''
-        slide.style.marginBottom = ''
-
-        if (this.slideSize > 0) {
-          const primarySizeCss = primaryCss || `${this.slideSize}px`
-          if (isVertical) {
-            slide.style.height = primarySizeCss
-          } else {
-            slide.style.width = primarySizeCss
-          }
-        }
-
-        if (isVertical) {
-          slide.style.width = crossCss || '100%'
-        } else if (crossCss) {
-          slide.style.height = crossCss
-        }
-
-        if (gapCss && i !== this.tvist.slides.length - 1) {
-          if (isVertical) {
-            slide.style.marginBottom = gapCss
-          } else {
-            slide.style.marginRight = gapCss
-          }
-        }
-      })
-    }
-
-    this.slideSizes = []
-    this.slideSizesCacheValid = false
-  }
-
-  /**
-   * Рассчитывает позиции всех слайдов
-   */
-  private calculatePositions(): void {
-    const slides = this.tvist.slides
-    const gap = this.gapPxResolved
-
-    this.slidePositions = []
-
-    if (this.slideSizes.length > 0) {
-      let pos = 0
-      for (let i = 0; i < slides.length; i++) {
-        this.slidePositions.push(pos)
-        pos += (this.slideSizes[i] ?? 0) + gap
-      }
-    } else {
-      for (let i = 0; i < slides.length; i++) {
-        this.slidePositions.push(i * (this.slideSize + gap))
-      }
-    }
-
-    // Обновляем кэш scroll-позиций после пересчёта layout
-    this.updateScrollCache()
-  }
-
-  /**
-   * Пересчитывает кэш scroll-позиций (minScroll, maxScroll, rootSize).
-   * Вызывается после calculatePositions/calculateSizes и при любом изменении layout.
-   */
-  private updateScrollCache(): void {
-    // ВАЖНО: cachedRootSize нужен для getCenterOffset даже при loop
-    this.cachedRootSize = this.getRootSize()
-
-    // minScroll: используем peekStart (уже вычислен в calculateSizes)
-    this.cachedMinScroll = this.peekStart === 0 ? 0 : -this.peekStart
-
-    // maxScroll: правый/нижний край последнего слайда совпадает с краем root (без дыры справа/снизу).
-    // Для этого используем cachedRootSize, а не containerSize, чтобы перекрыть peekEnd.
-    const lastIndex = this.tvist.slides.length - 1
-    if (lastIndex >= 0) {
-      const lastPageRight =
-        this.getSlidePosition(lastIndex) + this.getSlideSize(lastIndex)
-      this.cachedMaxScroll = this.cachedRootSize - this.peekStart - lastPageRight
-    } else {
-      this.cachedMaxScroll = 0
-    }
-
-    this.scrollCacheValid = true
-  }
-
-  /**
-   * Инвалидирует кэш scroll-позиций.
-   * Следующий вызов getMinScrollPosition/getMaxScrollPosition пересчитает значения.
-   */
-  private invalidateScrollCache(): void {
-    this.scrollCacheValid = false
-  }
-
+  __tvistInternal_applyPeek(): void;
   /**
    * Установить позиции слайдов вручную (используется в GridModule)
    */
-  public setSlidePositions(positions: number[]): void {
-    this.slidePositions = positions
-    this.invalidateScrollCache()
-  }
-
+  __tvistInternal_setSlidePositions(positions: number[]): void;
   /**
    * Установить размер слайда вручную (используется в GridModule)
    */
-  public setSlideSize(size: number): void {
-    this.slideSize = size
-  }
-
-  /**
-   * Вычисляет последний допустимый индекс для скролла
-   */
-  private getEndIndex(): number {
-    const slideCount = this.tvist.slides.length
-
-    if (this.isLoopEnabled() || this.isCenterMode() || this.options.isNavigation || this.isAutoSize()) {
-      return slideCount - 1
-    }
-
-    const perPage = this.options.perPage ?? 1
-    return Math.max(0, Math.min(slideCount - perPage, slideCount - 1))
-  }
-
+  __tvistInternal_setSlideSize(size: number): void;
   /**
    * Минимальная позиция скролла (при trim — первый слайд прижат к левому краю, левый peek не показывается).
    * Возвращает кэшированное значение; кэш обновляется при calculatePositions/update.
    */
-  getMinScrollPosition(): number {
-    if (!this.scrollCacheValid) this.updateScrollCache()
-    return this.cachedMinScroll
-  }
-
+  __tvistInternal_getMinScrollPosition(): number;
   /**
    * Максимальная позиция скролла (отрицательная).
    * При этой позиции правый край последнего слайда совпадает с правым краем root — правый peek не показывается (trim).
    * Возвращает кэшированное значение; кэш обновляется при calculatePositions/update.
    */
-  getMaxScrollPosition(): number {
-    if (!this.scrollCacheValid) this.updateScrollCache()
-    return this.cachedMaxScroll
-  }
-
+  __tvistInternal_getMaxScrollPosition(): number;
   /**
    * Получить позицию слайда по индексу
    */
-  getSlidePosition(index: number): number {
-    if (index < 0 || index >= this.slidePositions.length) {
-      return 0
-    }
-    return this.slidePositions[index] ?? 0
-  }
-
+  __tvistInternal_getSlidePosition(index: number): number;
   /**
    * Получить все позиции слайдов (публичный метод для тестов)
    */
-  public getSlidePositions(): number[] {
-    return [...this.slidePositions]
-  }
-
-  /**
-   * Вычисляет endIndex для Counter на основе текущих опций
-   */
-  private calculateCounterEndIndex(): number {
-    const slideCount = this.tvist.slides.length
-    const perPage = this.options.perPage ?? 1
-    return (this.isLoopEnabled() || this.options.isNavigation || this.isCenterMode())
-      ? slideCount - 1
-      : Math.max(0, slideCount - perPage)
-  }
-
-  /**
-   * Обновляет Counter.endIndex и Counter.max после изменения perPage/slideCount
-   */
-  private updateCounterLimits(): void {
-    this.index.endIndex = this.calculateCounterEndIndex()
-    this.index.max = this.tvist.slides.length
-  }
-
-  /**
-   * Синхронизирует location и target с позицией текущего индекса
-   * @param applyDOM - применить transform к DOM (false для disabled-режима)
-   */
-  private syncPositionToIndex(applyDOM = true): void {
-    const currentIndex = this.index.get()
-    const targetPosition = this.getScrollPositionForIndex(currentIndex)
-    this.target.set(targetPosition)
-    this.location.set(targetPosition)
-    if (applyDOM) this.applyTransform()
-  }
-
+  __tvistInternal_getSlidePositions(): number[];
   /**
    * Переход к слайду
    * @param index - индекс целевого слайда
    * @param instant - мгновенный переход без анимации
    * @param afterDragSnap - snap после отпускания при drag (длительность = speed, easing easeOutCubic)
    */
-  scrollTo(index: number, instant = false, afterDragSnap = false): void {
-    this.animator.stop()
-    const token = ++this.transitionToken
-    const endIndex = this.getEndIndex()
-    const previousIndex = this.index.get()
-    const ctx = this.resolveTargetIndex(index, endIndex, previousIndex, afterDragSnap)
-
-    if (ctx.indexChanged && !instant) {
-      this.handleBeforeTransition(ctx, previousIndex)
-    }
-
-    this.index.set(ctx.clampedIndex)
-
-    const targetPosition = this.clampTargetPosition(
-      this.getScrollPositionForIndex(ctx.normalizedIndex),
-      endIndex
-    )
-
-    if (ctx.indexChanged) {
-      this.tvist.emit('beforeSlideChange', ctx.eventIndex)
-    }
-
-    if (instant) {
-      this.performInstantScroll(targetPosition, ctx, endIndex)
-    } else {
-      this.performAnimatedScroll(targetPosition, ctx, endIndex, afterDragSnap, token)
-    }
-  }
-
-  private resolveTargetIndex(
-    index: number,
-    endIndex: number,
-    previousIndex: number,
-    afterDragSnap = false
-  ): ScrollContext {
-    const loopEnabled = this.isLoopEnabled()
-    let clampedIndex = loopEnabled || this.options.isNavigation || this.isCenterMode()
-      ? index
-      : Math.max(0, Math.min(index, endIndex))
-
-    const rewindAllowed =
-      this.options.rewind && !loopEnabled && (!afterDragSnap || this.options.rewindByDrag)
-
-    if (rewindAllowed) {
-      if (index > endIndex) {
-        clampedIndex = 0
-      } else if (index < 0) {
-        clampedIndex = endIndex
-      }
-    }
-
-    const normalizedIndex = this.index.loop
-      ? (clampedIndex < 0 ? clampedIndex + this.index.max : clampedIndex % this.index.max)
-      : Math.max(0, Math.min(clampedIndex, this.index.endIndex))
-
-    // eventIndex — realIndex для событий (slideChangeStart, slideChangeEnd и пр.)
-    // В loop-режиме normalizedIndex = DOM-позиция, eventIndex = realIndex из data-tvist-slide-index.
-    // В обычном режиме они совпадают.
-    return {
-      requestedIndex: index,
-      clampedIndex,
-      normalizedIndex,
-      eventIndex: this.getEventIndex(normalizedIndex),
-      indexChanged: normalizedIndex !== previousIndex,
-    }
-  }
-
-  /**
-   * Обрабатывает beforeTransitionStart и loop re-indexing.
-   * Может мутировать ctx при loop-перестановке слайдов.
-   */
-  private handleBeforeTransition(ctx: ScrollContext, previousIndex: number): void {
-    const savedDirection = this.tvist._scrollDirection
-    const direction = savedDirection ?? (ctx.normalizedIndex > previousIndex ? 'next' : 'prev')
-    this.tvist._scrollDirection = undefined
-
-    const counterBeforeEmit = this.index.get()
-    this.tvist.emit('beforeTransitionStart', { index: ctx.eventIndex, direction })
-    const counterAfterEmit = this.index.get()
-
-    // LoopModule переставил слайды: DOM-позиция целевого слайда могла измениться.
-    // Ищем новую DOM-позицию по eventIndex (= realIndex).
-    if (counterBeforeEmit !== counterAfterEmit && this.isLoopEnabled()) {
-      const withClones = this.isLoopWithClonesEnabled()
-      const targetDomIndex = withClones
-        ? findDomIndexByRealIndexForTransition(
-            this.tvist.slides,
-            ctx.eventIndex,
-            counterAfterEmit,
-            direction
-          )
-        : findDomIndexByRealIndex(this.tvist.slides, ctx.eventIndex)
-
-      if (targetDomIndex !== -1) {
-        ctx.clampedIndex = targetDomIndex
-        ctx.normalizedIndex = targetDomIndex
-      } else {
-        // Fallback: delta-подход
-        const delta = ctx.clampedIndex - counterBeforeEmit
-        ctx.clampedIndex = counterAfterEmit + delta
-        ctx.normalizedIndex = ((ctx.clampedIndex % this.index.max) + this.index.max) % this.index.max
-      }
-      // realIndex изменился — события должны эмититься независимо от DOM-позиции
-      ctx.indexChanged = true
-    }
-  }
-
-  /** При навигации применяем ограничения (но не для center режима) */
-  private clampTargetPosition(position: number, endIndex: number): number {
-    if (!this.options.isNavigation || this.isLoopEnabled() || this.isCenterMode()) {
-      return position
-    }
-    const peekTrim = this.options.peekTrim !== false
-    const maxPos = peekTrim ? this.getMaxScrollPosition() : -this.getSlidePosition(endIndex)
-    const minPos = peekTrim ? this.getMinScrollPosition() : 0
-    return Math.max(maxPos, Math.min(minPos, position))
-  }
-
-  private performInstantScroll(targetPosition: number, ctx: ScrollContext, endIndex: number): void {
-    this.target.set(targetPosition)
-    this.location.set(targetPosition)
-    this.applyTransform()
-
-    if (ctx.indexChanged) {
-      this.tvist.emit('slideChangeEnd', ctx.eventIndex)
-      this.emitReachEdge(ctx, endIndex)
-    }
-  }
-
-  private performAnimatedScroll(
-    targetPosition: number,
-    ctx: ScrollContext,
-    endIndex: number,
-    afterDragSnap: boolean,
-    token: number
-  ): void {
-    this.target.set(targetPosition)
-    const defaultSpeed = this.options.speed ?? 300
-
-    if (ctx.indexChanged) {
-      this.tvist.emit('transitionStart', ctx.eventIndex)
-      this.tvist.emit('slideChangeStart', ctx.eventIndex, { isDrag: afterDragSnap })
-    }
-
-    // Проверяем, нужна ли анимация для корректировки позиции
-    const currentLocation = this.location.get()
-    const needsAnimation = Math.abs(currentLocation - targetPosition) > 0.5
-
-    let duration = defaultSpeed
-    let easingFn: EasingFunction = easings.easeOutQuad
-
-    // Определяем, является ли этот скролл rewind-переходом
-    const isRewind =
-      this.options.rewind &&
-      (!afterDragSnap || this.options.rewindByDrag) &&
-      !this.isLoopEnabled() &&
-      ctx.indexChanged &&
-      ((ctx.requestedIndex > endIndex && ctx.normalizedIndex === 0) ||
-        (ctx.requestedIndex < 0 && ctx.normalizedIndex === endIndex))
-
-    if (afterDragSnap && !isRewind) {
-      duration = this.options.speed ?? 300
-      easingFn = easings.easeOutCubic
-    } else if (isRewind) {
-      duration = this.options.speed ?? 300
-      easingFn = easings.easeOutQuad
-    }
-
-    const complete = () => {
-      if (token !== this.transitionToken) return
-      this.tvist.emit('transitionEnd', ctx.eventIndex)
-      if (ctx.indexChanged) {
-        this.tvist.emit('slideChangeEnd', ctx.eventIndex, { isDrag: afterDragSnap })
-        this.emitReachEdge(ctx, endIndex)
-      }
-    }
-
-    if (needsAnimation && duration > 0) {
-      if ((this.options.effect ?? 'slide') === 'slide') {
-        this.startCssTransition(currentLocation, targetPosition, duration, easingFn, token, complete)
-      } else {
-        this.animator.animate(
-          currentLocation, targetPosition, duration,
-          (value) => {
-            this.location.set(value)
-            this.applyTransform()
-            this.tvist.emit('scroll')
-          },
-          complete, easingFn
-        )
-      }
-    } else {
-      if (needsAnimation) {
-        this.location.set(targetPosition)
-        this.applyTransform()
-        this.tvist.emit('scroll')
-        complete()
-        return
-      }
-      // Позиция уже корректна (needsAnimation=false); microtask чтобы событие было
-      // асинхронным как после анимации. Эмитируем transitionEnd всегда, slideChangeEnd
-      // — только если индекс изменился (например, drag довёл до граничной позиции).
-      void Promise.resolve().then(complete)
-    }
-  }
-
-  private startCssTransition(
-    from: number,
-    to: number,
-    duration: number,
-    easing: EasingFunction,
-    token: number,
-    complete: () => void
-  ): void {
-    const container = this.tvist.container
-    // Loop-перестановка и остановка предыдущего перехода меняют transform
-    // в том же кадре. Фиксируем начальную позицию в computed style, иначе
-    // браузер объединит её с конечной и пропустит CSS-анимацию.
-    this.writeTransform(from)
-    void getComputedStyle(container).transform
-
-    const start = performance.now()
-    this.cssTransitionActive = true
-    this.location.setReader(() =>
-      from + (to - from) * easing(Math.min((performance.now() - start) / duration, 1))
-    )
-    const bezier = easing === easings.easeOutCubic
-      ? 'cubic-bezier(0.333333, 1, 0.666667, 1)'
-      : 'cubic-bezier(0.333333, 0.666667, 0.666667, 1)'
-    container.style.transition = `transform ${duration}ms ${bezier}`
-    this.writeTransform(to)
-
-    const finish = () => {
-      if (token !== this.transitionToken || !this.cssTransitionActive) return
-      if (!container.isConnected) {
-        this.stopCssTransition(false)
-        return
-      }
-      this.stopCssTransition(false)
-      this.location.set(to)
-      this.emitPositionUpdates()
-      complete()
-    }
-    this.onTransitionEnd = (event: TransitionEvent) => {
-      if (event.target === container && event.propertyName === 'transform') finish()
-    }
-    container.addEventListener('transitionend', this.onTransitionEnd)
-    this.transitionTimer = window.setTimeout(finish, duration)
-    this.ensureTransitionUpdates()
-  }
-
-  private onTransitionEnd?: (event: TransitionEvent) => void
-
+  __tvistInternal_scrollTo(index: number, instant?: boolean, afterDragSnap?: boolean): void;
   /** Запускает чтение позиции только пока промежуточные значения кому-то нужны. */
-  ensureTransitionUpdates(): void {
-    if (!this.cssTransitionActive || this.transitionRaf !== null || !this.tvist.hasPositionListeners()) return
-    this.transitionRaf = requestAnimationFrame(() => {
-      this.transitionRaf = null
-      if (!this.cssTransitionActive) return
-      this.emitPositionUpdates()
-      this.ensureTransitionUpdates()
-    })
-  }
+  __tvistInternal_ensureTransitionUpdates(): void;
 
-  private emitPositionUpdates(): void {
-    const position = this.location.get()
-    this.tvist.emit('setTranslate', this.tvist, position)
-    this.emitProgress()
-    this.tvist.emit('scroll')
-  }
-
-  private readRenderedPosition(): number {
-    try {
-      const transform = getComputedStyle(this.tvist.container).transform
-      if (transform.startsWith('matrix')) {
-        const matrix = new DOMMatrixReadOnly(transform)
-        return this.options.direction === 'vertical' ? matrix.m42 : matrix.m41
-      }
-    } catch {
-      // happy-dom не вычисляет матрицу CSS-перехода.
-    }
-    return this.location.get()
-  }
-
-  private stopCssTransition(freeze = true): void {
-    if (!this.cssTransitionActive) return
-    const position = freeze ? this.readRenderedPosition() : this.target.get()
-    this.cssTransitionActive = false
-    this.location.setReader()
-    if (this.transitionRaf !== null && typeof cancelAnimationFrame === 'function') {
-      cancelAnimationFrame(this.transitionRaf)
-    }
-    if (this.transitionTimer !== null) clearTimeout(this.transitionTimer)
-    this.transitionRaf = null
-    this.transitionTimer = null
-    if (this.onTransitionEnd) this.tvist.container.removeEventListener('transitionend', this.onTransitionEnd)
-    this.onTransitionEnd = undefined
-    this.tvist.container.style.transition = ''
-    this.location.set(position)
-    if (freeze) this.writeTransform(position)
-  }
-
-  private writeTransform(position: number): void {
-    const pos = this.options.roundLengths === false ? position : Math.round(position)
-    this.setTransformPosition(pos)
-  }
-
-  private setTransformPosition(pos: number): void {
-    this.tvist.container.style.transform = this.options.direction === 'vertical'
-      ? `translate3d(0, ${pos}px, 0)`
-      : `translate3d(${pos}px, 0, 0)`
-    this._lastAppliedTransformPos = pos
-  }
-
-  /** Прогресс прокрутки 0..1 (только при !loop) */
-  private emitProgress(): void {
-    if (this.isLoopEnabled()) return
-    const minScroll = this.getMinScrollPosition()
-    const maxScroll = this.getMaxScrollPosition()
-    const range = maxScroll - minScroll
-    if (range <= 0) return
-    const pos = this.location.get()
-    const progress = Math.max(0, Math.min(1, (pos - minScroll) / range))
-    this.tvist.emit('progress', progress)
-  }
-
-  /** События достижения начала/конца (reachBeginning / reachEnd) */
-  private emitReachEdge(ctx: ScrollContext, endIndex: number): void {
-    const index = ctx.eventIndex
-    // reach-edge только когда requestedIndex вышел за пределы доступного диапазона
-    const loopEnabled = this.isLoopEnabled()
-    const triedBeforeStart = !loopEnabled && ctx.requestedIndex < 0
-    const triedAfterEnd = !loopEnabled && !this.options.rewind && ctx.requestedIndex > endIndex
-
-    if (index <= 0 && triedBeforeStart) {
-      this.tvist.emit('reachBeginning')
-    }
-    if (index >= endIndex && triedAfterEnd) {
-      this.tvist.emit('reachEnd')
-    }
-  }
-
-  scrollBy(delta: number, afterDragSnap = false): void {
-    const targetIndex = this.index.get() + delta
-    // В loop-режиме направление определяется по знаку delta, а не по сравнению индексов
-    const direction = delta > 0 ? 'next' : delta < 0 ? 'prev' : undefined
-    if (direction) this.tvist._scrollDirection = direction
-    this.scrollTo(targetIndex, false, afterDragSnap)
-  }
-
+  __tvistInternal_scrollBy(delta: number, afterDragSnap?: boolean): void;
   /**
    * Применяет transform к контейнеру.
    * Мемоизирует последнюю применённую позицию: если округлённое значение не
    * изменилось, пропускает запись style.transform и все события (scroll/setTranslate/progress).
    * Это убирает лишние DOM-записи и обработчики на кадрах без визуального сдвига.
    */
-  applyTransform(): void {
-    const container = this.tvist.container
-    if (this._isLocked) {
-      if (this.isCenterJustify()) {
-        if (!this.scrollCacheValid) this.updateScrollCache()
-        const offset = Math.max(0, (this.cachedRootSize - this.getContentSize()) / 2)
-        if (this._lastAppliedTransformPos !== offset) {
-          this.setTransformPosition(offset)
-          this.tvist.emit('setTranslate', this.tvist, offset)
-          this.emitProgress()
-        }
-      } else {
-        if (this._lastAppliedTransformPos !== 0) {
-          container.style.transform = ''
-          this._lastAppliedTransformPos = 0
-          this.tvist.emit('setTranslate', this.tvist, 0)
-          this.emitProgress()
-        }
-      }
-      return
-    }
-
-    const rawPos = this.location.get()
-    const pos = this.options.roundLengths === false ? rawPos : Math.round(rawPos)
-
-    if (pos === this._lastAppliedTransformPos) return
-
-    this.setTransformPosition(pos)
-    this.tvist.emit('setTranslate', this.tvist, pos)
-    this.emitProgress()
-  }
-
+  __tvistInternal_applyTransform(): void;
   /** Пересчёт без применения стилей (слайдер disabled) */
-  updateDisabled(): void {
-    this.invalidateRootSizeCache()
-    this.slideSizesCacheValid = false
-    this.calculateSizes(true)
-    this.calculatePositions()
-    this.updateCounterLimits()
-    this.checkLock(true)
-    this.syncPositionToIndex(false)
-  }
-
+  __tvistInternal_updateDisabled(): void;
   /** Пересчёт размеров и позиций (resize) */
-  update(): void {
-    this.animator.stop()
-    this.invalidateRootSizeCache()
-    this.slideSizesCacheValid = false
-    // После пересчёта layout позиция контейнера должна быть применена заново,
-    // даже если округлённое значение совпадает с кешированным.
-    this._lastAppliedTransformPos = null
-    this.resolveGap()
-    this.resolveFixedDimensionsEarly()
-    this.applyPeek()
-    this.calculateSizes()
-    this.calculatePositions()
-    this.updateCounterLimits()
-    this.checkLock()
-    this.syncPositionToIndex()
-  }
-
+  __tvistInternal_update(): void;
   /** Пересчитать позиции после перестановки тех же DOM-слайдов без повторного измерения. */
-  updateAfterReorder(previousSlides: readonly HTMLElement[]): void {
-    if (this.isAutoSize()) {
-      const sizes = new Map(previousSlides.map((slide, index) => [slide, this.slideSizes[index] ?? 0]))
-      const gap = gapCssForMargin(this.options.gap)
-      const vertical = this.options.direction === 'vertical'
-      this.slideSizes = this.tvist.slides.map((slide, index) => {
-        slide.style[vertical ? 'marginBottom' : 'marginRight'] =
-          index === this.tvist.slides.length - 1 ? '' : gap
-        return sizes.get(slide) ?? 0
-      })
-    }
-    this.calculatePositions()
-    this.updateCounterLimits()
-    this.checkLock()
-  }
-
+  __tvistInternal_updateAfterReorder(previousSlides: readonly HTMLElement[]): void;
   /**
    * Проверка на необходимость блокировки слайдера.
    * Блокировка включается, если весь контент помещается в контейнер и некуда листать.
    */
-  public checkLock(isDisabled = false): void {
-    const slideCount = this.tvist.slides.length
-    const perPage = this.options.perPage ?? 1
-    const hasSizes = this.slideSize > 0 || this.slideSizes.length === slideCount
-
-    // Если размеры ещё не рассчитаны, блокируем просто по количеству слайдов
-    if (!hasSizes) {
-      this.setLocked(slideCount <= perPage, isDisabled)
-      return
-    }
-
-    const contentFits = this.getContentSize() <= this.containerSize + 1
-
-    if (this.isLoopEnabled()) {
-      const loopOpts = this.options.loop
-      const withClonesAndFill =
-        typeof loopOpts === 'object' &&
-        loopOpts !== null &&
-        loopOpts.withClones === true
-
-      if (!withClonesAndFill && contentFits) {
-        this.setLocked(true, isDisabled)
-        return
-      }
-
-      this.setLocked(false, isDisabled)
-      return
-    }
-
-    const cannotScroll = this.getMaxScrollPosition() >= this.getMinScrollPosition() - 1
-
-    if (slideCount > perPage) {
-      this.setLocked(cannotScroll, isDisabled)
-    } else {
-      this.setLocked(contentFits && cannotScroll, isDisabled)
-    }
-  }
-
+  __tvistInternal_checkLock(isDisabled?: boolean): void;
   /**
    * Получить общий размер всего контента (публичный метод для модулей)
    */
-  public getTotalSize(): number {
-    return this.getContentSize()
-  }
-
-  private getContentSize(): number {
-    const slides = this.tvist.slides
-
-    if (slides.length === 0) return 0
-
-    let minPos = Infinity
-    let maxPos = -Infinity
-
-    for (let i = 0; i < slides.length; i++) {
-      const pos = this.getSlidePosition(i)
-      const size = this.getSlideSize(i)
-      if (pos < minPos) minPos = pos
-      if (pos + size > maxPos) maxPos = pos + size
-    }
-
-    if (minPos === Infinity) return 0
-    
-    return maxPos - minPos
-  }
-
-  private setLocked(isLocked: boolean, isDisabled = false): void {
-    // В disabled-режиме не меняем стейт: при enable() checkLock() должен
-    // применить классы заново, что произойдёт только если _isLocked изменится.
-    if (isDisabled) return
-
-    if (this._isLocked !== isLocked) {
-      this._isLocked = isLocked
-      this.tvist.root.classList.toggle(TVIST_CLASSES.locked, isLocked)
-
-      if (isLocked) {
-        this.index.set(0)
-        const initialPos = this.getScrollPositionForIndex(0)
-        this.location.set(initialPos)
-        this.target.set(initialPos)
-        this.applyTransform()
-        this.tvist.emit('lock')
-      } else {
-        this.tvist.emit('unlock')
-      }
-    }
-  }
-
+  __tvistInternal_getTotalSize(): number;
   /**
    * Получить состояние блокировки
    */
-  get isLocked(): boolean {
-    return this._isLocked
-  }
-
+  readonly __tvistInternal_isLocked: boolean;
   /**
    * Получить размер слайда (ширина или высота).
    * При autoWidth/autoHeight возвращает размер первого слайда для совместимости с модулями.
    */
-  get slideSizeValue(): number {
-    return this.slideSizes.length > 0 ? this.getSlideSize(0) : this.slideSize
-  }
-
+  readonly __tvistInternal_slideSizeValue: number;
   /**
    * Получить размер контейнера (ширина или высота)
    */
-  get containerSizeValue(): number {
-    return this.containerSize
-  }
-
+  readonly __tvistInternal_containerSizeValue: number;
   /**
    * Получить значения peek (start, end)
    */
-  public getPeek(): { start: number; end: number } {
-    return { start: this.peekStart, end: this.peekEnd }
-  }
-
+  __tvistInternal_getPeek(): { start: number; end: number };
   /**
    * Вычисляет видимость каждого слайда математически (без DOM-запросов).
    * Использует закэшированные slidePositions, slideSizes и текущий location.
@@ -1384,99 +134,439 @@ export class Engine {
    *
    * @returns массив булевых значений видимости для каждого слайда
    */
-  public getVisibleSlides(): boolean[] {
-    const currentPos = this.location.get()
-    const viewportSize = this.containerSize
-    const slides = this.tvist.slides
-    const result: boolean[] = []
-    const THRESHOLD = 1
+  __tvistInternal_getVisibleSlides(): boolean[];
+  /**
+   * Получить текущий индекс
+   */
+  readonly __tvistInternal_activeIndex: number;
+  /**
+   * Получить количество слайдов
+   */
+  readonly __tvistInternal_slideCount: number;
+  /**
+   * Проверить, можно ли листать вперёд
+   */
+  __tvistInternal_canScrollNext(): boolean;
+  /**
+   * Проверить, можно ли листать назад
+   */
+  __tvistInternal_canScrollPrev(): boolean;
+  /**
+   * Очистка
+   */
+  __tvistInternal_destroy(): void;
+}
 
+export function createEngine(tvist: Tvist, options: TvistOptions): Engine {
+  let local__isLocked = false;
+
+  /**
+   * Синхронизирует location и target с позицией текущего индекса
+   * @param applyDOM - применить transform к DOM (false для disabled-режима)
+   */
+  function local_syncPositionToIndex(applyDOM = true): void {
+    const currentIndex = local_index.get();
+    const targetPosition = layout.__tvistInternal_getScrollPositionForIndex(currentIndex);
+    local_target.set(targetPosition);
+    local_location.set(targetPosition);
+    if (applyDOM) motion.__tvistInternal_applyTransform();
+  }
+  /** Пересчёт без применения стилей (слайдер disabled) */
+  function local_updateDisabled(): void {
+    layout.__tvistInternal_invalidateRootSizeCache();
+    layout.__tvistInternal_slideSizesCacheValid = false;
+    layout.__tvistInternal_calculateSizes(true);
+    layout.__tvistInternal_calculatePositions();
+    layout.__tvistInternal_updateCounterLimits();
+    local_checkLock(true);
+    local_syncPositionToIndex(false);
+  }
+  /** Пересчёт размеров и позиций (resize) */
+  function local_update(): void {
+    local_animator.stop();
+    layout.__tvistInternal_invalidateRootSizeCache();
+    layout.__tvistInternal_slideSizesCacheValid = false;
+    // После пересчёта layout позиция контейнера должна быть применена заново,
+    // даже если округлённое значение совпадает с кешированным.
+    motion.__tvistInternal__lastAppliedTransformPos = null;
+    layout.__tvistInternal_resolveGap();
+    layout.__tvistInternal_resolveFixedDimensionsEarly();
+    layout.__tvistInternal_applyPeek();
+    layout.__tvistInternal_calculateSizes();
+    layout.__tvistInternal_calculatePositions();
+    layout.__tvistInternal_updateCounterLimits();
+    local_checkLock();
+    local_syncPositionToIndex();
+  }
+  /** Пересчитать позиции после перестановки тех же DOM-слайдов без повторного измерения. */
+  function local_updateAfterReorder(previousSlides: readonly HTMLElement[]): void {
+    if (layout.__tvistInternal_isAutoSize()) {
+      const sizes = new Map(
+        previousSlides.map((slide, index) => [slide, layout.__tvistInternal_slideSizes[index] ?? 0])
+      );
+      const gap = gapCssForMargin(local_options.gap);
+      const vertical = local_options.direction === 'vertical';
+      layout.__tvistInternal_slideSizes = local_tvist.slides.map((slide, index) => {
+        slide.style[vertical ? 'marginBottom' : 'marginRight'] =
+          index === local_tvist.slides.length - 1 ? '' : gap;
+        return sizes.get(slide) ?? 0;
+      });
+    }
+    layout.__tvistInternal_calculatePositions();
+    layout.__tvistInternal_updateCounterLimits();
+    local_checkLock();
+  }
+  /**
+   * Проверка на необходимость блокировки слайдера.
+   * Блокировка включается, если весь контент помещается в контейнер и некуда листать.
+   */
+  function local_checkLock(isDisabled = false): void {
+    const slideCount = local_tvist.slides.length;
+    const perPage = local_options.perPage ?? 1;
+    const hasSizes =
+      layout.__tvistInternal_slideSize > 0 ||
+      layout.__tvistInternal_slideSizes.length === slideCount;
+    // Если размеры ещё не рассчитаны, блокируем просто по количеству слайдов
+    if (!hasSizes) {
+      local_setLocked(slideCount <= perPage, isDisabled);
+      return;
+    }
+    const contentFits = local_getContentSize() <= layout.__tvistInternal_containerSize + 1;
+    if (layout.__tvistInternal_isLoopEnabled()) {
+      const loopOpts = local_options.loop;
+      const withClonesAndFill =
+        typeof loopOpts === 'object' && loopOpts !== null && loopOpts.withClones === true;
+      if (!withClonesAndFill && contentFits) {
+        local_setLocked(true, isDisabled);
+        return;
+      }
+      local_setLocked(false, isDisabled);
+      return;
+    }
+    const cannotScroll =
+      layout.__tvistInternal_getMaxScrollPosition() >=
+      layout.__tvistInternal_getMinScrollPosition() - 1;
+    if (slideCount > perPage) {
+      local_setLocked(cannotScroll, isDisabled);
+    } else {
+      local_setLocked(contentFits && cannotScroll, isDisabled);
+    }
+  }
+  /**
+   * Получить общий размер всего контента (публичный метод для модулей)
+   */
+  function local_getTotalSize(): number {
+    return local_getContentSize();
+  }
+
+  function local_getContentSize(): number {
+    const slides = local_tvist.slides;
+    if (slides.length === 0) return 0;
+    let minPos = Infinity;
+    let maxPos = -Infinity;
+    for (let i = 0; i < slides.length; i++) {
+      const pos = layout.__tvistInternal_getSlidePosition(i);
+      const size = layout.__tvistInternal_getSlideSize(i);
+      if (pos < minPos) minPos = pos;
+      if (pos + size > maxPos) maxPos = pos + size;
+    }
+    if (minPos === Infinity) return 0;
+    return maxPos - minPos;
+  }
+
+  function local_setLocked(isLocked: boolean, isDisabled = false): void {
+    // В disabled-режиме не меняем стейт: при enable() checkLock() должен
+    // применить классы заново, что произойдёт только если _isLocked изменится.
+    if (isDisabled) return;
+    if (local__isLocked !== isLocked) {
+      local__isLocked = isLocked;
+      local_tvist.root.classList.toggle(TVIST_CLASSES.locked, isLocked);
+      if (isLocked) {
+        local_index.set(0);
+        const initialPos = layout.__tvistInternal_getScrollPositionForIndex(0);
+        local_location.set(initialPos);
+        local_target.set(initialPos);
+        motion.__tvistInternal_applyTransform();
+        local_tvist.emit('lock');
+      } else {
+        local_tvist.emit('unlock');
+      }
+    }
+  }
+  /**
+   * Получить состояние блокировки
+   */
+  function read_isLocked(): boolean {
+    return local__isLocked;
+  }
+  /**
+   * Получить размер слайда (ширина или высота).
+   * При autoWidth/autoHeight возвращает размер первого слайда для совместимости с модулями.
+   */
+  function read_slideSizeValue(): number {
+    return layout.__tvistInternal_slideSizes.length > 0
+      ? layout.__tvistInternal_getSlideSize(0)
+      : layout.__tvistInternal_slideSize;
+  }
+  /**
+   * Получить размер контейнера (ширина или высота)
+   */
+  function read_containerSizeValue(): number {
+    return layout.__tvistInternal_containerSize;
+  }
+  /**
+   * Получить значения peek (start, end)
+   */
+  function local_getPeek(): { start: number; end: number } {
+    return { start: layout.__tvistInternal_peekStart, end: layout.__tvistInternal_peekEnd };
+  }
+  /**
+   * Вычисляет видимость каждого слайда математически (без DOM-запросов).
+   * Использует закэшированные slidePositions, slideSizes и текущий location.
+   * Для эффекта cube маска граней задаётся в SlideStatesModule через `getCubeSlidesInRange`.
+   *
+   * @returns массив булевых значений видимости для каждого слайда
+   */
+  function local_getVisibleSlides(): boolean[] {
+    const currentPos = local_location.get();
+    const viewportSize = layout.__tvistInternal_containerSize;
+    const slides = local_tvist.slides;
+    const result: boolean[] = [];
+    const THRESHOLD = 1;
     for (let i = 0; i < slides.length; i++) {
       // slidePosition — позиция слайда в координатах контента
       // currentPos — отрицательное смещение (translate), поэтому видимая область:
       // от -currentPos до -currentPos + viewportSize
-      const viewportStart = -currentPos
-      const viewportEnd = viewportStart + viewportSize
-
-      const slideStart = this.getSlidePosition(i)
-      const slideEnd = slideStart + this.getSlideSize(i)
-
-      const isVisible = slideStart < viewportEnd - THRESHOLD && slideEnd > viewportStart + THRESHOLD
-      result.push(isVisible)
+      const viewportStart = -currentPos;
+      const viewportEnd = viewportStart + viewportSize;
+      const slideStart = layout.__tvistInternal_getSlidePosition(i);
+      const slideEnd = slideStart + layout.__tvistInternal_getSlideSize(i);
+      const isVisible =
+        slideStart < viewportEnd - THRESHOLD && slideEnd > viewportStart + THRESHOLD;
+      result.push(isVisible);
     }
-
-    return result
+    return result;
   }
-
   /**
    * Получить текущий индекс
    */
-  get activeIndex(): number {
-    return this.index.get()
+  function read_activeIndex(): number {
+    return local_index.get();
   }
-
   /**
    * Получить количество слайдов
    */
-  get slideCount(): number {
-    return this.tvist.slides.length
+  function read_slideCount(): number {
+    return local_tvist.slides.length;
   }
-
   /**
    * Проверить, можно ли листать вперёд
    */
-  canScrollNext(): boolean {
-    if (this.isLocked) return false
-    if (this.isLoopEnabled() || this.options.rewind) return true
-
-    const limit = this.options.isNavigation
-      ? this.tvist.slides.length - 1
-      : this.getEndIndex()
-
-    if (this.index.get() >= limit) return false
-
+  function local_canScrollNext(): boolean {
+    if (read_isLocked()) return false;
+    if (layout.__tvistInternal_isLoopEnabled() || local_options.rewind) return true;
+    const limit = local_options.isNavigation
+      ? local_tvist.slides.length - 1
+      : layout.__tvistInternal_getEndIndex();
+    if (local_index.get() >= limit) return false;
     // В center и autoSize режимах граница определяется только по индексу:
     // center: translate не совпадает с getMaxScrollPosition
     // autoSize: несколько индексов могут сходиться к одной translate (clamp к maxScroll)
-    if (this.isCenterMode() || this.isAutoSize()) return true
-
+    if (layout.__tvistInternal_isCenterMode() || layout.__tvistInternal_isAutoSize()) return true;
     // Нет осмысленного диапазона (тесты без layout, нулевые размеры) — только индекс
-    if (!this.hasScrollRange()) return true
-
+    if (!local_hasScrollRange()) return true;
     // Сверка с фактической позицией: при slideMinWidth / рассинхроне после drag
     // индекс может быть < limit, а translate уже у упора — стрелка «вперёд» должна быть disabled
-    return this.location.get() > this.getMaxScrollPosition() + 1
+    return local_location.get() > layout.__tvistInternal_getMaxScrollPosition() + 1;
   }
-
   /**
    * Проверить, можно ли листать назад
    */
-  canScrollPrev(): boolean {
-    if (this.isLocked) return false
-    if (this.isLoopEnabled() || this.options.rewind) return true
-
-    if (this.index.get() > 0) return true
-
-    if (this.isCenterMode() || this.isAutoSize()) return false
-
-    if (!this.hasScrollRange()) return false
-
-    return this.location.get() < this.getMinScrollPosition() - 1
+  function local_canScrollPrev(): boolean {
+    if (read_isLocked()) return false;
+    if (layout.__tvistInternal_isLoopEnabled() || local_options.rewind) return true;
+    if (local_index.get() > 0) return true;
+    if (layout.__tvistInternal_isCenterMode() || layout.__tvistInternal_isAutoSize()) return false;
+    if (!local_hasScrollRange()) return false;
+    return local_location.get() < layout.__tvistInternal_getMinScrollPosition() - 1;
   }
-
   /**
    * Есть ли осмысленный диапазон скролла (не нулевые размеры, не тест без layout)
    */
-  private hasScrollRange(): boolean {
-    const scrollRange = this.getMinScrollPosition() - this.getMaxScrollPosition()
-    return Number.isFinite(scrollRange) && scrollRange > 1
+  function local_hasScrollRange(): boolean {
+    const scrollRange =
+      layout.__tvistInternal_getMinScrollPosition() - layout.__tvistInternal_getMaxScrollPosition();
+    return Number.isFinite(scrollRange) && scrollRange > 1;
   }
-
   /**
    * Очистка
    */
-  destroy(): void {
-    this.animator.stop()
-    this._lastAppliedTransformPos = null
+  function local_destroy(): void {
+    local_animator.stop();
+    motion.__tvistInternal__lastAppliedTransformPos = null;
   }
+  const motion = createMotion({
+    get __tvistInternal_animator() {
+      return local_animator;
+    },
+    get __tvistInternal_getEndIndex() {
+      return layout.__tvistInternal_getEndIndex;
+    },
+    get __tvistInternal_index() {
+      return local_index;
+    },
+    get __tvistInternal_getScrollPositionForIndex() {
+      return layout.__tvistInternal_getScrollPositionForIndex;
+    },
+    get __tvistInternal_tvist() {
+      return local_tvist;
+    },
+    get __tvistInternal_isLoopEnabled() {
+      return layout.__tvistInternal_isLoopEnabled;
+    },
+    get __tvistInternal_options() {
+      return local_options;
+    },
+    get __tvistInternal_isCenterMode() {
+      return layout.__tvistInternal_isCenterMode;
+    },
+    get __tvistInternal_getEventIndex() {
+      return layout.__tvistInternal_getEventIndex;
+    },
+    get __tvistInternal_isLoopWithClonesEnabled() {
+      return layout.__tvistInternal_isLoopWithClonesEnabled;
+    },
+    get __tvistInternal_getMaxScrollPosition() {
+      return layout.__tvistInternal_getMaxScrollPosition;
+    },
+    get __tvistInternal_getSlidePosition() {
+      return layout.__tvistInternal_getSlidePosition;
+    },
+    get __tvistInternal_getMinScrollPosition() {
+      return layout.__tvistInternal_getMinScrollPosition;
+    },
+    get __tvistInternal_target() {
+      return local_target;
+    },
+    get __tvistInternal_location() {
+      return local_location;
+    },
+    get __tvistInternal__isLocked() {
+      return local__isLocked;
+    },
+    get __tvistInternal_isCenterJustify() {
+      return layout.__tvistInternal_isCenterJustify;
+    },
+    get __tvistInternal_scrollCacheValid() {
+      return layout.__tvistInternal_scrollCacheValid;
+    },
+    get __tvistInternal_updateScrollCache() {
+      return layout.__tvistInternal_updateScrollCache;
+    },
+    get __tvistInternal_cachedRootSize() {
+      return layout.__tvistInternal_cachedRootSize;
+    },
+    get __tvistInternal_getContentSize() {
+      return local_getContentSize;
+    },
+  });
+  const layout = createLayout({
+    get __tvistInternal_options() {
+      return local_options;
+    },
+    get __tvistInternal_tvist() {
+      return local_tvist;
+    },
+    get __tvistInternal_index() {
+      return local_index;
+    },
+  });
+  const component: Engine = {
+    get __tvistInternal_location() {
+      return local_location;
+    },
+    get __tvistInternal_target() {
+      return local_target;
+    },
+    get __tvistInternal_index() {
+      return local_index;
+    },
+    get __tvistInternal_animator() {
+      return local_animator;
+    },
+    __tvistInternal_getSlideSize: layout.__tvistInternal_getSlideSize,
+    __tvistInternal_isCenterActive: layout.__tvistInternal_isCenterActive,
+    __tvistInternal_isCenterFocus: layout.__tvistInternal_isCenterFocus,
+    __tvistInternal_isCenterMode: layout.__tvistInternal_isCenterMode,
+    __tvistInternal_isCenterJustify: layout.__tvistInternal_isCenterJustify,
+    __tvistInternal_getCenterOffset: layout.__tvistInternal_getCenterOffset,
+    __tvistInternal_clampCenterPosition: layout.__tvistInternal_clampCenterPosition,
+    __tvistInternal_getScrollPositionForIndex: layout.__tvistInternal_getScrollPositionForIndex,
+    get __tvistInternal_gapPxValue() {
+      return layout.__tvistInternal_read_gapPxValue();
+    },
+    __tvistInternal_applyPeek: layout.__tvistInternal_applyPeek,
+    __tvistInternal_setSlidePositions: layout.__tvistInternal_setSlidePositions,
+    __tvistInternal_setSlideSize: layout.__tvistInternal_setSlideSize,
+    __tvistInternal_getMinScrollPosition: layout.__tvistInternal_getMinScrollPosition,
+    __tvistInternal_getMaxScrollPosition: layout.__tvistInternal_getMaxScrollPosition,
+    __tvistInternal_getSlidePosition: layout.__tvistInternal_getSlidePosition,
+    __tvistInternal_getSlidePositions: layout.__tvistInternal_getSlidePositions,
+    __tvistInternal_scrollTo: motion.__tvistInternal_scrollTo,
+    __tvistInternal_ensureTransitionUpdates: motion.__tvistInternal_ensureTransitionUpdates,
+    __tvistInternal_scrollBy: motion.__tvistInternal_scrollBy,
+    __tvistInternal_applyTransform: motion.__tvistInternal_applyTransform,
+    __tvistInternal_updateDisabled: local_updateDisabled,
+    __tvistInternal_update: local_update,
+    __tvistInternal_updateAfterReorder: local_updateAfterReorder,
+    __tvistInternal_checkLock: local_checkLock,
+    __tvistInternal_getTotalSize: local_getTotalSize,
+    get __tvistInternal_isLocked() {
+      return read_isLocked();
+    },
+    get __tvistInternal_slideSizeValue() {
+      return read_slideSizeValue();
+    },
+    get __tvistInternal_containerSizeValue() {
+      return read_containerSizeValue();
+    },
+    __tvistInternal_getPeek: local_getPeek,
+    __tvistInternal_getVisibleSlides: local_getVisibleSlides,
+    get __tvistInternal_activeIndex() {
+      return read_activeIndex();
+    },
+    get __tvistInternal_slideCount() {
+      return read_slideCount();
+    },
+    __tvistInternal_canScrollNext: local_canScrollNext,
+    __tvistInternal_canScrollPrev: local_canScrollPrev,
+    __tvistInternal_destroy: local_destroy,
+  };
+  const local_tvist = tvist;
+  const local_options = options;
+  const startIndex = options.start ?? 0;
+  const local_location = new Vector1D(0);
+  const local_target = new Vector1D(0);
+  const local_index = new Counter(
+    tvist.slides.length,
+    startIndex,
+    layout.__tvistInternal_isLoopEnabled(),
+    layout.__tvistInternal_calculateCounterEndIndex()
+  );
+  const local_animator = new Animator();
+  local_animator.setExternalController(
+    () => motion.__tvistInternal_cssTransitionActive,
+    () => motion.__tvistInternal_stopCssTransition()
+  );
+  layout.__tvistInternal_resolveGap();
+  layout.__tvistInternal_resolveFixedDimensionsEarly();
+  layout.__tvistInternal_applyPeek();
+  layout.__tvistInternal_calculateSizes();
+  layout.__tvistInternal_calculatePositions();
+  local_checkLock();
+  const initialPos = layout.__tvistInternal_getScrollPositionForIndex(startIndex);
+  local_location.set(initialPos);
+  local_target.set(initialPos);
+  motion.__tvistInternal_applyTransform();
+  return component;
 }

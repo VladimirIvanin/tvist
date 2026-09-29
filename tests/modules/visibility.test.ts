@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * Тесты для VisibilityModule
  */
@@ -41,7 +42,7 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      const visibilityModule = slider.modules.get('visibility')
+      const visibilityModule = getRuntime(slider).modules.get('visibility')
       expect(visibilityModule).toBeDefined()
     })
 
@@ -50,7 +51,7 @@ describe('VisibilityModule', () => {
         visibility: false,
       })
 
-      const visibilityModule = slider.modules.get('visibility')
+      const visibilityModule = getRuntime(slider).modules.get('visibility')
       expect(visibilityModule).toBeUndefined()
     })
 
@@ -59,7 +60,7 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      const visibilityModule = slider.modules.get('visibility') as any
+      const visibilityModule = getRuntime(slider).modules.get('visibility') as any
       const api = visibilityModule?.getVisibility()
 
       expect(api).toBeDefined()
@@ -74,7 +75,7 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      const visibilityModule = slider.modules.get('visibility') as any
+      const visibilityModule = getRuntime(slider).modules.get('visibility') as any
       const api = visibilityModule?.getVisibility()
 
       expect(api.isVisible()).toBe(true)
@@ -85,7 +86,7 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      const visibilityModule = slider.modules.get('visibility') as any
+      const visibilityModule = getRuntime(slider).modules.get('visibility') as any
       const api = visibilityModule?.getVisibility()
 
       // Скрываем слайдер
@@ -102,7 +103,7 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      const visibilityModule = slider.modules.get('visibility') as any
+      const visibilityModule = getRuntime(slider).modules.get('visibility') as any
       const api = visibilityModule?.getVisibility()
 
       // Скрываем слайдер
@@ -123,7 +124,7 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      const visibilityModule = slider.modules.get('visibility') as any
+      const visibilityModule = getRuntime(slider).modules.get('visibility') as any
       const api = visibilityModule?.getVisibility()
 
       // Скрываем родителя
@@ -140,7 +141,7 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      const visibilityModule = slider.modules.get('visibility') as any
+      const visibilityModule = getRuntime(slider).modules.get('visibility') as any
       const api = visibilityModule?.getVisibility()
 
       // Скрываем слайдер
@@ -162,7 +163,7 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      const autoplayModule = slider.modules.get('autoplay') as any
+      const autoplayModule = getRuntime(slider).modules.get('autoplay') as any
       const autoplay = autoplayModule?.getAutoplay()
 
       expect(autoplay.isRunning()).toBe(true)
@@ -180,7 +181,7 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      const autoplayModule = slider.modules.get('autoplay') as any
+      const autoplayModule = getRuntime(slider).modules.get('autoplay') as any
       const autoplay = autoplayModule?.getAutoplay()
 
       // Скрываем слайдер
@@ -201,7 +202,7 @@ describe('VisibilityModule', () => {
         visibility: { pauseAutoplay: false },
       })
 
-      const autoplayModule = slider.modules.get('autoplay') as any
+      const autoplayModule = getRuntime(slider).modules.get('autoplay') as any
       const autoplay = autoplayModule?.getAutoplay()
 
       expect(autoplay.isRunning()).toBe(true)
@@ -222,7 +223,7 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      const marqueeModule = slider.modules.get('marquee') as any
+      const marqueeModule = getRuntime(slider).modules.get('marquee') as any
       const marquee = marqueeModule?.getMarquee()
 
       expect(marquee.isRunning()).toBe(true)
@@ -242,7 +243,7 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      const marqueeModule = slider.modules.get('marquee') as any
+      const marqueeModule = getRuntime(slider).modules.get('marquee') as any
       const marquee = marqueeModule?.getMarquee()
 
       // Скрываем слайдер
@@ -264,7 +265,7 @@ describe('VisibilityModule', () => {
         visibility: { pauseMarquee: false },
       })
 
-      const marqueeModule = slider.modules.get('marquee') as any
+      const marqueeModule = getRuntime(slider).modules.get('marquee') as any
       const marquee = marqueeModule?.getMarquee()
 
       expect(marquee.isRunning()).toBe(true)
@@ -364,11 +365,11 @@ describe('VisibilityModule', () => {
         visibility: false,
       })
 
-      expect(slider.modules.get('visibility')).toBeUndefined()
+      expect(getRuntime(slider).modules.get('visibility')).toBeUndefined()
 
       slider.updateOptions({ visibility: true })
 
-      expect(slider.modules.get('visibility')).toBeDefined()
+      expect(getRuntime(slider).modules.get('visibility')).toBeDefined()
     })
 
     it('должен выключаться при updateOptions({ visibility: false })', async () => {
@@ -376,11 +377,11 @@ describe('VisibilityModule', () => {
         visibility: true,
       })
 
-      expect(slider.modules.get('visibility')).toBeDefined()
+      expect(getRuntime(slider).modules.get('visibility')).toBeDefined()
 
       slider.updateOptions({ visibility: false })
 
-      expect(slider.modules.get('visibility')).toBeUndefined()
+      expect(getRuntime(slider).modules.get('visibility')).toBeUndefined()
     })
   })
 
@@ -474,7 +475,7 @@ describe('VisibilityModule', () => {
       await new Promise(resolve => setTimeout(resolve, 100))
 
       const pagination = root.querySelector('.tvist-v1__pagination')
-      
+
       expect(pagination).not.toBeNull()
 
       const bullets = pagination!.querySelectorAll('.tvist-v1__bullet')
@@ -502,7 +503,7 @@ describe('VisibilityModule', () => {
       await new Promise(resolve => setTimeout(resolve, 100))
 
       const pagination = root.querySelector('.tvist-v1__pagination')
-      
+
       expect(pagination).not.toBeNull()
 
       const bullets = pagination!.querySelectorAll('.tvist-v1__bullet')
@@ -537,7 +538,7 @@ describe('VisibilityModule', () => {
       await new Promise(resolve => setTimeout(resolve, 100))
 
       const pagination = root.querySelector('.tvist-v1__pagination')
-      
+
       expect(pagination).not.toBeNull()
 
       const bullets = pagination!.querySelectorAll('.tvist-v1__bullet') as NodeListOf<HTMLElement>

@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  */
@@ -63,11 +64,11 @@ describe('AutoWidth - No Gaps on Prev Navigation', () => {
   function getLastSlideRightEdge(slider: Tvist): number {
     const transform = slider.container.style.transform
     const translateX = parseFloat(transform.match(/translate3d\((-?\d+\.?\d*)px/)?.[1] || '0')
-    
+
     const lastIndex = slider.slides.length - 1
-    const lastSlidePosition = slider.engine.getSlidePosition(lastIndex)
-    const lastSlideSize = slider.engine.getSlideSize(lastIndex)
-    
+    const lastSlidePosition = getRuntime(slider).engine.getSlidePosition(lastIndex)
+    const lastSlideSize = getRuntime(slider).engine.getSlideSize(lastIndex)
+
     return lastSlidePosition + lastSlideSize - translateX
   }
 
@@ -114,7 +115,7 @@ describe('AutoWidth - No Gaps on Prev Navigation', () => {
 
       // Переходим к последнему слайду
       slider.scrollTo(5, true)
-      
+
       // Используем prev()
       slider.prev()
       expect(slider.activeIndex).toBe(4)
@@ -137,7 +138,7 @@ describe('AutoWidth - No Gaps on Prev Navigation', () => {
       // Прокручиваем назад по одному слайду и проверяем отсутствие дыр
       for (let targetIndex = 4; targetIndex >= 0; targetIndex--) {
         slider.scrollTo(targetIndex, true)
-        
+
         const lastSlideRight = getLastSlideRightEdge(slider)
         expect(lastSlideRight).toBeGreaterThanOrEqual(
           containerWidth - 1,
@@ -158,13 +159,13 @@ describe('AutoWidth - No Gaps on Prev Navigation', () => {
       let iterations = 0
       while (slider.activeIndex > 0 && iterations < 10) {
         slider.prev()
-        
+
         const lastSlideRight = getLastSlideRightEdge(slider)
         expect(lastSlideRight).toBeGreaterThanOrEqual(
           containerWidth - 1,
           `Дыра обнаружена на индексе ${slider.activeIndex}`
         )
-        
+
         iterations++
       }
     })
@@ -201,7 +202,7 @@ describe('AutoWidth - No Gaps on Prev Navigation', () => {
       const slider = createAutoWidthSlider(slideWidths, containerWidth)
 
       slider.scrollTo(4, true)
-      
+
       for (let i = 3; i >= 0; i--) {
         slider.scrollTo(i, true)
         const lastSlideRight = getLastSlideRightEdge(slider)
@@ -231,17 +232,17 @@ describe('AutoWidth - No Gaps on Prev Navigation', () => {
       // Переходим к последнему слайду
       slider.scrollTo(5, true)
       const translateAtEnd = getTranslateX(slider)
-      
+
       // Переходим на индекс 4
       slider.scrollTo(4, true)
       const translateAt4 = getTranslateX(slider)
-      
+
       // Получаем maxScroll
-      const maxScroll = slider.engine.getMaxScrollPosition()
-      
+      const maxScroll = getRuntime(slider).engine.getMaxScrollPosition()
+
       // translateAt4 должен быть равен maxScroll (а не базовой позиции слайда)
       expect(Math.abs(translateAt4 - maxScroll)).toBeLessThan(1)
-      
+
       // При этом translateAtEnd должен быть равен maxScroll
       expect(Math.abs(translateAtEnd - maxScroll)).toBeLessThan(1)
     })
@@ -252,12 +253,12 @@ describe('AutoWidth - No Gaps on Prev Navigation', () => {
       const slider = createAutoWidthSlider(slideWidths, containerWidth)
 
       slider.scrollTo(5, true)
-      
+
       // При переходе на индекс 0, 1, 2 не должно быть коррекции
       slider.scrollTo(1, true)
       const translateAt1 = getTranslateX(slider)
-      const expectedAt1 = -slider.engine.getSlidePosition(1)
-      
+      const expectedAt1 = -getRuntime(slider).engine.getSlidePosition(1)
+
       // Должен использоваться basePosition без коррекции
       expect(Math.abs(translateAt1 - expectedAt1)).toBeLessThan(1)
     })
@@ -298,9 +299,9 @@ describe('AutoWidth - No Gaps on Prev Navigation', () => {
       const newWidths = [220, 270, 320, 370]
       slides.forEach((slide, i) => {
         slide.style.width = `${newWidths[i]}px`
-        Object.defineProperty(slide, 'offsetWidth', { 
-          configurable: true, 
-          value: newWidths[i] 
+        Object.defineProperty(slide, 'offsetWidth', {
+          configurable: true,
+          value: newWidths[i]
         })
       })
 

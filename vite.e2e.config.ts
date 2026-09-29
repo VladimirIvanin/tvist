@@ -9,7 +9,7 @@ const versionMajor = parseInt(pkg.version.split('.')[0], 10) || 0;
 
 export default defineConfig({
   root: resolve(__dirname, 'e2e'),
-  publicDir: false,
+  publicDir: resolve(__dirname, 'browser-build'),
 
   server: {
     host: '127.0.0.1',

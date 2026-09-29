@@ -1,8 +1,9 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
- * 
+ *
  * Тест для проверки бага с отключением waitForVideo через updateOptions
- * 
+ *
  * Баг: Когда videoEndedWhilePaused=true и waitForVideo отключается через updateOptions(),
  * состояние waitingForVideo может остаться true, что приводит к застреванию autoplay
  * при вызове resume(), т.к. run() выходит сразу если waitingForVideo=true.
@@ -75,7 +76,7 @@ describe('AutoplayModule - waitForVideo Disabled via updateOptions Bug', () => {
       speed: 300,
     })
 
-    const autoplayModule = slider['modules'].get('autoplay') as any
+    const autoplayModule = getRuntime(slider)['modules'].get('autoplay') as any
     const root = container.querySelector(`.${TVIST_CLASSES.block}`) as HTMLElement
 
     // Ждём, пока handleSlideChangedForVideo установит waitingForVideo
@@ -116,7 +117,7 @@ describe('AutoplayModule - waitForVideo Disabled via updateOptions Bug', () => {
 
     // Проверяем, что autoplay продолжает работать
     vi.advanceTimersByTime(1000)
-    
+
     // Должен произойти переход
     expect(slider.activeIndex).toBe(1)
   })
@@ -148,7 +149,7 @@ describe('AutoplayModule - waitForVideo Disabled via updateOptions Bug', () => {
       speed: 300,
     })
 
-    const autoplayModule = slider['modules'].get('autoplay') as any
+    const autoplayModule = getRuntime(slider)['modules'].get('autoplay') as any
 
     // Ждём, пока waitingForVideo установится
     vi.advanceTimersByTime(100)

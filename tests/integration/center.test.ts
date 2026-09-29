@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * Интеграционные тесты для режима центрирования
  */
@@ -92,11 +93,11 @@ describe('Center Mode Integration', () => {
         start: 0,
       })
 
-      expect(tvist.engine.canScrollNext()).toBe(true)
-      
+      expect(getRuntime(tvist).engine.canScrollNext()).toBe(true)
+
       tvist.scrollTo(6, true)
       expect(tvist.activeIndex).toBe(6)
-      expect(tvist.engine.canScrollPrev()).toBe(true)
+      expect(getRuntime(tvist).engine.canScrollPrev()).toBe(true)
     })
 
     it('endIndex должен быть slideCount - 1 в center режиме', () => {

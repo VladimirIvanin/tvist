@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * Отладочный тест для marquee + drag + loop
  */
@@ -58,9 +59,9 @@ describe('DEBUG: Marquee + Drag + Loop', () => {
       gap: 20
     })
 
-    const marqueeModule = slider.getModule('marquee') as any
-    const dragModule = slider.getModule('drag') as any
-    const loopModule = slider.getModule('loop') as any
+    const marqueeModule = getRuntime(slider).getModule('marquee') as any
+    const dragModule = getRuntime(slider).getModule('drag') as any
+    const loopModule = getRuntime(slider).getModule('loop') as any
 
     // Симулируем что marquee уже прокрутился на 100px
     if (marqueeModule?.setCurrentPosition) {
@@ -69,7 +70,7 @@ describe('DEBUG: Marquee + Drag + Loop', () => {
     }
 
     console.log('\n===НАЧАЛЬНОЕ СОСТОЯНИЕ (marquee на 100px) ===')
-    console.log('Location:', slider.engine.location.get())
+    console.log('Location:', getRuntime(slider).engine.location.get())
     console.log('Transform:', getTranslateX(container))
     console.log('Marquee position:', marqueeModule.getCurrentPosition())
     console.log('Slides order:', loopModule.getTransformState().slidesOrder.join(', '))
@@ -86,7 +87,7 @@ describe('DEBUG: Marquee + Drag + Loop', () => {
     await new Promise(resolve => setTimeout(resolve, 10))
 
     console.log('\n=== ПОСЛЕ POINTERDOWN ===')
-    console.log('Location:', slider.engine.location.get())
+    console.log('Location:', getRuntime(slider).engine.location.get())
     console.log('Transform:', getTranslateX(container))
     console.log('Marquee position:', marqueeModule.getCurrentPosition())
     console.log('Slides order:', loopModule.getTransformState().slidesOrder.join(', '))
@@ -103,7 +104,7 @@ describe('DEBUG: Marquee + Drag + Loop', () => {
     await new Promise(resolve => setTimeout(resolve, 10))
 
     console.log('\n=== ПОСЛЕ ПЕРВОГО ДВИЖЕНИЯ (15px) ===')
-    console.log('Location:', slider.engine.location.get())
+    console.log('Location:', getRuntime(slider).engine.location.get())
     console.log('Transform:', getTranslateX(container))
     console.log('Marquee position:', marqueeModule.getCurrentPosition())
     console.log('Slides order:', loopModule.getTransformState().slidesOrder.join(', '))
@@ -123,7 +124,7 @@ describe('DEBUG: Marquee + Drag + Loop', () => {
     await new Promise(resolve => setTimeout(resolve, 10))
 
     console.log('\n=== ПОСЛЕ ВТОРОГО ДВИЖЕНИЯ (30px) ===')
-    console.log('Location:', slider.engine.location.get())
+    console.log('Location:', getRuntime(slider).engine.location.get())
     console.log('Transform:', getTranslateX(container))
     console.log('Marquee position:', marqueeModule.getCurrentPosition())
     console.log('Slides order:', loopModule.getTransformState().slidesOrder.join(', '))
@@ -139,13 +140,13 @@ describe('DEBUG: Marquee + Drag + Loop', () => {
     await new Promise(resolve => setTimeout(resolve, 10))
 
     console.log('\n=== ПОСЛЕ POINTERUP ===')
-    console.log('Location:', slider.engine.location.get())
+    console.log('Location:', getRuntime(slider).engine.location.get())
     console.log('Transform:', getTranslateX(container))
     console.log('Marquee position:', marqueeModule.getCurrentPosition())
     console.log('Slides order:', loopModule.getTransformState().slidesOrder.join(', '))
 
     // Финальные проверки
-    const finalLocation = slider.engine.location.get()
+    const finalLocation = getRuntime(slider).engine.location.get()
     console.log('\n=== ИТОГОВАЯ ПРОВЕРКА ===')
     console.log('Финальный location:', finalLocation)
     console.log('Location должен быть <= 0:', finalLocation <= 0)

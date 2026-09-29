@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * Тест для бага: бесконечная прокрутка при display: grid у родителя
  *
@@ -96,7 +97,7 @@ describe('BUG: бесконечная прокрутка при display: grid у
     expect(observedTarget).toBe(fixture.track)
 
     // Отслеживаем вызовы update()
-    const updateSpy = vi.spyOn(slider, 'update')
+    const updateSpy = vi.spyOn(getRuntime(slider), 'update')
 
     // Первый вызов ResizeObserver — throttle пропускает сразу (lastCall=0)
     resizeCallback?.([], {} as ResizeObserver)
@@ -138,7 +139,7 @@ describe('BUG: бесконечная прокрутка при display: grid у
 
     global.ResizeObserver = OriginalResizeObserver
 
-    const updateSpy = vi.spyOn(slider, 'update')
+    const updateSpy = vi.spyOn(getRuntime(slider), 'update')
 
     // Симулируем 10 срабатываний ResizeObserver подряд
     // (как при бесконечном цикле в display: grid)
@@ -193,7 +194,7 @@ describe('BUG: бесконечная прокрутка при display: grid у
     expect(slider.slides.length).toBe(5)
 
     // Индекс должен быть 0 (начальная позиция)
-    expect(slider.engine.index.get()).toBe(0)
+    expect(getRuntime(slider).engine.index.get()).toBe(0)
   })
 
   it('ResizeObserver наблюдает за track при вертикальном направлении', () => {

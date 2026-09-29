@@ -354,7 +354,7 @@ export function renderApiReference(
       'Статические свойства'
     )}</section>
     <section id="settings"><h2>Вложенные настройки</h2>${settings}</section>
-    <section id="modules"><h2>Модули</h2><p>Настройки, управление и события встроенных модулей. <a href="${base}api/modules.html">Подключение и создание собственных модулей →</a></p>${modules}</section>
+    <section id="modules"><h2>Модули</h2><p>Настройки, управление и события встроенных модулей. <a href="${base}api/modules.html">Встроенные возможности и миграция API →</a></p>${modules}</section>
     <section id="types"><h2>Типы</h2><p><a href="${base}api/typescript.html">Использование TypeScript →</a></p>${typeSections}</section></article></div>`;
 }
 

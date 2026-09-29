@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  */
@@ -18,14 +19,14 @@ describe('Tvist.sync', () => {
     const thumbs = new Tvist(fb.root, { speed: 0, drag: false })
     main.sync(thumbs)
 
-    const spy = vi.spyOn(thumbs, 'scrollTo')
+    const spy = vi.spyOn(getRuntime(thumbs), 'scrollTo')
     thumbs.scrollTo(1, true)
     spy.mockClear()
 
     main.emit('slideChangeStart', 1)
 
     expect(spy).toHaveBeenCalledTimes(1)
-    expect(spy).toHaveBeenCalledWith(1)
+    expect(spy).toHaveBeenCalledWith(1, false)
   })
 
   it('reverse: main receives scrollTo when its index already matches', () => {
@@ -35,7 +36,7 @@ describe('Tvist.sync', () => {
     const thumbs = new Tvist(fb.root, { speed: 0, drag: false })
     main.sync(thumbs)
 
-    const spy = vi.spyOn(main, 'scrollTo')
+    const spy = vi.spyOn(getRuntime(main), 'scrollTo')
     main.scrollTo(2, true)
     spy.mockClear()
 

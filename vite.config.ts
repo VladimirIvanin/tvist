@@ -4,7 +4,9 @@ import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')) as { version: string };
+const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf-8')) as {
+  version: string;
+};
 const versionMajor = parseInt(pkg.version.split('.')[0], 10) || 0;
 
 export default defineConfig({
@@ -15,11 +17,10 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'Tvist',
-      formats: ['es', 'cjs', 'umd'],
+      formats: ['es', 'cjs'],
       fileName: (format) => {
         if (format === 'es') return 'tvist.esm.js';
-        if (format === 'cjs') return 'tvist.cjs.js';
-        if (format === 'umd') return 'tvist.umd.js';
+        if (format === 'cjs') return 'tvist.cjs';
         return `tvist.${format}.js`;
       },
     },
@@ -46,7 +47,7 @@ export default defineConfig({
         comments: false,
         ecma: 2020,
       },
-      mangle: { toplevel: true },
+      mangle: { toplevel: true, properties: { regex: /^__tvistInternal_/ } },
     },
     sourcemap: true,
     target: 'es2020',
@@ -54,7 +55,7 @@ export default defineConfig({
     reportCompressedSize: true,
     assetsInlineLimit: 4096,
   },
-  
+
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
@@ -62,10 +63,10 @@ export default defineConfig({
       '@modules': resolve(__dirname, './src/modules'),
       '@utils': resolve(__dirname, './src/utils'),
       // Алиас для импорта tvist в dev режиме
-      'tvist': resolve(__dirname, './src/index.ts'),
+      tvist: resolve(__dirname, './src/index.ts'),
     },
   },
-  
+
   css: {
     preprocessorOptions: {
       scss: {

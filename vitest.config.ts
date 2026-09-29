@@ -1,10 +1,12 @@
 import { defineConfig } from 'vitest/config';
+import { factoryProbes } from './tests/fixtures/factory-probes';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  plugins: [factoryProbes()],
   test: {
     environment: 'happy-dom',
     globals: true,
@@ -30,6 +32,7 @@ export default defineConfig({
         statements: 70,
         perFile: false,
         autoUpdate: false,
+        'src/core/**': { lines: 80, statements: 80, branches: 80, functions: 80 },
       },
     },
     include: ['tests/**/*.test.ts', 'src/**/*.test.ts'],
@@ -45,4 +48,3 @@ export default defineConfig({
     },
   },
 });
-

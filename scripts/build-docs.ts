@@ -324,7 +324,7 @@ function main(): void {
     const hasInlineDemos = isExample && (/<Demo\s+id=/.test(source) || /<[A-Z][A-Za-z0-9]*Example\b[^>]*\/>/.test(source) || /<div\s+ref=/.test(source))
     const content = isExample
       ? examplesLayout(rel, `<article class="doc-content"><div class="doc-title"><span class="eyebrow">${escapeHtml(demoById.get(id)?.category || 'Tvist')}</span><h1>${escapeHtml(heading)}</h1></div>${hasInlineDemos ? '' : demoCard(id)}<div class="markdown-body">${raw}</div></article>`)
-      : `<div class="doc-shell page-wrap"><aside class="doc-side"><span class="eyebrow">${section === 'api' ? 'Справочник' : 'Руководство'}</span><a href="${base}guide/getting-started.html">Быстрый старт</a><a href="${base}api/index.html">Справочник API</a><a href="${base}api/modules.html">Создание модулей</a><a href="${base}api/typescript.html">TypeScript</a><a href="${base}api/breakpoints.html">Breakpoints</a></aside><article class="doc-content markdown-body">${raw}</article></div>`
+      : `<div class="doc-shell page-wrap"><aside class="doc-side"><span class="eyebrow">${section === 'api' ? 'Справочник' : 'Руководство'}</span><a href="${base}guide/getting-started.html">Быстрый старт</a><a href="${base}api/index.html">Справочник API</a><a href="${base}api/modules.html">Встроенные возможности</a><a href="${base}api/typescript.html">TypeScript</a><a href="${base}api/breakpoints.html">Breakpoints</a></aside><article class="doc-content markdown-body">${raw}</article></div>`
     writePage(rel, shell(heading, content, rel))
   }
   console.log(`Generated ${markdownFiles.length + 3} pages`)

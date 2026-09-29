@@ -11,37 +11,29 @@
  * - Free mode с опциональным snap (freeSnap)
  * - Passive listeners для производительности
  */
-
-import { Module } from '../Module';
+import { createComponent, type Component } from '../Component';
 import {
   HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS,
   TVIST_CLASSES,
   TVIST_DOM_EVENTS,
 } from '../../core/constants';
-import type { Tvist } from '../../core/Tvist';
+import type { TvistRuntime as Tvist } from '../../core/runtime';
 import type { TvistOptions, TvistLongPressDomEventDetail } from '../../core/types';
-const DRAG_DEBUG = false;
-const dragLog = (..._args: unknown[]) => {
-  if (DRAG_DEBUG) {
-    console.warn('[DRAG]', ..._args);
-  }
-};
 
 const RUBBERBAND_FRICTION = 5;
-
 const SLIDER_CONTROL_SELECTOR = [
   TVIST_CLASSES.arrowPrev,
   TVIST_CLASSES.arrowNext,
   TVIST_CLASSES.pagination,
   TVIST_CLASSES.bullet,
-].map(className => `.${className}`).join(', ');
-
+]
+  .map((className) => `.${className}`)
+  .join(', ');
 interface DragPoint {
   x: number;
   y: number;
   time: number;
 }
-
 interface HoldToPauseConfig {
   threshold: number;
   root: 'slider' | 'container' | HTMLElement;
@@ -49,35 +41,58 @@ interface HoldToPauseConfig {
   cancelOnDrag: boolean;
   moveThreshold?: number;
 }
-
 type PointerEventHandler = (e: TouchEvent | MouseEvent | PointerEvent) => void;
-
 interface ManagedHandler {
   event: string;
   handler: PointerEventHandler | EventListener;
   options?: AddEventListenerOptions;
 }
 
-export class DragModule extends Module {
-  readonly name = 'drag';
+/** Internal component; state lives in this factory's closure. */
+export interface DragModule extends Component {
+  readonly name: 'drag';
 
-  private isDragging = false;
-  private startX = 0;
-  private startY = 0;
-  private startPosition = 0;
-  private startIndex = 0;
-  private currentX = 0;
-  private currentY = 0;
+  init(): void;
 
-  private wasAnimating = false;
-  private animationTarget: number | null = null;
+  destroy(): void;
 
-  private animationId: number | null = null;
+  shouldBeActive(): boolean;
 
-  private minPosition = 0;
-  private maxPosition = 0;
+  onResize(): void;
 
-  private loopModuleRef: {
+  onOptionsUpdate(): void;
+}
+
+export function createDragModule(tvist: Tvist, options: TvistOptions): DragModule {
+  const base = createComponent(tvist, options);
+
+  const local_name = 'drag' as const;
+
+  let local_isDragging = false;
+
+  let local_startX = 0;
+
+  let local_startY = 0;
+
+  let local_startPosition = 0;
+
+  let local_startIndex = 0;
+
+  let local_currentX = 0;
+
+  let local_currentY = 0;
+
+  let local_wasAnimating = false;
+
+  let local_animationTarget: number | null = null;
+
+  let local_animationId: number | null = null;
+
+  let local_minPosition = 0;
+
+  let local_maxPosition = 0;
+
+  let local_loopModuleRef: {
     fix?: (params: {
       direction?: 'next' | 'prev';
       activeSlideIndex?: number;
@@ -85,152 +100,151 @@ export class DragModule extends Module {
       setTranslate?: boolean;
     }) => void;
   } | null = null;
-  private isMarqueeActive = false;
 
-  private readonly FRICTION = 0.92;
-  private readonly MIN_VELOCITY = 0.05;
-  private readonly LOG_INTERVAL = 200;
-  private readonly TOUCH_ANGLE = 45;
-  private readonly MIN_DRAG_DISTANCE = 5;
+  let local_isMarqueeActive = false;
 
-  private isPotentialDrag = false;
+  const local_FRICTION = 0.92 as const;
 
-  private holdConfig: HoldToPauseConfig | null = null;
-  private holdRoot: HTMLElement | null = null;
-  private holdTimer: number | null = null;
-  private holdPending = false;
-  private holdActive = false;
-  private holdPointerType = 'mouse';
-  private holdStartX = 0;
-  private holdStartY = 0;
-  private holdPointerId: number | null = null;
-  private holdCaptureTarget: HTMLElement | null = null;
+  const local_MIN_VELOCITY = 0.05 as const;
 
-  private isFirstMove = true;
+  const local_LOG_INTERVAL = 200 as const;
+
+  const local_TOUCH_ANGLE = 45 as const;
+
+  const local_MIN_DRAG_DISTANCE = 5 as const;
+
+  let local_isPotentialDrag = false;
+
+  let local_holdConfig: HoldToPauseConfig | null = null;
+
+  let local_holdRoot: HTMLElement | null = null;
+
+  let local_holdTimer: number | null = null;
+
+  let local_holdPending = false;
+
+  let local_holdActive = false;
+
+  let local_holdPointerType = 'mouse';
+
+  let local_holdStartX = 0;
+
+  let local_holdStartY = 0;
+
+  let local_holdPointerId: number | null = null;
+
+  let local_holdCaptureTarget: HTMLElement | null = null;
+
+  let local_isFirstMove = true;
   // Frame-based cooldown: после любого loopFix пропускаем N pointermove событий,
   // предотвращая каскадный ping-pong при быстрых drag-ах в маленьких каруселях.
-  private coverageFixCooldown = 0;
+  let local_coverageFixCooldown = 0;
 
-  private accumulatedDeltaBeforeDragStart = { x: 0, y: 0 };
-  private shouldSubtractAccumulatedDelta = false;
+  let local_accumulatedDeltaBeforeDragStart: { x: number; y: number } = { x: 0, y: 0 };
 
-  private lastMoveTime = 0;
-  private baseEvent: DragPoint | null = null;
-  private prevBaseEvent: DragPoint | null = null;
+  let local_shouldSubtractAccumulatedDelta = false;
 
-  constructor(tvist: Tvist, options: TvistOptions) {
-    super(tvist, options);
+  let local_lastMoveTime = 0;
+
+  let local_baseEvent: DragPoint | null = null;
+
+  let local_prevBaseEvent: DragPoint | null = null;
+
+  function local_init(): void {
+    if (!local_shouldBeActive()) return;
+    local_attachEvents();
+    local_setupHoldToPause();
+    local_updateCachedRefs();
+    local_updateBounds();
+    base.on('resized', () => local_updateBounds());
+    base.on('positionShifted', local_onPositionShifted);
+    base.on('loopFix', local_onLoopFix);
   }
 
-  override init(): void {
-    if (!this.shouldBeActive()) return;
-
-    this.attachEvents();
-    this.setupHoldToPause();
-    this.updateCachedRefs();
-    this.updateBounds();
-
-    this.on('resized', () => this.updateBounds());
-    this.on('positionShifted', this.onPositionShifted);
-    this.on('loopFix', this.onLoopFix);
-  }
-
-  private get isLoopEnabled(): boolean {
+  function read_isLoopEnabled(): boolean {
     return (
-      this.options.loop === true ||
-      (typeof this.options.loop === 'object' && this.options.loop.enabled !== false)
+      options.loop === true || (typeof options.loop === 'object' && options.loop.enabled !== false)
     );
   }
 
-  private get isLoopWithClonesEnabled(): boolean {
-    return typeof this.options.loop === 'object' && this.options.loop.withClones === true;
+  function read_isLoopWithClonesEnabled(): boolean {
+    return typeof options.loop === 'object' && options.loop.withClones === true;
   }
-
   /**
    * Нет отдельной «страницы» прокрутки (все слайды помещаются в perPage) —
    * loopFix на драге не вызываем (и избегаем лишних прыжков).
    * При 2 слайдах и perPage 1 здесь false — перестановка нужна уже во время драга.
    */
-  private shouldSkipLoopDomReorderDuringDrag(): boolean {
-    const slidesCount = this.tvist.slides.length;
-    const perPage = this.options.perPage ?? 1;
+  function local_shouldSkipLoopDomReorderDuringDrag(): boolean {
+    const slidesCount = tvist.slides.length;
+    const perPage = options.perPage ?? 1;
     return slidesCount <= perPage;
   }
 
-  private updateCachedRefs(): void {
-    this.loopModuleRef = this.tvist.getModule('loop') as typeof this.loopModuleRef;
-    this.isMarqueeActive = this.options.marquee !== false && this.options.marquee !== undefined;
+  function local_updateCachedRefs(): void {
+    local_loopModuleRef = tvist.__tvistInternal_getModule('loop') as typeof local_loopModuleRef;
+    local_isMarqueeActive = options.marquee !== false && options.marquee !== undefined;
   }
 
-  private onLoopFix = (): void => {
-    if (this.isDragging) {
-      const before = this.startPosition;
-      this.startPosition = this.tvist.engine.location.get();
-      this.startIndex = this.tvist.engine.index.get();
-      dragLog('onLoopFix (during drag)', {
-        activeIndex: this.tvist.engine.index.get(),
-        realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-        startPositionBefore: before,
-        startPositionAfter: this.startPosition,
-      });
+  const local_onLoopFix: () => void = (): void => {
+    if (local_isDragging) {
+      local_startPosition = tvist.__tvistInternal_engine.__tvistInternal_location.get();
+      local_startIndex = tvist.__tvistInternal_engine.__tvistInternal_index.get();
     }
   };
 
-  override destroy(): void {
-    this.cancelHoldTracking();
-    this.detachHoldEvents();
-    this.detachEvents();
-    this.stopMomentum();
-    this.off('positionShifted', this.onPositionShifted);
-    this.off('loopFix', this.onLoopFix);
+  function local_destroy(): void {
+    local_cancelHoldTracking();
+    local_detachHoldEvents();
+    local_detachEvents();
+    local_stopMomentum();
+    base.off('positionShifted', local_onPositionShifted);
+    base.off('loopFix', local_onLoopFix);
   }
 
-  private onPositionShifted = (delta: number): void => {
-    if (this.isDragging) {
-      this.startPosition += delta;
+  const local_onPositionShifted: (delta: number) => void = (delta: number): void => {
+    if (local_isDragging) {
+      local_startPosition += delta;
     }
   };
 
-  public override shouldBeActive(): boolean {
-    return this.options.drag !== false;
+  function local_shouldBeActive(): boolean {
+    return options.drag !== false;
   }
-
   /**
    * При loop или marquee границ нет (бесконечная прокрутка).
    * При center (без loop) используем getScrollPositionForIndex для учёта centerOffset.
    */
-  private updateBounds(): void {
-    const { engine, slides } = this.tvist;
-    const perPage = this.options.perPage ?? 1;
-
-    if (this.isLoopEnabled || this.isMarqueeActive) {
-      this.minPosition = Infinity;
-      this.maxPosition = -Infinity;
-    } else if (this.tvist.engine.isCenterMode()) {
-      this.minPosition = engine.getScrollPositionForIndex(0);
-      this.maxPosition = engine.getScrollPositionForIndex(slides.length - 1);
+  function local_updateBounds(): void {
+    const { __tvistInternal_engine: engine, slides } = tvist;
+    const perPage = options.perPage ?? 1;
+    if (read_isLoopEnabled() || local_isMarqueeActive) {
+      local_minPosition = Infinity;
+      local_maxPosition = -Infinity;
+    } else if (tvist.__tvistInternal_engine.__tvistInternal_isCenterMode()) {
+      local_minPosition = engine.__tvistInternal_getScrollPositionForIndex(0);
+      local_maxPosition = engine.__tvistInternal_getScrollPositionForIndex(slides.length - 1);
     } else {
-      const usePeekTrim = this.options.peekTrim !== false;
-      this.minPosition = usePeekTrim ? engine.getMinScrollPosition() : 0;
-      this.maxPosition = usePeekTrim
-        ? engine.getMaxScrollPosition()
-        : -engine.getSlidePosition(slides.length - perPage);
+      const usePeekTrim = options.peekTrim !== false;
+      local_minPosition = usePeekTrim ? engine.__tvistInternal_getMinScrollPosition() : 0;
+      local_maxPosition = usePeekTrim
+        ? engine.__tvistInternal_getMaxScrollPosition()
+        : -engine.__tvistInternal_getSlidePosition(slides.length - perPage);
     }
-
-    if (this.options.debug) {
+    if (options.debug) {
       console.warn('[DragModule] Границы обновлены:', {
-        minPosition: this.minPosition,
-        maxPosition: this.maxPosition,
-        loop: this.isLoopEnabled,
-        center: this.tvist.engine.isCenterMode(),
-        peekTrim: this.options.peekTrim !== false,
+        minPosition: local_minPosition,
+        maxPosition: local_maxPosition,
+        loop: read_isLoopEnabled(),
+        center: tvist.__tvistInternal_engine.__tvistInternal_isCenterMode(),
+        peekTrim: options.peekTrim !== false,
         slidesCount: slides.length,
         perPage,
       });
     }
   }
 
-  private manageEvents(
+  function local_manageEvents(
     action: 'add' | 'remove',
     target: EventTarget,
     handlers: ManagedHandler[]
@@ -238,57 +252,55 @@ export class DragModule extends Module {
     for (const { event, handler, options } of handlers) {
       const listener = handler as EventListener;
       if (action === 'add') {
-        target.addEventListener(event, listener, options);
+        base.resources.listen(target, event, listener, options);
       } else {
-        target.removeEventListener(event, listener);
+        base.resources.unlisten(target, event, listener);
       }
     }
   }
 
-  private manageRootEvents(action: 'add' | 'remove'): void {
-    const { root } = this.tvist;
-
+  function local_manageRootEvents(action: 'add' | 'remove'): void {
+    const { root } = tvist;
     if ('PointerEvent' in window) {
-      this.manageEvents(action, root, [{ event: 'pointerdown', handler: this.onPointerDown }]);
+      local_manageEvents(action, root, [{ event: 'pointerdown', handler: local_onPointerDown }]);
     } else {
-      this.manageEvents(action, root, [
-        { event: 'touchstart', handler: this.onPointerDown, options: { passive: true } },
-        { event: 'mousedown', handler: this.onPointerDown },
+      local_manageEvents(action, root, [
+        { event: 'touchstart', handler: local_onPointerDown, options: { passive: true } },
+        { event: 'mousedown', handler: local_onPointerDown },
       ]);
     }
-
-    this.manageEvents(action, root, [{ event: 'dragstart', handler: this.onDragStart }]);
+    local_manageEvents(action, root, [{ event: 'dragstart', handler: local_onDragStart }]);
     root.classList.toggle(TVIST_CLASSES.draggable, action === 'add');
   }
 
-  private attachEvents(): void {
-    this.manageRootEvents('add');
+  function local_attachEvents(): void {
+    local_manageRootEvents('add');
   }
 
-  private detachEvents(): void {
-    this.manageRootEvents('remove');
-    this.manageDocumentEvents('remove');
+  function local_detachEvents(): void {
+    local_manageRootEvents('remove');
+    local_manageDocumentEvents('remove');
   }
 
-  private manageDocumentEvents(action: 'add' | 'remove'): void {
+  function local_manageDocumentEvents(action: 'add' | 'remove'): void {
     if ('PointerEvent' in window) {
-      this.manageEvents(action, document, [
-        { event: 'pointermove', handler: this.onPointerMove },
-        { event: 'pointerup', handler: this.onPointerUp },
-        { event: 'pointercancel', handler: this.onPointerUp },
+      local_manageEvents(action, document, [
+        { event: 'pointermove', handler: local_onPointerMove },
+        { event: 'pointerup', handler: local_onPointerUp },
+        { event: 'pointercancel', handler: local_onPointerUp },
       ]);
     } else {
-      this.manageEvents(action, document, [
-        { event: 'touchmove', handler: this.onPointerMove, options: { passive: false } },
-        { event: 'touchend', handler: this.onPointerUp },
-        { event: 'touchcancel', handler: this.onPointerUp },
-        { event: 'mousemove', handler: this.onPointerMove },
-        { event: 'mouseup', handler: this.onPointerUp },
+      local_manageEvents(action, document, [
+        { event: 'touchmove', handler: local_onPointerMove, options: { passive: false } },
+        { event: 'touchend', handler: local_onPointerUp },
+        { event: 'touchcancel', handler: local_onPointerUp },
+        { event: 'mousemove', handler: local_onPointerMove },
+        { event: 'mouseup', handler: local_onPointerUp },
       ]);
     }
   }
 
-  private normalizeHoldToPause(raw: TvistOptions['holdToPause']): HoldToPauseConfig | null {
+  function local_normalizeHoldToPause(raw: TvistOptions['holdToPause']): HoldToPauseConfig | null {
     if (!raw) return null;
     if (raw === true) {
       return {
@@ -297,9 +309,7 @@ export class DragModule extends Module {
         cancelOnDrag: true,
       };
     }
-
     if (raw.enabled === false) return null;
-
     return {
       threshold: raw.threshold ?? HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS,
       root: raw.root ?? 'slider',
@@ -309,220 +319,226 @@ export class DragModule extends Module {
     };
   }
 
-  private resolveHoldRoot(config: HoldToPauseConfig): HTMLElement {
-    if (config.root === 'container') return this.tvist.container;
-    if (config.root === 'slider') return this.tvist.root;
+  function local_resolveHoldRoot(config: HoldToPauseConfig): HTMLElement {
+    if (config.root === 'container') return tvist.container;
+    if (config.root === 'slider') return tvist.root;
     return config.root;
   }
 
-  private setupHoldToPause(): void {
-    this.holdConfig = this.normalizeHoldToPause(this.options.holdToPause);
-    if (!this.holdConfig) return;
-    this.holdRoot = this.resolveHoldRoot(this.holdConfig);
-    this.attachHoldEvents();
+  function local_setupHoldToPause(): void {
+    local_holdConfig = local_normalizeHoldToPause(options.holdToPause);
+    if (!local_holdConfig) return;
+    local_holdRoot = local_resolveHoldRoot(local_holdConfig);
+    local_attachHoldEvents();
   }
 
-  private manageHoldEvents(action: 'add' | 'remove'): void {
-    if (!this.holdRoot) return;
-
+  function local_manageHoldEvents(action: 'add' | 'remove'): void {
+    if (!local_holdRoot) return;
     if ('PointerEvent' in window) {
-      this.manageEvents(action, this.holdRoot, [
-        { event: 'pointerdown', handler: this.onHoldPointerDown },
-        { event: 'lostpointercapture', handler: this.onLostPointerCapture },
+      local_manageEvents(action, local_holdRoot, [
+        { event: 'pointerdown', handler: local_onHoldPointerDown },
+        { event: 'lostpointercapture', handler: local_onLostPointerCapture },
       ]);
     } else {
-      this.manageEvents(action, this.holdRoot, [
-        { event: 'touchstart', handler: this.onHoldPointerDown, options: { passive: true } },
-        { event: 'mousedown', handler: this.onHoldPointerDown },
+      local_manageEvents(action, local_holdRoot, [
+        { event: 'touchstart', handler: local_onHoldPointerDown, options: { passive: true } },
+        { event: 'mousedown', handler: local_onHoldPointerDown },
       ]);
     }
   }
 
-  private attachHoldEvents(): void {
-    this.manageHoldEvents('add');
+  function local_attachHoldEvents(): void {
+    local_manageHoldEvents('add');
   }
 
-  private detachHoldEvents(): void {
-    this.manageHoldEvents('remove');
-    this.holdRoot = null;
+  function local_detachHoldEvents(): void {
+    local_manageHoldEvents('remove');
+    local_holdRoot = null;
   }
 
-  private manageHoldDocumentEvents(action: 'add' | 'remove'): void {
+  function local_manageHoldDocumentEvents(action: 'add' | 'remove'): void {
     if ('PointerEvent' in window) {
-      this.manageEvents(action, document, [
-        { event: 'pointermove', handler: this.onHoldPointerMove },
-        { event: 'pointerup', handler: this.onHoldPointerUp },
-        { event: 'pointercancel', handler: this.onHoldPointerUp },
+      local_manageEvents(action, document, [
+        { event: 'pointermove', handler: local_onHoldPointerMove },
+        { event: 'pointerup', handler: local_onHoldPointerUp },
+        { event: 'pointercancel', handler: local_onHoldPointerUp },
       ]);
     } else {
-      this.manageEvents(action, document, [
-        { event: 'touchmove', handler: this.onHoldPointerMove, options: { passive: true } },
-        { event: 'touchend', handler: this.onHoldPointerUp },
-        { event: 'touchcancel', handler: this.onHoldPointerUp },
-        { event: 'mousemove', handler: this.onHoldPointerMove },
-        { event: 'mouseup', handler: this.onHoldPointerUp },
+      local_manageEvents(action, document, [
+        { event: 'touchmove', handler: local_onHoldPointerMove, options: { passive: true } },
+        { event: 'touchend', handler: local_onHoldPointerUp },
+        { event: 'touchcancel', handler: local_onHoldPointerUp },
+        { event: 'mousemove', handler: local_onHoldPointerMove },
+        { event: 'mouseup', handler: local_onHoldPointerUp },
       ]);
     }
   }
 
-  private addHoldDocumentEvents(): void {
-    this.manageHoldDocumentEvents('add');
+  function local_addHoldDocumentEvents(): void {
+    local_manageHoldDocumentEvents('add');
   }
 
-  private removeHoldDocumentEvents(): void {
-    this.manageHoldDocumentEvents('remove');
+  function local_removeHoldDocumentEvents(): void {
+    local_manageHoldDocumentEvents('remove');
   }
 
-  private onDragStart = (e: Event): void => {
+  const local_onDragStart: (e: Event) => void = (e: Event): void => {
     e.preventDefault();
   };
 
-  private onHoldPointerDown = (e: TouchEvent | MouseEvent | PointerEvent): void => {
-    if (!this.holdConfig || !this.holdRoot) return;
+  const local_onHoldPointerDown: (e: TouchEvent | MouseEvent | PointerEvent) => void = (
+    e: TouchEvent | MouseEvent | PointerEvent
+  ): void => {
+    if (!local_holdConfig || !local_holdRoot) return;
     if ('button' in e && e.button !== 0) return;
-
     const target = e.target as HTMLElement | null;
     if (!target) return;
-
     const nearestBlock = target.closest?.(`.${TVIST_CLASSES.block}`);
-    if (nearestBlock && nearestBlock !== this.tvist.root) return;
-    if (target.closest(SLIDER_CONTROL_SELECTOR) || this.isFocusableElement(target)) return;
-    if (this.holdConfig.exclude && target.closest(this.holdConfig.exclude)) return;
-
-    const point = this.getPointerPosition(e);
+    if (nearestBlock && nearestBlock !== tvist.root) return;
+    if (target.closest(SLIDER_CONTROL_SELECTOR) || local_isFocusableElement(target)) return;
+    if (local_holdConfig.exclude && target.closest(local_holdConfig.exclude)) return;
+    const point = local_getPointerPosition(e);
     if (!point) return;
-
     e.stopPropagation();
-
-    this.cancelHoldTracking();
-    this.holdPending = true;
-    this.holdActive = false;
-    this.holdStartX = point.x;
-    this.holdStartY = point.y;
-    this.holdPointerType = this.getPointerType(e);
-    this.holdPointerId = 'pointerId' in e ? e.pointerId : null;
-    this.holdCaptureTarget =
-      e.currentTarget instanceof HTMLElement ? e.currentTarget : this.holdRoot;
-
+    local_cancelHoldTracking();
+    local_holdPending = true;
+    local_holdActive = false;
+    local_holdStartX = point.x;
+    local_holdStartY = point.y;
+    local_holdPointerType = local_getPointerType(e);
+    local_holdPointerId = 'pointerId' in e ? e.pointerId : null;
+    local_holdCaptureTarget =
+      e.currentTarget instanceof HTMLElement ? e.currentTarget : local_holdRoot;
     if (
-      this.holdPointerId !== null &&
-      this.holdCaptureTarget &&
-      'setPointerCapture' in this.holdCaptureTarget
+      local_holdPointerId !== null &&
+      local_holdCaptureTarget &&
+      'setPointerCapture' in local_holdCaptureTarget
     ) {
       try {
-        this.holdCaptureTarget.setPointerCapture(this.holdPointerId);
+        local_holdCaptureTarget.setPointerCapture(local_holdPointerId);
       } catch {
         // noop
       }
     }
-
-    this.holdTimer = window.setTimeout(() => {
-      if (!this.holdPending || this.holdActive) return;
-      this.holdPending = false;
-      this.holdActive = true;
-      const pressIndex = this.tvist.realIndex ?? this.tvist.activeIndex;
-      this.emit('longPressStart', {
+    local_holdTimer = base.resources.timeout(() => {
+      if (!local_holdPending || local_holdActive) return;
+      local_holdPending = false;
+      local_holdActive = true;
+      const pressIndex = tvist.realIndex ?? tvist.activeIndex;
+      base.emit('longPressStart', {
         index: pressIndex,
-        pointerType: this.holdPointerType,
+        pointerType: local_holdPointerType,
       });
-      this.dispatchLongPressSlideDomEvent(
+      local_dispatchLongPressSlideDomEvent(
         TVIST_DOM_EVENTS.longPressStart,
         pressIndex,
-        this.holdPointerType
+        local_holdPointerType
       );
-      const autoplay = this.tvist.getModule('autoplay') as { pause?: () => void } | undefined;
+      const autoplay = tvist.__tvistInternal_getModule('autoplay') as
+        | {
+            pause?: () => void;
+          }
+        | undefined;
       autoplay?.pause?.();
-      const video = this.tvist.getModule('video') as
-        | { pauseActiveForHold?: () => void }
+      const video = tvist.__tvistInternal_getModule('video') as
+        | {
+            pauseActiveForHold?: () => void;
+          }
         | undefined;
       video?.pauseActiveForHold?.();
-    }, this.holdConfig.threshold);
-
-    this.addHoldDocumentEvents();
+    }, local_holdConfig.threshold);
+    local_addHoldDocumentEvents();
   };
 
-  private onLostPointerCapture = (e: Event): void => {
-    if (!this.holdActive && !this.holdPending) return;
+  const local_onLostPointerCapture: (e: Event) => void = (e: Event): void => {
+    if (!local_holdActive && !local_holdPending) return;
     if (!(e instanceof PointerEvent)) return;
-    if (this.holdPointerId !== null && e.pointerId !== this.holdPointerId) return;
-    this.finishHold();
+    if (local_holdPointerId !== null && e.pointerId !== local_holdPointerId) return;
+    local_finishHold();
   };
 
-  private onHoldPointerMove = (e: TouchEvent | MouseEvent | PointerEvent): void => {
-    if (!this.holdPending || !this.holdConfig) return;
-    const point = this.getPointerPosition(e);
+  const local_onHoldPointerMove: (e: TouchEvent | MouseEvent | PointerEvent) => void = (
+    e: TouchEvent | MouseEvent | PointerEvent
+  ): void => {
+    if (!local_holdPending || !local_holdConfig) return;
+    const point = local_getPointerPosition(e);
     if (!point) return;
-    const dx = point.x - this.holdStartX;
-    const dy = point.y - this.holdStartY;
+    const dx = point.x - local_holdStartX;
+    const dy = point.y - local_holdStartY;
     const distance = Math.hypot(dx, dy);
-    const threshold = this.holdConfig.moveThreshold ?? this.MIN_DRAG_DISTANCE;
+    const threshold = local_holdConfig.moveThreshold ?? local_MIN_DRAG_DISTANCE;
     if (distance > threshold) {
-      this.cancelHoldTracking();
+      local_cancelHoldTracking();
     }
   };
 
-  private onHoldPointerUp = (e: TouchEvent | MouseEvent | PointerEvent): void => {
-    if (!this.holdPending && !this.holdActive) return;
-    if ('pointerId' in e && this.holdPointerId !== null && e.pointerId !== this.holdPointerId)
+  const local_onHoldPointerUp: (e: TouchEvent | MouseEvent | PointerEvent) => void = (
+    e: TouchEvent | MouseEvent | PointerEvent
+  ): void => {
+    if (!local_holdPending && !local_holdActive) return;
+    if ('pointerId' in e && local_holdPointerId !== null && e.pointerId !== local_holdPointerId)
       return;
-    this.finishHold();
+    local_finishHold();
   };
 
-  private getPointerType(e: TouchEvent | MouseEvent | PointerEvent): string {
+  function local_getPointerType(e: TouchEvent | MouseEvent | PointerEvent): string {
     if ('pointerType' in e) return e.pointerType || 'mouse';
     if ('touches' in e) return 'touch';
     return 'mouse';
   }
 
-  private cancelHoldTracking(): void {
-    if (this.holdTimer !== null) {
-      window.clearTimeout(this.holdTimer);
-      this.holdTimer = null;
+  function local_cancelHoldTracking(): void {
+    if (local_holdTimer !== null) {
+      base.resources.cancelTimeout(local_holdTimer);
+      local_holdTimer = null;
     }
-    this.holdPending = false;
-    this.removeHoldDocumentEvents();
-    this.releaseHoldPointerCapture();
-    this.holdPointerId = null;
+    local_holdPending = false;
+    local_removeHoldDocumentEvents();
+    local_releaseHoldPointerCapture();
+    local_holdPointerId = null;
   }
 
-  private finishHold(): void {
-    const wasActive = this.holdActive;
-    this.cancelHoldTracking();
-    this.holdActive = false;
+  function local_finishHold(): void {
+    const wasActive = local_holdActive;
+    local_cancelHoldTracking();
+    local_holdActive = false;
     if (!wasActive) return;
-
-    const autoplay = this.tvist.getModule('autoplay') as { resume?: () => void } | undefined;
+    const autoplay = tvist.__tvistInternal_getModule('autoplay') as
+      | {
+          resume?: () => void;
+        }
+      | undefined;
     autoplay?.resume?.();
-    const video = this.tvist.getModule('video') as
-      | { resumeActiveAfterHold?: () => void }
+    const video = tvist.__tvistInternal_getModule('video') as
+      | {
+          resumeActiveAfterHold?: () => void;
+        }
       | undefined;
     video?.resumeActiveAfterHold?.();
-    const endIndex = this.tvist.realIndex ?? this.tvist.activeIndex;
-    this.emit('longPressEnd', {
+    const endIndex = tvist.realIndex ?? tvist.activeIndex;
+    base.emit('longPressEnd', {
       index: endIndex,
-      pointerType: this.holdPointerType,
+      pointerType: local_holdPointerType,
     });
-    this.dispatchLongPressSlideDomEvent(
+    local_dispatchLongPressSlideDomEvent(
       TVIST_DOM_EVENTS.longPressEnd,
       endIndex,
-      this.holdPointerType
+      local_holdPointerType
     );
   }
 
-  private resolveHoldSlideEl(index: number): HTMLElement | null {
-    const byAttr = this.tvist.root.querySelector<HTMLElement>(
-      `[data-tvist-slide-index="${index}"]`
-    );
+  function local_resolveHoldSlideEl(index: number): HTMLElement | null {
+    const byAttr = tvist.root.querySelector<HTMLElement>(`[data-tvist-slide-index="${index}"]`);
     if (byAttr) return byAttr;
-    return this.tvist.slides[index] ?? null;
+    return tvist.slides[index] ?? null;
   }
 
-  private dispatchLongPressSlideDomEvent(
+  function local_dispatchLongPressSlideDomEvent(
     eventName: (typeof TVIST_DOM_EVENTS)[keyof typeof TVIST_DOM_EVENTS],
     index: number,
     pointerType: string
   ): void {
-    const el = this.resolveHoldSlideEl(index);
+    const el = local_resolveHoldSlideEl(index);
     if (!el) return;
     el.dispatchEvent(
       new CustomEvent<TvistLongPressDomEventDetail>(eventName, {
@@ -533,154 +549,126 @@ export class DragModule extends Module {
     );
   }
 
-  private releaseHoldPointerCapture(): void {
+  function local_releaseHoldPointerCapture(): void {
     if (
-      this.holdPointerId !== null &&
-      this.holdCaptureTarget &&
-      'hasPointerCapture' in this.holdCaptureTarget &&
-      this.holdCaptureTarget.hasPointerCapture(this.holdPointerId)
+      local_holdPointerId !== null &&
+      local_holdCaptureTarget &&
+      'hasPointerCapture' in local_holdCaptureTarget &&
+      local_holdCaptureTarget.hasPointerCapture(local_holdPointerId)
     ) {
       try {
-        this.holdCaptureTarget.releasePointerCapture(this.holdPointerId);
+        local_holdCaptureTarget.releasePointerCapture(local_holdPointerId);
       } catch {
         // noop
       }
     }
-    this.holdCaptureTarget = null;
+    local_holdCaptureTarget = null;
   }
 
-  private onPointerDown = (e: TouchEvent | MouseEvent | PointerEvent): void => {
-    if (this.isDragging) return;
-    if (this.tvist.engine.isLocked) return;
+  const local_onPointerDown: (e: TouchEvent | MouseEvent | PointerEvent) => void = (
+    e: TouchEvent | MouseEvent | PointerEvent
+  ): void => {
+    if (local_isDragging) return;
+    if (tvist.__tvistInternal_engine.__tvistInternal_isLocked) return;
     if ('button' in e && e.button !== 0) return;
-
     const target = e.target as HTMLElement;
     const nearestBlock = target?.closest?.(`.${TVIST_CLASSES.block}`);
-    if (nearestBlock && nearestBlock !== this.tvist.root) return;
+    if (nearestBlock && nearestBlock !== tvist.root) return;
     // Нажатие на стрелку или её SVG не должно останавливать переход как начало drag.
-    if (target.closest(SLIDER_CONTROL_SELECTOR) || this.isFocusableElement(target)) return;
-
-    const point = this.getPointerPosition(e);
+    if (target.closest(SLIDER_CONTROL_SELECTOR) || local_isFocusableElement(target)) return;
+    const point = local_getPointerPosition(e);
     if (!point) return;
-
-    this.isPotentialDrag = true;
-    this.startX = point.x;
-    this.startY = point.y;
-    this.currentX = point.x;
-    this.currentY = point.y;
-    this.startIndex = this.tvist.engine.index.get();
-    this.tvist.allowClick = true;
-
-    const marqueeModule = this.tvist.getModule('marquee') as { pause?: () => void };
+    local_isPotentialDrag = true;
+    local_startX = point.x;
+    local_startY = point.y;
+    local_currentX = point.x;
+    local_currentY = point.y;
+    local_startIndex = tvist.__tvistInternal_engine.__tvistInternal_index.get();
+    tvist.__tvistInternal_allowClick = true;
+    const marqueeModule = tvist.__tvistInternal_getModule('marquee') as {
+      pause?: () => void;
+    };
     marqueeModule?.pause?.();
-
-    this.startPosition = this.tvist.engine.location.get();
-
-    this.baseEvent = null;
-    this.prevBaseEvent = null;
-    this.lastMoveTime = 0;
-    this.isFirstMove = true;
-    this.accumulatedDeltaBeforeDragStart = { x: 0, y: 0 };
-    this.shouldSubtractAccumulatedDelta = false;
-
-    this.wasAnimating = this.tvist.engine.animator.isAnimating();
-    if (this.wasAnimating) {
-      this.animationTarget = this.tvist.engine.activeIndex;
+    local_startPosition = tvist.__tvistInternal_engine.__tvistInternal_location.get();
+    local_baseEvent = null;
+    local_prevBaseEvent = null;
+    local_lastMoveTime = 0;
+    local_isFirstMove = true;
+    local_accumulatedDeltaBeforeDragStart = { x: 0, y: 0 };
+    local_shouldSubtractAccumulatedDelta = false;
+    local_wasAnimating = tvist.__tvistInternal_engine.__tvistInternal_animator.isAnimating();
+    if (local_wasAnimating) {
+      local_animationTarget = tvist.__tvistInternal_engine.__tvistInternal_activeIndex;
     }
 
-    dragLog('pointerDown', {
-      activeIndex: this.tvist.engine.index.get(),
-      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-      location: this.tvist.engine.location.get(),
-      startPosition: this.startPosition,
-      startIndex: this.startIndex,
-      wasAnimating: this.wasAnimating,
-      animationTarget: this.animationTarget,
-      loop: this.isLoopEnabled,
-      rewind: this.options.rewind,
-      autoplay: this.options.autoplay,
-      slidesCount: this.tvist.slides.length,
-      slideSize: this.tvist.engine.slideSizeValue,
-      expectedLocationForIndex3: this.tvist.engine.getScrollPositionForIndex(3),
-    });
-
-    this.stopMomentum();
-    this.tvist.engine.animator.stop();
-    this.manageDocumentEvents('add');
+    local_stopMomentum();
+    tvist.__tvistInternal_engine.__tvistInternal_animator.stop();
+    local_manageDocumentEvents('add');
   };
 
-  private onPointerMove = (e: TouchEvent | MouseEvent | PointerEvent): void => {
-    if (!this.isPotentialDrag && !this.isDragging) return;
-
-    const point = this.getPointerPosition(e);
+  const local_onPointerMove: (e: TouchEvent | MouseEvent | PointerEvent) => void = (
+    e: TouchEvent | MouseEvent | PointerEvent
+  ): void => {
+    if (!local_isPotentialDrag && !local_isDragging) return;
+    const point = local_getPointerPosition(e);
     if (!point) return;
-
     const now = Date.now();
-    this.currentX = point.x;
-    this.currentY = point.y;
-
-    const isHorizontal = this.options.direction !== 'vertical';
-    let deltaX = point.x - this.startX;
-    let deltaY = point.y - this.startY;
+    local_currentX = point.x;
+    local_currentY = point.y;
+    const isHorizontal = options.direction !== 'vertical';
+    let deltaX = point.x - local_startX;
+    let deltaY = point.y - local_startY;
     const moveDistance = Math.hypot(deltaX, deltaY);
-
-    if (!this.isDragging) {
+    if (!local_isDragging) {
       const canStartWithoutThresholdWhenInterruptingAnimation =
-        this.wasAnimating && (!this.isLoopEnabled || this.isLoopWithClonesEnabled);
-
+        local_wasAnimating && (!read_isLoopEnabled() || read_isLoopWithClonesEnabled());
       // Если пользователь прервал текущий snap-аним, перехватываем drag сразу
       // (без стандартного порога), чтобы не было "тупняка" при быстром re-drag.
       // Но для loop без клонов сохраняем порог: ранний loopFix может сдвинуть
       // порядок DOM слишком рано и визуально "прятать" слайд.
       if (
         !canStartWithoutThresholdWhenInterruptingAnimation &&
-        moveDistance <= this.MIN_DRAG_DISTANCE
+        moveDistance <= local_MIN_DRAG_DISTANCE
       )
         return;
-
-      const started = this.tryStartDrag(e, point, deltaX, deltaY, isHorizontal, now);
+      const started = local_tryStartDrag(e, point, deltaX, deltaY, isHorizontal, now);
       if (!started) return;
     }
-
-    if (this.shouldSubtractAccumulatedDelta) {
-      deltaX -= this.accumulatedDeltaBeforeDragStart.x;
-      deltaY -= this.accumulatedDeltaBeforeDragStart.y;
-      this.shouldSubtractAccumulatedDelta = false;
-      this.accumulatedDeltaBeforeDragStart = { x: 0, y: 0 };
+    if (local_shouldSubtractAccumulatedDelta) {
+      deltaX -= local_accumulatedDeltaBeforeDragStart.x;
+      deltaY -= local_accumulatedDeltaBeforeDragStart.y;
+      local_shouldSubtractAccumulatedDelta = false;
+      local_accumulatedDeltaBeforeDragStart = { x: 0, y: 0 };
     }
+    const newPosition = local_computeDragPosition(deltaX, deltaY, isHorizontal);
+    tvist.__tvistInternal_engine.__tvistInternal_location.set(newPosition);
 
-    const newPosition = this.computeDragPosition(deltaX, deltaY, isHorizontal);
-    this.tvist.engine.location.set(newPosition);
+    tvist.__tvistInternal_engine.__tvistInternal_applyTransform();
 
-    dragLog('applying transform', { newPosition, locationBefore: this.tvist.engine.location.get() });
-    this.tvist.engine.applyTransform();
-    dragLog('transform applied', { locationAfter: this.tvist.engine.location.get() });
-
-    if (this.isLoopEnabled) {
-      this.checkContentCoverageAndFix(newPosition, point);
+    if (read_isLoopEnabled()) {
+      local_checkContentCoverageAndFix(newPosition, point);
     }
-
-    const elapsed = now - this.lastMoveTime;
-    if (elapsed > this.LOG_INTERVAL) {
-      this.prevBaseEvent = this.baseEvent;
-      this.baseEvent = { x: point.x, y: point.y, time: now };
-      this.lastMoveTime = now;
+    const elapsed = now - local_lastMoveTime;
+    if (elapsed > local_LOG_INTERVAL) {
+      local_prevBaseEvent = local_baseEvent;
+      local_baseEvent = { x: point.x, y: point.y, time: now };
+      local_lastMoveTime = now;
     }
-
-    this.emit('drag', e);
-
-    if (this.getPointerType(e) === 'touch') {
+    base.emit('drag', e);
+    if (local_getPointerType(e) === 'touch') {
       e.preventDefault();
     }
   };
-
   /**
    * Определяет, является ли жест скроллом страницы или drag-ом слайдера.
    * Возвращает true если drag начался, false если жест отдан браузеру.
    */
-  private tryStartDrag(
+  function local_tryStartDrag(
     e: TouchEvent | MouseEvent | PointerEvent,
-    point: { x: number; y: number },
+    point: {
+      x: number;
+      y: number;
+    },
     deltaX: number,
     deltaY: number,
     isHorizontal: boolean,
@@ -690,207 +678,158 @@ export class DragModule extends Module {
     const absY = Math.abs(deltaY);
     const touchAngle = (Math.atan2(absY, absX) * 180) / Math.PI;
     const isScrolling = isHorizontal
-      ? touchAngle > this.TOUCH_ANGLE
-      : 90 - touchAngle > this.TOUCH_ANGLE;
-
+      ? touchAngle > local_TOUCH_ANGLE
+      : 90 - touchAngle > local_TOUCH_ANGLE;
     if (isScrolling) {
-      this.isPotentialDrag = false;
-      this.wasAnimating = false;
-      this.animationTarget = null;
+      local_isPotentialDrag = false;
+      local_wasAnimating = false;
+      local_animationTarget = null;
       return false;
     }
-
-    if (this.holdConfig?.cancelOnDrag !== false) {
-      this.finishHold();
+    if (local_holdConfig?.cancelOnDrag !== false) {
+      local_finishHold();
     }
+    local_isDragging = true;
+    tvist.__tvistInternal_allowClick = false;
+    local_stopMomentum();
+    tvist.__tvistInternal_engine.__tvistInternal_animator.stop();
+    local_applyFirstMoveLoopFix(deltaX, deltaY, isHorizontal, point);
+    local_baseEvent = { x: point.x, y: point.y, time: now };
+    local_lastMoveTime = now;
+    local_accumulatedDeltaBeforeDragStart = { x: deltaX, y: deltaY };
+    local_shouldSubtractAccumulatedDelta = true;
 
-    this.isDragging = true;
-    this.tvist.allowClick = false;
-    this.stopMomentum();
-    this.tvist.engine.animator.stop();
-
-    this.applyFirstMoveLoopFix(deltaX, deltaY, isHorizontal, point);
-
-    this.baseEvent = { x: point.x, y: point.y, time: now };
-    this.lastMoveTime = now;
-    this.accumulatedDeltaBeforeDragStart = { x: deltaX, y: deltaY };
-    this.shouldSubtractAccumulatedDelta = true;
-
-    dragLog('dragStart', {
-      activeIndex: this.tvist.engine.index.get(),
-      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-      startIndex: this.startIndex,
-      startPosition: this.startPosition,
-      accumulatedDelta: this.accumulatedDeltaBeforeDragStart,
-    });
-
-    this.emit('dragStart', e);
-    this.tvist.root.classList.add(TVIST_CLASSES.dragging);
+    base.emit('dragStart', e);
+    tvist.root.classList.add(TVIST_CLASSES.dragging);
     return true;
   }
-
   /**
    * Вызывает loopFix перед первым применением transform.
    * Пропускается для маленьких каруселей и marquee-режима.
    */
-  private applyFirstMoveLoopFix(
+  function local_applyFirstMoveLoopFix(
     deltaX: number,
     deltaY: number,
     isHorizontal: boolean,
-    point: { x: number; y: number }
+    point: {
+      x: number;
+      y: number;
+    }
   ): void {
-    if (!this.isLoopEnabled || !this.isFirstMove) return;
-
+    if (!read_isLoopEnabled() || !local_isFirstMove) return;
     // При прерывании активной snap-анимации ранний first-move loopFix в режиме
     // loop без клонов может переставить DOM раньше нужного момента, из-за чего
     // визуально "исчезает" крайний слайд. В этом сценарии даём coverage-fix
     // сработать позже, только при реальной необходимости.
-    if (this.wasAnimating && !this.isLoopWithClonesEnabled) {
-      this.isFirstMove = false;
+    if (local_wasAnimating && !read_isLoopWithClonesEnabled()) {
+      local_isFirstMove = false;
       return;
     }
-
-    if (this.isMarqueeActive) {
-      this.isFirstMove = false;
+    if (local_isMarqueeActive) {
+      local_isFirstMove = false;
       return;
     }
-
-    if (this.shouldSkipLoopDomReorderDuringDrag()) {
-      this.isFirstMove = false;
+    if (local_shouldSkipLoopDomReorderDuringDrag()) {
+      local_isFirstMove = false;
       return;
     }
-
-    if (!this.loopModuleRef?.fix) return;
-
+    if (!local_loopModuleRef?.fix) return;
     const delta = isHorizontal ? deltaX : deltaY;
     const direction = delta > 0 ? 'prev' : 'next';
 
-    dragLog('firstMove loopFix (before)', {
-      direction,
-      activeIndex: this.tvist.engine.index.get(),
-      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-      location: this.tvist.engine.location.get(),
-    });
-
-    this.loopModuleRef.fix({ direction });
-    this.isFirstMove = false;
-
-    this.startPosition = this.tvist.engine.location.get();
-    this.startX = point.x;
-    this.startY = point.y;
-    this.startIndex = this.tvist.engine.index.get();
-    this.coverageFixCooldown = 5;
-
-    dragLog('firstMove loopFix (after)', {
-      activeIndex: this.tvist.engine.index.get(),
-      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-      startPosition: this.startPosition,
-      startIndex: this.startIndex,
-    });
+    local_loopModuleRef.fix({ direction });
+    local_isFirstMove = false;
+    local_startPosition = tvist.__tvistInternal_engine.__tvistInternal_location.get();
+    local_startX = point.x;
+    local_startY = point.y;
+    local_startIndex = tvist.__tvistInternal_engine.__tvistInternal_index.get();
+    local_coverageFixCooldown = 5;
   }
-
   /**
    * Вычисляет новую позицию track с учётом режима (marquee, center, обычный).
    */
-  private computeDragPosition(deltaX: number, deltaY: number, isHorizontal: boolean): number {
-    const dragSpeed = this.options.dragSpeed ?? 1;
+  function local_computeDragPosition(
+    deltaX: number,
+    deltaY: number,
+    isHorizontal: boolean
+  ): number {
+    const dragSpeed = options.dragSpeed ?? 1;
     const delta = isHorizontal ? deltaX : deltaY;
     const distance = delta * dragSpeed;
-
-    if (this.isMarqueeActive) {
-      const newPosition = this.startPosition + distance;
-      if (this.options.rubberband !== false && !this.isLoopEnabled) {
-        return this.applyRubberbandToPosition(newPosition);
+    if (local_isMarqueeActive) {
+      const newPosition = local_startPosition + distance;
+      if (options.rubberband !== false && !read_isLoopEnabled()) {
+        return local_applyRubberbandToPosition(newPosition);
       }
       return newPosition;
     }
-
-    if (this.tvist.engine.isCenterMode() && !this.isLoopEnabled) {
-      const basePosition = -this.tvist.engine.getSlidePosition(this.startIndex);
-      const centerOffset = this.tvist.engine.getCenterOffset(this.startIndex);
+    if (tvist.__tvistInternal_engine.__tvistInternal_isCenterMode() && !read_isLoopEnabled()) {
+      const basePosition =
+        -tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(local_startIndex);
+      const centerOffset =
+        tvist.__tvistInternal_engine.__tvistInternal_getCenterOffset(local_startIndex);
       let newPosition = basePosition + centerOffset + distance;
-      if (this.tvist.engine.isCenterFocus()) {
-        newPosition = this.tvist.engine.clampCenterPosition(newPosition);
+      if (tvist.__tvistInternal_engine.__tvistInternal_isCenterFocus()) {
+        newPosition = tvist.__tvistInternal_engine.__tvistInternal_clampCenterPosition(newPosition);
       }
-      if (this.options.rubberband !== false) {
-        return this.applyRubberbandToPosition(newPosition);
+      if (options.rubberband !== false) {
+        return local_applyRubberbandToPosition(newPosition);
       }
       return newPosition;
     }
-
     const effectiveDistance =
-      this.options.rubberband !== false ? this.applyRubberband(distance) : distance;
-    return this.startPosition + effectiveDistance;
+      options.rubberband !== false ? local_applyRubberband(distance) : distance;
+    return local_startPosition + effectiveDistance;
   }
 
-  private onPointerUp = (e: TouchEvent | MouseEvent | PointerEvent): void => {
-    if (!this.isPotentialDrag && !this.isDragging) return;
-
-    const wasDragging = this.isDragging;
-    this.isPotentialDrag = false;
-
-    if (this.isDragging) {
-      this.isDragging = false;
-      this.tvist.root.classList.remove(TVIST_CLASSES.dragging);
-
-      setTimeout(() => {
-        this.tvist.allowClick = true;
+  const local_onPointerUp: (e: TouchEvent | MouseEvent | PointerEvent) => void = (
+    e: TouchEvent | MouseEvent | PointerEvent
+  ): void => {
+    if (!local_isPotentialDrag && !local_isDragging) return;
+    const wasDragging = local_isDragging;
+    local_isPotentialDrag = false;
+    if (local_isDragging) {
+      local_isDragging = false;
+      tvist.root.classList.remove(TVIST_CLASSES.dragging);
+      base.resources.timeout(() => {
+        tvist.__tvistInternal_allowClick = true;
       }, 0);
-
-      if (!this.isLoopEnabled) {
-        const currentPosition = this.tvist.engine.location.get();
+      if (!read_isLoopEnabled()) {
+        const currentPosition = tvist.__tvistInternal_engine.__tvistInternal_location.get();
         const clampedPosition = Math.min(
-          this.minPosition,
-          Math.max(this.maxPosition, currentPosition)
+          local_minPosition,
+          Math.max(local_maxPosition, currentPosition)
         );
-
         if (clampedPosition !== currentPosition) {
-          this.tvist.engine.location.set(clampedPosition);
-          this.tvist.engine.applyTransform();
+          tvist.__tvistInternal_engine.__tvistInternal_location.set(clampedPosition);
+          tvist.__tvistInternal_engine.__tvistInternal_applyTransform();
         }
       }
+      const velocity = local_calculateVelocity();
 
-      const velocity = this.calculateVelocity();
-
-      dragLog('dragEnd', {
-        activeIndex: this.tvist.engine.index.get(),
-        realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-        location: this.tvist.engine.location.get(),
-        startPosition: this.startPosition,
-        startIndex: this.startIndex,
-        currentX: this.currentX,
-        startX: this.startX,
-        dragDistance: this.currentX - this.startX,
-        willSnap: !this.isMarqueeActive,
-        dragMode: this.options.drag,
-        loop: this.isLoopEnabled,
-        rewind: this.options.rewind,
-      });
-
-      this.emit('dragEnd', e);
-
-      if (!this.isMarqueeActive) {
-        if (this.options.drag === 'free') {
-          this.startMomentum(velocity);
+      base.emit('dragEnd', e);
+      if (!local_isMarqueeActive) {
+        if (options.drag === 'free') {
+          local_startMomentum(velocity);
         } else {
-          this.snapToNearest(velocity);
+          local_snapToNearest(velocity);
         }
       }
-    } else if (!wasDragging && this.wasAnimating && this.animationTarget !== null) {
-      this.tvist.scrollTo(this.animationTarget, false);
+    } else if (!wasDragging && local_wasAnimating && local_animationTarget !== null) {
+      tvist.scrollTo(local_animationTarget, false);
     }
-
     if (!wasDragging) {
-      const mq = this.tvist.getModule('marquee') as { resume?: () => void };
+      const mq = tvist.__tvistInternal_getModule('marquee') as {
+        resume?: () => void;
+      };
       mq?.resume?.();
     }
-
-    this.wasAnimating = false;
-    this.animationTarget = null;
-    this.manageDocumentEvents('remove');
+    local_wasAnimating = false;
+    local_animationTarget = null;
+    local_manageDocumentEvents('remove');
   };
 
-  private getPointerPosition(
+  function local_getPointerPosition(
     e: TouchEvent | MouseEvent | PointerEvent
   ): { x: number; y: number } | null {
     if ('touches' in e && e.touches.length > 0) {
@@ -903,101 +842,79 @@ export class DragModule extends Module {
     return null;
   }
 
-  private isFocusableElement(element: HTMLElement): boolean {
-    const focusableSelectors =
-      this.options.focusableElements ?? 'input, textarea, select, [tabindex]';
-
+  function local_isFocusableElement(element: HTMLElement): boolean {
+    const focusableSelectors = options.focusableElements ?? 'input, textarea, select, [tabindex]';
     return element.matches(focusableSelectors);
   }
-
   /**
    * Проверяет покрытие viewport контентом и вызывает loopFix при необходимости.
    * Работает для всех loop-режимов (обычный loop и marquee + loop).
    */
-  private checkContentCoverageAndFix(
+  function local_checkContentCoverageAndFix(
     currentPosition: number,
-    point: { x: number; y: number }
+    point: {
+      x: number;
+      y: number;
+    }
   ): void {
-    const loopModule = this.loopModuleRef;
+    const loopModule = local_loopModuleRef;
     if (!loopModule?.fix) return;
     const loopFix = loopModule.fix.bind(loopModule);
-
-    const viewportSize = this.tvist.engine.containerSizeValue;
-    const peek = this.tvist.engine.getPeek();
-
+    const viewportSize = tvist.__tvistInternal_engine.__tvistInternal_containerSizeValue;
+    const peek = tvist.__tvistInternal_engine.__tvistInternal_getPeek();
     // Нет «страниц» для прокрутки (все слайды в одном perPage) — перестановки не нужны.
     // Раньше отсекали slidesCount <= perPage + 1, из‑за чего при 2 слайдах и perPage 1
     // loopFix вызывался только после mouseup.
-    if (!this.isMarqueeActive && this.shouldSkipLoopDomReorderDuringDrag()) return;
-
+    if (!local_isMarqueeActive && local_shouldSkipLoopDomReorderDuringDrag()) return;
     // Видимая область включает peek
     const vpStart = -currentPosition - peek.start;
     const vpEnd = -currentPosition + viewportSize + peek.end;
-
-    const slides = this.tvist.slides;
+    const slides = tvist.slides;
     if (slides.length === 0) return;
-
-    const contentStart = this.tvist.engine.getSlidePosition(0);
+    const contentStart = tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(0);
     const lastIdx = slides.length - 1;
     const contentEnd =
-      this.tvist.engine.getSlidePosition(lastIdx) + this.tvist.engine.getSlideSize(lastIdx);
-
-    const isHoriz = this.options.direction !== 'vertical';
-    const dragDelta = isHoriz ? point.x - this.startX : point.y - this.startY;
-
+      tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(lastIdx) +
+      tvist.__tvistInternal_engine.__tvistInternal_getSlideSize(lastIdx);
+    const isHoriz = options.direction !== 'vertical';
+    const dragDelta = isHoriz ? point.x - local_startX : point.y - local_startY;
     // Пропускаем если |dragDelta| слишком мал — направление ненадёжно.
     // После каждого loopFix startX сбрасывается к point.x, и на следующем кадре
     // dragDelta ≈ 0.4px с произвольным знаком, что вызывает ложные срабатывания.
     const MIN_COVERAGE_DRAG_DELTA = 10;
     if (Math.abs(dragDelta) < MIN_COVERAGE_DRAG_DELTA) return;
-
-    if (this.coverageFixCooldown > 0) {
-      this.coverageFixCooldown--;
+    if (local_coverageFixCooldown > 0) {
+      local_coverageFixCooldown--;
       return;
     }
-
     // Буфер -5px: игнорируем субпиксельные зазоры, реагируем только на реальные пустоты.
     const buffer = -5;
-
     let fixed = false;
-
     if (dragDelta > 0 && vpStart < contentStart + buffer) {
-      dragLog('checkContentCoverageAndFix PREV', {
-        dragDelta,
-        activeIndex: this.tvist.engine.index.get(),
-        realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-      });
       loopFix({ direction: 'prev', activeSlideIndex: 0 });
       fixed = true;
     } else if (dragDelta < 0 && vpEnd > contentEnd - buffer) {
-      const coverageActiveIdx = this.findSlideNearViewportEdge(vpStart, slides);
-      dragLog('checkContentCoverageAndFix NEXT', {
-        dragDelta,
-        coverageActiveIdx,
-        activeIndex: this.tvist.engine.index.get(),
-        realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-      });
+      const coverageActiveIdx = local_findSlideNearViewportEdge(vpStart, slides);
+
       loopFix({ direction: 'next', activeSlideIndex: coverageActiveIdx });
       fixed = true;
     }
-
     if (fixed) {
-      this.startPosition = this.tvist.engine.location.get();
-      this.startX = point.x;
-      this.startY = point.y;
-      this.startIndex = this.tvist.engine.index.get();
-      this.coverageFixCooldown = 5;
+      local_startPosition = tvist.__tvistInternal_engine.__tvistInternal_location.get();
+      local_startX = point.x;
+      local_startY = point.y;
+      local_startIndex = tvist.__tvistInternal_engine.__tvistInternal_index.get();
+      local_coverageFixCooldown = 5;
     }
   }
-
   /**
    * Находит индекс слайда, ближайшего к левому краю viewport.
    * Используется для корректного activeSlideIndex при coverageFix NEXT.
    */
-  private findSlideNearViewportEdge(viewportLeft: number, slides: HTMLElement[]): number {
+  function local_findSlideNearViewportEdge(viewportLeft: number, slides: HTMLElement[]): number {
     let nearestIdx = 0;
     for (let i = 0; i < slides.length; i++) {
-      const pos = this.tvist.engine.getSlidePosition(i);
+      const pos = tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(i);
       if (pos > viewportLeft) break;
       nearestIdx = i;
     }
@@ -1005,217 +922,174 @@ export class DragModule extends Module {
     return Math.max(nearestIdx, 1);
   }
 
-  private applyRubberband(distance: number): number {
-    const position = this.startPosition + distance;
-
-    if (position >= this.maxPosition && position <= this.minPosition) {
+  function local_applyRubberband(distance: number): number {
+    const position = local_startPosition + distance;
+    if (position >= local_maxPosition && position <= local_minPosition) {
       return distance;
     }
-
     let inBounds = distance;
     let outOfBounds = 0;
-
-    if (position > this.minPosition) {
-      const overflow = position - this.minPosition;
+    if (position > local_minPosition) {
+      const overflow = position - local_minPosition;
       inBounds = distance - overflow;
       outOfBounds = overflow;
-    } else if (position < this.maxPosition) {
-      const overflow = this.maxPosition - position;
+    } else if (position < local_maxPosition) {
+      const overflow = local_maxPosition - position;
       inBounds = distance + overflow;
       outOfBounds = -overflow;
     }
-
     return inBounds + outOfBounds / RUBBERBAND_FRICTION;
   }
 
-  private applyRubberbandToPosition(position: number): number {
-    if (position >= this.maxPosition && position <= this.minPosition) {
+  function local_applyRubberbandToPosition(position: number): number {
+    if (position >= local_maxPosition && position <= local_minPosition) {
       return position;
     }
-
-    if (position > this.minPosition) {
-      const overflow = position - this.minPosition;
-      return this.minPosition + overflow / RUBBERBAND_FRICTION;
-    } else if (position < this.maxPosition) {
-      const overflow = this.maxPosition - position;
-      return this.maxPosition - overflow / RUBBERBAND_FRICTION;
+    if (position > local_minPosition) {
+      const overflow = position - local_minPosition;
+      return local_minPosition + overflow / RUBBERBAND_FRICTION;
+    } else if (position < local_maxPosition) {
+      const overflow = local_maxPosition - position;
+      return local_maxPosition - overflow / RUBBERBAND_FRICTION;
     }
-
     return position;
   }
 
-  private calculateVelocity(): number {
-    const currentPosition = this.tvist.engine.location.get();
-    const exceeded = currentPosition > this.minPosition || currentPosition < this.maxPosition;
-
-    if (!this.isLoopEnabled && exceeded) return 0;
-
+  function local_calculateVelocity(): number {
+    const currentPosition = tvist.__tvistInternal_engine.__tvistInternal_location.get();
+    const exceeded = currentPosition > local_minPosition || currentPosition < local_maxPosition;
+    if (!read_isLoopEnabled() && exceeded) return 0;
     const now = Date.now();
-    const currentPoint = { x: this.currentX, y: this.currentY, time: now };
-
+    const currentPoint = { x: local_currentX, y: local_currentY, time: now };
     const basePoint =
-      this.baseEvent?.time === now && this.prevBaseEvent ? this.prevBaseEvent : this.baseEvent;
-
+      local_baseEvent?.time === now && local_prevBaseEvent ? local_prevBaseEvent : local_baseEvent;
     if (!basePoint) return 0;
-
     const timeDiff = now - basePoint.time;
-    if (timeDiff === 0 || timeDiff >= this.LOG_INTERVAL) return 0;
-
-    const isHorizontal = this.options.direction !== 'vertical';
+    if (timeDiff === 0 || timeDiff >= local_LOG_INTERVAL) return 0;
+    const isHorizontal = options.direction !== 'vertical';
     const distance = isHorizontal ? currentPoint.x - basePoint.x : currentPoint.y - basePoint.y;
-
     return distance / timeDiff;
   }
 
-  private startMomentum(initialVelocity: number): void {
-    const currentPosition = this.tvist.engine.location.get();
-
-    if (this.options.debug) {
+  function local_startMomentum(initialVelocity: number): void {
+    const currentPosition = tvist.__tvistInternal_engine.__tvistInternal_location.get();
+    if (options.debug) {
       console.warn('[DragModule] startMomentum:', {
         currentPosition,
         initialVelocity,
-        minPosition: this.minPosition,
-        maxPosition: this.maxPosition,
-        isLoop: this.isLoopEnabled,
+        minPosition: local_minPosition,
+        maxPosition: local_maxPosition,
+        isLoop: read_isLoopEnabled(),
       });
     }
-
-    if (!this.isLoopEnabled) {
+    if (!read_isLoopEnabled()) {
       const isOutOfBounds =
-        currentPosition > this.minPosition || currentPosition < this.maxPosition;
-
+        currentPosition > local_minPosition || currentPosition < local_maxPosition;
       if (isOutOfBounds) {
-        if (this.options.debug) {
+        if (options.debug) {
           console.warn('[DragModule] Out of bounds, skipping momentum');
         }
-        if (this.options.drag !== 'free' || this.options.freeSnap) {
-          this.snapToNearest(initialVelocity);
+        if (options.drag !== 'free' || options.freeSnap) {
+          local_snapToNearest(initialVelocity);
         }
         return;
       }
     }
-
     if (Math.abs(initialVelocity) < 0.1) {
-      if (this.options.drag !== 'free' || this.options.freeSnap) {
-        this.snapToNearest(initialVelocity);
+      if (options.drag !== 'free' || options.freeSnap) {
+        local_snapToNearest(initialVelocity);
       }
       return;
     }
-
-    const flickPower = this.options.flickPower ?? 600;
+    const flickPower = options.flickPower ?? 600;
     let velocity = (initialVelocity * flickPower) / 60;
     const frameMs = 1000 / 60;
     let lastFrameTime = performance.now() - frameMs;
-
     const animate = (timestamp: number): void => {
       const frames = Math.min(Math.max(timestamp - lastFrameTime, 0), 100) / frameMs;
       lastFrameTime = timestamp;
-      const decay = Math.pow(this.FRICTION, frames);
-      const distance = velocity * this.FRICTION * (1 - decay) / (1 - this.FRICTION);
+      const decay = Math.pow(local_FRICTION, frames);
+      const distance = (velocity * local_FRICTION * (1 - decay)) / (1 - local_FRICTION);
       velocity *= decay;
-
-      const currentPos = this.tvist.engine.location.get();
+      const currentPos = tvist.__tvistInternal_engine.__tvistInternal_location.get();
       let newPosition = currentPos + distance;
-
       let hitBoundary = false;
-      if (!this.isLoopEnabled) {
-        if (newPosition > this.minPosition) {
-          newPosition = this.minPosition;
+      if (!read_isLoopEnabled()) {
+        if (newPosition > local_minPosition) {
+          newPosition = local_minPosition;
           velocity = 0;
           hitBoundary = true;
-        } else if (newPosition < this.maxPosition) {
-          newPosition = this.maxPosition;
+        } else if (newPosition < local_maxPosition) {
+          newPosition = local_maxPosition;
           velocity = 0;
           hitBoundary = true;
         }
       }
-
-      this.tvist.engine.location.set(newPosition);
-      this.tvist.engine.applyTransform();
-      this.emit('scroll');
-
-      if (Math.abs(velocity) > this.MIN_VELOCITY && !hitBoundary) {
-        this.animationId = requestAnimationFrame(animate);
+      tvist.__tvistInternal_engine.__tvistInternal_location.set(newPosition);
+      tvist.__tvistInternal_engine.__tvistInternal_applyTransform();
+      base.emit('scroll');
+      if (Math.abs(velocity) > local_MIN_VELOCITY && !hitBoundary) {
+        local_animationId = base.resources.frame(animate);
       } else {
-        this.stopMomentum();
-        if (this.options.drag !== 'free' || this.options.freeSnap) {
-          this.snapToNearest(initialVelocity);
+        local_stopMomentum();
+        if (options.drag !== 'free' || options.freeSnap) {
+          local_snapToNearest(initialVelocity);
         }
       }
     };
-
     animate(performance.now());
   }
 
-  private snapToNearest(_velocity: number): void {
-    const isFreeSnap = this.options.drag === 'free' && this.options.freeSnap;
-
+  function local_snapToNearest(_velocity: number): void {
+    const isFreeSnap = options.drag === 'free' && options.freeSnap;
     if (isFreeSnap) {
-      this.snapToNearestSlide(_velocity);
+      local_snapToNearestSlide(_velocity);
     } else {
-      this.snapWithThreshold(_velocity);
+      local_snapWithThreshold(_velocity);
     }
   }
 
-  private snapToNearestSlide(endVelocity: number): void {
-    const { engine, slides } = this.tvist;
-    const currentPosition = engine.location.get();
-    const currentIndex = engine.index.get();
-
+  function local_snapToNearestSlide(endVelocity: number): void {
+    const { __tvistInternal_engine: engine, slides } = tvist;
+    const currentPosition = engine.__tvistInternal_location.get();
+    const currentIndex = engine.__tvistInternal_index.get();
     let nearestIndex = 0;
     let minDistance = Infinity;
-
     for (let i = 0; i < slides.length; i++) {
-      const slidePosition = engine.getScrollPositionForIndex(i);
+      const slidePosition = engine.__tvistInternal_getScrollPositionForIndex(i);
       const distance = Math.abs(currentPosition - slidePosition);
-
       if (distance < minDistance) {
         minDistance = distance;
         nearestIndex = i;
       }
     }
 
-    dragLog('snapToNearestSlide', {
-      currentPosition,
-      nearestIndex,
-      minDistance,
-      activeIndex: currentIndex,
-      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-    });
-
-    this.applyLoopScrollDirectionHintForFreeSnap(currentIndex, nearestIndex, endVelocity);
-    engine.scrollTo(nearestIndex, false, true);
+    local_applyLoopScrollDirectionHintForFreeSnap(currentIndex, nearestIndex, endVelocity);
+    engine.__tvistInternal_scrollTo(nearestIndex, false, true);
   }
 
-  private snapWithThreshold(velocity: number): void {
-    const { engine } = this.tvist;
-    const startIndex = engine.activeIndex;
-
-    const slideSize = engine.slideSizeValue;
-    const gap = engine.gapPxValue;
+  function local_snapWithThreshold(velocity: number): void {
+    const { __tvistInternal_engine: engine } = tvist;
+    const startIndex = engine.__tvistInternal_activeIndex;
+    const slideSize = engine.__tvistInternal_slideSizeValue;
+    const gap = engine.__tvistInternal_gapPxValue;
     const slideWithGap = slideSize + gap;
-
     if (slideWithGap === 0) {
-      dragLog('snapWithThreshold (no size)', { targetIndex: startIndex });
-      engine.scrollTo(startIndex, false, true);
+      engine.__tvistInternal_scrollTo(startIndex, false, true);
       return;
     }
-
     // Первый move только запускает drag, а loopFix может перебазировать начало.
     // Для snap важен путь, который действительно прошёл трек с последней базы.
-    const dragDistance = engine.location.get() - this.startPosition;
-
+    const dragDistance = engine.__tvistInternal_location.get() - local_startPosition;
     const threshold = Math.max(slideSize * 0.2, 80);
-    const flickPower = this.options.flickPower ?? 600;
-    const flickMaxPages = this.options.flickMaxPages ?? 1;
-    const maxFlickDistance = engine.containerSizeValue * flickMaxPages;
+    const flickPower = options.flickPower ?? 600;
+    const flickMaxPages = options.flickMaxPages ?? 1;
+    const maxFlickDistance = engine.__tvistInternal_containerSizeValue * flickMaxPages;
     const flickDistance =
       Math.sign(velocity) * Math.min(Math.abs(velocity) * flickPower, maxFlickDistance);
     const projectedDistance = dragDistance + flickDistance;
-
     const exactSlidesMoved = -projectedDistance / slideWithGap;
     let slidesMoved = Math.round(exactSlidesMoved);
-
     // Один короткий flick должен переключать максимум на один слайд по умолчанию,
     // даже когда в viewport видно несколько слайдов. Длинный drag сохраняет
     // возможность пройти столько слайдов, сколько пользователь протащил сам.
@@ -1224,7 +1098,6 @@ export class DragModule extends Module {
       Math.ceil(flickMaxPages)
     );
     slidesMoved = Math.sign(slidesMoved) * Math.min(Math.abs(slidesMoved), maxSlidesMoved);
-
     if (slidesMoved === 0) {
       if (Math.abs(dragDistance) < threshold) {
         slidesMoved = 0;
@@ -1233,77 +1106,75 @@ export class DragModule extends Module {
       }
     }
 
-    dragLog('snapWithThreshold', {
-      startIndex,
-      startIndexFromEngine: this.startIndex,
-      slidesMoved,
-      dragDistance,
-      velocity,
-      flickDistance,
-      projectedDistance,
-      currentLocation: engine.location.get(),
-      startPosition: this.startPosition,
-      threshold,
-      realIndex: 'realIndex' in this.tvist ? this.tvist.realIndex : undefined,
-      loop: this.isLoopEnabled,
-      rewind: this.options.rewind,
-    });
-
-    if (this.isLoopEnabled) {
+    if (read_isLoopEnabled()) {
       // В loop-режиме DOM переставляется во время драга, поэтому абсолютный
       // targetIndex = startIndex + slidesMoved ненадёжен (приводил к rewind-поведению).
       // scrollBy сам выставляет _scrollDirection по знаку delta.
-      dragLog('>>> CALLING engine.scrollBy', slidesMoved);
-      engine.scrollBy(slidesMoved, true);
+
+      engine.__tvistInternal_scrollBy(slidesMoved, true);
     } else {
       const targetIndex = startIndex + slidesMoved;
-      dragLog('>>> CALLING engine.scrollTo', targetIndex);
-      engine.scrollTo(targetIndex, false, true);
+
+      engine.__tvistInternal_scrollTo(targetIndex, false, true);
     }
   }
-
   /**
    * freeSnap + loop: направление по скорости жеста; при почти нулевой — по кратчайшему шагу по кругу.
    * Используется только в режиме freeSnap (drag: 'free' + freeSnap: true).
    */
-  private applyLoopScrollDirectionHintForFreeSnap(
+  function local_applyLoopScrollDirectionHintForFreeSnap(
     currentIndex: number,
     nearestIndex: number,
     velocity: number
   ): void {
-    if (!this.isLoopEnabled || currentIndex === nearestIndex) return;
-
+    if (!read_isLoopEnabled() || currentIndex === nearestIndex) return;
     if (Math.abs(velocity) >= 0.05) {
-      this.tvist._scrollDirection = velocity > 0 ? 'prev' : 'next';
+      tvist.__tvistInternal__scrollDirection = velocity > 0 ? 'prev' : 'next';
       return;
     }
-
-    const len = this.tvist.slides.length;
+    const len = tvist.slides.length;
     if (len <= 1) return;
-
     const forward = (nearestIndex - currentIndex + len) % len;
     const backward = (currentIndex - nearestIndex + len) % len;
-    if (forward < backward) this.tvist._scrollDirection = 'next';
-    else if (backward < forward) this.tvist._scrollDirection = 'prev';
+    if (forward < backward) tvist.__tvistInternal__scrollDirection = 'next';
+    else if (backward < forward) tvist.__tvistInternal__scrollDirection = 'prev';
   }
 
-  private stopMomentum(): void {
-    if (this.animationId !== null) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
+  function local_stopMomentum(): void {
+    if (local_animationId !== null) {
+      base.resources.cancelFrame(local_animationId);
+      local_animationId = null;
     }
   }
 
-  override onResize(): void {
-    this.updateCachedRefs();
-    this.updateBounds();
+  function local_onResize(): void {
+    local_updateCachedRefs();
+    local_updateBounds();
   }
 
-  override onOptionsUpdate(): void {
-    this.finishHold();
-    this.detachHoldEvents();
-    this.setupHoldToPause();
-    this.updateCachedRefs();
-    this.updateBounds();
+  function local_onOptionsUpdate(): void {
+    local_finishHold();
+    local_detachHoldEvents();
+    local_setupHoldToPause();
+    local_updateCachedRefs();
+    local_updateBounds();
   }
+  const component: DragModule = {
+    get name() {
+      return local_name;
+    },
+    init: local_init,
+    destroy: () => {
+      try {
+        local_destroy();
+      } finally {
+        base.dispose();
+      }
+    },
+    shouldBeActive: local_shouldBeActive,
+    onResize: local_onResize,
+    onOptionsUpdate: local_onOptionsUpdate,
+  };
+
+  return component;
 }

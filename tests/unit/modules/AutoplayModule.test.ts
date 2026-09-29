@@ -502,19 +502,19 @@ describe('AutoplayModule', () => {
         loop: true
       })
 
-      expect(slider.activeIndex).toBe(0)
+      expect(slider.realIndex).toBe(0)
 
       // С loop включённым, rewind не должен применяться
       // loop имеет приоритет
       vi.advanceTimersByTime(1000)
-      expect(slider.activeIndex).toBe(1)
+      expect(slider.realIndex).toBe(1)
 
       vi.advanceTimersByTime(1000)
-      expect(slider.activeIndex).toBe(2)
+      expect(slider.realIndex).toBe(2)
 
       // В loop режиме переход на следующий слайд (0)
       vi.advanceTimersByTime(1000)
-      expect(slider.activeIndex).toBe(0)
+      expect(slider.realIndex).toBe(0)
 
       slider.destroy()
     })

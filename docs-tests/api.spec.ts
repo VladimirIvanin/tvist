@@ -38,7 +38,7 @@ test('прямые якоря и старые API-ссылки ведут к н�
     ['api/properties.html#tvistinstance', 'property-root-tvistInstance'],
     ['api/events.html#slideChangeEnd', 'event-slideChangeEnd'],
     ['api/events.html#navigationmounted', 'event-navigation-mounted'],
-    ['api/static.html#registermodule', 'static-registerModule'],
+    ['api/static.html#classes', 'static-CLASSES'],
   ]) {
     await page.goto(oldRoute!);
     await expect(page).toHaveURL(new RegExp(`api/index\\.html#${id}$`));

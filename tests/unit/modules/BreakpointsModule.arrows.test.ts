@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тесты для взаимодействия Breakpoints с Arrows/Pagination
  * Проверяем что hideWhenSinglePage работает при смене breakpoint
@@ -64,7 +65,7 @@ describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
     const nextArrow = root.querySelector(`.${TVIST_CLASSES.arrowNext}`) as HTMLElement
 
     // На десктопе (perPage: 2, 2 слайда) -> locked -> стрелки скрыты
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
     expect(prevArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(true)
     expect(nextArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(true)
 
@@ -73,7 +74,7 @@ describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
     slider.update()
 
     // На мобиле (perPage: 1, 2 слайда) -> unlocked -> стрелки видны
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
     expect(slider.options.perPage).toBe(1)
     expect(prevArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(false)
     expect(nextArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(false)
@@ -104,7 +105,7 @@ describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
     const nextArrow = root.querySelector(`.${TVIST_CLASSES.arrowNext}`) as HTMLElement
 
     // На мобиле (perPage: 1, 2 слайда) -> unlocked -> стрелки видны
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
     expect(prevArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(false)
 
     // Расширяем экран
@@ -112,7 +113,7 @@ describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
     slider.update()
 
     // На десктопе (perPage: 2, 2 слайда) -> locked -> стрелки скрыты
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
     expect(slider.options.perPage).toBe(2)
     expect(prevArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(true)
     expect(nextArrow?.classList.contains(TVIST_CLASSES.arrowHidden)).toBe(true)
@@ -141,7 +142,7 @@ describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
     const pagination = root.querySelector(`.${TVIST_CLASSES.pagination}`) as HTMLElement
 
     // На десктопе (perPage: 2, 2 слайда) -> 1 страница -> пагинация скрыта
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
     expect(pagination?.classList.contains(TVIST_CLASSES.paginationHidden)).toBe(true)
 
     // Сужаем экран
@@ -149,7 +150,7 @@ describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
     slider.update()
 
     // На мобиле (perPage: 1, 2 слайда) -> 2 страницы -> пагинация видна
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
     expect(pagination?.classList.contains(TVIST_CLASSES.paginationHidden)).toBe(false)
 
     const bullets = pagination?.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
@@ -177,25 +178,25 @@ describe('BreakpointsModule + Navigation (hideWhenSinglePage)', () => {
       }
     })
 
-    expect(slider.engine.isLocked).toBe(false)
+    expect(getRuntime(slider).engine.isLocked).toBe(false)
     expect(slider.options.perPage).toBe(1)
 
     slider.scrollTo(1, { instant: true })
-    expect(slider.engine.index.get()).toBe(1)
+    expect(getRuntime(slider).engine.index.get()).toBe(1)
 
-    const mobilePosition = slider.engine.location.get()
+    const mobilePosition = getRuntime(slider).engine.location.get()
     expect(mobilePosition).toBeLessThan(0)
 
     // Расширяем экран
     resizeSlider(root, 1200)
     slider.update()
 
-    expect(slider.engine.isLocked).toBe(true)
+    expect(getRuntime(slider).engine.isLocked).toBe(true)
     expect(slider.options.perPage).toBe(2)
 
-    const desktopPosition = slider.engine.location.get()
+    const desktopPosition = getRuntime(slider).engine.location.get()
     expect(desktopPosition).toBeCloseTo(0, 5)
-    expect(slider.engine.index.get()).toBe(0)
+    expect(getRuntime(slider).engine.index.get()).toBe(0)
 
     slider.destroy()
   })

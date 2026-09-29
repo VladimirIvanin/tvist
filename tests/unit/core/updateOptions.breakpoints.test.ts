@@ -1,3 +1,4 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тесты для updateOptions с breakpoints
  * Проверяем корректность работы при динамическом изменении breakpoints
@@ -5,12 +6,12 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { Tvist } from '../../../src/core/Tvist'
-import { BreakpointsModule } from '../../../src/modules/breakpoints/BreakpointsModule'
-import { DragModule } from '../../../src/modules/drag/DragModule'
+import { createBreakpointsModule as BreakpointsModule } from '../../../src/modules/breakpoints/BreakpointsModule'
+import { createDragModule as DragModule } from '../../../src/modules/drag/DragModule'
 
 // Регистрируем модули
-Tvist.registerModule('breakpoints', BreakpointsModule)
-Tvist.registerModule('drag', DragModule)
+
+
 
 describe('updateOptions - breakpoints lock/unlock', () => {
   let container: HTMLElement
@@ -68,7 +69,7 @@ describe('updateOptions - breakpoints lock/unlock', () => {
     })
 
     // На десктопе (perPage: 2, 2 слайда) слайдер должен быть заблокирован
-    expect(tvist.engine.isLocked).toBe(true)
+    expect(getRuntime(tvist).engine.isLocked).toBe(true)
     expect(tvist.canScrollNext).toBe(false)
     expect(tvist.canScrollPrev).toBe(false)
 
@@ -81,7 +82,7 @@ describe('updateOptions - breakpoints lock/unlock', () => {
 
     // После применения breakpoint (perPage: 1) слайдер должен разблокироваться
     // Потому что теперь 2 слайда и perPage: 1 = 2 страницы
-    expect(tvist.engine.isLocked).toBe(false)
+    expect(getRuntime(tvist).engine.isLocked).toBe(false)
     expect(tvist.canScrollNext).toBe(true)
     expect(tvist.canScrollPrev).toBe(false) // На первом слайде
   })
@@ -100,14 +101,14 @@ describe('updateOptions - breakpoints lock/unlock', () => {
     })
 
     // Проверяем начальное состояние (perPage: 2, 2 слайда = lock)
-    expect(tvist.engine.isLocked).toBe(true)
+    expect(getRuntime(tvist).engine.isLocked).toBe(true)
 
     // Вручную меняем perPage на 1 и вызываем checkLock
     tvist.options.perPage = 1
-    tvist.engine.update()
+    getRuntime(tvist).engine.update()
 
     // После update должен вызваться checkLock и слайдер должен разблокироваться
-    expect(tvist.engine.isLocked).toBe(false)
+    expect(getRuntime(tvist).engine.isLocked).toBe(false)
   })
 
   it('должен эмитить события lock/unlock при изменении состояния', () => {
@@ -159,10 +160,10 @@ describe('updateOptions - breakpoints lock/unlock', () => {
     })
 
     // На десктопе drag не работает (isLocked = true)
-    expect(tvist.engine.isLocked).toBe(true)
+    expect(getRuntime(tvist).engine.isLocked).toBe(true)
 
     // Симулируем drag на десктопе - не должен работать
-    const dragModule = tvist.getModule('drag')
+    const dragModule = getRuntime(tvist).getModule('drag')
     expect(dragModule).toBeDefined()
 
     // Переходим на мобилу
@@ -171,7 +172,7 @@ describe('updateOptions - breakpoints lock/unlock', () => {
     tvist.update()
 
     // Теперь drag должен работать (isLocked = false)
-    expect(tvist.engine.isLocked).toBe(false)
+    expect(getRuntime(tvist).engine.isLocked).toBe(false)
   })
 
   it('должен корректно обновлять bounds в DragModule после unlock', () => {
@@ -189,19 +190,19 @@ describe('updateOptions - breakpoints lock/unlock', () => {
       }
     })
 
-    expect(tvist.engine.isLocked).toBe(true)
+    expect(getRuntime(tvist).engine.isLocked).toBe(true)
 
     // Переходим на мобилу
     Object.defineProperty(root, 'clientWidth', { value: 768, configurable: true })
     Object.defineProperty(root, 'offsetWidth', { value: 768, configurable: true })
     tvist.update()
 
-    expect(tvist.engine.isLocked).toBe(false)
+    expect(getRuntime(tvist).engine.isLocked).toBe(false)
 
     // DragModule должен обновить свои границы при onResize
-    const dragModule = tvist.getModule('drag')
+    const dragModule = getRuntime(tvist).getModule('drag')
     expect(dragModule).toBeDefined()
-    
+
     // Проверяем что можем листать
     expect(tvist.canScrollNext).toBe(true)
   })
@@ -227,7 +228,7 @@ describe('updateOptions - breakpoints lock/unlock', () => {
     })
 
     // На десктопе (perPage: 3, 3 слайда) - lock
-    expect(tvist.engine.isLocked).toBe(true)
+    expect(getRuntime(tvist).engine.isLocked).toBe(true)
     expect(tvist.canScrollNext).toBe(false)
 
     // Переходим на мобилу (perPage: 1, 3 слайда) - unlock
@@ -235,7 +236,7 @@ describe('updateOptions - breakpoints lock/unlock', () => {
     Object.defineProperty(root, 'offsetWidth', { value: 768, configurable: true })
     tvist.update()
 
-    expect(tvist.engine.isLocked).toBe(false)
+    expect(getRuntime(tvist).engine.isLocked).toBe(false)
     expect(tvist.canScrollNext).toBe(true)
   })
 
@@ -260,27 +261,27 @@ describe('updateOptions - breakpoints lock/unlock', () => {
 
     // ДЕСКТОП: perPage: 2, 2 слайда = 1 страница = lock
     console.log('ДЕСКТОП состояние:', {
-      isLocked: tvist.engine.isLocked,
+      isLocked: getRuntime(tvist).engine.isLocked,
       perPage: tvist.options.perPage,
       canScrollNext: tvist.canScrollNext,
       canScrollPrev: tvist.canScrollPrev,
       activeIndex: tvist.activeIndex
     })
 
-    expect(tvist.engine.isLocked).toBe(true)
+    expect(getRuntime(tvist).engine.isLocked).toBe(true)
     expect(tvist.canScrollNext).toBe(false)
     expect(tvist.canScrollPrev).toBe(false)
 
     // СИМУЛИРУЕМ СУЖЕНИЕ ЭКРАНА до 768px (мобила)
     Object.defineProperty(root, 'clientWidth', { value: 768, configurable: true })
     Object.defineProperty(root, 'offsetWidth', { value: 768, configurable: true })
-    
+
     // Вызываем update (как это происходит в браузере через ResizeObserver)
     tvist.update()
 
     // МОБИЛА: perPage: 1, 2 слайда = 2 страницы = unlock
     console.log('МОБИЛА состояние после resize:', {
-      isLocked: tvist.engine.isLocked,
+      isLocked: getRuntime(tvist).engine.isLocked,
       perPage: tvist.options.perPage,
       canScrollNext: tvist.canScrollNext,
       canScrollPrev: tvist.canScrollPrev,
@@ -288,53 +289,53 @@ describe('updateOptions - breakpoints lock/unlock', () => {
     })
 
     // ПРОВЕРЯЕМ ЧТО СЛАЙДЕР РАЗБЛОКИРОВАН
-    expect(tvist.engine.isLocked).toBe(false)
+    expect(getRuntime(tvist).engine.isLocked).toBe(false)
     expect(tvist.canScrollNext).toBe(true)
 
     // ПРОВЕРЯЕМ ЧТО МОЖЕМ ЛИСТАТЬ СТРЕЛКАМИ
     console.log('Перед next():', {
       activeIndex: tvist.activeIndex,
       canScrollNext: tvist.canScrollNext,
-      isLocked: tvist.engine.isLocked,
-      location: tvist.engine.location.get(),
-      target: tvist.engine.target.get(),
-      slideSize: tvist.engine.slideSizeValue,
-      containerSize: tvist.engine.containerSizeValue,
+      isLocked: getRuntime(tvist).engine.isLocked,
+      location: getRuntime(tvist).engine.location.get(),
+      target: getRuntime(tvist).engine.target.get(),
+      slideSize: getRuntime(tvist).engine.slideSizeValue,
+      containerSize: getRuntime(tvist).engine.containerSizeValue,
       perPage: tvist.options.perPage
     })
-    
+
     // Проверяем позицию слайда 1
-    const slide1Position = tvist.engine.getScrollPositionForIndex(1)
+    const slide1Position = getRuntime(tvist).engine.getScrollPositionForIndex(1)
     console.log('Позиция слайда 1:', slide1Position)
-    
+
     // Подписываемся на события
     let slideChangeStartFired = false
     let slideChangeEndFired = false
-    tvist.on('slideChangeStart', (idx: number) => { 
+    tvist.on('slideChangeStart', (idx: number) => {
       console.log('slideChangeStart fired, index:', idx)
-      slideChangeStartFired = true 
+      slideChangeStartFired = true
     })
-    tvist.on('slideChangeEnd', (idx: number) => { 
+    tvist.on('slideChangeEnd', (idx: number) => {
       console.log('slideChangeEnd fired, index:', idx)
-      slideChangeEndFired = true 
+      slideChangeEndFired = true
     })
-    
+
     console.log('Вызываем next(), текущий activeIndex:', tvist.activeIndex)
     console.log('canScrollNext:', tvist.canScrollNext)
-    console.log('engine.canScrollNext():', tvist.engine.canScrollNext())
-    
+    console.log('engine.canScrollNext():', getRuntime(tvist).engine.canScrollNext())
+
     tvist.next()
-    
+
     console.log('События:', { slideChangeStartFired, slideChangeEndFired })
-    
+
     console.log('После next():', {
       activeIndex: tvist.activeIndex,
       canScrollNext: tvist.canScrollNext,
-      location: tvist.engine.location.get(),
-      target: tvist.engine.target.get(),
+      location: getRuntime(tvist).engine.location.get(),
+      target: getRuntime(tvist).engine.target.get(),
       expectedPosition: slide1Position
     })
-    
+
     expect(tvist.activeIndex).toBe(1)
 
     // ПРОВЕРЯЕМ ЧТО МОЖЕМ ЛИСТАТЬ НАЗАД

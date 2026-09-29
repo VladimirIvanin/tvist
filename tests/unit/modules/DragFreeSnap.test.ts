@@ -1,6 +1,7 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тесты для Free Mode + Snap
- * 
+ *
  * Проверяем корректность snap к ближайшему слайду:
  * 1. Snap к ближайшему слайду после momentum
  * 2. Не к следующему после активного, а именно к БЛИЖАЙШЕМУ
@@ -9,7 +10,7 @@
 
 import { beforeEach, describe, expect, it, afterEach } from 'vitest'
 import { Tvist } from '@core/Tvist'
-import { DragModule } from '@modules/drag/DragModule'
+import { createDragModule as DragModule } from '@modules/drag/DragModule'
 import {
   createSliderFixture,
   simulateDrag,
@@ -22,8 +23,8 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
   let slider: Tvist
 
   beforeEach(() => {
-    Tvist.registerModule('drag', DragModule)
-    
+
+
     fixture = createSliderFixture({
       slidesCount: 10,
       width: 600,
@@ -42,7 +43,7 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
   afterEach(() => {
     slider?.destroy()
     fixture?.cleanup()
-    Tvist.unregisterModule('drag')
+
   })
 
   describe('Snap к ближайшему слайду', () => {
@@ -65,9 +66,9 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
       // Должны остаться на слайде 0 или перейти к слайду 1,
       // но проверим что позиция точно на одном из слайдов
       const finalIndex = slider.activeIndex
-      const finalPosition = slider.engine.location.get()
-      const expectedPosition = slider.engine.getScrollPositionForIndex(finalIndex)
-      
+      const finalPosition = getRuntime(slider).engine.location.get()
+      const expectedPosition = getRuntime(slider).engine.getScrollPositionForIndex(finalIndex)
+
       // Позиция должна быть на слайде (с небольшой погрешностью)
       expect(Math.abs(finalPosition - expectedPosition)).toBeLessThan(5)
     })
@@ -87,13 +88,13 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
       await waitForAnimation(2200)
 
       const finalIndex = slider.activeIndex
-      
+
       // Должны остаться на том же слайде или максимум на +1
       expect(finalIndex - initialIndex).toBeLessThanOrEqual(1)
-      
+
       // Проверяем что точно на позиции слайда
-      const finalPosition = slider.engine.location.get()
-      const expectedPosition = slider.engine.getScrollPositionForIndex(finalIndex)
+      const finalPosition = getRuntime(slider).engine.location.get()
+      const expectedPosition = getRuntime(slider).engine.getScrollPositionForIndex(finalIndex)
       expect(Math.abs(finalPosition - expectedPosition)).toBeLessThan(5)
     })
 
@@ -115,13 +116,13 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
       await waitForAnimation(2200)
 
       const finalIndex = slider.activeIndex
-      
+
       // Должны улететь вперед от слайда 2
       expect(finalIndex).toBeGreaterThan(2)
-      
+
       // И быть точно на позиции слайда (snap сработал)
-      const finalPosition = slider.engine.location.get()
-      const expectedPosition = slider.engine.getScrollPositionForIndex(finalIndex)
+      const finalPosition = getRuntime(slider).engine.location.get()
+      const expectedPosition = getRuntime(slider).engine.getScrollPositionForIndex(finalIndex)
       expect(Math.abs(finalPosition - expectedPosition)).toBeLessThan(10)
     })
 
@@ -142,13 +143,13 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
       await waitForAnimation(2200)
 
       const finalIndex = slider.activeIndex
-      
+
       // Должны улететь вперед
       expect(finalIndex).toBeGreaterThan(2)
-      
+
       // И точно снапиться к слайду
-      const finalPosition = slider.engine.location.get()
-      const expectedPosition = slider.engine.getScrollPositionForIndex(finalIndex)
+      const finalPosition = getRuntime(slider).engine.location.get()
+      const expectedPosition = getRuntime(slider).engine.getScrollPositionForIndex(finalIndex)
       expect(Math.abs(finalPosition - expectedPosition)).toBeLessThan(5)
     })
   })
@@ -157,7 +158,7 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
     it('Free+Snap должен снапиться к ближайшему, а Normal - учитывать threshold', async () => {
       // Тест 1: Free+Snap
       const freeSlider = slider // уже создан с free+snap
-      
+
       // Маленький drag
       await simulateDrag({
         element: fixture.container,
@@ -170,8 +171,8 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
       await waitForAnimation(2200)
 
       const freeIndex = freeSlider.activeIndex
-      const freePosition = freeSlider.engine.location.get()
-      
+      const freePosition = getRuntime(freeSlider).engine.location.get()
+
       freeSlider.destroy()
 
       // Тест 2: Normal режим
@@ -193,13 +194,13 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
       await waitForAnimation(600)
 
       const normalIndex = normalSlider.activeIndex
-      
+
       normalSlider.destroy()
 
       // В Free+Snap снапимся к ближайшему (может остаться на 0)
       // В Normal используется threshold (может тоже остаться на 0)
       // Но важно что оба на точной позиции слайда
-      const expectedFreePos = freeSlider.engine.getScrollPositionForIndex(freeIndex)
+      const expectedFreePos = getRuntime(freeSlider).engine.getScrollPositionForIndex(freeIndex)
       expect(Math.abs(freePosition - expectedFreePos)).toBeLessThan(5)
     })
   })
@@ -222,9 +223,9 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
 
       // Должны остаться на первом слайде
       expect(slider.activeIndex).toBe(0)
-      
-      const finalPosition = slider.engine.location.get()
-      const expectedPosition = slider.engine.getScrollPositionForIndex(0)
+
+      const finalPosition = getRuntime(slider).engine.location.get()
+      const expectedPosition = getRuntime(slider).engine.getScrollPositionForIndex(0)
       expect(Math.abs(finalPosition - expectedPosition)).toBeLessThan(5)
     })
 
@@ -246,18 +247,18 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
       await waitForAnimation(600)
 
       const finalIndex = slider.activeIndex
-      
+
       // Не должны уйти дальше последнего доступного слайда
       expect(finalIndex).toBeLessThanOrEqual(lastIndex)
-      
-      const finalPosition = slider.engine.location.get()
-      const expectedPosition = slider.engine.getScrollPositionForIndex(finalIndex)
+
+      const finalPosition = getRuntime(slider).engine.location.get()
+      const expectedPosition = getRuntime(slider).engine.getScrollPositionForIndex(finalIndex)
       expect(Math.abs(finalPosition - expectedPosition)).toBeLessThan(5)
     })
 
     it('должен корректно работать с center: true', async () => {
       slider.destroy()
-      
+
       slider = new Tvist(fixture.root, {
         drag: 'free',
         freeSnap: true,
@@ -278,9 +279,9 @@ describe('DragModule Free+Snap - Snap к ближайшему', () => {
       await waitForAnimation(2200)
 
       const finalIndex = slider.activeIndex
-      const finalPosition = slider.engine.location.get()
-      const expectedPosition = slider.engine.getScrollPositionForIndex(finalIndex)
-      
+      const finalPosition = getRuntime(slider).engine.location.get()
+      const expectedPosition = getRuntime(slider).engine.getScrollPositionForIndex(finalIndex)
+
       // Должны снапиться точно к центрированной позиции
       expect(Math.abs(finalPosition - expectedPosition)).toBeLessThan(5)
     })

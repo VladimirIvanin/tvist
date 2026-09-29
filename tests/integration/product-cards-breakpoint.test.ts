@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { Tvist } from '../../src/index'
 import { createSliderFixture, resizeSlider } from '../fixtures'
@@ -49,7 +50,7 @@ describe('Product Cards Example - breakpoint switching', () => {
 
     // Шаг 2: Сужаем экран до 800px (меньше 999px)
     resizeSlider(fixture.root, 800)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
     // Слайдер должен включиться
     expect(slider.isEnabled).toBe(true)
@@ -57,7 +58,7 @@ describe('Product Cards Example - breakpoint switching', () => {
 
     // Шаг 3: Расширяем экран обратно до 1200px (больше 999px)
     resizeSlider(fixture.root, 1200)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
     // Слайдер должен отключиться обратно
     expect(slider.isEnabled).toBe(false)
@@ -84,29 +85,29 @@ describe('Product Cards Example - breakpoint switching', () => {
 
     // Цикл 1: Сужаем -> Расширяем
     resizeSlider(fixture.root, 800)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
     expect(slider.isEnabled).toBe(true)
 
     resizeSlider(fixture.root, 1200)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
     expect(slider.isEnabled).toBe(false)
 
     // Цикл 2: Сужаем -> Расширяем снова
     resizeSlider(fixture.root, 600)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
     expect(slider.isEnabled).toBe(true)
 
     resizeSlider(fixture.root, 1100)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
     expect(slider.isEnabled).toBe(false)
 
     // Цикл 3: Ещё раз
     resizeSlider(fixture.root, 900)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
     expect(slider.isEnabled).toBe(true)
 
     resizeSlider(fixture.root, 1200)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
     expect(slider.isEnabled).toBe(false)
   })
 
@@ -135,7 +136,7 @@ describe('Product Cards Example - breakpoint switching', () => {
 
     // Сужаем экран
     resizeSlider(fixture.root, 800)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
     expect(events).toContain('breakpoint:999')
     expect(events).toContain('enabled')
@@ -145,7 +146,7 @@ describe('Product Cards Example - breakpoint switching', () => {
 
     // Расширяем экран
     resizeSlider(fixture.root, 1200)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
     expect(events).toContain('breakpoint:null')
     expect(events).toContain('disabled')
@@ -175,16 +176,16 @@ describe('Product Cards Example - breakpoint switching', () => {
     for (let i = 0; i < 3; i++) {
       // Сужаем
       resizeSlider(fixture.root, 800)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
-      
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
+
       // Проверяем, что DOM не сломался
       expect(fixture.root.querySelectorAll('.tvist-v1__slide').length).toBe(6)
       expect(slider.isEnabled).toBe(true)
 
       // Расширяем
       resizeSlider(fixture.root, 1200)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
-      
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
+
       // Проверяем, что DOM не сломался
       expect(fixture.root.querySelectorAll('.tvist-v1__slide').length).toBe(6)
       expect(slider.isEnabled).toBe(false)
@@ -209,12 +210,12 @@ describe('Product Cards Example - breakpoint switching', () => {
 
     // Изменяем размер контейнера
     resizeSlider(fixture.root, 800)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
     expect(slider.isEnabled).toBe(true)
 
     // Возвращаем обратно
     resizeSlider(fixture.root, 1200)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
     expect(slider.isEnabled).toBe(false)
   })
 })

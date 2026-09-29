@@ -1,6 +1,7 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тесты для ScrollbarModule
- * 
+ *
  * Проверяем:
  * 1. Создание DOM элементов скроллбара
  * 2. Обновление позиции при изменении слайда
@@ -12,7 +13,7 @@
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '@core/Tvist'
-import { ScrollbarModule } from '@modules/scrollbar/ScrollbarModule'
+import { createScrollbarModule as ScrollbarModule } from '@modules/scrollbar/ScrollbarModule'
 import {
   createSliderFixture,
   waitForAnimation,
@@ -68,7 +69,7 @@ describe('ScrollbarModule', () => {
 
   beforeEach(() => {
     // Регистрируем модуль
-    Tvist.registerModule('scrollbar', ScrollbarModule)
+
 
     // Создаём фикстуру
     fixture = createSliderFixture({
@@ -87,17 +88,17 @@ describe('ScrollbarModule', () => {
   afterEach(() => {
     slider.destroy()
     fixture.cleanup()
-    Tvist.unregisterModule('scrollbar')
+
   })
 
   describe('Initialization', () => {
     it('должен создавать DOM элементы скроллбара', () => {
       const scrollbarEl = slider.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)
       expect(scrollbarEl).toBeTruthy()
-      
+
       const trackEl = scrollbarEl?.querySelector(`.${TVIST_CLASSES.scrollbarTrack}`)
       expect(trackEl).toBeTruthy()
-      
+
       const thumbEl = scrollbarEl?.querySelector(`.${TVIST_CLASSES.scrollbarThumb}`)
       expect(thumbEl).toBeTruthy()
     })
@@ -119,7 +120,7 @@ describe('ScrollbarModule', () => {
     })
 
     it('должен регистрироваться как модуль', () => {
-      const module = slider.getModule<ScrollbarModule>('scrollbar')
+      const module = getRuntime(slider).getModule<ScrollbarModule>('scrollbar')
       expect(module).toBeDefined()
       expect(module?.name).toBe('Scrollbar')
     })
@@ -132,7 +133,7 @@ describe('ScrollbarModule', () => {
 
       // Начальная позиция
       const initialLeft = thumbEl?.style.left
-      
+
       // Переходим к следующему слайду
       slider.next()
       await waitForAnimation(350)
@@ -163,7 +164,7 @@ describe('ScrollbarModule', () => {
       // На первом слайде позиция должна быть 0%
       const left = parseFloat(thumbEl?.style.left || '0')
       expect(left).toBe(0)
-      
+
       // Позиция задаётся через left/top, transform не задаётся
       const transform = thumbEl?.style.transform
       expect(transform).toBeFalsy()
@@ -181,7 +182,7 @@ describe('ScrollbarModule', () => {
 
       // Проверяем промежуточные позиции во время анимации
       const positions: number[] = []
-      
+
       for (let i = 0; i < 5; i++) {
         await waitForAnimation(60)
         const currentLeft = parseFloat(thumbEl?.style.left || '0')
@@ -194,7 +195,7 @@ describe('ScrollbarModule', () => {
 
       // Проверяем, что позиция плавно менялась
       expect(finalLeft).toBeGreaterThan(initialLeft)
-      
+
       // Проверяем, что были промежуточные значения
       const uniquePositions = new Set(positions)
       expect(uniquePositions.size).toBeGreaterThan(1)
@@ -211,7 +212,7 @@ describe('ScrollbarModule', () => {
       // На последнем слайде ползунок должен быть в конце трека
       const thumbWidth = parseFloat(thumbEl?.style.width || '0')
       const left = parseFloat(thumbEl?.style.left || '0')
-      
+
       // left + width должно быть примерно 100%
       expect(left + thumbWidth).toBeCloseTo(100, 1)
     })
@@ -229,7 +230,7 @@ describe('ScrollbarModule', () => {
       // Проверяем стартовую позицию для вертикального направления
       const top = parseFloat(thumbEl?.style.top || '0')
       expect(top).toBe(0)
-      
+
       // Позиция задаётся через top, transform не задаётся
       const transform = thumbEl?.style.transform
       expect(transform).toBeFalsy()
@@ -343,11 +344,11 @@ describe('ScrollbarModule', () => {
 
       // Начинаем и завершаем перетаскивание
       emitDragStart(thumbEl!, 100, 50)
-      
+
       expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(true)
 
       emitDragEnd()
-      
+
       // Класс dragging должен удалиться
       expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(false)
     })
@@ -424,7 +425,7 @@ describe('ScrollbarModule', () => {
       } else {
         document.dispatchEvent(new TouchEvent('touchend'))
       }
-      
+
       expect(scrollbarEl?.classList.contains(TVIST_CLASSES.scrollbarDragging)).toBe(false)
     })
 
@@ -516,7 +517,7 @@ describe('ScrollbarModule', () => {
     })
 
     it('должен обновлять опции при updateOptions', () => {
-      const module = slider.getModule<ScrollbarModule>('scrollbar')
+      const module = getRuntime(slider).getModule<ScrollbarModule>('scrollbar')
       expect(module).toBeDefined()
 
       slider.updateOptions({

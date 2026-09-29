@@ -1,6 +1,7 @@
+import { getRuntime } from '../../../src/core/runtime'
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
-import { Engine } from '@core/Engine'
+import { createEngine as Engine } from '@core/Engine'
 import { Tvist } from '@core/Tvist'
 
 describe('Engine', () => {
@@ -55,7 +56,7 @@ describe('Engine', () => {
     })
 
     // slideSize = (1000 - 20 * (3-1)) / 3 = (1000 - 40) / 3 = 320
-    const slideSize = slider.engine.slideSizeValue
+    const slideSize = getRuntime(slider).engine.slideSizeValue
 
     expect(slideSize).toBeCloseTo(320, 0)
   })
@@ -66,8 +67,8 @@ describe('Engine', () => {
       gap: 10,
     })
 
-    expect(slider.engine.getSlidePosition(0)).toBe(0)
-    expect(slider.engine.getSlidePosition(1)).toBeGreaterThan(0)
+    expect(getRuntime(slider).engine.getSlidePosition(0)).toBe(0)
+    expect(getRuntime(slider).engine.getSlidePosition(1)).toBeGreaterThan(0)
   })
 
   it('should scroll to specific index', () => {
@@ -129,7 +130,7 @@ describe('Engine', () => {
       gap: 10,
     })
 
-    const initialWidth = slider.engine.slideSizeValue
+    const initialWidth = getRuntime(slider).engine.slideSizeValue
 
     // Изменяем размер контейнера и мокаем новый offsetWidth
     root.style.width = '1200px'
@@ -144,7 +145,7 @@ describe('Engine', () => {
     })
     slider.update()
 
-    const newWidth = slider.engine.slideSizeValue
+    const newWidth = getRuntime(slider).engine.slideSizeValue
 
     expect(newWidth).not.toBe(initialWidth)
     expect(newWidth).toBeCloseTo(595, 0) // (1200 - 10) / 2 = 595
@@ -200,7 +201,7 @@ describe('Engine', () => {
     slider.scrollTo(2, true)
     expect(slider.activeIndex).toBe(2)
 
-    slider.engine.scrollBy(1)
+    getRuntime(slider).engine.scrollBy(1)
     // scrollBy не мгновенный, но должен запустить анимацию
     // Проверяем что метод не падает
     expect(slider.activeIndex).toBeGreaterThanOrEqual(2)
@@ -224,8 +225,8 @@ describe('Engine', () => {
       speed: 0,
     })
 
-    slider.engine.location.set(-10.6)
-    slider.engine.applyTransform()
+    getRuntime(slider).engine.location.set(-10.6)
+    getRuntime(slider).engine.applyTransform()
 
     expect(slider.container.style.transform).toContain('translate3d(-11px, 0, 0)')
   })
@@ -237,8 +238,8 @@ describe('Engine', () => {
       roundLengths: false,
     })
 
-    slider.engine.location.set(-10.6)
-    slider.engine.applyTransform()
+    getRuntime(slider).engine.location.set(-10.6)
+    getRuntime(slider).engine.applyTransform()
 
     expect(slider.container.style.transform).toContain('translate3d(-10.6px, 0, 0)')
   })
@@ -257,7 +258,7 @@ describe('Engine', () => {
 
   it('should calculate perPage based on slideMinSize', () => {
     // containerWidth = 1000 (from beforeEach)
-    
+
     // Case 1: 1000 / 200 = 5 slides per page
     const slider1 = new Tvist(root, {
       slideMinSize: 200,
@@ -287,7 +288,7 @@ describe('Engine', () => {
       slideMinSize: 400,
       gap: 0
     })
-    
+
     expect(slider.options.perPage).toBe(2)
 
     // Resize to 1500 => perPage = floor(1500/400) = 3
@@ -301,10 +302,10 @@ describe('Engine', () => {
       configurable: true,
       value: 1500
     })
-    
+
     slider.update()
     expect(slider.options.perPage).toBe(3)
-    
+
     // Resize to 300 => perPage = floor(300/400) = 0 -> should be 1
     root.style.width = '300px'
     Object.defineProperty(root, 'offsetWidth', {
@@ -315,7 +316,7 @@ describe('Engine', () => {
       configurable: true,
       value: 300
     })
-    
+
     slider.update()
     expect(slider.options.perPage).toBe(1)
   })
@@ -327,7 +328,7 @@ describe('Engine', () => {
       fixedWidth: 200,
     })
     expect(slider.options.perPage).toBe(5)
-    expect(slider.engine.slideSizeValue).toBe(200)
+    expect(getRuntime(slider).engine.slideSizeValue).toBe(200)
   })
 
   it('должен учитывать gap при fixedWidth', () => {
@@ -337,7 +338,7 @@ describe('Engine', () => {
       fixedWidth: 300,
     })
     expect(slider.options.perPage).toBe(3)
-    expect(slider.engine.slideSizeValue).toBe(300)
+    expect(getRuntime(slider).engine.slideSizeValue).toBe(300)
   })
 
   it('не должен применять slideMinSize при активном fixedWidth', () => {

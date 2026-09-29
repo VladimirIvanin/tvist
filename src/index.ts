@@ -1,43 +1,18 @@
-/**
- * Tvist - главная точка входа
- */
-
-import './styles/tvist.scss'
-
-// Core
-export { Tvist, Tvist as TvistV1, type TvistRootElement } from './core/Tvist'
+/** Complete Tvist slider. Built-in features are activated through options. */
+import './styles/tvist.scss';
+export { Tvist, Tvist as TvistV1, Tvist as default, type TvistRootElement } from './core/Tvist';
 export {
   TVIST_CSS_PREFIX,
   TVIST_CLASSES,
   TVIST_DOM_EVENTS,
   HOLD_TO_PAUSE_DEFAULT_THRESHOLD_MS,
-} from './core/constants'
-export { Engine } from './core/Engine'
-export { Vector1D } from './core/Vector1D'
-export { Counter } from './core/Counter'
-export { EventEmitter } from './core/EventEmitter'
-export { Animator, easings, throttle } from './core/Animator'
-
-// Modules (автоматическая регистрация при импорте)
-import './modules/drag'
-import './modules/navigation'
-import './modules/pagination'
-import './modules/autoplay'
-import './modules/breakpoints'
-import './modules/loop'
-import './modules/slide-states'
-import './modules/thumbs'
-import './modules/effects'
-import './modules/grid'
-import './modules/scroll-control'
-import './modules/scrollbar'
-import './modules/marquee'
-import './modules/lazyload'
-import './modules/video'
-
-
-// Types
+} from './core/constants';
 export type {
+  AutoplayControls,
+  VideoControls,
+  MarqueeControls,
+  LazyloadControls,
+  VisibilityControls,
   TvistOptions,
   CenterOptions,
   TvistDestroyOptions,
@@ -46,17 +21,10 @@ export type {
   VideoOptions,
   VideoEvent,
   VideoProgressEvent,
+  AutoplayProgressEvent,
   NativeLazyAdjacentOptions,
-} from './core/types'
-export type { Module, ModuleConstructor } from './modules/Module'
-
-// Utils (опционально для расширенного использования)
-export * from './utils'
-
-// Экспорт модулей для расширенного использования
-export * from './modules'
-
-// Дефолтный экспорт
-export { Tvist as default } from './core/Tvist'
-
-// Для браузера: TvistV1 и TVIST_CSS_PREFIX позволяют использовать несколько версий на одной странице без конфликтов
+  HoldToPauseOptions,
+  VisibilityOptions,
+  BrowserFixesOptions,
+  LoopOptions,
+} from './core/types';

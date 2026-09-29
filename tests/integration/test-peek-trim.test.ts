@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { Tvist } from '../../src'
 import { createSliderFixture, type SliderFixture } from '../fixtures'
@@ -28,23 +29,23 @@ describe('peekTrim', () => {
     })
 
     slider.scrollTo(3, true) // Go to last slide
-    
-    const location = slider.engine.location.get()
-    const maxScroll = slider.engine.getMaxScrollPosition()
-    
+
+    const location = getRuntime(slider).engine.location.get()
+    const maxScroll = getRuntime(slider).engine.getMaxScrollPosition()
+
     expect(location).toBe(maxScroll)
-    
+
     // Check if there is a gap on the right
-    const viewportSize = slider.engine.containerSizeValue
+    const viewportSize = getRuntime(slider).engine.containerSizeValue
     const vpRight = -location + viewportSize
-    
+
     let contentRight = -Infinity
     for (let i = 0; i < slider.slides.length; i++) {
-      const pos = slider.engine.getSlidePosition(i)
-      const size = slider.engine.getSlideSize(i)
+      const pos = getRuntime(slider).engine.getSlidePosition(i)
+      const size = getRuntime(slider).engine.getSlideSize(i)
       if (pos + size > contentRight) contentRight = pos + size
     }
-    
+
     const rightGap = Math.max(0, vpRight - contentRight)
     console.log({ location, maxScroll, viewportSize, vpRight, contentRight, rightGap })
   })

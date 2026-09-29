@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Tvist } from '@core/Tvist'
 import { TVIST_CLASSES } from '@core/constants'
@@ -134,7 +135,7 @@ describe('Automatically created controls', () => {
     pagination.querySelectorAll<HTMLElement>(`.${TVIST_CLASSES.bullet}`)[2]!.click()
     expect(slider.activeIndex).toBe(2)
 
-    const nextSpy = vi.spyOn(slider, 'next')
+    const nextSpy = vi.spyOn(getRuntime(slider), 'next')
     slider.destroy()
     next.click()
     expect(nextSpy).not.toHaveBeenCalled()
@@ -211,10 +212,10 @@ describe('Automatically created controls', () => {
     const externalHandler = vi.fn()
     slider.on('slideChangeEnd', externalHandler)
     const events = ['slideChangeStart', 'slideChangeEnd', 'transitionEnd', 'lock', 'unlock', 'scroll', 'loopFix']
-    const listenerCounts = () => events.map(event => slider['events'].listenerCount(event))
+    const listenerCounts = () => events.map(event => getRuntime(slider)['events'].listenerCount(event))
     const baseline = listenerCounts()
-    const nextSpy = vi.spyOn(slider, 'next')
-    const scrollSpy = vi.spyOn(slider, 'scrollTo')
+    const nextSpy = vi.spyOn(getRuntime(slider), 'next')
+    const scrollSpy = vi.spyOn(getRuntime(slider), 'scrollTo')
 
     for (let cycle = 0; cycle < 3; cycle++) {
       slider.updateOptions({ arrows: true, pagination: true })
@@ -251,7 +252,7 @@ describe('Automatically created controls', () => {
     pagination.className = TVIST_CLASSES.pagination
     root.append(prev, next, pagination)
     const slider = mount(root, { arrows: true, pagination: true })
-    const nextSpy = vi.spyOn(slider, 'next')
+    const nextSpy = vi.spyOn(getRuntime(slider), 'next')
     slider.updateOptions({ arrows: false, pagination: false })
     next.click()
     expect(nextSpy).not.toHaveBeenCalled()
@@ -285,8 +286,8 @@ describe('Automatically created controls', () => {
     })
     for (let cycle = 0; cycle < 3; cycle++) {
       window.innerWidth = 600
-      expect(slider.getModule('navigation')).toBeUndefined()
-      expect(slider.getModule('pagination')).toBeUndefined()
+      expect(getRuntime(slider).getModule('navigation')).toBeUndefined()
+      expect(getRuntime(slider).getModule('pagination')).toBeUndefined()
       expect(root.children).toHaveLength(1)
       window.innerWidth = 1200
       expectSingleControls(root)
@@ -318,7 +319,7 @@ describe('Automatically created controls', () => {
     expect(pagination.querySelectorAll(`.${TVIST_CLASSES.bullet}`)).toHaveLength(4)
     next.click()
     expect(slider.realIndex).toBe(1)
-    const module = slider.getModule('pagination')!
+    const module = getRuntime(slider).getModule('pagination')!
     slider.emit('loopFix')
     const frameId = (module as unknown as { updateFrameId: number | null }).updateFrameId
     expect(frameId).not.toBeNull()

@@ -93,9 +93,8 @@ describe('Tvist reference contract', () => {
     expect(metadata.methods.find((entry) => entry.name === 'scrollTo')?.signature).toBe(
       'scrollTo(index: number, instant?: boolean): this'
     );
-    expect(metadata.methods.find((entry) => entry.name === 'getModule')?.signature).toContain(
-      '<T extends Module>'
-    );
+    expect(metadata.methods.some(entry => entry.name === 'getModule')).toBe(false);
+    expect(metadata.properties.some(entry => entry.name === 'marquee')).toBe(true);
     expect(metadata.properties.find((entry) => entry.name === 'activeIndex')?.readonly).toBe(true);
     expect(metadata.statics.find((entry) => entry.name === 'CSS_PREFIX')?.deprecated).toBeTruthy();
     expect(

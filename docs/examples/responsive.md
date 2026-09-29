@@ -1,6 +1,6 @@
 # Responsive Example
 
-> **Входит в браузерную сборку core.** Достаточно `tvist.core.min.js` и `tvist.core.css`; отдельное подключение этого модуля не требуется. [Схема подключения](/guide/installation).
+> **Входит в полную браузерную сборку.** Достаточно `tvist.min.js` и `tvist.css`; отдельное подключение этого модуля не требуется. [Схема подключения](/guide/installation).
 
 Адаптивный слайдер с автоматической подстройкой под разные размеры экрана.
 
@@ -35,7 +35,7 @@ const slider = new Tvist('.tvist', {
   gap: 20,
   speed: 300,
   drag: true,
-  
+
   // Настройки для разных ширин окна
   breakpoints: {
     1200: {  // При ширине ≤ 1200px
@@ -51,7 +51,7 @@ const slider = new Tvist('.tvist', {
       gap: 0
     }
   },
-  
+
   // Обработчик смены breakpoint
   on: {
     breakpoint: (bp) => {
@@ -74,10 +74,10 @@ const slider = new Tvist('.tvist', {
   perPage: 2,
   gap: 12,
   speed: 300,
-  
+
   // Breakpoints относительно КОНТЕЙНЕРА, а не окна
   breakpointsBase: 'container',
-  
+
   breakpoints: {
     600: {  // При ширине контейнера ≤ 600px
       perPage: 1,
@@ -99,11 +99,11 @@ const slider = new Tvist('.tvist', {
 const slider = new Tvist('.tvist', {
   // Вместо фиксированного perPage
   slideMinSize: 250,  // Минимальная ширина слайда в пикселях
-  
+
   gap: 16,
   speed: 300,
   drag: true,
-  
+
   on: {
     resize: () => {
       // При resize пересчитывается perPage автоматически
@@ -132,7 +132,7 @@ const slider = new Tvist('.tvist', {
 const slider = new Tvist('.tvist', {
   slideMinSize: 250,  // База для расчета
   gap: 16,
-  
+
   breakpoints: {
     768: {
       slideMinSize: 200,  // На мобильных — меньше
@@ -199,15 +199,15 @@ const slider = new Tvist('.tvist', {
   perPage: 4,
   gap: 24,
   breakpoints: {
-    992: { 
+    992: {
       perPage: 3,
       gap: 20  // Меньший gap на средних экранах
     },
-    768: { 
+    768: {
       perPage: 2,
       gap: 16  // Еще меньше
     },
-    480: { 
+    480: {
       perPage: 1,
       gap: 0   // Без gap на мобильных
     }
@@ -220,18 +220,18 @@ const slider = new Tvist('.tvist', {
 ```javascript
 const slider = new Tvist('.tvist', {
   // ... настройки
-  
+
   on: {
     breakpoint: (bp) => {
       console.log('Изменился breakpoint:', bp);
       console.log('Новый perPage:', slider.options.perPage);
-      
+
       // Можно динамически менять UI
       if (bp <= 768) {
         // Мобильная версия
       }
     },
-    
+
     resize: () => {
       // Вызывается при resize окна
       // Полезно для slideMinSize режима

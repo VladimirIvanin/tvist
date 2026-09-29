@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * Тесты очистки артефактов при disabled слайдере.
  *
@@ -65,7 +66,7 @@ describe('disabled cleanup — container-based breakpoints', () => {
     expect(fixture.root.classList.contains(TVIST_CLASSES.draggable)).toBe(true)
 
     resizeSlider(fixture.root, 500)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
     checkDisabledCleanup(slider, fixture.root)
   })
@@ -82,13 +83,13 @@ describe('disabled cleanup — container-based breakpoints', () => {
     })
 
     resizeSlider(fixture.root, 500)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
     resizeSlider(fixture.root, 1000)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
     resizeSlider(fixture.root, 500)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
     checkDisabledCleanup(slider, fixture.root)
   })
@@ -125,7 +126,7 @@ describe('disabled cleanup — container-based breakpoints', () => {
     })
 
     resizeSlider(fixture.root, 600)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
     checkDisabledCleanup(slider, fixture.root)
   })
@@ -141,7 +142,7 @@ describe('disabled cleanup — window-based breakpoints (default)', () => {
 
   function setWindowWidth(slider: Tvist, width: number) {
     window.innerWidth = width
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
   }
 
   it('десктоп→мобильный: очищает width, transform, классы слайдов и рута', () => {

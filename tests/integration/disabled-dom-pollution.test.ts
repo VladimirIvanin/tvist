@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * Тесты DOM-загрязнения при инициализации в disabled состоянии.
  *
@@ -51,7 +52,7 @@ describe('DOM-загрязнение при disabled — container-based', () =>
 
     // Переходим на мобильный
     resizeSlider(fixture.root, 500)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
 
     expect(slider.isEnabled).toBe(false)
     // scrollbar DOM должен быть удалён
@@ -70,15 +71,15 @@ describe('DOM-загрязнение при disabled — container-based', () =>
     })
 
     resizeSlider(fixture.root, 500)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
     expect(fixture.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)).toBeNull()
 
     resizeSlider(fixture.root, 1000)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
     expect(fixture.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)).not.toBeNull()
 
     resizeSlider(fixture.root, 500)
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
     expect(fixture.root.querySelector(`.${TVIST_CLASSES.scrollbar}`)).toBeNull()
   })
 })
@@ -91,7 +92,7 @@ describe('DOM-загрязнение при disabled — window-based', () => {
 
   function setWindowWidth(slider: Tvist, width: number) {
     window.innerWidth = width
-    slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+    getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
   }
 
   it('scrollbar: DOM-элементы не создаются при начальном disabled breakpoint', () => {

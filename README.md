@@ -14,51 +14,18 @@ npm install tvist
 
 ### Скачать для браузера (без npm)
 
-Минифицированная сборка для `<script>` — папка [browser-build/](browser-build/) в репозитории (после `npm run build:browser`). В браузере глобальный конструктор — **`TvistV1`**.
-
-CDN (файлы из `browser-build/`): **`@latest`** в jsDelivr указывает на [последний релиз GitHub](https://github.com/VladimirIvanin/tvist/releases); для острия ветки `main` замените `@latest` на `@main`.
-
-Для production закрепите тег релиза или разместите файлы на своём домене с долгим кешированием.
-
-`npm run build:browser` (или `npm run build:browser:split`) выпускает три пары JS/CSS: core, modules и полную сборку. Выберите полную пару либо core с нужными дополнениями.
-
-Для обычной карусели подключите core: он включает свайпы, брейкпоинты, стрелки, пагинацию, классы состояний, autoplay, loop и visibility.
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.core.css">
-<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.core.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    new TvistV1('#slider', { arrows: true, pagination: true, loop: true });
-  });
-</script>
-```
-
-Для миниатюр, эффектов Fade/Cube, Grid, ScrollControl, Scrollbar, Marquee, LazyLoad или Video добавьте пару modules:
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.core.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.modules.css">
-<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.core.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.modules.min.js"></script>
-```
-
-Используйте одну версию всех файлов. CSS modules подключайте после CSS core. Создавайте слайдер после загрузки нужных JS; с `defer` — в `DOMContentLoaded`. Modules также может загрузиться до core благодаря очереди регистрации.
-
-Для всех возможностей в одном JS и одном CSS подключите полную сборку:
+Минифицированная сборка для `<script>` находится в папке [browser-build/](browser-build/). Команда `npm run build:browser` выпускает одну полную пару `tvist.min.js` + `tvist.css` и gzip-копию `tvist.min.js.gz`. Размер gzip выводится при сборке. В JS включены все встроенные возможности; сборка проверяет лимит 100 000 байт до gzip/Brotli.
 
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css">
 <script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
 ```
 
-Полная сборка включает все 16 модулей и использует тот же конструктор `TvistV1`. Подключайте её вместо пар core и modules; инициализируйте слайдер после загрузки JS.
-
-[Состав сборок и способы подключения](docs/guide/installation.md#cdn).
+Создавайте слайдер после загрузки JS. При использовании `defer` инициализируйте его в `DOMContentLoaded`. JS и CSS должны иметь одну версию. [Миграция с API расширений](docs/api/modules.md). [Размер и результаты проверок](docs/browser-build.md).
 
 ## ✨ Возможности
 
-- 📖 **Широкое API** — десятки опций, методы, события и подключаемые модули под полный контроль
+- 📖 **Широкое API** — десятки опций, методы, события и встроенные возможности
 - 🖱️ **Drag & Drop** — touch/mouse с rubberband эффектом, free mode с momentum scroll
 - 🎨 **Navigation** — стрелки с disabled состояниями
 - 📊 **Pagination** — bullets, fraction, progress
@@ -134,8 +101,8 @@ npm run dev
 npm run docs:dev
 
 # Собрать и просмотреть production версию документации
-npm run build:docs
-npm run preview:docs
+npm run docs:build
+npm run docs:preview
 ```
 
 ## 🛠️ Разработка
@@ -165,7 +132,7 @@ npm run docs:dev         # Запуск документации и пример
 npm run dev:watch        # Dev + проверка типов
 npm run build            # Production сборка библиотеки
 npm run build:browser    # Только минифицированная сборка для браузера (browser-build/)
-npm run build:docs       # Сборка документации и примеров
+npm run docs:build       # Сборка документации и примеров
 npm run test             # Запуск тестов
 npm run test:ui          # UI для тестов
 npm run test:coverage    # Покрытие кодом

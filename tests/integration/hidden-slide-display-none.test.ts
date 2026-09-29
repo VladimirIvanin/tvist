@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  *
@@ -33,9 +34,9 @@ describe('слайд скрыт через CSS display: none', () => {
     expect(slider.canScrollPrev).toBe(false)
     expect(slider.canScrollNext).toBe(true)
 
-    expect(slider.engine.getSlidePositions()).toHaveLength(3)
-    expect(slider.engine.getSlidePositions()[2]).toBe(2000)
-    expect(slider.engine.getMaxScrollPosition()).toBe(-2000)
+    expect(getRuntime(slider).engine.getSlidePositions()).toHaveLength(3)
+    expect(getRuntime(slider).engine.getSlidePositions()[2]).toBe(2000)
+    expect(getRuntime(slider).engine.getMaxScrollPosition()).toBe(-2000)
 
     slider.scrollTo(2, true)
     expect(slider.activeIndex).toBe(2)

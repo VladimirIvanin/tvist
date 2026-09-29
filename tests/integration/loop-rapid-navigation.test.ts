@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Tvist } from '@core/Tvist'
 import { TVIST_CLASSES } from '@core/constants'
@@ -51,9 +52,9 @@ describe('Loop rapid navigation', () => {
 
       for (let i = 0; i < 60; i++) {
         button.click()
-        const position = slider.engine.location.get()
+        const position = getRuntime(slider).engine.location.get()
         expect(position).toBeLessThanOrEqual(0)
-        expect(position).toBeGreaterThanOrEqual(slider.engine.getMaxScrollPosition())
+        expect(position).toBeGreaterThanOrEqual(getRuntime(slider).engine.getMaxScrollPosition())
         await vi.advanceTimersByTimeAsync(20)
       }
 
@@ -61,8 +62,8 @@ describe('Loop rapid navigation', () => {
       expect(ended).toHaveBeenCalled()
       expect(slider.realIndex).toBe(((sign * 4) % 3 + 3) % 3)
       await vi.advanceTimersByTimeAsync(300)
-      expect(slider.engine.animator.isAnimating()).toBe(false)
-      expect(slider.engine.location.get()).toBe(slider.engine.target.get())
+      expect(getRuntime(slider).engine.animator.isAnimating()).toBe(false)
+      expect(getRuntime(slider).engine.location.get()).toBe(getRuntime(slider).engine.target.get())
       const bullets = fixture.root.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
       expect(bullets[slider.realIndex]?.classList.contains(TVIST_CLASSES.bulletActive)).toBe(true)
 
@@ -70,7 +71,7 @@ describe('Loop rapid navigation', () => {
       fixture.root.dispatchEvent(new MouseEvent('mouseleave'))
       await vi.advanceTimersByTimeAsync(3000)
       expect(slider.realIndex).toBe((previousIndex + 1) % 3)
-      expect(slider.engine.animator.isAnimating()).toBe(false)
+      expect(getRuntime(slider).engine.animator.isAnimating()).toBe(false)
     }
   )
 
@@ -80,8 +81,8 @@ describe('Loop rapid navigation', () => {
     next.click()
     expect(slider.realIndex).toBe(0)
     await vi.advanceTimersByTimeAsync(300)
-    expect(slider.engine.animator.isAnimating()).toBe(false)
-    expect(slider.engine.location.get()).toBe(slider.engine.target.get())
+    expect(getRuntime(slider).engine.animator.isAnimating()).toBe(false)
+    expect(getRuntime(slider).engine.location.get()).toBe(getRuntime(slider).engine.target.get())
   })
 
   it.each([
@@ -94,16 +95,16 @@ describe('Loop rapid navigation', () => {
     button.click()
     await vi.advanceTimersByTimeAsync(60)
     const index = slider.realIndex
-    const position = slider.engine.location.get()
-    const stop = vi.spyOn(slider.engine.animator, 'stop')
+    const position = getRuntime(slider).engine.location.get()
+    const stop = vi.spyOn(getRuntime(slider).engine.animator, 'stop')
     const ended = vi.fn()
     slider.on('transitionEnd', ended)
     const target = targetType === 'button' ? button : button.querySelector('svg path')!
 
     target.dispatchEvent(createMouseEvent('mousedown', { clientX: 100, clientY: 100 }))
-    expect(slider.engine.animator.isAnimating()).toBe(true)
+    expect(getRuntime(slider).engine.animator.isAnimating()).toBe(true)
     await vi.advanceTimersByTimeAsync(60)
-    expect(slider.engine.location.get()).not.toBe(position)
+    expect(getRuntime(slider).engine.location.get()).not.toBe(position)
     target.dispatchEvent(createMouseEvent('mouseup', { clientX: 100, clientY: 100 }))
     button.click()
 
@@ -111,14 +112,14 @@ describe('Loop rapid navigation', () => {
     expect(slider.realIndex).toBe(index)
     await vi.advanceTimersByTimeAsync(180)
     expect(ended).toHaveBeenCalledTimes(1)
-    expect(slider.engine.animator.isAnimating()).toBe(false)
+    expect(getRuntime(slider).engine.animator.isAnimating()).toBe(false)
   })
 
   it('ignores pointer presses on pagination content for drag and holdToPause', async () => {
     slider.updateOptions({ holdToPause: true })
     next.click()
     await vi.advanceTimersByTimeAsync(60)
-    const stop = vi.spyOn(slider.engine.animator, 'stop')
+    const stop = vi.spyOn(getRuntime(slider).engine.animator, 'stop')
     const hold = vi.fn()
     slider.on('longPressStart', hold)
     const bullet = fixture.root.querySelector(`.${TVIST_CLASSES.bullet}`)!
@@ -127,12 +128,12 @@ describe('Loop rapid navigation', () => {
 
     label.dispatchEvent(createMouseEvent('mousedown', { clientX: 100, clientY: 100 }))
     await vi.advanceTimersByTimeAsync(120)
-    expect(slider.engine.animator.isAnimating()).toBe(true)
+    expect(getRuntime(slider).engine.animator.isAnimating()).toBe(true)
     expect(stop).not.toHaveBeenCalled()
     expect(hold).not.toHaveBeenCalled()
     label.dispatchEvent(createMouseEvent('mouseup', { clientX: 100, clientY: 100 }))
     await vi.advanceTimersByTimeAsync(120)
-    expect(slider.engine.animator.isAnimating()).toBe(false)
+    expect(getRuntime(slider).engine.animator.isAnimating()).toBe(false)
   })
 
   it.each(['prev', 'next'] as const)(
@@ -146,14 +147,14 @@ describe('Loop rapid navigation', () => {
 
       // The browser clock can reach the transition deadline before its timer is dispatched.
       vi.spyOn(performance, 'now').mockReturnValue(300)
-      expect(slider.engine.location.get()).toBe(slider.engine.target.get())
-      expect(slider.engine.animator.isAnimating()).toBe(true)
+      expect(getRuntime(slider).engine.location.get()).toBe(getRuntime(slider).engine.target.get())
+      expect(getRuntime(slider).engine.animator.isAnimating()).toBe(true)
       for (let i = 0; i < 10; i++) button.click()
       expect(slider.realIndex).toBe(index)
 
       await vi.advanceTimersByTimeAsync(300)
       expect(ended).toHaveBeenCalledTimes(1)
-      expect(slider.engine.animator.isAnimating()).toBe(false)
+      expect(getRuntime(slider).engine.animator.isAnimating()).toBe(false)
     }
   )
 
@@ -163,7 +164,7 @@ describe('Loop rapid navigation', () => {
       prev.click()
       expect(slider.realIndex).toBe(((3 - i) % 3 + 3) % 3)
     }
-    expect(slider.engine.animator.isAnimating()).toBe(false)
+    expect(getRuntime(slider).engine.animator.isAnimating()).toBe(false)
   })
 
   it('allows repeated steps during transitions without loop', async () => {
@@ -173,6 +174,6 @@ describe('Loop rapid navigation', () => {
     next.click()
     expect(slider.realIndex).toBe(2)
     await vi.advanceTimersByTimeAsync(300)
-    expect(slider.engine.animator.isAnimating()).toBe(false)
+    expect(getRuntime(slider).engine.animator.isAnimating()).toBe(false)
   })
 })

@@ -23,7 +23,7 @@
 
 ## Проверка состояния
 
-- **Свойство**: `slider.engine.isLocked` — `true` / `false`.
+- **Свойство**: `slider.root.classList.contains(TvistV1.CLASSES.locked)` — `true` / `false`.
 - **События**: в опциях `on.lock` и `on.unlock`.
 
 ## Пример кода
@@ -41,7 +41,7 @@ const slider = new Tvist('.tvist', {
 })
 
 // Текущее состояние
-console.log(slider.engine.isLocked)
+console.log(slider.root.classList.contains(TvistV1.CLASSES.locked))
 ```
 
 ## Связанные примеры

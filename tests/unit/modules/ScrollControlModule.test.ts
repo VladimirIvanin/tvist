@@ -1,6 +1,7 @@
+import { getRuntime } from '../../../src/core/runtime'
 /**
  * Тесты для ScrollControlModule
- * 
+ *
  * Проверяем:
  * 1. Wheel события для навигации
  * 2. Поддержку horizontal и vertical направлений
@@ -10,7 +11,7 @@
 
 import { beforeEach, describe, expect, it, vi, afterEach } from 'vitest'
 import { Tvist } from '@core/Tvist'
-import { ScrollControlModule } from '@modules/scroll-control/ScrollControlModule'
+import { createScrollControlModule as ScrollControlModule } from '@modules/scroll-control/ScrollControlModule'
 import {
   createSliderFixture,
   waitForAnimation,
@@ -23,7 +24,7 @@ describe('ScrollControlModule', () => {
 
   beforeEach(() => {
     // Регистрируем модуль
-    Tvist.registerModule('scroll-control', ScrollControlModule)
+
 
     // Создаём фикстуру
     fixture = createSliderFixture({
@@ -42,7 +43,7 @@ describe('ScrollControlModule', () => {
   afterEach(() => {
     slider.destroy()
     fixture.cleanup()
-    Tvist.unregisterModule('scroll-control')
+
   })
 
   describe('Wheel Navigation', () => {
@@ -186,10 +187,10 @@ describe('ScrollControlModule', () => {
         wheel: false,
       })
 
-      const module = slider.getModule<ScrollControlModule>('scroll-control')
+      const module = getRuntime(slider).getModule<ScrollControlModule>('scroll-control')
       // Модуль не должен создаваться если wheel=false
       expect(module).toBeUndefined()
-      
+
       // Проверяем что обработчики не установлены через попытку вызвать wheel
       const wheelEvent = new WheelEvent('wheel', {
         deltaY: 100,
@@ -203,7 +204,7 @@ describe('ScrollControlModule', () => {
     })
 
     it('должен обновлять опции при updateOptions', () => {
-      const module = slider.getModule<ScrollControlModule>('scroll-control')
+      const module = getRuntime(slider).getModule<ScrollControlModule>('scroll-control')
       expect(module).toBeDefined()
 
       slider.updateOptions({
@@ -224,8 +225,8 @@ describe('ScrollControlModule', () => {
         // wheel не указан
       })
 
-      const module = slider.getModule<ScrollControlModule>('scroll-control')
-      
+      const module = getRuntime(slider).getModule<ScrollControlModule>('scroll-control')
+
       // Модуль не должен создаваться если wheel не указан
       expect(module).toBeUndefined()
     })

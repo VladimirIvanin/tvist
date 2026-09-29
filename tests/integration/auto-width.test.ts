@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  */
@@ -97,7 +98,7 @@ describe('Auto Width / Auto Height integration', () => {
 
     const expectedSizes = [180, 280, 380, 260, 200, 340]
     expectedSizes.forEach((size, i) => {
-      expect(slider.engine.getSlideSize(i)).toBe(size)
+      expect(getRuntime(slider).engine.getSlideSize(i)).toBe(size)
     })
   })
 

@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '@core/Tvist'
-import { GridModule } from '@modules/grid/GridModule'
+import { createGridModule as GridModule } from '@modules/grid/GridModule'
 
 describe('GridModule', () => {
   let container: HTMLElement
   let slider: Tvist
 
   beforeEach(() => {
-    Tvist.registerModule('grid', GridModule)
+
 
     document.body.innerHTML = ''
     const root = document.createElement('div')
@@ -25,7 +25,7 @@ describe('GridModule', () => {
   afterEach(() => {
     slider?.destroy()
     document.body.innerHTML = ''
-    Tvist.unregisterModule('grid')
+
   })
 
   const createSlides = (count: number) => {

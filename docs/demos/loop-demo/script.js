@@ -21,7 +21,7 @@ function updateInfo() {
   const realIndex = slider.realIndex ?? activeIndex
   const totalSlides = slider.slides.length
   const cloneCount = (totalSlides - 4) / 2 // 4 оригинальных слайда
-  
+
   infoEl.innerHTML = `
     <strong>activeIndex:</strong> <span>${activeIndex}</span> (физический индекс в DOM)<br>
     <strong>realIndex:</strong> <span>${realIndex}</span> (логический индекс слайда)<br>
@@ -80,12 +80,12 @@ window.slider = new Tvist('#slider', {
     slideChangeEnd: (index) => {
       const activeIndex = slider.activeIndex
       const realIndex = slider.realIndex
-      const position = slider.engine.location.get()
+      const position = new DOMMatrixReadOnly(getComputedStyle(slider.container).transform).m41
       const slides = slider.slides
       const currentSlide = slides[activeIndex]
       const isClone = currentSlide?.getAttribute('data-tvist-clone') === 'true'
       const slideIndex = currentSlide?.getAttribute('data-tvist-slide-index')
-      
+
       log(`✨ slideChangeEnd: realIndex=${index}`, 'event')
       log(`   → activeIndex=${activeIndex}, position=${position.toFixed(0)}px`, 'dom')
       log(`   → current slide: [${activeIndex}] data-index=${slideIndex}, isClone=${isClone}`, 'dom')

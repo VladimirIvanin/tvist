@@ -1,6 +1,5 @@
 # Scrollbar Module
 
-> **При использовании core требуется пакет modules.** Подключите `tvist.modules.min.js` и `tvist.modules.css` дополнительно к core **до создания слайдера**. Все дополнительные модули поставляются одним пакетом. Полная сборка `tvist.min.js` с `tvist.css` уже включает эти возможности. [Схема подключения](/guide/installation).
 
 Модуль кастомного скроллбара для визуальной навигации по слайдеру.
 
@@ -30,22 +29,22 @@ const slider = new Tvist('.tvist', {
 interface ScrollbarOptions {
   // Селектор или элемент для контейнера скроллбара
   container?: string | HTMLElement
-  
+
   // Автоматически скрывать скроллбар при бездействии
   hide?: boolean
-  
+
   // Задержка перед скрытием (мс)
   hideDelay?: number
-  
+
   // CSS класс для скроллбара
   scrollbarClass?: string
-  
+
   // CSS класс для трека скроллбара
   trackClass?: string
-  
+
   // CSS класс для ползунка
   thumbClass?: string
-  
+
   // Возможность перетаскивания ползунка
   draggable?: boolean
 }

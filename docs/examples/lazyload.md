@@ -1,6 +1,5 @@
 # LazyLoad - Ленивая загрузка изображений
 
-> **При использовании core требуется пакет modules.** Подключите `tvist.modules.min.js` и `tvist.modules.css` дополнительно к core **до создания слайдера**. Все дополнительные модули поставляются одним пакетом. Полная сборка `tvist.min.js` с `tvist.css` уже включает эти возможности. [Схема подключения](/guide/installation).
 
 Модуль **LazyLoad** реализует ленивую загрузку изображений в слайдах. Изображения загружаются только когда слайд становится видимым или близок к видимой области. Это значительно улучшает производительность и ускоряет первоначальную загрузку страницы.
 
@@ -54,8 +53,8 @@ const slider = new Tvist('.tvist-v1', {
 
 ```html
 <div class="tvist-v1__slide">
-  <img 
-    data-src="image-800.jpg" 
+  <img
+    data-src="image-800.jpg"
     data-srcset="image-400.jpg 400w, image-800.jpg 800w, image-1200.jpg 1200w"
     sizes="(max-width: 600px) 400px, (max-width: 1000px) 800px, 1200px"
     alt="Адаптивное изображение">
@@ -137,8 +136,7 @@ slider.on('lazyLoadError', (img, slideIndex) => {
 Загружает все оставшиеся изображения немедленно.
 
 ```javascript
-const lazyModule = slider.modules.get('lazyload')
-lazyModule.loadAll()
+slider.lazyload?.loadAll()
 ```
 
 ### `loadSlide(index)`
@@ -146,8 +144,7 @@ lazyModule.loadAll()
 Загружает изображения конкретного слайда.
 
 ```javascript
-const lazyModule = slider.modules.get('lazyload')
-lazyModule.loadSlide(5) // Загрузить изображения 5-го слайда
+slider.lazyload?.loadSlide(5) // Загрузить изображения 5-го слайда
 ```
 
 ## CSS-классы
@@ -168,10 +165,10 @@ lazyModule.loadSlide(5) // Загрузить изображения 5-го сл
 .tvist-v1 {
   /* Размер спиннера */
   --tvist-v1-spinner-size: 50px;
-  
+
   /* Цвет спиннера */
   --tvist-v1-spinner-color: rgba(0, 0, 0, 0.3);
-  
+
   /* Оверлей во время загрузки */
   --tvist-v1-loading-overlay: rgba(255, 255, 255, 0.7);
 }

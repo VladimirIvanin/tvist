@@ -1,3 +1,4 @@
+import { getRuntime } from '../../src/core/runtime'
 /**
  * @vitest-environment happy-dom
  *
@@ -59,21 +60,21 @@ describe('fixedWidth / fixedHeight и breakpoints', () => {
 
       expect(slider.options.fixedWidth).toBe(250)
       expect(slider.options.perPage).toBe(4)
-      expect(slider.engine.slideSizeValue).toBe(250)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(250)
 
       setWindowWidth(700)
       slider.update()
 
       expect(slider.options.fixedWidth).toBe(200)
       expect(slider.options.perPage).toBe(5)
-      expect(slider.engine.slideSizeValue).toBe(200)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(200)
 
       setWindowWidth(1200)
       slider.update()
 
       expect(slider.options.fixedWidth).toBe(250)
       expect(slider.options.perPage).toBe(4)
-      expect(slider.engine.slideSizeValue).toBe(250)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(250)
 
       slider.destroy()
     })
@@ -89,7 +90,7 @@ describe('fixedWidth / fixedHeight и breakpoints', () => {
 
       // (1000 + 20) / (300 + 20) = 3
       expect(slider.options.perPage).toBe(3)
-      expect(slider.engine.slideSizeValue).toBe(300)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(300)
 
       setWindowWidth(700)
       slider.update()
@@ -97,7 +98,7 @@ describe('fixedWidth / fixedHeight и breakpoints', () => {
       // (1000 + 10) / (200 + 10) = 4
       expect(slider.options.gap).toBe(10)
       expect(slider.options.perPage).toBe(4)
-      expect(slider.engine.slideSizeValue).toBe(200)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(200)
 
       slider.destroy()
     })
@@ -130,20 +131,20 @@ describe('fixedWidth / fixedHeight и breakpoints', () => {
 
       // (500 + 10) / (150 + 10) = 3
       expect(slider.options.perPage).toBe(3)
-      expect(slider.engine.slideSizeValue).toBe(150)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(150)
 
       setWindowWidth(700)
       slider.update()
 
       // (500 + 10) / (100 + 10) = 4
       expect(slider.options.perPage).toBe(4)
-      expect(slider.engine.slideSizeValue).toBe(100)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(100)
 
       setWindowWidth(1200)
       slider.update()
 
       expect(slider.options.perPage).toBe(3)
-      expect(slider.engine.slideSizeValue).toBe(150)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(150)
 
       slider.destroy()
     })
@@ -177,25 +178,25 @@ describe('fixedWidth / fixedHeight и breakpoints', () => {
       })
 
       expect(slider.options.perPage).toBe(3)
-      expect(slider.engine.slideSizeValue).toBe(300)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(300)
 
       resizeSlider(root, 550)
       syncTrackToRoot(root, 550, 400)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       slider.update()
 
       expect(slider.options.fixedWidth).toBe(200)
       expect(slider.options.perPage).toBe(2)
-      expect(slider.engine.slideSizeValue).toBe(200)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(200)
 
       resizeSlider(root, 900)
       syncTrackToRoot(root, 900, 400)
-      slider['modules'].get('breakpoints')?.['checkBreakpoints']()
+      getRuntime(slider)['modules'].get('breakpoints')?.['checkBreakpoints']()
       slider.update()
 
       expect(slider.options.fixedWidth).toBe(300)
       expect(slider.options.perPage).toBe(3)
-      expect(slider.engine.slideSizeValue).toBe(300)
+      expect(getRuntime(slider).engine.slideSizeValue).toBe(300)
 
       slider.destroy()
     })
