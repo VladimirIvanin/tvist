@@ -6,7 +6,7 @@
   --surface: #fcfdfb;
   --surface-alt: #e6ebe7;
   --ink: #1d2b30;
-  --muted: #5d6a68;
+  --muted: #4c5956;
   --line: #cbd4cf;
   --accent: #225d53;
   --accent-ink: #f7fcf9;
@@ -18,7 +18,7 @@
   --surface: #1f2a2b;
   --surface-alt: #293638;
   --ink: #eef4f0;
-  --muted: #b1c1bb;
+  --muted: #c2cec8;
   --line: #3a4b47;
   --accent: #8ecfba;
   --accent-ink: #10211c;
@@ -186,18 +186,18 @@ img { max-width: 100%; display: block; }
 .demo-foot a { color: var(--accent); white-space: nowrap; }
 .demo-foot > div { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; }
 .text-action { border: 0; padding: 0; color: var(--accent); background: transparent; font-size: 11px; text-decoration: underline; text-underline-offset: 2px; }
-.markdown-body { font-size: 15px; line-height: 1.85; padding-top: 20px; }
+.markdown-body { font-size: 17px; line-height: 1.8; padding-top: 20px; }
 .markdown-body > h1:first-child { font-size: clamp(45px, 5vw, 70px); line-height: 1.12; letter-spacing: -.06em; margin: 0 0 30px; }
 .markdown-body h2 { font-size: 30px; letter-spacing: -.04em; line-height: 1.25; border-top: 1px solid var(--line); padding-top: 30px; margin-top: 52px; }
 .markdown-body h3 { font-size: 21px; letter-spacing: -.03em; margin-top: 34px; }
 .markdown-body h1[id], .markdown-body h2[id], .markdown-body h3[id] { scroll-margin-top: 100px; }
 .markdown-body p, .markdown-body ul, .markdown-body ol { max-width: 76ch; }
-.markdown-body a { color: var(--accent); text-underline-offset: 3px; }
-.markdown-body code { background: var(--surface-alt); padding: 2px 4px; font: 12px 'IBM Plex Mono', monospace; }
-.markdown-body pre { padding: 20px; overflow: auto; border: 1px solid var(--line); background: var(--code); font: 12px/1.7 'IBM Plex Mono', monospace; }
+.markdown-body a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.markdown-body code { background: var(--surface-alt); padding: 2px 4px; font: 14px/1.5 'IBM Plex Mono', monospace; }
+.markdown-body pre { padding: 20px; overflow: auto; border: 1px solid var(--line); background: var(--code); font: 14px/1.75 'IBM Plex Mono', monospace; }
 .markdown-body pre code { padding: 0; background: transparent; }
 .markdown-body blockquote, .markdown-body .note { max-width: 76ch; margin: 22px 0; padding: 14px 20px; border-left: 2px solid var(--accent); background: var(--surface-alt); color: var(--muted); }
-.markdown-body table { border-collapse: collapse; width: 100%; font-size: 12px; }
+.markdown-body table { border-collapse: collapse; width: 100%; font-size: 14px; }
 .markdown-body th, .markdown-body td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); padding: 10px; }
 .table-scroll { max-width: 100%; overflow-x: auto; }
 .options-table { min-width: 750px; }
@@ -209,22 +209,22 @@ img { max-width: 100%; display: block; }
 .api-sidebar { position: sticky; top: 100px; align-self: start; max-height: calc(100dvh - 120px); overflow-y: auto; padding-block: 16px; border-top: 1px solid var(--line); }
 .api-sidebar > .eyebrow { display: block; margin-bottom: 18px; }
 .api-nav { display: grid; gap: 8px; }
-.api-nav a { display: block; padding: 3px 8px; color: var(--muted); font-size: 14px; line-height: 1.4; text-decoration: none; }
+.api-nav a { display: block; padding: 3px 8px; color: var(--muted); font-size: 15px; line-height: 1.45; text-decoration: none; }
 .api-nav a:hover, .api-nav a[aria-current] { color: var(--accent); background: var(--surface-alt); }
 .api-nav-label { margin: 16px 8px 4px; color: var(--ink); font-size: 12px; font-weight: 600; }
 .api-nav .api-nav-module { font-size: 13px; }
 .api-menu-toggle { display: none; }
 .api-table-scroll { margin-block: 20px; border: 1px solid var(--line); background: var(--surface); }
-.markdown-body .api-table { table-layout: fixed; min-width: 880px; font-size: 13px; line-height: 1.65; }
+.markdown-body .api-table { table-layout: fixed; min-width: 880px; font-size: 14px; line-height: 1.7; }
 .api-table th, .api-table td { padding: 14px 12px; overflow-wrap: anywhere; }
-.api-table thead th { color: var(--muted); background: var(--surface-alt); font-size: 12px; font-weight: 600; }
+.api-table thead th { color: var(--ink); background: var(--surface-alt); font-size: 13px; font-weight: 600; }
 .api-table th:first-child { width: 20%; }
 .api-table th:nth-child(2) { width: 24%; }
 .api-table thead:has(th:nth-child(4)) th:nth-child(3) { width: 15%; }
 .api-table thead:not(:has(th:nth-child(4))) th:first-child { width: 30%; }
 .api-table tr:target { background: var(--surface-alt); box-shadow: inset 3px 0 var(--accent); }
 .api-entry-link { display: inline; text-decoration: none; }
-.api-entry-link > span { margin-left: 7px; color: var(--muted); opacity: .55; }
+.api-entry-link > span { margin-left: 7px; color: var(--muted); }
 .api-type code, .api-table th code, .api-default code { padding: 0; background: transparent; font-size: 12px; white-space: normal; }
 .api-type a { text-decoration-style: dotted; }
 .api-description > :first-child { margin-top: 0; }
@@ -235,7 +235,7 @@ img { max-width: 100%; display: block; }
 .api-description ul { padding-left: 20px; }
 .api-description h3, .api-description h4 { margin: 12px 0; font-size: 16px; }
 .api-description table { font-size: 12px; }
-.api-readonly { display: block; margin-top: 8px; color: var(--muted); font-size: 11px; font-weight: 400; }
+.api-readonly { display: block; margin-top: 8px; color: var(--muted); font-size: 13px; font-weight: 400; }
 .api-deprecated { color: var(--accent); font-weight: 600; }
 .api-content h4 { margin-block: 22px 10px; }
 .builder-intro { padding-top: 70px; padding-bottom: 35px; border-bottom: 1px solid var(--line); }
