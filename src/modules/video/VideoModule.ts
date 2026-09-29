@@ -203,20 +203,20 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
     local_scanSlides();
     local_setupVisibilityHandlers();
     // Подписываемся на событие смены слайда
-    base.on('slideChangeStart', (index: number) => {
+    base.__tvistInternal_on('slideChangeStart', (index: number) => {
       local_onSlideChange(index);
     });
-    base.on('autoplayHoverPause', local_onAutoplayHoverPause);
-    base.on('autoplayHoverResume', local_onAutoplayHoverResume);
+    base.__tvistInternal_on('autoplayHoverPause', local_onAutoplayHoverPause);
+    base.__tvistInternal_on('autoplayHoverResume', local_onAutoplayHoverResume);
     // Запускаем видео на начальном слайде (используем realIndex)
-    const startRealIndex = tvist.realIndex ?? tvist.activeIndex;
+    const startRealIndex = tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex;
     local_previousIndex = startRealIndex;
     local_activateSlideByRealIndex(startRealIndex);
   }
 
   function local_destroy(): void {
-    base.off('autoplayHoverPause', local_onAutoplayHoverPause);
-    base.off('autoplayHoverResume', local_onAutoplayHoverResume);
+    base.__tvistInternal_off('autoplayHoverPause', local_onAutoplayHoverPause);
+    base.__tvistInternal_off('autoplayHoverResume', local_onAutoplayHoverResume);
     local_stopProgressTracking();
     local_deactivateAll();
     local_cleanupVideoListeners();
@@ -260,7 +260,9 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
         local_muted = local_config.muted;
         local_scanSlides();
         local_setupVisibilityHandlers();
-        local_activateSlideByRealIndex(tvist.realIndex ?? tvist.activeIndex);
+        local_activateSlideByRealIndex(
+          tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex
+        );
       } else if (wasActive && !isNowActive) {
         local_destroy();
       } else if (wasActive && isNowActive) {
@@ -279,7 +281,7 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
   function local_scanSlides(): void {
     local_videos.clear();
     local_iframes.clear();
-    tvist.slides.forEach((slide, domIndex) => {
+    tvist.__tvistInternal_slides.forEach((slide, domIndex) => {
       // Используем оригинальный индекс (data-tvist-slide-index) если есть (loop mode)
       const dataIndex = slide.getAttribute('data-tvist-slide-index');
       const registrationIndex = dataIndex !== null ? parseInt(dataIndex, 10) : domIndex;
@@ -370,10 +372,10 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
     const { video, slide, slideIndex } = entry;
     const emitVideoEvent = (name: string) => {
       const payload: VideoEvent = { slide, video, index: slideIndex };
-      base.emit(name, payload);
+      base.__tvistInternal_emit(name, payload);
     };
     const addHandler = (event: string, handler: EventListener) => {
-      base.resources.listen(video, event, handler);
+      base.__tvistInternal_resources.__tvistInternal_listen(video, event, handler);
       entry.handlers.set(event, handler);
     };
     // loadedmetadata — видео готово
@@ -418,7 +420,7 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
       currentTime: video.currentTime,
       duration: video.duration,
     };
-    base.emit('videoProgress', payload);
+    base.__tvistInternal_emit('videoProgress', payload);
   }
   /**
    * Очистить все слушатели видео
@@ -426,7 +428,7 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
   function local_cleanupVideoListeners(): void {
     local_videos.forEach((entry) => {
       entry.handlers.forEach((handler, event) => {
-        base.resources.unlisten(entry.video, event, handler);
+        base.__tvistInternal_resources.__tvistInternal_unlisten(entry.video, event, handler);
       });
       entry.handlers.clear();
     });
@@ -516,10 +518,14 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
       video.load();
       const readyEvents = ['canplay', 'canplaythrough', 'loadeddata', 'loadedmetadata'];
       const onReady = () => {
-        readyEvents.forEach((event) => base.resources.unlisten(video, event, onReady));
-        base.resources.frame(doPlay);
+        readyEvents.forEach((event) =>
+          base.__tvistInternal_resources.__tvistInternal_unlisten(video, event, onReady)
+        );
+        base.__tvistInternal_resources.__tvistInternal_frame(doPlay);
       };
-      readyEvents.forEach((event) => base.resources.listen(video, event, onReady));
+      readyEvents.forEach((event) =>
+        base.__tvistInternal_resources.__tvistInternal_listen(video, event, onReady)
+      );
     }
   }
   // ==================== iframe управление ====================
@@ -548,22 +554,23 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
         return;
       }
       local_emitVideoProgress(video, slide, index);
-      local_progressRAF = base.resources.frame(tick);
+      local_progressRAF = base.__tvistInternal_resources.__tvistInternal_frame(tick);
     };
-    local_progressRAF = base.resources.frame(tick);
+    local_progressRAF = base.__tvistInternal_resources.__tvistInternal_frame(tick);
   }
   /**
    * Остановить отслеживание прогресса через RAF
    */
   function local_stopProgressTracking(): void {
     if (local_progressRAF !== null) {
-      base.resources.cancelFrame(local_progressRAF);
+      base.__tvistInternal_resources.__tvistInternal_cancelFrame(local_progressRAF);
       local_progressRAF = null;
     }
   }
   // ==================== Visibility ====================
   function local_getActiveVideo(): HTMLVideoElement | undefined {
-    return local_videos.get(tvist.realIndex ?? tvist.activeIndex)?.video;
+    return local_videos.get(tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex)
+      ?.video;
   }
   /**
    * Настроить обработчики видимости (viewport + вкладка)
@@ -583,7 +590,7 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
         },
         { threshold: 0.1 }
       );
-      local_intersectionObserver.observe(tvist.root);
+      local_intersectionObserver.observe(tvist.__tvistInternal_root);
     }
     // visibilitychange — пауза при скрытии вкладки
     local_visibilityHandler = () => {
@@ -593,7 +600,11 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
         local_resumeFromVisibility();
       }
     };
-    base.resources.listen(document, 'visibilitychange', local_visibilityHandler);
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      document,
+      'visibilitychange',
+      local_visibilityHandler
+    );
   }
   /**
    * Убрать обработчики видимости
@@ -604,7 +615,11 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
       local_intersectionObserver = null;
     }
     if (local_visibilityHandler) {
-      base.resources.unlisten(document, 'visibilitychange', local_visibilityHandler);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        document,
+        'visibilitychange',
+        local_visibilityHandler
+      );
       local_visibilityHandler = undefined;
     }
   }
@@ -653,7 +668,7 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
    * Воспроизвести видео на слайде (текущем или по индексу)
    */
   function local_playVideo(index?: number): void {
-    const idx = index ?? tvist.activeIndex;
+    const idx = index ?? tvist.__tvistInternal_activeIndex;
     const entry = local_videos.get(idx);
     if (entry) {
       local_safePlay(entry.video);
@@ -663,7 +678,7 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
    * Поставить видео на паузу
    */
   function local_pauseVideo(index?: number): void {
-    const idx = index ?? tvist.activeIndex;
+    const idx = index ?? tvist.__tvistInternal_activeIndex;
     const entry = local_videos.get(idx);
     if (entry) {
       entry.video.pause();
@@ -751,7 +766,7 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
     shouldBeActive: local_shouldBeActive,

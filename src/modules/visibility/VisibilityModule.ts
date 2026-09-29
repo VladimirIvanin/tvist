@@ -176,7 +176,7 @@ export function createVisibilityModule(tvist: Tvist, options: TvistOptions): Vis
           // Проверяем видимость через IntersectionObserver
           const isIntersecting = entry.isIntersecting;
           // Дополнительно проверяем CSS видимость и видимость вкладки
-          const isCSSVisible = isElementVisibleCSS(tvist.root);
+          const isCSSVisible = isElementVisibleCSS(tvist.__tvistInternal_root);
           const newVisibility = isIntersecting && isCSSVisible && isPageVisible();
           if (newVisibility !== local_isVisible) {
             local_isVisible = newVisibility;
@@ -188,7 +188,7 @@ export function createVisibilityModule(tvist: Tvist, options: TvistOptions): Vis
         threshold: local_config.threshold,
       }
     );
-    local_intersectionObserver.observe(tvist.root);
+    local_intersectionObserver.observe(tvist.__tvistInternal_root);
   }
   /**
    * Остановка IntersectionObserver
@@ -208,7 +208,7 @@ export function createVisibilityModule(tvist: Tvist, options: TvistOptions): Vis
       local_throttledCheckVisibility();
     });
     // Отслеживаем изменения атрибута style у root элемента и его родителей
-    let element: HTMLElement | null = tvist.root;
+    let element: HTMLElement | null = tvist.__tvistInternal_root;
     while (element && element !== document.body) {
       local_mutationObserver.observe(element, {
         attributes: true,
@@ -231,7 +231,7 @@ export function createVisibilityModule(tvist: Tvist, options: TvistOptions): Vis
    * Вызывается из MutationObserver при изменении style/class у root и родителей.
    */
   function local_checkVisibility(): void {
-    const isCSSVisible = isElementVisibleCSS(tvist.root);
+    const isCSSVisible = isElementVisibleCSS(tvist.__tvistInternal_root);
     const visible = isCSSVisible && isPageVisible();
     if (visible !== local_isVisible) {
       local_isVisible = visible;
@@ -245,12 +245,12 @@ export function createVisibilityModule(tvist: Tvist, options: TvistOptions): Vis
     if (isVisible) {
       // Разрешаем переключение слайдов
       tvist.__tvistInternal__isVisible = true;
-      base.emit('sliderVisible');
+      base.__tvistInternal_emit('sliderVisible');
       local_resumeModules();
     } else {
       // Блокируем переключение слайдов
       tvist.__tvistInternal__isVisible = false;
-      base.emit('sliderHidden');
+      base.__tvistInternal_emit('sliderHidden');
       local_pauseModules();
     }
   }
@@ -317,7 +317,7 @@ export function createVisibilityModule(tvist: Tvist, options: TvistOptions): Vis
     return {
       isVisible: () => local_isVisible,
       check: () => {
-        const isCSSVisible = isElementVisibleCSS(tvist.root);
+        const isCSSVisible = isElementVisibleCSS(tvist.__tvistInternal_root);
         const visible = isCSSVisible && isPageVisible();
         if (visible !== local_isVisible) {
           local_isVisible = visible;
@@ -336,7 +336,7 @@ export function createVisibilityModule(tvist: Tvist, options: TvistOptions): Vis
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
     shouldBeActive: local_shouldBeActive,
@@ -350,7 +350,7 @@ export function createVisibilityModule(tvist: Tvist, options: TvistOptions): Vis
       local_checkVisibility();
     },
     100,
-    base.resources
+    base.__tvistInternal_resources
   );
   return component;
 }

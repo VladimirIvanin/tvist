@@ -206,9 +206,9 @@ export function createEngine(tvist: Tvist, options: TvistOptions): Engine {
       );
       const gap = gapCssForMargin(local_options.gap);
       const vertical = local_options.direction === 'vertical';
-      layout.__tvistInternal_slideSizes = local_tvist.slides.map((slide, index) => {
+      layout.__tvistInternal_slideSizes = local_tvist.__tvistInternal_slides.map((slide, index) => {
         slide.style[vertical ? 'marginBottom' : 'marginRight'] =
-          index === local_tvist.slides.length - 1 ? '' : gap;
+          index === local_tvist.__tvistInternal_slides.length - 1 ? '' : gap;
         return sizes.get(slide) ?? 0;
       });
     }
@@ -221,7 +221,7 @@ export function createEngine(tvist: Tvist, options: TvistOptions): Engine {
    * Блокировка включается, если весь контент помещается в контейнер и некуда листать.
    */
   function local_checkLock(isDisabled = false): void {
-    const slideCount = local_tvist.slides.length;
+    const slideCount = local_tvist.__tvistInternal_slides.length;
     const perPage = local_options.perPage ?? 1;
     const hasSizes =
       layout.__tvistInternal_slideSize > 0 ||
@@ -260,7 +260,7 @@ export function createEngine(tvist: Tvist, options: TvistOptions): Engine {
   }
 
   function local_getContentSize(): number {
-    const slides = local_tvist.slides;
+    const slides = local_tvist.__tvistInternal_slides;
     if (slides.length === 0) return 0;
     let minPos = Infinity;
     let maxPos = -Infinity;
@@ -280,16 +280,16 @@ export function createEngine(tvist: Tvist, options: TvistOptions): Engine {
     if (isDisabled) return;
     if (local__isLocked !== isLocked) {
       local__isLocked = isLocked;
-      local_tvist.root.classList.toggle(TVIST_CLASSES.locked, isLocked);
+      local_tvist.__tvistInternal_root.classList.toggle(TVIST_CLASSES.locked, isLocked);
       if (isLocked) {
         local_index.set(0);
         const initialPos = layout.__tvistInternal_getScrollPositionForIndex(0);
         local_location.set(initialPos);
         local_target.set(initialPos);
         motion.__tvistInternal_applyTransform();
-        local_tvist.emit('lock');
+        local_tvist.__tvistInternal_emit('lock');
       } else {
-        local_tvist.emit('unlock');
+        local_tvist.__tvistInternal_emit('unlock');
       }
     }
   }
@@ -330,7 +330,7 @@ export function createEngine(tvist: Tvist, options: TvistOptions): Engine {
   function local_getVisibleSlides(): boolean[] {
     const currentPos = local_location.get();
     const viewportSize = layout.__tvistInternal_containerSize;
-    const slides = local_tvist.slides;
+    const slides = local_tvist.__tvistInternal_slides;
     const result: boolean[] = [];
     const THRESHOLD = 1;
     for (let i = 0; i < slides.length; i++) {
@@ -357,7 +357,7 @@ export function createEngine(tvist: Tvist, options: TvistOptions): Engine {
    * Получить количество слайдов
    */
   function read_slideCount(): number {
-    return local_tvist.slides.length;
+    return local_tvist.__tvistInternal_slides.length;
   }
   /**
    * Проверить, можно ли листать вперёд
@@ -366,7 +366,7 @@ export function createEngine(tvist: Tvist, options: TvistOptions): Engine {
     if (read_isLocked()) return false;
     if (layout.__tvistInternal_isLoopEnabled() || local_options.rewind) return true;
     const limit = local_options.isNavigation
-      ? local_tvist.slides.length - 1
+      ? local_tvist.__tvistInternal_slides.length - 1
       : layout.__tvistInternal_getEndIndex();
     if (local_index.get() >= limit) return false;
     // В center и autoSize режимах граница определяется только по индексу:
@@ -548,7 +548,7 @@ export function createEngine(tvist: Tvist, options: TvistOptions): Engine {
   const local_location = new Vector1D(0);
   const local_target = new Vector1D(0);
   const local_index = new Counter(
-    tvist.slides.length,
+    tvist.__tvistInternal_slides.length,
     startIndex,
     layout.__tvistInternal_isLoopEnabled(),
     layout.__tvistInternal_calculateCounterEndIndex()

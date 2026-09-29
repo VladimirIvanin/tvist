@@ -62,22 +62,22 @@ export function createNavigationModule(tvist: Tvist, options: TvistOptions): Nav
     local_injectArrowIcons();
     local_attachEvents();
     local_updateArrowsState();
-    base.emit('navigation:mounted');
+    base.__tvistInternal_emit('navigation:mounted');
     // Обновляем состояние при изменении слайда
-    base.on('slideChangeEnd', local_stateChangeHandler);
+    base.__tvistInternal_on('slideChangeEnd', local_stateChangeHandler);
     // После анимации (в т.ч. когда индекс не менялся, но translate дошёл до упора)
-    base.on('transitionEnd', local_stateChangeHandler);
+    base.__tvistInternal_on('transitionEnd', local_stateChangeHandler);
     // Обновляем состояние при lock/unlock (для breakpoints)
-    base.on('lock', local_stateChangeHandler);
-    base.on('unlock', local_stateChangeHandler);
+    base.__tvistInternal_on('lock', local_stateChangeHandler);
+    base.__tvistInternal_on('unlock', local_stateChangeHandler);
   }
 
   function local_destroy(): void {
     local_detachEvents();
-    base.off('slideChangeEnd', local_stateChangeHandler);
-    base.off('transitionEnd', local_stateChangeHandler);
-    base.off('lock', local_stateChangeHandler);
-    base.off('unlock', local_stateChangeHandler);
+    base.__tvistInternal_off('slideChangeEnd', local_stateChangeHandler);
+    base.__tvistInternal_off('transitionEnd', local_stateChangeHandler);
+    base.__tvistInternal_off('lock', local_stateChangeHandler);
+    base.__tvistInternal_off('unlock', local_stateChangeHandler);
     local_createdButtons.forEach((button) => button.remove());
     local_createdButtons.length = 0;
     local_prevButton = null;
@@ -113,8 +113,8 @@ export function createNavigationModule(tvist: Tvist, options: TvistOptions): Nav
       }
     }
     // Ищем по стандартным классам только элементы этого слайдера.
-    local_prevButton ??= base.findOwnElement(`.${TVIST_CLASSES.arrowPrev}`);
-    local_nextButton ??= base.findOwnElement(`.${TVIST_CLASSES.arrowNext}`);
+    local_prevButton ??= base.__tvistInternal_findOwnElement(`.${TVIST_CLASSES.arrowPrev}`);
+    local_nextButton ??= base.__tvistInternal_findOwnElement(`.${TVIST_CLASSES.arrowNext}`);
     local_prevButton ??= local_createArrow('prev');
     local_nextButton ??= local_createArrow('next');
   }
@@ -127,7 +127,7 @@ export function createNavigationModule(tvist: Tvist, options: TvistOptions): Nav
       'aria-label',
       direction === 'prev' ? 'Предыдущий слайд' : 'Следующий слайд'
     );
-    tvist.root.appendChild(button);
+    tvist.__tvistInternal_root.appendChild(button);
     local_createdButtons.push(button);
     return button;
   }
@@ -177,18 +177,34 @@ export function createNavigationModule(tvist: Tvist, options: TvistOptions): Nav
     if (!local_prevButton || !local_nextButton) return;
     local_prevClickHandler = () => local_onPrevClick();
     local_nextClickHandler = () => local_onNextClick();
-    base.resources.listen(local_prevButton, 'click', local_prevClickHandler);
-    base.resources.listen(local_nextButton, 'click', local_nextClickHandler);
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      local_prevButton,
+      'click',
+      local_prevClickHandler
+    );
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      local_nextButton,
+      'click',
+      local_nextClickHandler
+    );
   }
   /**
    * Отключение обработчиков
    */
   function local_detachEvents(): void {
     if (local_prevButton && local_prevClickHandler) {
-      base.resources.unlisten(local_prevButton, 'click', local_prevClickHandler);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        local_prevButton,
+        'click',
+        local_prevClickHandler
+      );
     }
     if (local_nextButton && local_nextClickHandler) {
-      base.resources.unlisten(local_nextButton, 'click', local_nextClickHandler);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        local_nextButton,
+        'click',
+        local_nextClickHandler
+      );
     }
   }
   /**
@@ -216,21 +232,21 @@ export function createNavigationModule(tvist: Tvist, options: TvistOptions): Nav
    */
   function local_onPrevClick(): void {
     if (local_isArrowDisabled(local_prevButton)) return;
-    tvist.prev();
+    tvist.__tvistInternal_prev();
   }
   /**
    * Клик на next
    */
   function local_onNextClick(): void {
     if (local_isArrowDisabled(local_nextButton)) return;
-    tvist.next();
+    tvist.__tvistInternal_next();
   }
   /**
    * Вычисляет количество страниц с учетом perPage и slidesPerGroup
    */
   function local_calculatePageCount(): number {
     return pageCount(
-      tvist.slides.length,
+      tvist.__tvistInternal_slides.length,
       options.perPage ?? 1,
       options.slidesPerGroup ?? 1,
       loopEnabled(options.loop)
@@ -241,7 +257,10 @@ export function createNavigationModule(tvist: Tvist, options: TvistOptions): Nav
    */
   function local_updateArrowsState(): void {
     if (!local_prevButton || !local_nextButton) return;
-    const { canScrollPrev, canScrollNext } = tvist;
+    const {
+      __tvistInternal_canScrollPrev: canScrollPrev,
+      __tvistInternal_canScrollNext: canScrollNext,
+    } = tvist;
     const arrows = options.arrows;
     const disabledClass =
       typeof arrows === 'object' && arrows !== null
@@ -309,9 +328,9 @@ export function createNavigationModule(tvist: Tvist, options: TvistOptions): Nav
    */
   function local_updateRootClass(isSinglePage: boolean): void {
     if (isSinglePage) {
-      tvist.root.classList.add(TVIST_CLASSES.singlePage);
+      tvist.__tvistInternal_root.classList.add(TVIST_CLASSES.singlePage);
     } else {
-      tvist.root.classList.remove(TVIST_CLASSES.singlePage);
+      tvist.__tvistInternal_root.classList.remove(TVIST_CLASSES.singlePage);
     }
   }
   /**
@@ -363,7 +382,7 @@ export function createNavigationModule(tvist: Tvist, options: TvistOptions): Nav
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
     shouldBeActive: local_shouldBeActive,

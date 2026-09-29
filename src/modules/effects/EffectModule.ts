@@ -45,17 +45,17 @@ export function createEffectModule(tvist: Tvist, options: TvistOptions): EffectM
         console.warn('Tvist: Effects work only with perPage: 1. Automatically setting perPage: 1');
       }
       options.perPage = 1;
-      tvist.update();
+      tvist.__tvistInternal_update();
     }
     // Set container styles for 3D
     if (options.effect === 'cube') {
       local_applyCubeRootStyles();
     }
-    tvist.on('setTranslate', local_setTranslateHandler);
+    tvist.__tvistInternal_on('setTranslate', local_setTranslateHandler);
   }
 
   function local_destroy(): void {
-    tvist.off('setTranslate', local_setTranslateHandler);
+    tvist.__tvistInternal_off('setTranslate', local_setTranslateHandler);
     local_cleanupEffectStyles(local_currentEffect);
     local_currentEffect = 'slide';
   }
@@ -72,7 +72,7 @@ export function createEffectModule(tvist: Tvist, options: TvistOptions): EffectM
   }
 
   function local_onSetTranslate(_tvist: Tvist, translate: number): void {
-    const { slides } = tvist;
+    const { __tvistInternal_slides: slides } = tvist;
     const slideSize = tvist.__tvistInternal_engine.__tvistInternal_slideSizeValue;
     slides.forEach((slide, i) => {
       const slidePosition = tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(i);
@@ -90,15 +90,15 @@ export function createEffectModule(tvist: Tvist, options: TvistOptions): EffectM
   }
 
   function local_applyCubeRootStyles(): void {
-    tvist.container.style.transformStyle = 'preserve-3d';
-    tvist.root.classList.add(TVIST_CLASSES.cube);
+    tvist.__tvistInternal_container.style.transformStyle = 'preserve-3d';
+    tvist.__tvistInternal_root.classList.add(TVIST_CLASSES.cube);
     const padding = options.cubeEffect?.viewportPadding ?? 10;
-    tvist.track.style.padding = `${padding}px`;
-    tvist.track.style.boxSizing = 'border-box';
+    tvist.__tvistInternal_track.style.padding = `${padding}px`;
+    tvist.__tvistInternal_track.style.boxSizing = 'border-box';
   }
 
   function local_cleanupEffectStyles(effect: TvistOptions['effect']): void {
-    tvist.slides.forEach((slide) => {
+    tvist.__tvistInternal_slides.forEach((slide) => {
       slide.style.opacity = '';
       slide.style.transform = '';
       slide.style.zIndex = '';
@@ -110,17 +110,17 @@ export function createEffectModule(tvist: Tvist, options: TvistOptions): EffectM
       });
     });
     if (effect === 'cube') {
-      tvist.container.style.transformStyle = '';
-      tvist.container.style.width = '';
-      tvist.container.style.height = '';
-      tvist.container.style.transformOrigin = '';
-      tvist.track.style.removeProperty('perspective');
-      tvist.track.style.removeProperty('-webkit-perspective');
-      tvist.track.style.removeProperty('perspective-origin');
-      tvist.track.style.removeProperty('overflow');
-      tvist.track.style.removeProperty('padding');
-      tvist.track.style.removeProperty('box-sizing');
-      tvist.root.classList.remove(TVIST_CLASSES.cube);
+      tvist.__tvistInternal_container.style.transformStyle = '';
+      tvist.__tvistInternal_container.style.width = '';
+      tvist.__tvistInternal_container.style.height = '';
+      tvist.__tvistInternal_container.style.transformOrigin = '';
+      tvist.__tvistInternal_track.style.removeProperty('perspective');
+      tvist.__tvistInternal_track.style.removeProperty('-webkit-perspective');
+      tvist.__tvistInternal_track.style.removeProperty('perspective-origin');
+      tvist.__tvistInternal_track.style.removeProperty('overflow');
+      tvist.__tvistInternal_track.style.removeProperty('padding');
+      tvist.__tvistInternal_track.style.removeProperty('box-sizing');
+      tvist.__tvistInternal_root.classList.remove(TVIST_CLASSES.cube);
     }
   }
   const component: EffectModule = {
@@ -136,7 +136,7 @@ export function createEffectModule(tvist: Tvist, options: TvistOptions): EffectM
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
     onOptionsUpdate: local_onOptionsUpdate,

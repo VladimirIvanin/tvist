@@ -156,9 +156,9 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     local_setupHoldToPause();
     local_updateCachedRefs();
     local_updateBounds();
-    base.on('resized', () => local_updateBounds());
-    base.on('positionShifted', local_onPositionShifted);
-    base.on('loopFix', local_onLoopFix);
+    base.__tvistInternal_on('resized', () => local_updateBounds());
+    base.__tvistInternal_on('positionShifted', local_onPositionShifted);
+    base.__tvistInternal_on('loopFix', local_onLoopFix);
   }
 
   function read_isLoopEnabled(): boolean {
@@ -176,7 +176,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
    * При 2 слайдах и perPage 1 здесь false — перестановка нужна уже во время драга.
    */
   function local_shouldSkipLoopDomReorderDuringDrag(): boolean {
-    const slidesCount = tvist.slides.length;
+    const slidesCount = tvist.__tvistInternal_slides.length;
     const perPage = options.perPage ?? 1;
     return slidesCount <= perPage;
   }
@@ -198,8 +198,8 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     local_detachHoldEvents();
     local_detachEvents();
     local_stopMomentum();
-    base.off('positionShifted', local_onPositionShifted);
-    base.off('loopFix', local_onLoopFix);
+    base.__tvistInternal_off('positionShifted', local_onPositionShifted);
+    base.__tvistInternal_off('loopFix', local_onLoopFix);
   }
 
   const local_onPositionShifted: (delta: number) => void = (delta: number): void => {
@@ -216,7 +216,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
    * При center (без loop) используем getScrollPositionForIndex для учёта centerOffset.
    */
   function local_updateBounds(): void {
-    const { __tvistInternal_engine: engine, slides } = tvist;
+    const { __tvistInternal_engine: engine, __tvistInternal_slides: slides } = tvist;
     const perPage = options.perPage ?? 1;
     if (read_isLoopEnabled() || local_isMarqueeActive) {
       local_minPosition = Infinity;
@@ -252,15 +252,15 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     for (const { event, handler, options } of handlers) {
       const listener = handler as EventListener;
       if (action === 'add') {
-        base.resources.listen(target, event, listener, options);
+        base.__tvistInternal_resources.__tvistInternal_listen(target, event, listener, options);
       } else {
-        base.resources.unlisten(target, event, listener);
+        base.__tvistInternal_resources.__tvistInternal_unlisten(target, event, listener);
       }
     }
   }
 
   function local_manageRootEvents(action: 'add' | 'remove'): void {
-    const { root } = tvist;
+    const { __tvistInternal_root: root } = tvist;
     if ('PointerEvent' in window) {
       local_manageEvents(action, root, [{ event: 'pointerdown', handler: local_onPointerDown }]);
     } else {
@@ -320,8 +320,8 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
   }
 
   function local_resolveHoldRoot(config: HoldToPauseConfig): HTMLElement {
-    if (config.root === 'container') return tvist.container;
-    if (config.root === 'slider') return tvist.root;
+    if (config.root === 'container') return tvist.__tvistInternal_container;
+    if (config.root === 'slider') return tvist.__tvistInternal_root;
     return config.root;
   }
 
@@ -394,7 +394,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     const target = e.target as HTMLElement | null;
     if (!target) return;
     const nearestBlock = target.closest?.(`.${TVIST_CLASSES.block}`);
-    if (nearestBlock && nearestBlock !== tvist.root) return;
+    if (nearestBlock && nearestBlock !== tvist.__tvistInternal_root) return;
     if (target.closest(SLIDER_CONTROL_SELECTOR) || local_isFocusableElement(target)) return;
     if (local_holdConfig.exclude && target.closest(local_holdConfig.exclude)) return;
     const point = local_getPointerPosition(e);
@@ -420,12 +420,12 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
         // noop
       }
     }
-    local_holdTimer = base.resources.timeout(() => {
+    local_holdTimer = base.__tvistInternal_resources.__tvistInternal_timeout(() => {
       if (!local_holdPending || local_holdActive) return;
       local_holdPending = false;
       local_holdActive = true;
-      const pressIndex = tvist.realIndex ?? tvist.activeIndex;
-      base.emit('longPressStart', {
+      const pressIndex = tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex;
+      base.__tvistInternal_emit('longPressStart', {
         index: pressIndex,
         pointerType: local_holdPointerType,
       });
@@ -489,7 +489,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
 
   function local_cancelHoldTracking(): void {
     if (local_holdTimer !== null) {
-      base.resources.cancelTimeout(local_holdTimer);
+      base.__tvistInternal_resources.__tvistInternal_cancelTimeout(local_holdTimer);
       local_holdTimer = null;
     }
     local_holdPending = false;
@@ -515,8 +515,8 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
         }
       | undefined;
     video?.resumeActiveAfterHold?.();
-    const endIndex = tvist.realIndex ?? tvist.activeIndex;
-    base.emit('longPressEnd', {
+    const endIndex = tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex;
+    base.__tvistInternal_emit('longPressEnd', {
       index: endIndex,
       pointerType: local_holdPointerType,
     });
@@ -528,9 +528,11 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
   }
 
   function local_resolveHoldSlideEl(index: number): HTMLElement | null {
-    const byAttr = tvist.root.querySelector<HTMLElement>(`[data-tvist-slide-index="${index}"]`);
+    const byAttr = tvist.__tvistInternal_root.querySelector<HTMLElement>(
+      `[data-tvist-slide-index="${index}"]`
+    );
     if (byAttr) return byAttr;
-    return tvist.slides[index] ?? null;
+    return tvist.__tvistInternal_slides[index] ?? null;
   }
 
   function local_dispatchLongPressSlideDomEvent(
@@ -573,7 +575,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     if ('button' in e && e.button !== 0) return;
     const target = e.target as HTMLElement;
     const nearestBlock = target?.closest?.(`.${TVIST_CLASSES.block}`);
-    if (nearestBlock && nearestBlock !== tvist.root) return;
+    if (nearestBlock && nearestBlock !== tvist.__tvistInternal_root) return;
     // Нажатие на стрелку или её SVG не должно останавливать переход как начало drag.
     if (target.closest(SLIDER_CONTROL_SELECTOR) || local_isFocusableElement(target)) return;
     const point = local_getPointerPosition(e);
@@ -654,7 +656,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
       local_baseEvent = { x: point.x, y: point.y, time: now };
       local_lastMoveTime = now;
     }
-    base.emit('drag', e);
+    base.__tvistInternal_emit('drag', e);
     if (local_getPointerType(e) === 'touch') {
       e.preventDefault();
     }
@@ -699,8 +701,8 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     local_accumulatedDeltaBeforeDragStart = { x: deltaX, y: deltaY };
     local_shouldSubtractAccumulatedDelta = true;
 
-    base.emit('dragStart', e);
-    tvist.root.classList.add(TVIST_CLASSES.dragging);
+    base.__tvistInternal_emit('dragStart', e);
+    tvist.__tvistInternal_root.classList.add(TVIST_CLASSES.dragging);
     return true;
   }
   /**
@@ -790,8 +792,8 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     local_isPotentialDrag = false;
     if (local_isDragging) {
       local_isDragging = false;
-      tvist.root.classList.remove(TVIST_CLASSES.dragging);
-      base.resources.timeout(() => {
+      tvist.__tvistInternal_root.classList.remove(TVIST_CLASSES.dragging);
+      base.__tvistInternal_resources.__tvistInternal_timeout(() => {
         tvist.__tvistInternal_allowClick = true;
       }, 0);
       if (!read_isLoopEnabled()) {
@@ -807,7 +809,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
       }
       const velocity = local_calculateVelocity();
 
-      base.emit('dragEnd', e);
+      base.__tvistInternal_emit('dragEnd', e);
       if (!local_isMarqueeActive) {
         if (options.drag === 'free') {
           local_startMomentum(velocity);
@@ -816,7 +818,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
         }
       }
     } else if (!wasDragging && local_wasAnimating && local_animationTarget !== null) {
-      tvist.scrollTo(local_animationTarget, false);
+      tvist.__tvistInternal_scrollTo(local_animationTarget, false);
     }
     if (!wasDragging) {
       const mq = tvist.__tvistInternal_getModule('marquee') as {
@@ -869,7 +871,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     // Видимая область включает peek
     const vpStart = -currentPosition - peek.start;
     const vpEnd = -currentPosition + viewportSize + peek.end;
-    const slides = tvist.slides;
+    const slides = tvist.__tvistInternal_slides;
     if (slides.length === 0) return;
     const contentStart = tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(0);
     const lastIdx = slides.length - 1;
@@ -1027,9 +1029,9 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
       }
       tvist.__tvistInternal_engine.__tvistInternal_location.set(newPosition);
       tvist.__tvistInternal_engine.__tvistInternal_applyTransform();
-      base.emit('scroll');
+      base.__tvistInternal_emit('scroll');
       if (Math.abs(velocity) > local_MIN_VELOCITY && !hitBoundary) {
-        local_animationId = base.resources.frame(animate);
+        local_animationId = base.__tvistInternal_resources.__tvistInternal_frame(animate);
       } else {
         local_stopMomentum();
         if (options.drag !== 'free' || options.freeSnap) {
@@ -1050,7 +1052,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
   }
 
   function local_snapToNearestSlide(endVelocity: number): void {
-    const { __tvistInternal_engine: engine, slides } = tvist;
+    const { __tvistInternal_engine: engine, __tvistInternal_slides: slides } = tvist;
     const currentPosition = engine.__tvistInternal_location.get();
     const currentIndex = engine.__tvistInternal_index.get();
     let nearestIndex = 0;
@@ -1132,7 +1134,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
       tvist.__tvistInternal__scrollDirection = velocity > 0 ? 'prev' : 'next';
       return;
     }
-    const len = tvist.slides.length;
+    const len = tvist.__tvistInternal_slides.length;
     if (len <= 1) return;
     const forward = (nearestIndex - currentIndex + len) % len;
     const backward = (currentIndex - nearestIndex + len) % len;
@@ -1142,7 +1144,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
 
   function local_stopMomentum(): void {
     if (local_animationId !== null) {
-      base.resources.cancelFrame(local_animationId);
+      base.__tvistInternal_resources.__tvistInternal_cancelFrame(local_animationId);
       local_animationId = null;
     }
   }
@@ -1168,7 +1170,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
     shouldBeActive: local_shouldBeActive,

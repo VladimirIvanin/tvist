@@ -128,7 +128,7 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
       } else {
         local_scrollbarEl.classList.add(TVIST_CLASSES.scrollbarHorizontal);
       }
-      tvist.root.appendChild(local_scrollbarEl);
+      tvist.__tvistInternal_root.appendChild(local_scrollbarEl);
     }
     // Создаём трек и ползунок
     local_trackEl = document.createElement('div');
@@ -148,21 +148,38 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
   function local_attachEventListeners(): void {
     if (!local_scrollbarEl || !local_thumbEl || !local_trackEl) return;
     // Клик по треку (переход к позиции)
-    base.resources.listen(local_trackEl, 'click', local_handleTrackClick);
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      local_trackEl,
+      'click',
+      local_handleTrackClick
+    );
     // Перетаскивание ползунка
     if (local_draggable) {
       if ('PointerEvent' in window) {
-        base.resources.listen(local_thumbEl, 'pointerdown', local_handleThumbPointerDown);
+        base.__tvistInternal_resources.__tvistInternal_listen(
+          local_thumbEl,
+          'pointerdown',
+          local_handleThumbPointerDown
+        );
       } else {
-        base.resources.listen(local_thumbEl, 'mousedown', local_handleThumbMouseDown);
-        base.resources.listen(local_thumbEl, 'touchstart', local_handleThumbTouchStart, {
-          passive: false,
-        });
+        base.__tvistInternal_resources.__tvistInternal_listen(
+          local_thumbEl,
+          'mousedown',
+          local_handleThumbMouseDown
+        );
+        base.__tvistInternal_resources.__tvistInternal_listen(
+          local_thumbEl,
+          'touchstart',
+          local_handleThumbTouchStart,
+          {
+            passive: false,
+          }
+        );
       }
     }
     // События слайдера
-    base.on('scroll', local_handleScroll);
-    base.on('slideChangeEnd', local_handleSlideChanged);
+    base.__tvistInternal_on('scroll', local_handleScroll);
+    base.__tvistInternal_on('slideChangeEnd', local_handleSlideChanged);
     // Автоскрытие (показать при наведении, скрыть по таймеру)
     local_updateAutoHideListeners();
   }
@@ -186,7 +203,7 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
     // Вычисляем процент клика
     const percent = clickPosition / trackSize;
     // Вычисляем целевой индекс
-    const slideCount = tvist.slides.length;
+    const slideCount = tvist.__tvistInternal_slides.length;
     const targetIndex = Math.round(percent * (slideCount - 1));
     // Переходим к слайду
     tvist.__tvistInternal_engine.__tvistInternal_scrollTo(targetIndex);
@@ -202,8 +219,16 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
     event.stopPropagation();
     event.preventDefault();
     local_startDrag(event.clientX, event.clientY);
-    base.resources.listen(document, 'pointermove', local_handleThumbPointerMove);
-    base.resources.listen(document, 'pointerup', local_handleThumbPointerUp);
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      document,
+      'pointermove',
+      local_handleThumbPointerMove
+    );
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      document,
+      'pointerup',
+      local_handleThumbPointerUp
+    );
   };
   /**
    * Обработчик движения (Pointer API)
@@ -220,8 +245,16 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
    */
   const local_handleThumbPointerUp: () => void = (): void => {
     local_endDrag();
-    base.resources.unlisten(document, 'pointermove', local_handleThumbPointerMove);
-    base.resources.unlisten(document, 'pointerup', local_handleThumbPointerUp);
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'pointermove',
+      local_handleThumbPointerMove
+    );
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'pointerup',
+      local_handleThumbPointerUp
+    );
   };
   /**
    * Обработчик начала перетаскивания (мышь)
@@ -231,8 +264,16 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
     event.stopPropagation();
     event.preventDefault();
     local_startDrag(event.clientX, event.clientY);
-    base.resources.listen(document, 'mousemove', local_handleThumbMouseMove);
-    base.resources.listen(document, 'mouseup', local_handleThumbMouseUp);
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      document,
+      'mousemove',
+      local_handleThumbMouseMove
+    );
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      document,
+      'mouseup',
+      local_handleThumbMouseUp
+    );
   };
   /**
    * Обработчик начала перетаскивания (тач)
@@ -244,8 +285,17 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
     // Останавливаем всплытие чтобы DragModule не перехватил событие
     event.stopPropagation();
     local_startDrag(touch.clientX, touch.clientY);
-    base.resources.listen(document, 'touchmove', local_handleThumbTouchMove, { passive: false });
-    base.resources.listen(document, 'touchend', local_handleThumbTouchEnd);
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      document,
+      'touchmove',
+      local_handleThumbTouchMove,
+      { passive: false }
+    );
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      document,
+      'touchend',
+      local_handleThumbTouchEnd
+    );
   };
   /**
    * Начать перетаскивание
@@ -295,7 +345,7 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
     // Вычисляем процент перемещения
     const percent = delta / trackSize;
     // Вычисляем общий диапазон прокрутки
-    const slideCount = tvist.slides.length;
+    const slideCount = tvist.__tvistInternal_slides.length;
     // Получаем позицию первого и последнего слайда
     const firstSlideScroll =
       tvist.__tvistInternal_engine.__tvistInternal_getScrollPositionForIndex(0);
@@ -330,23 +380,39 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
     // Обновляем индекс без анимации
     tvist.__tvistInternal_engine.__tvistInternal_index.set(closestIndex);
     // Генерируем события прокрутки
-    tvist.emit('scroll');
+    tvist.__tvistInternal_emit('scroll');
   }
   /**
    * Завершить перетаскивание (мышь)
    */
   const local_handleThumbMouseUp: () => void = (): void => {
     local_endDrag();
-    base.resources.unlisten(document, 'mousemove', local_handleThumbMouseMove);
-    base.resources.unlisten(document, 'mouseup', local_handleThumbMouseUp);
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'mousemove',
+      local_handleThumbMouseMove
+    );
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'mouseup',
+      local_handleThumbMouseUp
+    );
   };
   /**
    * Завершить перетаскивание (тач)
    */
   const local_handleThumbTouchEnd: () => void = (): void => {
     local_endDrag();
-    base.resources.unlisten(document, 'touchmove', local_handleThumbTouchMove);
-    base.resources.unlisten(document, 'touchend', local_handleThumbTouchEnd);
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'touchmove',
+      local_handleThumbTouchMove
+    );
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'touchend',
+      local_handleThumbTouchEnd
+    );
   };
   /**
    * Завершить перетаскивание
@@ -356,7 +422,7 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
     local_scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarDragging);
     // После завершения drag делаем snap к ближайшему слайду
     const currentPos = tvist.__tvistInternal_engine.__tvistInternal_location.get();
-    const slideCount = tvist.slides.length;
+    const slideCount = tvist.__tvistInternal_slides.length;
     let closestIndex = 0;
     let minDistance = Infinity;
     for (let i = 0; i < slideCount; i++) {
@@ -390,7 +456,7 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
   function local_updateScrollbar(): void {
     if (!local_thumbEl || !local_trackEl) return;
     const isVertical = options.direction === 'vertical';
-    const slideCount = tvist.slides.length;
+    const slideCount = tvist.__tvistInternal_slides.length;
     if (slideCount <= 1) return;
     // Размер ползунка — меняется только при resize / смене perPage
     const perPage = options.perPage ?? 1;
@@ -445,7 +511,7 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
     local_scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarHidden);
     // Сбрасываем таймер скрытия
     if (local_hideTimer) {
-      base.resources.cancelTimeout(local_hideTimer);
+      base.__tvistInternal_resources.__tvistInternal_cancelTimeout(local_hideTimer);
       local_hideTimer = undefined;
     }
   };
@@ -454,7 +520,7 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
    */
   const local_startHideTimer: () => void = (): void => {
     if (!local_hide || local_isDragging) return;
-    local_hideTimer = base.resources.timeout(() => {
+    local_hideTimer = base.__tvistInternal_resources.__tvistInternal_timeout(() => {
       local_scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarHidden);
     }, local_hideDelay);
   };
@@ -470,15 +536,31 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
    */
   function local_updateAutoHideListeners(): void {
     // Сначала всегда снимаем, чтобы не дублировать при повторном включении
-    base.resources.unlisten(tvist.root, 'mouseenter', local_showScrollbar);
-    base.resources.unlisten(tvist.root, 'mouseleave', local_startHideTimer);
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      tvist.__tvistInternal_root,
+      'mouseenter',
+      local_showScrollbar
+    );
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      tvist.__tvistInternal_root,
+      'mouseleave',
+      local_startHideTimer
+    );
     if (local_hideTimer) {
-      base.resources.cancelTimeout(local_hideTimer);
+      base.__tvistInternal_resources.__tvistInternal_cancelTimeout(local_hideTimer);
       local_hideTimer = undefined;
     }
     if (local_hide) {
-      base.resources.listen(tvist.root, 'mouseenter', local_showScrollbar);
-      base.resources.listen(tvist.root, 'mouseleave', local_startHideTimer);
+      base.__tvistInternal_resources.__tvistInternal_listen(
+        tvist.__tvistInternal_root,
+        'mouseenter',
+        local_showScrollbar
+      );
+      base.__tvistInternal_resources.__tvistInternal_listen(
+        tvist.__tvistInternal_root,
+        'mouseleave',
+        local_startHideTimer
+      );
     } else {
       local_scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarHidden);
     }
@@ -507,25 +589,73 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
   function local_destroy(): void {
     // Очищаем таймеры
     if (local_hideTimer) {
-      base.resources.cancelTimeout(local_hideTimer);
+      base.__tvistInternal_resources.__tvistInternal_cancelTimeout(local_hideTimer);
     }
     // Удаляем обработчики событий
     if (local_trackEl) {
-      base.resources.unlisten(local_trackEl, 'click', local_handleTrackClick);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        local_trackEl,
+        'click',
+        local_handleTrackClick
+      );
     }
     if (local_thumbEl) {
-      base.resources.unlisten(local_thumbEl, 'pointerdown', local_handleThumbPointerDown);
-      base.resources.unlisten(local_thumbEl, 'mousedown', local_handleThumbMouseDown);
-      base.resources.unlisten(local_thumbEl, 'touchstart', local_handleThumbTouchStart);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        local_thumbEl,
+        'pointerdown',
+        local_handleThumbPointerDown
+      );
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        local_thumbEl,
+        'mousedown',
+        local_handleThumbMouseDown
+      );
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        local_thumbEl,
+        'touchstart',
+        local_handleThumbTouchStart
+      );
     }
-    base.resources.unlisten(document, 'pointermove', local_handleThumbPointerMove);
-    base.resources.unlisten(document, 'pointerup', local_handleThumbPointerUp);
-    base.resources.unlisten(document, 'mousemove', local_handleThumbMouseMove);
-    base.resources.unlisten(document, 'mouseup', local_handleThumbMouseUp);
-    base.resources.unlisten(document, 'touchmove', local_handleThumbTouchMove);
-    base.resources.unlisten(document, 'touchend', local_handleThumbTouchEnd);
-    base.resources.unlisten(tvist.root, 'mouseenter', local_showScrollbar);
-    base.resources.unlisten(tvist.root, 'mouseleave', local_startHideTimer);
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'pointermove',
+      local_handleThumbPointerMove
+    );
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'pointerup',
+      local_handleThumbPointerUp
+    );
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'mousemove',
+      local_handleThumbMouseMove
+    );
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'mouseup',
+      local_handleThumbMouseUp
+    );
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'touchmove',
+      local_handleThumbTouchMove
+    );
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'touchend',
+      local_handleThumbTouchEnd
+    );
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      tvist.__tvistInternal_root,
+      'mouseenter',
+      local_showScrollbar
+    );
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      tvist.__tvistInternal_root,
+      'mouseleave',
+      local_startHideTimer
+    );
     // Удаляем DOM элементы (если не кастомный контейнер)
     if (!local_isCustomContainer && local_scrollbarEl) {
       local_scrollbarEl.remove();
@@ -543,7 +673,7 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
   };

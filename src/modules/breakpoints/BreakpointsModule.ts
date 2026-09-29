@@ -71,7 +71,11 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
     // Отключаем все media queries
     local_mediaQueries.forEach((mq) => {
       try {
-        base.resources.unlisten(mq, 'change', local_handleMediaChange);
+        base.__tvistInternal_resources.__tvistInternal_unlisten(
+          mq,
+          'change',
+          local_handleMediaChange
+        );
       } catch {
         // Fallback for older browsers
         mq.removeListener(local_handleMediaChange);
@@ -101,7 +105,7 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
     breakpoints.forEach((bp) => {
       const mq = window.matchMedia(`(max-width: ${bp}px)`);
       // Слушаем изменения
-      base.resources.listen(mq, 'change', local_handleMediaChange);
+      base.__tvistInternal_resources.__tvistInternal_listen(mq, 'change', local_handleMediaChange);
       local_mediaQueries.set(bp, mq);
     });
   }
@@ -114,8 +118,8 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
     // Сначала синхронно применяем breakpoint (может disable/enable слайдер)
     local_checkBreakpoints();
     // Если слайдер включен, пересчитываем размеры
-    if (tvist.isEnabled) {
-      tvist.update();
+    if (tvist.__tvistInternal_isEnabled) {
+      tvist.__tvistInternal_update();
     }
   };
   // Проверка текущего breakpoint
@@ -131,7 +135,7 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
       breakpointsBase: originalOptions.breakpointsBase,
     };
     // Форсируем обновление кеша при явной проверке breakpoints
-    const newBreakpoint = findMatchingBreakpoint(tvist.root, optionsForCheck, true);
+    const newBreakpoint = findMatchingBreakpoint(tvist.__tvistInternal_root, optionsForCheck, true);
     // Проверяем, был ли вручную изменён enabled
     const manualEnabledChange = tvist.__tvistInternal_checkAndResetManualEnabledChange();
     // Запоминаем старый breakpoint для события
@@ -143,7 +147,7 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
       local_applyBreakpoint(newBreakpoint);
       // Эмитим событие только если breakpoint реально изменился
       if (breakpointChanged) {
-        base.emit('breakpoint', newBreakpoint);
+        base.__tvistInternal_emit('breakpoint', newBreakpoint);
         // Вызываем callback из опций
         if (originalOptions.on?.breakpoint) {
           originalOptions.on.breakpoint(newBreakpoint);
@@ -165,14 +169,14 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
     // Проверяем enabled флаг
     const shouldBeEnabled = newOptions.enabled !== false;
     // Применяем новые опции к слайдеру (заменяем полностью, кроме breakpoints)
-    const breakpoints = tvist.options.breakpoints;
-    Object.keys(tvist.options).forEach((key) => {
+    const breakpoints = tvist.__tvistInternal_options.breakpoints;
+    Object.keys(tvist.__tvistInternal_options).forEach((key) => {
       if (key !== 'breakpoints' && key !== 'on') {
-        delete (tvist.options as Record<string, unknown>)[key];
+        delete (tvist.__tvistInternal_options as Record<string, unknown>)[key];
       }
     });
-    Object.assign(tvist.options, newOptions);
-    tvist.options.breakpoints = breakpoints;
+    Object.assign(tvist.__tvistInternal_options, newOptions);
+    tvist.__tvistInternal_options.breakpoints = breakpoints;
     // Синхронизируем модули с новыми опциями (инициализируем новые, уничтожаем деактивированные)
     // Вызываем до enable/disable, чтобы модули были готовы при включении слайдера
     if (shouldBeEnabled) {
@@ -181,13 +185,13 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
     // Включаем или отключаем слайдер в зависимости от enabled
     // ВАЖНО: enable/disable вызывают update(), что может привести к повторному onResize
     // Но это не проблема, т.к. currentBreakpoint уже обновлён и повторного apply не будет
-    if (shouldBeEnabled && !tvist.isEnabled) {
-      tvist.enable();
-    } else if (!shouldBeEnabled && tvist.isEnabled) {
-      tvist.disable();
-    } else if (shouldBeEnabled && tvist.isEnabled) {
+    if (shouldBeEnabled && !tvist.__tvistInternal_isEnabled) {
+      tvist.__tvistInternal_enable();
+    } else if (!shouldBeEnabled && tvist.__tvistInternal_isEnabled) {
+      tvist.__tvistInternal_disable();
+    } else if (shouldBeEnabled && tvist.__tvistInternal_isEnabled) {
       // Только если слайдер остается включенным, обновляем его
-      tvist.update();
+      tvist.__tvistInternal_update();
     }
     // При деактивации только уничтожаем ставшие неактивными модули —
     // создавать новые нельзя, слайдер отключён
@@ -219,7 +223,7 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
     shouldBeActive: local_shouldBeActive,
@@ -227,6 +231,6 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
     onResize: local_onResize,
   };
   // Сохраняем текущий breakpoint чтобы не применять его повторно при init
-  local_currentBreakpoint = findMatchingBreakpoint(tvist.root, options);
+  local_currentBreakpoint = findMatchingBreakpoint(tvist.__tvistInternal_root, options);
   return component;
 }

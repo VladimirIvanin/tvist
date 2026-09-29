@@ -35,29 +35,31 @@ export function createThumbsModule(tvist: Tvist, options: TvistOptions): ThumbsM
 
   function local_initNavigation(): void {
     // Добавляем класс модификатор на корневой элемент
-    tvist.root.classList.add(TVIST_CLASSES.nav);
-    const slides = tvist.slides;
+    tvist.__tvistInternal_root.classList.add(TVIST_CLASSES.nav);
+    const slides = tvist.__tvistInternal_slides;
     const listeners: (() => void)[] = [];
     const activeClass = TVIST_CLASSES.slideNavActive;
     // 1. Обработка кликов
     slides.forEach((slide, index) => {
       const handler = () => {
-        if (tvist.options.isNavigation) {
+        if (tvist.__tvistInternal_options.isNavigation) {
           // Вызываем событие
-          tvist.emit('navigation:click', index);
-          if (index === tvist.activeIndex) {
+          tvist.__tvistInternal_emit('navigation:click', index);
+          if (index === tvist.__tvistInternal_activeIndex) {
             // Если индекс совпадает с текущим, но классы не обновлены (например, после drag с syncOnDrag: false),
             // принудительно обновляем классы и эмитим slideChangeStart для синхронизации с главным слайдером.
             updateClasses(index);
-            tvist.emit('slideChangeStart', index);
+            tvist.__tvistInternal_emit('slideChangeStart', index);
           } else {
             // Переходим к слайду
-            tvist.scrollTo(index);
+            tvist.__tvistInternal_scrollTo(index);
           }
         }
       };
-      base.resources.listen(slide, 'click', handler);
-      listeners.push(() => base.resources.unlisten(slide, 'click', handler));
+      base.__tvistInternal_resources.__tvistInternal_listen(slide, 'click', handler);
+      listeners.push(() =>
+        base.__tvistInternal_resources.__tvistInternal_unlisten(slide, 'click', handler)
+      );
     });
     local_removeClickListeners = () => {
       listeners.forEach((remove) => remove());
@@ -79,21 +81,21 @@ export function createThumbsModule(tvist: Tvist, options: TvistOptions): ThumbsM
       });
     };
     // Подписываемся на изменение слайда
-    base.on('slideChangeStart', updateClasses);
-    base.on('slideChangeEnd', updateClasses); // На всякий случай дублируем для надежности
+    base.__tvistInternal_on('slideChangeStart', updateClasses);
+    base.__tvistInternal_on('slideChangeEnd', updateClasses); // На всякий случай дублируем для надежности
     // Начальное состояние
-    base.on('created', () => {
-      updateClasses(tvist.activeIndex);
+    base.__tvistInternal_on('created', () => {
+      updateClasses(tvist.__tvistInternal_activeIndex);
     });
     // Если слайдер уже создан (например, модуль инициализирован позже)
-    updateClasses(tvist.activeIndex);
+    updateClasses(tvist.__tvistInternal_activeIndex);
   }
 
   function local_destroy(): void {
     local_removeClickListeners?.();
   }
   const component: ThumbsModule = {
-    shouldBeActive: base.shouldBeActive,
+    shouldBeActive: base.__tvistInternal_shouldBeActive,
     get name() {
       return local_name;
     },
@@ -102,7 +104,7 @@ export function createThumbsModule(tvist: Tvist, options: TvistOptions): ThumbsM
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
   };

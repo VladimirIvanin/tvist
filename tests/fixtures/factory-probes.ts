@@ -43,6 +43,18 @@ export function factoryProbes(): Plugin {
           }
         }
         if (!component) continue;
+        const declaration = component.declarationList.declarations.find(
+          (item) => item.name.getText(source) === 'component'
+        );
+        const runtimeKeys = new Set(
+          id.endsWith('/core/runtime.ts') &&
+          declaration?.initializer &&
+          ts.isObjectLiteralExpression(declaration.initializer)
+            ? declaration.initializer.properties
+                .filter((property) => property.name && ts.isIdentifier(property.name))
+                .map((property) => property.name!.getText(source))
+            : []
+        );
         const descriptors = Array.from(
           fields,
           ([key, name]) =>
@@ -73,7 +85,7 @@ export function factoryProbes(): Plugin {
             edits.push({
               start: node.expression.getStart(source),
               end: node.expression.end,
-              text: `component.${node.expression.text.slice(6)}`,
+              text: `component.${runtimeKeys.has('__tvistInternal_' + node.expression.text.slice(6)) ? '__tvistInternal_' : ''}${node.expression.text.slice(6)}`,
             });
           }
           ts.forEachChild(node, visit);

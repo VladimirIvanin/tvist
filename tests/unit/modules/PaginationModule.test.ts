@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '@core/Tvist'
+import { createSliderFixture } from '../../fixtures'
 // Импортируем модуль через index для автоматической регистрации
 import '../../../src/modules/pagination'
 import '../../../src/modules/loop'
@@ -19,6 +20,24 @@ describe('PaginationModule', () => {
 
   afterEach(() => {
     document.body.innerHTML = ''
+  })
+
+  it('preserves fraction callback totals with fractional perPage and grouped navigation', () => {
+    const fixture = createSliderFixture({ slidesCount: 4, width: 300, slideWidth: 100 })
+    const renderFraction = vi.fn((current: number, total: number) => `${current}/${total}`)
+    const slider = new Tvist(fixture.root, {
+      perPage: 1.5,
+      slidesPerGroup: 2,
+      speed: 0,
+      pagination: { type: 'fraction', renderFraction },
+    })
+    expect(renderFraction).toHaveBeenLastCalledWith(1, 3.5)
+    slider.scrollTo(1, true)
+    expect(renderFraction).toHaveBeenLastCalledWith(2, 3.5)
+    slider.updateOptions({ perPage: 2 })
+    slider.scrollTo(0, true)
+    expect(renderFraction).toHaveBeenLastCalledWith(1, 3)
+    slider.destroy()
   })
 
   describe('Bullets pagination', () => {

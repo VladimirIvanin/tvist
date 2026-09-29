@@ -83,7 +83,7 @@ export function createMotion(deps: MotionContext): Motion {
       endIndex
     );
     if (ctx.indexChanged) {
-      deps.__tvistInternal_tvist.emit('beforeSlideChange', ctx.eventIndex);
+      deps.__tvistInternal_tvist.__tvistInternal_emit('beforeSlideChange', ctx.eventIndex);
     }
     if (instant) {
       local_performInstantScroll(targetPosition, ctx, endIndex);
@@ -142,7 +142,10 @@ export function createMotion(deps: MotionContext): Motion {
     const direction = savedDirection ?? (ctx.normalizedIndex > previousIndex ? 'next' : 'prev');
     deps.__tvistInternal_tvist.__tvistInternal__scrollDirection = undefined;
     const counterBeforeEmit = deps.__tvistInternal_index.get();
-    deps.__tvistInternal_tvist.emit('beforeTransitionStart', { index: ctx.eventIndex, direction });
+    deps.__tvistInternal_tvist.__tvistInternal_emit('beforeTransitionStart', {
+      index: ctx.eventIndex,
+      direction,
+    });
     const counterAfterEmit = deps.__tvistInternal_index.get();
     // LoopModule переставил слайды: DOM-позиция целевого слайда могла измениться.
     // Ищем новую DOM-позицию по eventIndex (= realIndex).
@@ -150,12 +153,15 @@ export function createMotion(deps: MotionContext): Motion {
       const withClones = deps.__tvistInternal_isLoopWithClonesEnabled();
       const targetDomIndex = withClones
         ? findDomIndexByRealIndexForTransition(
-            deps.__tvistInternal_tvist.slides,
+            deps.__tvistInternal_tvist.__tvistInternal_slides,
             ctx.eventIndex,
             counterAfterEmit,
             direction
           )
-        : findDomIndexByRealIndex(deps.__tvistInternal_tvist.slides, ctx.eventIndex);
+        : findDomIndexByRealIndex(
+            deps.__tvistInternal_tvist.__tvistInternal_slides,
+            ctx.eventIndex
+          );
       if (targetDomIndex !== -1) {
         ctx.clampedIndex = targetDomIndex;
         ctx.normalizedIndex = targetDomIndex;
@@ -198,7 +204,7 @@ export function createMotion(deps: MotionContext): Motion {
     deps.__tvistInternal_location.set(targetPosition);
     local_applyTransform();
     if (ctx.indexChanged) {
-      deps.__tvistInternal_tvist.emit('slideChangeEnd', ctx.eventIndex);
+      deps.__tvistInternal_tvist.__tvistInternal_emit('slideChangeEnd', ctx.eventIndex);
       local_emitReachEdge(ctx, endIndex);
     }
   }
@@ -213,8 +219,8 @@ export function createMotion(deps: MotionContext): Motion {
     deps.__tvistInternal_target.set(targetPosition);
     const defaultSpeed = deps.__tvistInternal_options.speed ?? 300;
     if (ctx.indexChanged) {
-      deps.__tvistInternal_tvist.emit('transitionStart', ctx.eventIndex);
-      deps.__tvistInternal_tvist.emit('slideChangeStart', ctx.eventIndex, {
+      deps.__tvistInternal_tvist.__tvistInternal_emit('transitionStart', ctx.eventIndex);
+      deps.__tvistInternal_tvist.__tvistInternal_emit('slideChangeStart', ctx.eventIndex, {
         isDrag: afterDragSnap,
       });
     }
@@ -240,9 +246,9 @@ export function createMotion(deps: MotionContext): Motion {
     }
     const complete = () => {
       if (token !== local_transitionToken) return;
-      deps.__tvistInternal_tvist.emit('transitionEnd', ctx.eventIndex);
+      deps.__tvistInternal_tvist.__tvistInternal_emit('transitionEnd', ctx.eventIndex);
       if (ctx.indexChanged) {
-        deps.__tvistInternal_tvist.emit('slideChangeEnd', ctx.eventIndex, {
+        deps.__tvistInternal_tvist.__tvistInternal_emit('slideChangeEnd', ctx.eventIndex, {
           isDrag: afterDragSnap,
         });
         local_emitReachEdge(ctx, endIndex);
@@ -266,7 +272,7 @@ export function createMotion(deps: MotionContext): Motion {
           (value) => {
             deps.__tvistInternal_location.set(value);
             local_applyTransform();
-            deps.__tvistInternal_tvist.emit('scroll');
+            deps.__tvistInternal_tvist.__tvistInternal_emit('scroll');
           },
           complete,
           easingFn
@@ -276,7 +282,7 @@ export function createMotion(deps: MotionContext): Motion {
       if (needsAnimation) {
         deps.__tvistInternal_location.set(targetPosition);
         local_applyTransform();
-        deps.__tvistInternal_tvist.emit('scroll');
+        deps.__tvistInternal_tvist.__tvistInternal_emit('scroll');
         complete();
         return;
       }
@@ -295,7 +301,7 @@ export function createMotion(deps: MotionContext): Motion {
     token: number,
     complete: () => void
   ): void {
-    const container = deps.__tvistInternal_tvist.container;
+    const container = deps.__tvistInternal_tvist.__tvistInternal_container;
     // Loop-перестановка и остановка предыдущего перехода меняют transform
     // в том же кадре. Фиксируем начальную позицию в computed style, иначе
     // браузер объединит её с конечной и пропустит CSS-анимацию.
@@ -351,14 +357,20 @@ export function createMotion(deps: MotionContext): Motion {
 
   function local_emitPositionUpdates(): void {
     const position = deps.__tvistInternal_location.get();
-    deps.__tvistInternal_tvist.emit('setTranslate', deps.__tvistInternal_tvist, position);
+    deps.__tvistInternal_tvist.__tvistInternal_emit(
+      'setTranslate',
+      deps.__tvistInternal_tvist,
+      position
+    );
     local_emitProgress();
-    deps.__tvistInternal_tvist.emit('scroll');
+    deps.__tvistInternal_tvist.__tvistInternal_emit('scroll');
   }
 
   function local_readRenderedPosition(): number {
     try {
-      const transform = getComputedStyle(deps.__tvistInternal_tvist.container).transform;
+      const transform = getComputedStyle(
+        deps.__tvistInternal_tvist.__tvistInternal_container
+      ).transform;
       if (transform.startsWith('matrix')) {
         const matrix = new DOMMatrixReadOnly(transform);
         return deps.__tvistInternal_options.direction === 'vertical' ? matrix.m42 : matrix.m41;
@@ -381,12 +393,12 @@ export function createMotion(deps: MotionContext): Motion {
     local_transitionRaf = null;
     local_transitionTimer = null;
     if (local_onTransitionEnd)
-      deps.__tvistInternal_tvist.container.removeEventListener(
+      deps.__tvistInternal_tvist.__tvistInternal_container.removeEventListener(
         'transitionend',
         local_onTransitionEnd
       );
     local_onTransitionEnd = undefined;
-    deps.__tvistInternal_tvist.container.style.transition = '';
+    deps.__tvistInternal_tvist.__tvistInternal_container.style.transition = '';
     deps.__tvistInternal_location.set(position);
     if (freeze) local_writeTransform(position);
   }
@@ -398,7 +410,7 @@ export function createMotion(deps: MotionContext): Motion {
   }
 
   function local_setTransformPosition(pos: number): void {
-    deps.__tvistInternal_tvist.container.style.transform =
+    deps.__tvistInternal_tvist.__tvistInternal_container.style.transform =
       deps.__tvistInternal_options.direction === 'vertical'
         ? `translate3d(0, ${pos}px, 0)`
         : `translate3d(${pos}px, 0, 0)`;
@@ -414,7 +426,7 @@ export function createMotion(deps: MotionContext): Motion {
     if (range <= 0) return;
     const pos = deps.__tvistInternal_location.get();
     const progress = Math.max(0, Math.min(1, (pos - minScroll) / range));
-    deps.__tvistInternal_tvist.emit('progress', progress);
+    deps.__tvistInternal_tvist.__tvistInternal_emit('progress', progress);
   }
 
   /** События достижения начала/конца (reachBeginning / reachEnd) */
@@ -426,10 +438,10 @@ export function createMotion(deps: MotionContext): Motion {
     const triedAfterEnd =
       !loopEnabled && !deps.__tvistInternal_options.rewind && ctx.requestedIndex > endIndex;
     if (index <= 0 && triedBeforeStart) {
-      deps.__tvistInternal_tvist.emit('reachBeginning');
+      deps.__tvistInternal_tvist.__tvistInternal_emit('reachBeginning');
     }
     if (index >= endIndex && triedAfterEnd) {
-      deps.__tvistInternal_tvist.emit('reachEnd');
+      deps.__tvistInternal_tvist.__tvistInternal_emit('reachEnd');
     }
   }
 
@@ -448,7 +460,7 @@ export function createMotion(deps: MotionContext): Motion {
    * Это убирает лишние DOM-записи и обработчики на кадрах без визуального сдвига.
    */
   function local_applyTransform(): void {
-    const container = deps.__tvistInternal_tvist.container;
+    const container = deps.__tvistInternal_tvist.__tvistInternal_container;
     if (deps.__tvistInternal__isLocked) {
       if (deps.__tvistInternal_isCenterJustify()) {
         if (!deps.__tvistInternal_scrollCacheValid) deps.__tvistInternal_updateScrollCache();
@@ -458,14 +470,22 @@ export function createMotion(deps: MotionContext): Motion {
         );
         if (local__lastAppliedTransformPos !== offset) {
           local_setTransformPosition(offset);
-          deps.__tvistInternal_tvist.emit('setTranslate', deps.__tvistInternal_tvist, offset);
+          deps.__tvistInternal_tvist.__tvistInternal_emit(
+            'setTranslate',
+            deps.__tvistInternal_tvist,
+            offset
+          );
           local_emitProgress();
         }
       } else {
         if (local__lastAppliedTransformPos !== 0) {
           container.style.transform = '';
           local__lastAppliedTransformPos = 0;
-          deps.__tvistInternal_tvist.emit('setTranslate', deps.__tvistInternal_tvist, 0);
+          deps.__tvistInternal_tvist.__tvistInternal_emit(
+            'setTranslate',
+            deps.__tvistInternal_tvist,
+            0
+          );
           local_emitProgress();
         }
       }
@@ -475,7 +495,11 @@ export function createMotion(deps: MotionContext): Motion {
     const pos = deps.__tvistInternal_options.roundLengths === false ? rawPos : Math.round(rawPos);
     if (pos === local__lastAppliedTransformPos) return;
     local_setTransformPosition(pos);
-    deps.__tvistInternal_tvist.emit('setTranslate', deps.__tvistInternal_tvist, pos);
+    deps.__tvistInternal_tvist.__tvistInternal_emit(
+      'setTranslate',
+      deps.__tvistInternal_tvist,
+      pos
+    );
     local_emitProgress();
   }
   const component: Motion = {

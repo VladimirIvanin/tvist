@@ -30,37 +30,37 @@ export class Tvist {
   }
   /** Уникальный идентификатор экземпляра. */
   get id(): string {
-    return getRuntime(this).id;
+    return getRuntime(this).__tvistInternal_id;
   }
   /** Корневой элемент слайдера. */
   get root(): HTMLElement {
-    return getRuntime(this).root;
+    return getRuntime(this).__tvistInternal_root;
   }
   /** Элемент viewport, обрезающий видимую область. */
   get track(): HTMLElement {
-    return getRuntime(this).track;
+    return getRuntime(this).__tvistInternal_track;
   }
   /** Контейнер слайдов, к которому применяется transform. */
   get container(): HTMLElement {
-    return getRuntime(this).container;
+    return getRuntime(this).__tvistInternal_container;
   }
   /** Текущая конфигурация. Для изменения используйте updateOptions(). */
   get options(): TvistOptions {
-    return getRuntime(this).options;
+    return getRuntime(this).__tvistInternal_options;
   }
   // ==================== ПУБЛИЧНОЕ API ====================
   /**
    * Следующий слайд (или страница при perPage > 1)
    */
   next(): this {
-    getRuntime(this).next();
+    getRuntime(this).__tvistInternal_next();
     return this;
   }
   /**
    * Предыдущий слайд (или страница при perPage > 1)
    */
   prev(): this {
-    getRuntime(this).prev();
+    getRuntime(this).__tvistInternal_prev();
     return this;
   }
   /**
@@ -69,14 +69,14 @@ export class Tvist {
    * @param instant - мгновенный переход без анимации
    */
   scrollTo(index: number, instant = false): this {
-    getRuntime(this).scrollTo(index, instant);
+    getRuntime(this).__tvistInternal_scrollTo(index, instant);
     return this;
   }
   /**
    * Обновить размеры и пересчитать позиции
    */
   update(): this {
-    getRuntime(this).update();
+    getRuntime(this).__tvistInternal_update();
     return this;
   }
   /**
@@ -84,7 +84,7 @@ export class Tvist {
    * @param newOptions - новые опции для применения
    */
   updateOptions(newOptions: Partial<TvistOptions>): this {
-    getRuntime(this).updateOptions(newOptions);
+    getRuntime(this).__tvistInternal_updateOptions(newOptions);
     return this;
   }
   /**
@@ -92,21 +92,21 @@ export class Tvist {
    * Убирает transform, отключает модули, но сохраняет экземпляр
    */
   disable(): this {
-    getRuntime(this).disable();
+    getRuntime(this).__tvistInternal_disable();
     return this;
   }
   /**
    * Включить слайдер (восстановить функциональность)
    */
   enable(): this {
-    getRuntime(this).enable();
+    getRuntime(this).__tvistInternal_enable();
     return this;
   }
   /**
    * Проверить, включен ли слайдер
    */
   get isEnabled(): boolean {
-    return getRuntime(this).isEnabled;
+    return getRuntime(this).__tvistInternal_isEnabled;
   }
   /**
    * Уничтожить экземпляр и очистить ресурсы.
@@ -114,21 +114,21 @@ export class Tvist {
    * Повторный вызов безопасен (no-op).
    */
   destroy(options?: TvistDestroyOptions): this {
-    getRuntime(this).destroy(options);
+    getRuntime(this).__tvistInternal_destroy(options);
     return this;
   }
   /**
    * Получить список слайдов
    */
   get slides(): HTMLElement[] {
-    return getRuntime(this).slides;
+    return getRuntime(this).__tvistInternal_slides;
   }
   /**
    * Количество оригинальных слайдов (без клонов).
    * В режиме loop.withClones не учитывает клонированные слайды по краям.
    */
   get originalSlideCount(): number {
-    return getRuntime(this).originalSlideCount;
+    return getRuntime(this).__tvistInternal_originalSlideCount;
   }
   /**
    * Общее количество слайдов в DOM (включая клоны).
@@ -136,43 +136,43 @@ export class Tvist {
    * Совпадает с originalSlideCount если loop.withClones не используется.
    */
   get slideCount(): number {
-    return getRuntime(this).slideCount;
+    return getRuntime(this).__tvistInternal_slideCount;
   }
   /**
    * Получить текущий индекс активного слайда
    */
   get activeIndex(): number {
-    return getRuntime(this).activeIndex;
+    return getRuntime(this).__tvistInternal_activeIndex;
   }
   /**
    * Получить текущий логический индекс слайда (с учётом loop)
    */
   get realIndex(): number {
-    return getRuntime(this).realIndex;
+    return getRuntime(this).__tvistInternal_realIndex;
   }
   /**
    * Проверить, можно ли листать вперёд
    */
   get canScrollNext(): boolean {
-    return getRuntime(this).canScrollNext;
+    return getRuntime(this).__tvistInternal_canScrollNext;
   }
   /**
    * Проверить, можно ли листать назад
    */
   get canScrollPrev(): boolean {
-    return getRuntime(this).canScrollPrev;
+    return getRuntime(this).__tvistInternal_canScrollPrev;
   }
   /**
    * Получить публичное API autoplay модуля
    */
   get autoplay(): AutoplayControls | undefined {
-    return getRuntime(this).autoplay;
+    return getRuntime(this).__tvistInternal_autoplay;
   }
   /**
    * Получить публичное API video модуля
    */
   get video(): VideoControls | undefined {
-    return getRuntime(this).video;
+    return getRuntime(this).__tvistInternal_video;
   }
   // ==================== СОБЫТИЯ ====================
   /**
@@ -180,7 +180,7 @@ export class Tvist {
    */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
   on(event: string, handler: (...args: any[]) => void): this {
-    getRuntime(this).on(event, handler);
+    getRuntime(this).__tvistInternal_on(event, handler);
     return this;
   }
   /**
@@ -188,7 +188,7 @@ export class Tvist {
    */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
   off(event: string, handler?: (...args: any[]) => void): this {
-    getRuntime(this).off(event, handler);
+    getRuntime(this).__tvistInternal_off(event, handler);
     return this;
   }
   /**
@@ -196,7 +196,7 @@ export class Tvist {
    */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event args are untyped */
   emit(event: string, ...args: any[]): this {
-    getRuntime(this).emit(event, ...args);
+    getRuntime(this).__tvistInternal_emit(event, ...args);
     return this;
   }
   /**
@@ -204,7 +204,7 @@ export class Tvist {
    */
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */
   once(event: string, handler: (...args: any[]) => void): this {
-    getRuntime(this).once(event, handler);
+    getRuntime(this).__tvistInternal_once(event, handler);
     return this;
   }
   /**
@@ -212,7 +212,7 @@ export class Tvist {
    * @param target - целевой экземпляр для синхронизации
    */
   sync(target: Tvist): this {
-    getRuntime(this).sync(target);
+    getRuntime(this).__tvistInternal_sync(target);
     return this;
   }
   /** Continuous motion controls, when enabled. */

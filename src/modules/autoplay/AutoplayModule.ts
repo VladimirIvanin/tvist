@@ -250,14 +250,16 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
    */
   function local_clearTransitionByAutoplayFallback(): void {
     if (local_clearTransitionByAutoplayTimeout !== null) {
-      base.resources.cancelTimeout(local_clearTransitionByAutoplayTimeout);
+      base.__tvistInternal_resources.__tvistInternal_cancelTimeout(
+        local_clearTransitionByAutoplayTimeout
+      );
       local_clearTransitionByAutoplayTimeout = null;
     }
   }
 
   function local_clearBoundaryCheckTimeout(): void {
     if (local_boundaryCheckTimeout !== null) {
-      base.resources.cancelTimeout(local_boundaryCheckTimeout);
+      base.__tvistInternal_resources.__tvistInternal_cancelTimeout(local_boundaryCheckTimeout);
       local_boundaryCheckTimeout = null;
     }
   }
@@ -275,19 +277,22 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
   function local_scheduleTransitionByAutoplayFallback(): void {
     local_clearTransitionByAutoplayFallback();
     const speed = options.speed ?? 300;
-    local_clearTransitionByAutoplayTimeout = base.resources.timeout(() => {
-      local_clearTransitionByAutoplayTimeout = null;
-      if (local_transitionByAutoplay) {
-        local_transitionByAutoplay = false;
-      }
-    }, speed * local_TRANSITION_FALLBACK_MULTIPLIER);
+    local_clearTransitionByAutoplayTimeout = base.__tvistInternal_resources.__tvistInternal_timeout(
+      () => {
+        local_clearTransitionByAutoplayTimeout = null;
+        if (local_transitionByAutoplay) {
+          local_transitionByAutoplay = false;
+        }
+      },
+      speed * local_TRANSITION_FALLBACK_MULTIPLIER
+    );
   }
   /**
    * Очистка таймаута fallback resume
    */
   function local_clearDragEndTimeout(): void {
     if (local_dragEndTimeout !== null) {
-      base.resources.cancelTimeout(local_dragEndTimeout);
+      base.__tvistInternal_resources.__tvistInternal_cancelTimeout(local_dragEndTimeout);
       local_dragEndTimeout = null;
     }
   }
@@ -327,7 +332,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
     // Всегда ставим на паузу при драге (не только при pauseOnInteraction),
     // иначе таймер может вызвать next() во время/сразу после драга (rewind к 0)
     // и перебить snap к нужному слайду — пагинация тогда расходится с кадром
-    base.on('dragStart', () => {
+    base.__tvistInternal_on('dragStart', () => {
       if (local_stopped) return;
       local_isDragging = true;
       local_clearDragEndTimeout();
@@ -340,12 +345,12 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
     });
     // dragEnd: запускаем fallback таймаут на случай если transitionEnd не сработает
     // (например, если snap вернул на тот же слайд и indexChanged === false)
-    base.on('dragEnd', () => {
+    base.__tvistInternal_on('dragEnd', () => {
       if (local_stopped) return;
       if (!local_isDragging) return;
       const speed = options.speed ?? 300;
       // Fallback: resume через speed + буфер, если transitionEnd не сработает
-      local_dragEndTimeout = base.resources.timeout(() => {
+      local_dragEndTimeout = base.__tvistInternal_resources.__tvistInternal_timeout(() => {
         local_resumeAfterDrag();
       }, speed + 100);
     });
@@ -354,7 +359,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
     // Если вызвать resume() сразу, setInterval начнёт отсчёт,
     // и next() может сработать во время или сразу после snap,
     // что приводит к багу с пагинацией (activeBullet != activeIndex).
-    base.on('transitionEnd', () => {
+    base.__tvistInternal_on('transitionEnd', () => {
       if (local_stopped) return;
       // НЕ сбрасываем transitionByAutoplay здесь!
       // transitionEnd срабатывает РАНЬШЕ slideChangeEnd (см. Engine.ts:650-653),
@@ -380,7 +385,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
     // - при ручной навигации (стрелки, пагинация и т.д.) сбрасываем таймер,
     //   чтобы новый слайд показывался полное время delay, а не остаток от предыдущего счётчика
     // - при autoplay-переходах не трогаем таймер, чтобы не ломать рекурсивный цикл run()
-    base.on('slideChangeEnd', (index: number) => {
+    base.__tvistInternal_on('slideChangeEnd', (index: number) => {
       if (local_stopped) return;
       const byAutoplay = local_transitionByAutoplay;
       const now = performance.now();
@@ -442,12 +447,12 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
       if (!local_waitingForVideo || local_stopped) return;
       local_emitAutoplayProgress(data.index, Math.min(Math.max(data.progress, 0), 1));
     };
-    base.on('videoProgress', local_videoProgressHandler);
+    base.__tvistInternal_on('videoProgress', local_videoProgressHandler);
   }
 
   function local_detachVideoProgressListener(): void {
     if (!local_videoProgressHandler) return;
-    base.off('videoProgress', local_videoProgressHandler);
+    base.__tvistInternal_off('videoProgress', local_videoProgressHandler);
     local_videoProgressHandler = undefined;
   }
   /**
@@ -461,7 +466,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
     local_waitingForVideo = false;
     local_videoEndedWhilePaused = false;
     // index = realIndex. Ищем слайд по data-tvist-slide-index (loop) или по DOM-позиции (обычный)
-    const slide = findSlideByRealIndex(tvist.slides, index);
+    const slide = findSlideByRealIndex(tvist.__tvistInternal_slides, index);
     // Если слайд не найден (некорректный индекс или проблема с DOM), запускаем обычный таймер
     // чтобы autoplay продолжил работу, а не остановился навсегда
     if (!slide) {
@@ -500,29 +505,32 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
         local_videoEndedWhilePaused = true;
         return;
       }
-      local_emitAutoplayProgress(tvist.realIndex ?? tvist.activeIndex, 1);
+      local_emitAutoplayProgress(
+        tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex,
+        1
+      );
       local_waitingForVideo = false;
       // Запоминаем индекс до навигации
-      const indexBefore = tvist.activeIndex;
+      const indexBefore = tvist.__tvistInternal_activeIndex;
       local_transitionByAutoplay = true;
-      tvist.next();
+      tvist.__tvistInternal_next();
       // Проверяем, изменился ли индекс (произошла ли навигация)
       // Если индекс не изменился (граница без loop), сбрасываем флаг немедленно
-      if (tvist.activeIndex === indexBefore) {
+      if (tvist.__tvistInternal_activeIndex === indexBefore) {
         local_transitionByAutoplay = false;
         // Не планируем fallback, т.к. переход не произошёл
       } else {
         local_scheduleTransitionByAutoplayFallback();
       }
     };
-    base.on('videoEnded', local_videoEndedHandler);
+    base.__tvistInternal_on('videoEnded', local_videoEndedHandler);
   }
   /**
    * Снять слушатель videoEnded
    */
   function local_detachVideoEndedListener(): void {
     if (local_videoEndedHandler) {
-      base.off('videoEnded', local_videoEndedHandler);
+      base.__tvistInternal_off('videoEnded', local_videoEndedHandler);
       local_videoEndedHandler = undefined;
     }
   }
@@ -535,27 +543,43 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
       local_pausedByHover = true;
       local_pause();
       // Только hover: VideoModule синхронизирует HTML-video (не путать с pause() от drag/вкладки)
-      base.emit('autoplayHoverPause');
+      base.__tvistInternal_emit('autoplayHoverPause');
     };
     local_mouseLeaveHandler = () => {
       if (local_stopped) return;
       local_pausedByHover = false;
       if (!local_hasPassivePauseReason()) local_resume();
-      base.emit('autoplayHoverResume');
+      base.__tvistInternal_emit('autoplayHoverResume');
     };
-    base.resources.listen(tvist.root, 'mouseenter', local_mouseEnterHandler);
-    base.resources.listen(tvist.root, 'mouseleave', local_mouseLeaveHandler);
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      tvist.__tvistInternal_root,
+      'mouseenter',
+      local_mouseEnterHandler
+    );
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      tvist.__tvistInternal_root,
+      'mouseleave',
+      local_mouseLeaveHandler
+    );
   }
   /**
    * Отключение hover событий
    */
   function local_detachHoverEvents(): void {
     if (local_mouseEnterHandler) {
-      base.resources.unlisten(tvist.root, 'mouseenter', local_mouseEnterHandler);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        tvist.__tvistInternal_root,
+        'mouseenter',
+        local_mouseEnterHandler
+      );
       local_mouseEnterHandler = undefined;
     }
     if (local_mouseLeaveHandler) {
-      base.resources.unlisten(tvist.root, 'mouseleave', local_mouseLeaveHandler);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        tvist.__tvistInternal_root,
+        'mouseleave',
+        local_mouseLeaveHandler
+      );
       local_mouseLeaveHandler = undefined;
     }
     local_pausedByHover = false;
@@ -569,21 +593,37 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
     };
     local_focusOutHandler = (event: FocusEvent) => {
       const nextTarget = event.relatedTarget;
-      if (nextTarget instanceof Node && tvist.root.contains(nextTarget)) return;
+      if (nextTarget instanceof Node && tvist.__tvistInternal_root.contains(nextTarget)) return;
       local_pausedByFocus = false;
       if (!local_stopped && !local_hasPassivePauseReason()) local_resume();
     };
-    base.resources.listen(tvist.root, 'focusin', local_focusInHandler);
-    base.resources.listen(tvist.root, 'focusout', local_focusOutHandler);
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      tvist.__tvistInternal_root,
+      'focusin',
+      local_focusInHandler
+    );
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      tvist.__tvistInternal_root,
+      'focusout',
+      local_focusOutHandler
+    );
   }
 
   function local_detachFocusEvents(): void {
     if (local_focusInHandler) {
-      base.resources.unlisten(tvist.root, 'focusin', local_focusInHandler);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        tvist.__tvistInternal_root,
+        'focusin',
+        local_focusInHandler
+      );
       local_focusInHandler = undefined;
     }
     if (local_focusOutHandler) {
-      base.resources.unlisten(tvist.root, 'focusout', local_focusOutHandler);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        tvist.__tvistInternal_root,
+        'focusout',
+        local_focusOutHandler
+      );
       local_focusOutHandler = undefined;
     }
     local_pausedByFocus = false;
@@ -609,14 +649,22 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
         }
       }
     };
-    base.resources.listen(document, 'visibilitychange', local_visibilityChangeHandler);
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      document,
+      'visibilitychange',
+      local_visibilityChangeHandler
+    );
   }
   /**
    * Отключение события visibilitychange
    */
   function local_detachVisibilityEvents(): void {
     if (local_visibilityChangeHandler) {
-      base.resources.unlisten(document, 'visibilitychange', local_visibilityChangeHandler);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(
+        document,
+        'visibilitychange',
+        local_visibilityChangeHandler
+      );
       local_visibilityChangeHandler = undefined;
     }
   }
@@ -640,22 +688,22 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
     local_currentChunkDuration = delay;
     // Запуск отслеживания прогресса
     local_startProgressTracking(delay, local_currentDuration, local_progressStartOffset);
-    local_timer = base.resources.timeout(() => {
+    local_timer = base.__tvistInternal_resources.__tvistInternal_timeout(() => {
       if (!local_paused && !local_stopped) {
         local_timeLeft = null; // Сбрасываем timeLeft для следующего шага
         local_progressStartOffset = 0;
         local_stopProgressTracking();
         // Запоминаем индекс до навигации
-        const indexBefore = tvist.activeIndex;
+        const indexBefore = tvist.__tvistInternal_activeIndex;
         const slidesPerPage = options.perPage ?? 1;
-        const endIndex = Math.max(0, tvist.slides.length - slidesPerPage);
+        const endIndex = Math.max(0, tvist.__tvistInternal_slides.length - slidesPerPage);
         const loopEnabled =
           options.loop === true ||
           (typeof options.loop === 'object' && options.loop.enabled !== false);
         const boundaryAttempt = !loopEnabled && !options.rewind && indexBefore >= endIndex;
         local_transitionByAutoplay = true;
         local_lastAutoplayNextAt = performance.now();
-        tvist.next();
+        tvist.__tvistInternal_next();
         // На заведомой границе (без loop/rewind) next() не изменит индекс.
         // Флаг нужно сбросить сразу, иначе ручная навигация попадёт в false-positive "autoplay".
         if (boundaryAttempt) {
@@ -679,33 +727,36 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
         }
         local_clearBoundaryCheckTimeout();
         const boundaryDelay = speed === 0 ? 0 : speed + 20;
-        local_boundaryCheckTimeout = base.resources.timeout(() => {
+        local_boundaryCheckTimeout = base.__tvistInternal_resources.__tvistInternal_timeout(() => {
           local_boundaryCheckTimeout = null;
           if (local_paused || local_stopped) return;
           // Если после ожидаемой длительности перехода индекс всё ещё тот же,
           // считаем, что next() уткнулся в границу без loop.
-          if (tvist.activeIndex !== indexBefore) return;
+          if (tvist.__tvistInternal_activeIndex !== indexBefore) return;
           // reachEnd должен приходить только после полного показа последнего слайда:
           // delay + время проверки границы от момента slideChangeEnd.
           if (local_lastSlideChangeEndAt !== null && local_config) {
             const minElapsed = local_config.delay + boundaryDelay;
             const elapsed = performance.now() - local_lastSlideChangeEndAt;
             if (elapsed < minElapsed) {
-              local_boundaryCheckTimeout = base.resources.timeout(
+              local_boundaryCheckTimeout = base.__tvistInternal_resources.__tvistInternal_timeout(
                 () => {
                   local_boundaryCheckTimeout = null;
                   if (local_paused || local_stopped) return;
-                  if (tvist.activeIndex !== indexBefore) return;
+                  if (tvist.__tvistInternal_activeIndex !== indexBefore) return;
                   local_transitionByAutoplay = false;
                   local_clearTransitionByAutoplayFallback();
-                  local_emitAutoplayProgress(tvist.realIndex ?? tvist.activeIndex, 1);
+                  local_emitAutoplayProgress(
+                    tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex,
+                    1
+                  );
                   if (
                     !(
                       options.loop === true ||
                       (typeof options.loop === 'object' && options.loop.enabled !== false)
                     )
                   ) {
-                    tvist.emit('reachEnd');
+                    tvist.__tvistInternal_emit('reachEnd');
                   }
                   local_stop();
                 },
@@ -716,14 +767,17 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
           }
           local_transitionByAutoplay = false;
           local_clearTransitionByAutoplayFallback();
-          local_emitAutoplayProgress(tvist.realIndex ?? tvist.activeIndex, 1);
+          local_emitAutoplayProgress(
+            tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex,
+            1
+          );
           if (
             !(
               options.loop === true ||
               (typeof options.loop === 'object' && options.loop.enabled !== false)
             )
           ) {
-            tvist.emit('reachEnd');
+            tvist.__tvistInternal_emit('reachEnd');
           }
           local_stop();
         }, boundaryDelay);
@@ -738,7 +792,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
   ): void {
     local_stopProgressTracking();
     if (timeLeft <= 0) {
-      local_emitAutoplayProgress(tvist.activeIndex, 1);
+      local_emitAutoplayProgress(tvist.__tvistInternal_activeIndex, 1);
       return;
     }
     local_progressStartTime = performance.now();
@@ -751,12 +805,12 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
       // Доля отрезка = timeLeft / totalDuration
       let progress = startOffset + chunkProgress * (timeLeft / totalDuration);
       progress = Math.min(progress, 1);
-      local_emitAutoplayProgress(tvist.activeIndex, progress);
+      local_emitAutoplayProgress(tvist.__tvistInternal_activeIndex, progress);
       if (progress < 1 && !local_paused && !local_stopped) {
-        local_progressRAF = base.resources.frame(tick);
+        local_progressRAF = base.__tvistInternal_resources.__tvistInternal_frame(tick);
       }
     };
-    local_progressRAF = base.resources.frame(tick);
+    local_progressRAF = base.__tvistInternal_resources.__tvistInternal_frame(tick);
   }
 
   function local_emitAutoplayProgress(index: number, progress: number): void {
@@ -765,16 +819,16 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
       index,
       segmentIndex: index,
       segmentProgress: progress,
-      totalSegments: tvist.slides.length,
+      totalSegments: tvist.__tvistInternal_slides.length,
     };
-    base.emit('autoplayProgress', payload);
+    base.__tvistInternal_emit('autoplayProgress', payload);
   }
   /**
    * Остановка отслеживания прогресса
    */
   function local_stopProgressTracking(): void {
     if (local_progressRAF !== null) {
-      base.resources.cancelFrame(local_progressRAF);
+      base.__tvistInternal_resources.__tvistInternal_cancelFrame(local_progressRAF);
       local_progressRAF = null;
     }
     local_progressStartTime = null;
@@ -784,7 +838,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
    */
   function local_cancelTimer(): void {
     if (local_timer !== null) {
-      base.resources.cancelTimeout(local_timer);
+      base.__tvistInternal_resources.__tvistInternal_cancelTimeout(local_timer);
       local_timer = null;
     }
   }
@@ -798,12 +852,12 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
     // Если включен режим ожидания видео, проверяем текущий слайд сразу при старте
     if (local_config?.waitForVideo) {
       // Используем realIndex для loop режима, иначе activeIndex
-      const currentIndex = tvist.realIndex ?? tvist.activeIndex;
+      const currentIndex = tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex;
       local_handleSlideChangedForVideo(currentIndex);
     } else {
       local_run(); // Запускаем рекурсивный цикл
     }
-    base.emit('autoplayStart');
+    base.__tvistInternal_emit('autoplayStart');
   }
   /**
    * Остановка autoplay
@@ -813,7 +867,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
     local_clearTransitionByAutoplayFallback();
     local_clearBoundaryCheckTimeout();
     local_stopProgressTracking();
-    base.emit('autoplayStop');
+    base.__tvistInternal_emit('autoplayStop');
   }
   /**
    * Пауза autoplay
@@ -834,7 +888,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
       // Очищаем таймер — иначе callback может сработать между pause() и resume()
       local_cancelTimer();
       local_stopProgressTracking();
-      base.emit('autoplayPause');
+      base.__tvistInternal_emit('autoplayPause');
     }
   }
   /**
@@ -853,12 +907,12 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
         local_videoEndedWhilePaused = false;
         local_waitingForVideo = false;
         // Запоминаем индекс до навигации
-        const indexBefore = tvist.activeIndex;
+        const indexBefore = tvist.__tvistInternal_activeIndex;
         local_transitionByAutoplay = true;
-        tvist.next();
+        tvist.__tvistInternal_next();
         // Проверяем, изменился ли индекс (произошла ли навигация)
         // Если индекс не изменился (граница без loop), сбрасываем флаг немедленно
-        if (tvist.activeIndex === indexBefore) {
+        if (tvist.__tvistInternal_activeIndex === indexBefore) {
           local_transitionByAutoplay = false;
           // Не планируем fallback, т.к. переход не произошёл
           // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: Если навигация не произошла (граница без loop),
@@ -868,21 +922,23 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
           // Если включен waitForVideo, вызываем handleSlideChangedForVideo для текущего слайда,
           // иначе просто запускаем таймер.
           if (local_config?.waitForVideo) {
-            local_handleSlideChangedForVideo(tvist.realIndex ?? tvist.activeIndex);
+            local_handleSlideChangedForVideo(
+              tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex
+            );
           } else {
             local_run();
           }
         } else {
           local_scheduleTransitionByAutoplayFallback();
         }
-        base.emit('autoplayResume');
+        base.__tvistInternal_emit('autoplayResume');
         return;
       }
       local_videoEndedWhilePaused = false;
       // Перезапускаем с полной задержкой
       // Это предотвращает немедленное переключение после паузы
       local_run();
-      base.emit('autoplayResume');
+      base.__tvistInternal_emit('autoplayResume');
     }
   }
   /**
@@ -919,7 +975,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
     shouldBeActive: local_shouldBeActive,

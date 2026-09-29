@@ -130,7 +130,7 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
    * Регистрация изображений для ленивой загрузки
    */
   function local_register(): void {
-    const slides = tvist.slides;
+    const slides = tvist.__tvistInternal_slides;
     slides.forEach((slide, index) => {
       const images = children(slide).filter((el): el is HTMLImageElement =>
         el.matches(IMAGE_SELECTOR)
@@ -168,9 +168,9 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
    */
   function local_setupEvents(): void {
     const scrollHandler = () => local_check();
-    base.on('scroll', scrollHandler);
-    base.on('slideChangeStart', () => local_check());
-    base.on('slideChangeEnd', () => local_check());
+    base.__tvistInternal_on('scroll', scrollHandler);
+    base.__tvistInternal_on('slideChangeStart', () => local_check());
+    base.__tvistInternal_on('slideChangeEnd', () => local_check());
   }
   /**
    * Проверка и загрузка изображений в зоне видимости.
@@ -178,7 +178,7 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
    */
   function local_check(): void {
     if (local_entries.length === 0) return;
-    const activeIndex = tvist.activeIndex;
+    const activeIndex = tvist.__tvistInternal_activeIndex;
     const perPage = options.perPage ?? 1;
     // Вычисляем диапазон слайдов для загрузки
     const distance = perPage * (local_preloadPrevNext + 1) - 1;
@@ -196,7 +196,7 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
    * Проверка, находится ли индекс в зоне загрузки
    */
   function local_isWithinRange(index: number, activeIndex: number, distance: number): boolean {
-    const slides = tvist.slides;
+    const slides = tvist.__tvistInternal_slides;
     const totalSlides = slides.length;
     // Для loop режима нужно учитывать циклический диапазон
     if (
@@ -215,7 +215,7 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
    */
   function local_load(entry: LazyLoadEntry): void {
     const [img, slideIndex, spinner] = entry;
-    const slide = tvist.slides[slideIndex];
+    const slide = tvist.__tvistInternal_slides[slideIndex];
     if (!slide) return;
     // Добавляем класс загрузки
     addClass(slide, LOADING_CLASS);
@@ -225,23 +225,23 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
       spinner.remove();
       img.style.display = '';
       // Emit события
-      base.emit('lazyLoaded', img, slideIndex);
+      base.__tvistInternal_emit('lazyLoaded', img, slideIndex);
       // Убираем обработчики
-      base.resources.unlisten(img, 'load', onLoad);
-      base.resources.unlisten(img, 'error', onError);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(img, 'load', onLoad);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(img, 'error', onError);
     };
     const onError = () => {
       removeClass(slide, LOADING_CLASS);
       spinner.remove();
       // Emit события об ошибке
-      base.emit('lazyLoadError', img, slideIndex);
+      base.__tvistInternal_emit('lazyLoadError', img, slideIndex);
       // Убираем обработчики
-      base.resources.unlisten(img, 'load', onLoad);
-      base.resources.unlisten(img, 'error', onError);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(img, 'load', onLoad);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(img, 'error', onError);
     };
     // Подписываемся на события
-    base.resources.listen(img, 'load', onLoad);
-    base.resources.listen(img, 'error', onError);
+    base.__tvistInternal_resources.__tvistInternal_listen(img, 'load', onLoad);
+    base.__tvistInternal_resources.__tvistInternal_listen(img, 'error', onError);
     // Устанавливаем src и srcset
     const src = img.getAttribute(SRC_DATA_ATTRIBUTE);
     const srcset = img.getAttribute(SRCSET_DATA_ATTRIBUTE);
@@ -288,7 +288,7 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
     shouldBeActive: local_shouldBeActive,

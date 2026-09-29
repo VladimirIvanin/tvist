@@ -135,7 +135,7 @@ describe('Automatically created controls', () => {
     pagination.querySelectorAll<HTMLElement>(`.${TVIST_CLASSES.bullet}`)[2]!.click()
     expect(slider.activeIndex).toBe(2)
 
-    const nextSpy = vi.spyOn(getRuntime(slider), 'next')
+    const nextSpy = vi.spyOn(getRuntime(slider), '__tvistInternal_next')
     slider.destroy()
     next.click()
     expect(nextSpy).not.toHaveBeenCalled()
@@ -214,8 +214,8 @@ describe('Automatically created controls', () => {
     const events = ['slideChangeStart', 'slideChangeEnd', 'transitionEnd', 'lock', 'unlock', 'scroll', 'loopFix']
     const listenerCounts = () => events.map(event => getRuntime(slider)['events'].listenerCount(event))
     const baseline = listenerCounts()
-    const nextSpy = vi.spyOn(getRuntime(slider), 'next')
-    const scrollSpy = vi.spyOn(getRuntime(slider), 'scrollTo')
+    const nextSpy = vi.spyOn(getRuntime(slider), '__tvistInternal_next')
+    const scrollSpy = vi.spyOn(getRuntime(slider), '__tvistInternal_scrollTo')
 
     for (let cycle = 0; cycle < 3; cycle++) {
       slider.updateOptions({ arrows: true, pagination: true })
@@ -252,7 +252,7 @@ describe('Automatically created controls', () => {
     pagination.className = TVIST_CLASSES.pagination
     root.append(prev, next, pagination)
     const slider = mount(root, { arrows: true, pagination: true })
-    const nextSpy = vi.spyOn(getRuntime(slider), 'next')
+    const nextSpy = vi.spyOn(getRuntime(slider), '__tvistInternal_next')
     slider.updateOptions({ arrows: false, pagination: false })
     next.click()
     expect(nextSpy).not.toHaveBeenCalled()

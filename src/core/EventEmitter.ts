@@ -3,11 +3,11 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any -- event args are intentionally untyped */
-type EventHandler = (...args: any[]) => void
+type EventHandler = (...args: any[]) => void;
 
 export class EventEmitter {
-  private listeners = new Map<string, Set<EventHandler>>()
-  private anyListeners = new Set<(event: string, ...args: any[]) => void>()
+  private __tvistInternal_listeners = new Map<string, Set<EventHandler>>();
+  private __tvistInternal_anyListeners = new Set<(event: string, ...args: any[]) => void>();
 
   /**
    * Подписаться на событие
@@ -15,13 +15,13 @@ export class EventEmitter {
    * @param handler - обработчик
    */
   on(event: string, handler: EventHandler): this {
-    let handlers = this.listeners.get(event)
+    let handlers = this.__tvistInternal_listeners.get(event);
     if (!handlers) {
-      handlers = new Set()
-      this.listeners.set(event, handlers)
+      handlers = new Set();
+      this.__tvistInternal_listeners.set(event, handlers);
     }
-    handlers.add(handler)
-    return this
+    handlers.add(handler);
+    return this;
   }
 
   /**
@@ -32,18 +32,18 @@ export class EventEmitter {
   off(event: string, handler?: EventHandler): this {
     if (!handler) {
       // Удаляем все обработчики для события
-      this.listeners.delete(event)
+      this.__tvistInternal_listeners.delete(event);
     } else {
       // Удаляем конкретный обработчик
-      const handlers = this.listeners.get(event)
+      const handlers = this.__tvistInternal_listeners.get(event);
       if (handlers) {
-        handlers.delete(handler)
+        handlers.delete(handler);
         if (handlers.size === 0) {
-          this.listeners.delete(event)
+          this.__tvistInternal_listeners.delete(event);
         }
       }
     }
-    return this
+    return this;
   }
 
   /**
@@ -53,27 +53,27 @@ export class EventEmitter {
    */
   emit(event: string, ...args: any[]): this {
     // Вызываем обработчики конкретного события
-    const handlers = this.listeners.get(event)
+    const handlers = this.__tvistInternal_listeners.get(event);
     if (handlers) {
-      handlers.forEach(handler => {
+      handlers.forEach((handler) => {
         try {
-          handler(...args)
+          handler(...args);
         } catch (error) {
-          console.error(`Error in event handler for "${event}":`, error)
+          console.error(`Error in event handler for "${event}":`, error);
         }
-      })
+      });
     }
 
     // Вызываем обработчики "любого" события
-    this.anyListeners.forEach(handler => {
+    this.__tvistInternal_anyListeners.forEach((handler) => {
       try {
-        handler(event, ...args)
+        handler(event, ...args);
       } catch (error) {
-        console.error(`Error in "any" event handler for "${event}":`, error)
+        console.error(`Error in "any" event handler for "${event}":`, error);
       }
-    })
+    });
 
-    return this
+    return this;
   }
 
   /**
@@ -82,10 +82,10 @@ export class EventEmitter {
    */
   once(event: string, handler: EventHandler): this {
     const wrappedHandler = (...args: any[]) => {
-      handler(...args)
-      this.off(event, wrappedHandler)
-    }
-    return this.on(event, wrappedHandler)
+      handler(...args);
+      this.off(event, wrappedHandler);
+    };
+    return this.on(event, wrappedHandler);
   }
 
   /**
@@ -93,8 +93,8 @@ export class EventEmitter {
    * Обработчик будет вызван для любого события
    */
   onAny(handler: (event: string, ...args: any[]) => void): this {
-    this.anyListeners.add(handler)
-    return this
+    this.__tvistInternal_anyListeners.add(handler);
+    return this;
   }
 
   /**
@@ -102,42 +102,44 @@ export class EventEmitter {
    */
   offAny(handler?: (event: string, ...args: any[]) => void): this {
     if (handler) {
-      this.anyListeners.delete(handler)
+      this.__tvistInternal_anyListeners.delete(handler);
     } else {
-      this.anyListeners.clear()
+      this.__tvistInternal_anyListeners.clear();
     }
-    return this
+    return this;
   }
 
   /**
    * Очистить все подписки
    */
   clear(): void {
-    this.listeners.clear()
-    this.anyListeners.clear()
+    this.__tvistInternal_listeners.clear();
+    this.__tvistInternal_anyListeners.clear();
   }
 
   /**
    * Получить список всех событий, на которые есть подписки
    */
   eventNames(): string[] {
-    return Array.from(this.listeners.keys())
+    return Array.from(this.__tvistInternal_listeners.keys());
   }
 
   /**
    * Получить количество обработчиков для события
    */
   listenerCount(event: string): number {
-    const handlers = this.listeners.get(event)
-    return handlers ? handlers.size : 0
+    const handlers = this.__tvistInternal_listeners.get(event);
+    return handlers ? handlers.size : 0;
   }
 
   /** Есть ли получатели промежуточной позиции перехода. */
   hasPositionListeners(): boolean {
-    return this.anyListeners.size > 0 ||
+    return (
+      this.__tvistInternal_anyListeners.size > 0 ||
       this.listenerCount('scroll') > 0 ||
       this.listenerCount('setTranslate') > 0 ||
       this.listenerCount('progress') > 0
+    );
   }
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */

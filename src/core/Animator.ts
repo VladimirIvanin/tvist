@@ -21,16 +21,16 @@ export const easings = {
 } as const;
 
 export class Animator {
-  private animationId: number | null = null;
-  private startTime = 0;
-  private isRunning = false;
-  private externalIsAnimating?: () => boolean;
-  private externalStop?: () => void;
+  private __tvistInternal_animationId: number | null = null;
+  private __tvistInternal_startTime = 0;
+  private __tvistInternal_isRunning = false;
+  private __tvistInternal_externalIsAnimating?: () => boolean;
+  private __tvistInternal_externalStop?: () => void;
 
   /** Подключить переход, которым управляет браузер, к прежнему состоянию Animator. */
   setExternalController(isAnimating: () => boolean, stop: () => void): void {
-    this.externalIsAnimating = isAnimating;
-    this.externalStop = stop;
+    this.__tvistInternal_externalIsAnimating = isAnimating;
+    this.__tvistInternal_externalStop = stop;
   }
 
   /**
@@ -60,15 +60,15 @@ export class Animator {
       return;
     }
 
-    this.isRunning = true;
+    this.__tvistInternal_isRunning = true;
     const distance = to - from;
 
     const animate = (currentTime: number) => {
-      if (!this.startTime) {
-        this.startTime = currentTime;
+      if (!this.__tvistInternal_startTime) {
+        this.__tvistInternal_startTime = currentTime;
       }
 
-      const elapsed = currentTime - this.startTime;
+      const elapsed = currentTime - this.__tvistInternal_startTime;
       const progress = Math.min(elapsed / duration, 1);
 
       // Применяем easing
@@ -78,35 +78,35 @@ export class Animator {
       onUpdate(currentValue);
 
       if (progress < 1) {
-        this.animationId = requestAnimationFrame(animate);
+        this.__tvistInternal_animationId = requestAnimationFrame(animate);
       } else {
-        this.isRunning = false;
-        this.startTime = 0;
+        this.__tvistInternal_isRunning = false;
+        this.__tvistInternal_startTime = 0;
         onComplete?.();
       }
     };
 
-    this.animationId = requestAnimationFrame(animate);
+    this.__tvistInternal_animationId = requestAnimationFrame(animate);
   }
 
   /**
    * Остановить текущую анимацию
    */
   stop(): void {
-    this.externalStop?.();
-    if (this.animationId !== null) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
+    this.__tvistInternal_externalStop?.();
+    if (this.__tvistInternal_animationId !== null) {
+      cancelAnimationFrame(this.__tvistInternal_animationId);
+      this.__tvistInternal_animationId = null;
     }
-    this.isRunning = false;
-    this.startTime = 0;
+    this.__tvistInternal_isRunning = false;
+    this.__tvistInternal_startTime = 0;
   }
 
   /**
    * Проверить, выполняется ли анимация
    */
   isAnimating(): boolean {
-    return this.isRunning || this.externalIsAnimating?.() === true;
+    return this.__tvistInternal_isRunning || this.__tvistInternal_externalIsAnimating?.() === true;
   }
 }
 
@@ -117,7 +117,10 @@ export class Animator {
 export function throttle<Args extends unknown[]>(
   fn: (...args: Args) => unknown,
   delay: number,
-  resources?: Pick<ReturnType<typeof createResources>, 'timeout' | 'cancelTimeout'>
+  resources?: Pick<
+    ReturnType<typeof createResources>,
+    '__tvistInternal_timeout' | '__tvistInternal_cancelTimeout'
+  >
 ): (...args: Args) => void {
   let lastCall = 0;
   let timeout: number | null = null;
@@ -136,14 +139,16 @@ export function throttle<Args extends unknown[]>(
     } else {
       // Планируем вызов на конец периода
       if (timeout !== null) {
-        if (resources) resources.cancelTimeout(timeout);
+        if (resources) resources.__tvistInternal_cancelTimeout(timeout);
         else clearTimeout(timeout);
       }
-      const schedule = resources?.timeout ?? window.setTimeout.bind(window);
-      timeout = schedule(() => {
+      const callback = () => {
         callFunction();
         timeout = null;
-      }, delay - timeSinceLastCall);
+      };
+      timeout = resources
+        ? resources.__tvistInternal_timeout(callback, delay - timeSinceLastCall)
+        : window.setTimeout(callback, delay - timeSinceLastCall);
     }
   };
 }

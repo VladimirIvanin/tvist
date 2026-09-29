@@ -1,4 +1,4 @@
-import { loopEnabled, pageCount } from '../../utils/positions';
+import { loopEnabled, pageCount, lastScrollIndex } from '../../utils/positions';
 /**
  * Pagination Module
  *
@@ -87,30 +87,30 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
     // Обновляем при изменении слайда СИНХРОННО (slideChangeStart эмитится ДО анимации),
     // чтобы к моменту slideChangeEnd (после анимации) bullet'ы были уже актуальны.
     // Также слушаем slideChangeEnd для instant-переходов (scrollTo с instant=true).
-    base.on('slideChangeStart', local_activeChangeHandler);
-    base.on('slideChangeEnd', local_settledChangeHandler);
+    base.__tvistInternal_on('slideChangeStart', local_activeChangeHandler);
+    base.__tvistInternal_on('slideChangeEnd', local_settledChangeHandler);
     // Обновляем видимость при lock/unlock (для breakpoints)
-    base.on('lock', local_visibilityChangeHandler);
-    base.on('unlock', local_visibilityChangeHandler);
+    base.__tvistInternal_on('lock', local_visibilityChangeHandler);
+    base.__tvistInternal_on('unlock', local_visibilityChangeHandler);
     // В free mode (drag: 'free') slideChangeStart/End не эмитятся при прокрутке —
     // обновляем активный bullet по ближайшему слайду на каждом кадре scroll.
     if (options.drag === 'free') {
-      base.on('scroll', local_positionChangeHandler);
+      base.__tvistInternal_on('scroll', local_positionChangeHandler);
     }
     local_render();
     local_updateActive();
     local_updateVisibility();
-    base.emit('pagination:mounted');
+    base.__tvistInternal_emit('pagination:mounted');
     // Для loop режима нужны дополнительные события
     if (options.loop) {
-      base.on('loopFix', local_settledChangeHandler);
-      base.on('transitionEnd', local_settledChangeHandler);
+      base.__tvistInternal_on('loopFix', local_settledChangeHandler);
+      base.__tvistInternal_on('transitionEnd', local_settledChangeHandler);
     }
   }
   /** Дополнительное отложенное обновление (для loop: после применения DOM/индекса) */
   function local_scheduleUpdateActive(): void {
     if (local_updateFrameId !== null) return;
-    local_updateFrameId = base.resources.frame(() => {
+    local_updateFrameId = base.__tvistInternal_resources.__tvistInternal_frame(() => {
       local_updateFrameId = null;
       local_updateActive();
     });
@@ -118,15 +118,15 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
 
   function local_destroy(): void {
     local_detachClickHandlers();
-    base.off('slideChangeStart', local_activeChangeHandler);
-    base.off('slideChangeEnd', local_settledChangeHandler);
-    base.off('lock', local_visibilityChangeHandler);
-    base.off('unlock', local_visibilityChangeHandler);
-    base.off('scroll', local_positionChangeHandler);
-    base.off('loopFix', local_settledChangeHandler);
-    base.off('transitionEnd', local_settledChangeHandler);
+    base.__tvistInternal_off('slideChangeStart', local_activeChangeHandler);
+    base.__tvistInternal_off('slideChangeEnd', local_settledChangeHandler);
+    base.__tvistInternal_off('lock', local_visibilityChangeHandler);
+    base.__tvistInternal_off('unlock', local_visibilityChangeHandler);
+    base.__tvistInternal_off('scroll', local_positionChangeHandler);
+    base.__tvistInternal_off('loopFix', local_settledChangeHandler);
+    base.__tvistInternal_off('transitionEnd', local_settledChangeHandler);
     if (local_updateFrameId !== null) {
-      base.resources.cancelFrame(local_updateFrameId);
+      base.__tvistInternal_resources.__tvistInternal_cancelFrame(local_updateFrameId);
       local_updateFrameId = null;
     }
     if (local_container) {
@@ -163,13 +163,8 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
    * Ожидаемое количество буллетов при текущих опциях (для проверки, нужен ли полный render)
    */
   function local_getExpectedBulletCount(): number {
-    const perPage = options.perPage ?? 1;
-    const slideCount = tvist.originalSlideCount;
-    const isLoop =
-      options.loop === true || (typeof options.loop === 'object' && options.loop.enabled !== false);
-    if (slideCount === 0) return 0;
-    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage);
-    const pageCount = endIndex + 1;
+    const pageCount = local_calculatePositionCount();
+    if (pageCount === 0) return 0;
     const limit = local_getBulletLimit(pageCount);
     return limit ?? pageCount;
   }
@@ -178,11 +173,18 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
    */
   function local_calculatePageCount(): number {
     return pageCount(
-      tvist.originalSlideCount,
+      tvist.__tvistInternal_originalSlideCount,
       options.perPage ?? 1,
       options.slidesPerGroup ?? 1,
       loopEnabled(options.loop)
     );
+  }
+  /** Individual positions retain the original arithmetic for fractional perPage values. */
+  function local_calculatePositionCount(): number {
+    const count = tvist.__tvistInternal_originalSlideCount;
+    return count === 0
+      ? 0
+      : lastScrollIndex(count, options.perPage ?? 1, loopEnabled(options.loop)) + 1;
   }
   /**
    * Поиск или создание контейнера
@@ -198,11 +200,11 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
       }
     }
     // Ищем по стандартному классу только контейнер этого слайдера.
-    local_container ??= base.findOwnElement(`.${TVIST_CLASSES.pagination}`);
+    local_container ??= base.__tvistInternal_findOwnElement(`.${TVIST_CLASSES.pagination}`);
     if (!local_container) {
       local_container = document.createElement('div');
       local_container.className = TVIST_CLASSES.pagination;
-      tvist.root.appendChild(local_container);
+      tvist.__tvistInternal_root.appendChild(local_container);
       local_createdContainer = true;
     }
   }
@@ -424,9 +426,9 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
    * В loop режиме используем realIndex, иначе activeIndex
    */
   function local_getCurrentSlideIndex(): number {
-    const loopOpt = options.loop;
-    const isLoop = loopOpt === true || (typeof loopOpt === 'object' && loopOpt.enabled !== false);
-    return isLoop ? tvist.realIndex : tvist.activeIndex;
+    return loopEnabled(options.loop)
+      ? tvist.__tvistInternal_realIndex
+      : tvist.__tvistInternal_activeIndex;
   }
   /**
    * Рендер пагинации
@@ -468,65 +470,29 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
     local_bullets = [];
     local_bulletGroups = [];
     local_detachClickHandlers();
-    // Вычисляем количество страниц с учетом perPage
-    const perPage = options.perPage ?? 1;
-    const slideCount = tvist.originalSlideCount;
-    const isLoop =
-      options.loop === true || (typeof options.loop === 'object' && options.loop.enabled !== false);
-    // Вычисляем endIndex (последний допустимый индекс)
-    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage);
-    // Используем количество возможных позиций (snap points) вместо страниц
-    // Если слайдов нет, то 0 страниц
-    const pageCount = slideCount === 0 ? 0 : endIndex + 1;
-    // Проверяем, используется ли лимит
+    const pageCount = local_calculatePositionCount();
     const limit = local_getBulletLimit(pageCount);
-    // Если используется лимит, вычисляем группы слайдов
-    if (limit && limit < pageCount) {
-      local_bulletGroups = local_calculateBulletGroups(pageCount, limit);
-      // Создаем ограниченное количество точек
-      for (let bulletIndex = 0; bulletIndex < limit; bulletIndex++) {
-        const group = local_bulletGroups[bulletIndex];
-        if (!group) continue;
-        let bulletHTML: string;
-        // Кастомный рендер
-        if (typeof pagination === 'object' && pagination?.renderBullet) {
-          bulletHTML = pagination.renderBullet(bulletIndex, bulletClass);
-        } else {
-          bulletHTML = `<span class="${bulletClass}" data-index="${bulletIndex}" data-group-start="${group.startIndex}" data-group-end="${group.endIndex}"></span>`;
-        }
-        const bullet = local_createElementFromHTML(bulletHTML);
-        container.appendChild(bullet);
-        local_bullets.push(bullet);
-        // Clickable - переходим к начальному индексу группы
-        if (clickable) {
-          const slideIndex = group.startIndex;
-          const handler = () => tvist.scrollTo(slideIndex);
-          local_clickHandlers.set(bullet, handler);
-          base.resources.listen(bullet, 'click', handler);
-          bullet.style.cursor = 'pointer';
-        }
-      }
-    } else {
-      // Обычный режим - создаем точки для каждой возможной позиции
-      for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-        let bulletHTML: string;
-        // Кастомный рендер
-        if (typeof pagination === 'object' && pagination?.renderBullet) {
-          bulletHTML = pagination.renderBullet(pageIndex, bulletClass);
-        } else {
-          bulletHTML = `<span class="${bulletClass}" data-index="${pageIndex}"></span>`;
-        }
-        const bullet = local_createElementFromHTML(bulletHTML);
-        container.appendChild(bullet);
-        local_bullets.push(bullet);
-        // Clickable - переходим к соответствующему индексу
-        if (clickable) {
-          const slideIndex = pageIndex;
-          const handler = () => tvist.scrollTo(slideIndex);
-          local_clickHandlers.set(bullet, handler);
-          base.resources.listen(bullet, 'click', handler);
-          bullet.style.cursor = 'pointer';
-        }
+    const limited = limit !== undefined && limit !== 0 && limit < pageCount;
+    if (limited) local_bulletGroups = local_calculateBulletGroups(pageCount, limit);
+    for (let bulletIndex = 0; bulletIndex < (limited ? limit : pageCount); bulletIndex++) {
+      const group = local_bulletGroups[bulletIndex];
+      if (limited && !group) continue;
+      const groupAttributes = group
+        ? ` data-group-start="${group.startIndex}" data-group-end="${group.endIndex}"`
+        : '';
+      const html =
+        typeof pagination === 'object' && pagination?.renderBullet
+          ? pagination.renderBullet(bulletIndex, bulletClass)
+          : `<span class="${bulletClass}" data-index="${bulletIndex}"${groupAttributes}></span>`;
+      const bullet = local_createElementFromHTML(html);
+      container.appendChild(bullet);
+      local_bullets.push(bullet);
+      if (clickable) {
+        const slideIndex = group?.startIndex ?? bulletIndex;
+        const handler = () => tvist.__tvistInternal_scrollTo(slideIndex);
+        local_clickHandlers.set(bullet, handler);
+        base.__tvistInternal_resources.__tvistInternal_listen(bullet, 'click', handler);
+        bullet.style.cursor = 'pointer';
       }
     }
   }
@@ -534,39 +500,15 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
    * Рендер fraction
    */
   function local_renderFraction(): void {
-    if (!local_container) return;
-    const pagination = options.pagination;
-    const perPage = options.perPage ?? 1;
-    const slideCount = tvist.originalSlideCount;
-    const isLoop =
-      options.loop === true || (typeof options.loop === 'object' && options.loop.enabled !== false);
-    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage);
-    const currentPage = local_getCurrentSlideIndex() + 1;
-    const totalPages = slideCount === 0 ? 0 : endIndex + 1;
-    let html: string;
-    if (typeof pagination === 'object' && pagination?.renderFraction) {
-      html = pagination.renderFraction(currentPage, totalPages);
-    } else {
-      html = `
-        <span class="${TVIST_CLASSES.paginationCurrent}">${currentPage}</span>
-        <span class="${TVIST_CLASSES.paginationSeparator}"> / </span>
-        <span class="${TVIST_CLASSES.paginationTotal}">${totalPages}</span>
-      `;
-    }
-    local_container.innerHTML = html;
+    local_renderFractionByIndex(local_getCurrentSlideIndex());
   }
   /**
    * Рендер progress
    */
   function local_renderProgress(): void {
     if (!local_container) return;
-    const perPage = options.perPage ?? 1;
-    const slideCount = tvist.originalSlideCount;
-    const isLoop =
-      options.loop === true || (typeof options.loop === 'object' && options.loop.enabled !== false);
-    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage);
     const currentPage = local_getCurrentSlideIndex() + 1;
-    const totalPages = slideCount === 0 ? 0 : endIndex + 1;
+    const totalPages = local_calculatePositionCount();
     const progress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0;
     local_container.innerHTML = `
       <div class="${TVIST_CLASSES.paginationProgress}">
@@ -585,13 +527,7 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
     if (!local_container) return;
     const pagination = options.pagination;
     if (typeof pagination === 'object' && pagination?.renderCustom) {
-      const perPage = options.perPage ?? 1;
-      const slideCount = tvist.originalSlideCount;
-      const isLoop =
-        options.loop === true ||
-        (typeof options.loop === 'object' && options.loop.enabled !== false);
-      const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage);
-      const totalPages = slideCount === 0 ? 0 : endIndex + 1;
+      const totalPages = local_calculatePositionCount();
       const html = pagination.renderCustom(local_getCurrentSlideIndex() + 1, totalPages);
       local_container.innerHTML = html;
     }
@@ -677,7 +613,7 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
    * Возвращает индекс слайда, ближайшего к текущей позиции трека.
    */
   function local_getNearestSlideIndex(): number {
-    const { __tvistInternal_engine: engine, slides } = tvist;
+    const { __tvistInternal_engine: engine, __tvistInternal_slides: slides } = tvist;
     const currentPosition = engine.__tvistInternal_location.get();
     let nearestIndex = 0;
     let minDistance = Infinity;
@@ -695,50 +631,14 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
    * Обновление активного bullet
    */
   function local_updateBulletsActive(): void {
-    const pagination = options.pagination;
-    const activeClass =
-      typeof pagination === 'object' && pagination !== null
-        ? (pagination.bulletActiveClass ?? TVIST_CLASSES.bulletActive)
-        : TVIST_CLASSES.bulletActive;
-    // Текущая страница соответствует индексу (в loop режиме используем realIndex)
-    const currentSlideIndex = local_getCurrentSlideIndex();
-    // Если используются группы, определяем активную точку через группы
-    const activeBulletIndex =
-      local_bulletGroups.length > 0
-        ? local_getActiveBulletIndex(currentSlideIndex)
-        : currentSlideIndex;
-
-    local_bullets.forEach((bullet, bulletIndex) => {
-      if (bulletIndex === activeBulletIndex) {
-        bullet.classList.add(activeClass);
-        bullet.setAttribute('aria-current', 'true');
-      } else {
-        bullet.classList.remove(activeClass);
-        bullet.removeAttribute('aria-current');
-      }
-    });
+    local_updateBulletsActiveByIndex(local_getCurrentSlideIndex());
   }
   /**
    * Обновление progress bar
    * Использует кэшированный элемент progressBarEl вместо querySelector
    */
   function local_updateProgressActive(): void {
-    // Используем кэшированный элемент вместо querySelector
-    local_progressBarEl ??=
-      local_container?.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`) ??
-      null;
-    if (local_progressBarEl) {
-      const perPage = options.perPage ?? 1;
-      const slideCount = tvist.originalSlideCount;
-      const isLoop =
-        options.loop === true ||
-        (typeof options.loop === 'object' && options.loop.enabled !== false);
-      const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage);
-      const currentPage = local_getCurrentSlideIndex() + 1;
-      const totalPages = slideCount === 0 ? 0 : endIndex + 1;
-      const progress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0;
-      local_progressBarEl.style.width = `${progress}%`;
-    }
+    local_updateProgressActiveByIndex(local_getCurrentSlideIndex());
   }
 
   function local_updateBulletsActiveByIndex(slideIndex: number): void {
@@ -763,13 +663,8 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
   function local_renderFractionByIndex(slideIndex: number): void {
     if (!local_container) return;
     const pagination = options.pagination;
-    const perPage = options.perPage ?? 1;
-    const slideCount = tvist.originalSlideCount;
-    const isLoop =
-      options.loop === true || (typeof options.loop === 'object' && options.loop.enabled !== false);
-    const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage);
     const currentPage = slideIndex + 1;
-    const totalPages = slideCount === 0 ? 0 : endIndex + 1;
+    const totalPages = local_calculatePositionCount();
     let html: string;
     if (typeof pagination === 'object' && pagination?.renderFraction) {
       html = pagination.renderFraction(currentPage, totalPages);
@@ -788,14 +683,8 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
       local_container?.querySelector<HTMLElement>(`.${TVIST_CLASSES.paginationProgressBar}`) ??
       null;
     if (local_progressBarEl) {
-      const perPage = options.perPage ?? 1;
-      const slideCount = tvist.originalSlideCount;
-      const isLoop =
-        options.loop === true ||
-        (typeof options.loop === 'object' && options.loop.enabled !== false);
-      const endIndex = isLoop ? slideCount - 1 : Math.max(0, slideCount - perPage);
       const currentPage = slideIndex + 1;
-      const totalPages = slideCount === 0 ? 0 : endIndex + 1;
+      const totalPages = local_calculatePositionCount();
       const progress = totalPages > 0 ? (currentPage / totalPages) * 100 : 0;
       local_progressBarEl.style.width = `${progress}%`;
     }
@@ -813,7 +702,7 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
    */
   function local_detachClickHandlers(): void {
     local_clickHandlers.forEach((handler, bullet) => {
-      base.resources.unlisten(bullet, 'click', handler);
+      base.__tvistInternal_resources.__tvistInternal_unlisten(bullet, 'click', handler);
     });
     local_clickHandlers.clear();
   }
@@ -843,7 +732,7 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
       try {
         local_destroy();
       } finally {
-        base.dispose();
+        base.__tvistInternal_dispose();
       }
     },
     shouldBeActive: local_shouldBeActive,
