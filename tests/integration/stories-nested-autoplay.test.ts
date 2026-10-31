@@ -57,7 +57,8 @@ describe('Stories nested sliders', () => {
     slider.destroy()
   })
 
-  it('switches outer group when active inner group reaches end', async () => {
+  it('shows the final story for its full delay before switching the outer group', async () => {
+    vi.useFakeTimers()
     host.innerHTML = createSliderMarkup([
       createSliderMarkup(['g1 story 1', 'g1 story 2']),
       createSliderMarkup(['g2 story 1', 'g2 story 2']),
@@ -79,16 +80,20 @@ describe('Stories nested sliders', () => {
       perPage: 1,
       speed: 0,
       loop: false,
-      autoplay: false,
+      autoplay: { delay: 100, pauseOnHover: false },
       on: {
-        reachEnd: () => {
-          outer.scrollTo(1, true)
+        autoplayProgress: ({ index, progress }) => {
+          if (index === 1 && progress === 1) outer.scrollTo(1, true)
         },
       },
     })
 
-    inner0.emit('reachEnd')
-    await Promise.resolve()
+    await vi.advanceTimersByTimeAsync(100)
+    expect(inner0.realIndex).toBe(1)
+    expect(outer.activeIndex).toBe(0)
+    await vi.advanceTimersByTimeAsync(99)
+    expect(outer.activeIndex).toBe(0)
+    await vi.advanceTimersByTimeAsync(2)
 
     expect(outer.activeIndex).toBe(1)
     outer.destroy()

@@ -301,7 +301,7 @@ function main(): void {
   collect(join(root, 'api'))
   for (const file of readdirSync(join(root, 'examples')).filter((n) => n.endsWith('.md'))) markdownFiles.push(join(root, 'examples', file))
   for (const file of markdownFiles) {
-    const rel = relative(root, file).replace(/\.md$/, '.html')
+    const rel = relative(root, file).replace(/\\/g, '/').replace(/\.md$/, '.html')
     if (rel === 'api/reference.html') continue // Fragment source is rendered in API records, never as a page.
     const legacy = legacyApiPages[rel]
     if (legacy) {

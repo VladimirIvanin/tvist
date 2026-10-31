@@ -718,10 +718,18 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
       if (expectedCount !== local_bullets.length) {
         local_render();
       }
-      local_updateActive();
     }
+    local_updateActive();
     // Обновляем видимость (для breakpoints и lock/unlock)
     local_updateVisibility();
+  }
+  function local_onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
+    if ('pagination' in newOptions || 'drag' in newOptions || 'loop' in newOptions) {
+      // Rebind the container, renderers and interaction subscriptions together.
+      local_destroy();
+      base.__tvistInternal_dispose();
+      local_init();
+    }
   }
   const component: PaginationModule = {
     get name() {
@@ -737,6 +745,7 @@ export function createPaginationModule(tvist: Tvist, options: TvistOptions): Pag
     },
     shouldBeActive: local_shouldBeActive,
     onUpdate: local_onUpdate,
+    onOptionsUpdate: local_onOptionsUpdate,
   };
 
   return component;

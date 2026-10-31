@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { TVIST_CLASSES } from '@core/constants'
 import { Tvist } from '@core/Tvist'
+import type { TvistRootElement } from '@core/Tvist'
 import { createSliderFixture } from '../../fixtures'
 // Импортируем модуль через index для автоматической регистрации
 import '../../../src/modules/pagination'
@@ -19,6 +20,9 @@ describe('PaginationModule', () => {
   })
 
   afterEach(() => {
+    document.querySelectorAll<TvistRootElement>(`.${TVIST_CLASSES.block}`).forEach(root => {
+      root.tvistInstance?.destroy({ destroyNested: true })
+    })
     document.body.innerHTML = ''
   })
 
@@ -158,6 +162,7 @@ describe('PaginationModule', () => {
 
         const bullets = container.querySelectorAll(`.${TVIST_CLASSES.bullet}`)
         expect(bullets.length).toBe(expected)
+        slider.destroy()
       })
     })
 
@@ -1479,6 +1484,7 @@ describe('PaginationModule', () => {
         // Проверяем что нельзя перейти дальше endIndex
         slider.scrollTo(slides - 1)
         expect(slider.activeIndex).toBe(endIndex)
+        slider.destroy()
       })
     })
   })

@@ -1,7 +1,6 @@
 import Tvist from '../src/index'
-// @ts-expect-error Локальная сборка Splide для сравнения не содержит декларации этого JS-файла.
-import Splide from '../.cursor/sliders/splide-master/dist/js/splide.esm.js'
-import '../.cursor/sliders/splide-master/dist/css/splide-core.min.css'
+import Splide from '@splidejs/splide'
+import '@splidejs/splide/css/core'
 
 new Tvist('#compareTvist', { perPage: 1, gap: 0, speed: 300, loop: true, drag: true })
 

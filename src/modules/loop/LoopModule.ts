@@ -65,8 +65,16 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
   function local_init(): void {
     const config = local_getLoopConfig();
     const loopEnabled = config.enabled;
-    local__withClones = config.withClones;
     if (!loopEnabled || local_isInitialized) return;
+    local__withClones = config.withClones;
+    // destroy восстанавливает исходный порядок и снимает индексы.
+    // Назначаем их до клонирования при повторной активации.
+    tvist.__tvistInternal_slides.forEach((slide, index) => {
+      if (!slide.hasAttribute('data-tvist-slide-index')) {
+        slide.setAttribute('data-tvist-slide-index', String(index));
+      }
+    });
+    const initialRealIndex = tvist.__tvistInternal_realIndex;
     if (local__withClones) {
       local_createClones();
       tvist.__tvistInternal_engine.__tvistInternal_update();
@@ -74,7 +82,6 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
     const slidesCount = tvist.__tvistInternal_slides.length;
     if (slidesCount < 1) return;
     local_isInitialized = true;
-    const initialRealIndex = options.start ?? 0;
     const bothDirections =
       tvist.__tvistInternal_engine.__tvistInternal_isCenterMode() || options.peek !== undefined;
     const hasPeek = options.peek !== undefined;
@@ -404,6 +411,9 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
     });
     container.appendChild(fragment);
     tvist.__tvistInternal_updateSlidesList();
+    // После удаления клонов/перестановок DOM-индекс снова равен realIndex,
+    // в том числе когда публичный scrollTo недоступен из-за disable().
+    tvist.__tvistInternal_engine.__tvistInternal_index.set(realIndex);
     tvist.__tvistInternal_update();
     tvist.__tvistInternal_scrollTo(realIndex, true);
     local_isInitialized = false;

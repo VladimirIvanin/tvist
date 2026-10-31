@@ -1,6 +1,6 @@
 import type { TvistOptions } from '../../core/types';
 
-export function setFadeEffect(slide: HTMLElement, progress: number, _options: TvistOptions): void {
+export function setFadeEffect(slide: HTMLElement, progress: number, options: TvistOptions): void {
   // _options.fadeEffect (e.g. crossFade) can be used here when implemented
 
   // Opacity
@@ -32,7 +32,10 @@ export function setFadeEffect(slide: HTMLElement, progress: number, _options: Tv
 
   // Slide 0 is at 0%. Progress 0. Translate 0. Correct.
 
-  slide.style.transform = `translate3d(${-progress * 100}%, 0, 0)`;
+  slide.style.transform =
+    options.direction === 'vertical'
+      ? `translate3d(0, ${-progress * 100}%, 0)`
+      : `translate3d(${-progress * 100}%, 0, 0)`;
 
   // Z-Index
   // Active slide (progress 0) should be on top.

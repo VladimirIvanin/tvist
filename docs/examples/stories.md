@@ -5,7 +5,9 @@
 - `autoplayProgress` — заполняет активный сегмент `0..1`
 - `longPressStart` / `longPressEnd` — пауза/возобновление по удержанию
 - `waitForVideo: true` — для HTML `<video>` переход по окончанию ролика
-- `reachEnd` — сигнал закрыть модалку или переключить внешний контейнер
+- `autoplayProgress` с `progress: 1` у последнего слайда — сигнал закрыть модалку или переключить внешний контейнер
+
+`reachEnd` сообщает о переходе на последний слайд. Для историй дождитесь завершения его прогресса, чтобы показать последний кадр целиком.
 
 
 ## Интерактивный пример
@@ -41,9 +43,9 @@ const slider = new Tvist('.tvist-v1', {
   on: {
     autoplayProgress: ({ progress, index }) => {
       renderStorySegments(index, progress)
-    },
-    reachEnd: () => {
-      closeStoriesModal()
+      if (progress === 1 && index === slider.slides.length - 1) {
+        closeStoriesModal()
+      }
     },
   },
 })

@@ -378,12 +378,13 @@ export function createGridModule(tvist: Tvist, options: TvistOptions): GridModul
     const engine = tvist.__tvistInternal_engine;
     const slides = tvist.__tvistInternal_slides;
     local_applyInterPageGaps();
-    const newPositions = slides.map((slide) => slide.offsetLeft);
+    const isVertical = options.direction === 'vertical';
+    const newPositions = slides.map((slide) => (isVertical ? slide.offsetTop : slide.offsetLeft));
     engine.__tvistInternal_setSlidePositions(newPositions);
     if (slides.length > 0) {
       const firstSlide = slides[0];
       if (firstSlide) {
-        const realSlideSize = firstSlide.offsetWidth;
+        const realSlideSize = isVertical ? firstSlide.offsetHeight : firstSlide.offsetWidth;
         engine.__tvistInternal_setSlideSize(realSlideSize);
       }
     }

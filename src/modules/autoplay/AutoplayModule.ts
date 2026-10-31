@@ -195,7 +195,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
    */
   function local_onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
     // Если autoplay изменился
-    if (newOptions.autoplay !== undefined) {
+    if ('autoplay' in newOptions) {
       const wasActive = local_config !== null;
       const oldConfig = local_config;
       // Перенормализуем
@@ -733,7 +733,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
           // Если после ожидаемой длительности перехода индекс всё ещё тот же,
           // считаем, что next() уткнулся в границу без loop.
           if (tvist.__tvistInternal_activeIndex !== indexBefore) return;
-          // reachEnd должен приходить только после полного показа последнего слайда:
+          // Завершаем autoplay только после полного показа последнего слайда:
           // delay + время проверки границы от момента slideChangeEnd.
           if (local_lastSlideChangeEndAt !== null && local_config) {
             const minElapsed = local_config.delay + boundaryDelay;
@@ -750,14 +750,6 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
                     tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex,
                     1
                   );
-                  if (
-                    !(
-                      options.loop === true ||
-                      (typeof options.loop === 'object' && options.loop.enabled !== false)
-                    )
-                  ) {
-                    tvist.__tvistInternal_emit('reachEnd');
-                  }
                   local_stop();
                 },
                 Math.max(0, Math.ceil(minElapsed - elapsed))
@@ -771,14 +763,6 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
             tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex,
             1
           );
-          if (
-            !(
-              options.loop === true ||
-              (typeof options.loop === 'object' && options.loop.enabled !== false)
-            )
-          ) {
-            tvist.__tvistInternal_emit('reachEnd');
-          }
           local_stop();
         }, boundaryDelay);
       }

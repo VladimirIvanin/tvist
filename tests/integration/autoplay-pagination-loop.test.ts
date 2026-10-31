@@ -421,7 +421,7 @@ describe('Autoplay + Pagination + Loop integration', () => {
     slider.destroy()
   })
 
-  it('should not emit reachEnd before last slide delay in non-loop with animated transitions', async () => {
+  it('emits reachEnd on arrival and completes autoplay after the last slide delay', async () => {
     container.innerHTML = `
       <div class="${TVIST_CLASSES.block}">
         <div class="${TVIST_CLASSES.track}">
@@ -465,15 +465,16 @@ describe('Autoplay + Pagination + Loop integration', () => {
     expect(slider.activeIndex).toBe(2)
     expect(lastSlideReachedAt).not.toBeNull()
 
-    // Пока не прошла полная задержка последнего слайда, reachEnd быть не должен.
+    expect(reachEndSpy).toHaveBeenCalledTimes(1)
+    expect(reachEndAt).toBe(lastSlideReachedAt)
+    // Последний слайд продолжает показываться после события достижения края.
     await vi.advanceTimersByTimeAsync(90)
-    expect(reachEndSpy).toHaveBeenCalledTimes(0)
+    expect(slider.autoplay?.isRunning()).toBe(true)
 
-    // После delay + проверки границы (speed+20) reachEnd должен прийти.
+    // После delay + проверки границы autoplay останавливается без повторного reachEnd.
     await vi.advanceTimersByTimeAsync(350)
     expect(reachEndSpy).toHaveBeenCalledTimes(1)
-    expect(reachEndAt).not.toBeNull()
-    expect((reachEndAt as number) - (lastSlideReachedAt as number)).toBeGreaterThanOrEqual(100)
+    expect(slider.autoplay?.isRunning()).toBe(false)
 
     slider.destroy()
   })

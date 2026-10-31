@@ -423,7 +423,7 @@ export function createMotion(deps: MotionContext): Motion {
     const minScroll = deps.__tvistInternal_getMinScrollPosition();
     const maxScroll = deps.__tvistInternal_getMaxScrollPosition();
     const range = maxScroll - minScroll;
-    if (range <= 0) return;
+    if (range === 0) return;
     const pos = deps.__tvistInternal_location.get();
     const progress = Math.max(0, Math.min(1, (pos - minScroll) / range));
     deps.__tvistInternal_tvist.__tvistInternal_emit('progress', progress);
@@ -432,15 +432,13 @@ export function createMotion(deps: MotionContext): Motion {
   /** События достижения начала/конца (reachBeginning / reachEnd) */
   function local_emitReachEdge(ctx: ScrollContext, endIndex: number): void {
     const index = ctx.eventIndex;
-    // reach-edge только когда requestedIndex вышел за пределы доступного диапазона
-    const loopEnabled = deps.__tvistInternal_isLoopEnabled();
-    const triedBeforeStart = !loopEnabled && ctx.requestedIndex < 0;
-    const triedAfterEnd =
-      !loopEnabled && !deps.__tvistInternal_options.rewind && ctx.requestedIndex > endIndex;
-    if (index <= 0 && triedBeforeStart) {
+    // Вызывается только после смены индекса, поэтому повторная навигация на краю
+    // не дублирует событие. В loop граничных позиций нет.
+    if (deps.__tvistInternal_isLoopEnabled() || endIndex <= 0) return;
+    if (index === 0) {
       deps.__tvistInternal_tvist.__tvistInternal_emit('reachBeginning');
     }
-    if (index >= endIndex && triedAfterEnd) {
+    if (index === endIndex) {
       deps.__tvistInternal_tvist.__tvistInternal_emit('reachEnd');
     }
   }

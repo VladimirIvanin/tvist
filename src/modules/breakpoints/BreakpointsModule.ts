@@ -44,6 +44,7 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
   const local_mediaQueries: Map<number, MediaQueryList> = new Map<number, MediaQueryList>();
 
   let local_currentBreakpoint: number | null = null;
+  let local_forceApply = false;
   /**
    * Получить оригинальные опции (до применения breakpoint)
    */
@@ -54,7 +55,9 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
    * Сбросить текущий breakpoint (для пересчёта при updateOptions).
    */
   function local_resetCurrentBreakpoint(): void {
-    local_currentBreakpoint = null;
+    local_forceApply = true;
+    local_destroy();
+    if (options.breakpointsBase !== 'container') local_setupMediaQueries();
   }
 
   function local_init(): void {
@@ -142,7 +145,8 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
     const oldBreakpoint = local_currentBreakpoint;
     const breakpointChanged = newBreakpoint !== oldBreakpoint;
     // Применяем если breakpoint изменился ИЛИ был ручной вызов enable/disable
-    if (breakpointChanged || manualEnabledChange) {
+    if (breakpointChanged || manualEnabledChange || local_forceApply) {
+      local_forceApply = false;
       local_currentBreakpoint = newBreakpoint;
       local_applyBreakpoint(newBreakpoint);
       // Эмитим событие только если breakpoint реально изменился
@@ -159,6 +163,7 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
    * Применение опций breakpoint
    */
   function local_applyBreakpoint(bp: number | null): void {
+    const oldOptions = { ...tvist.__tvistInternal_options };
     const originalOptions = local_getOriginalOptions();
     // Начинаем с оригинальных опций (deep clone с сохранением DOM-элементов)
     const newOptions = cloneOptions(originalOptions as Record<string, unknown>) as TvistOptions;
@@ -177,6 +182,17 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
     });
     Object.assign(tvist.__tvistInternal_options, newOptions);
     tvist.__tvistInternal_options.breakpoints = breakpoints;
+    // Уведомляем уже работающие компоненты до синхронизации и пересчёта DOM.
+    // Передаём также удалённые ключи, чтобы сбросить локальные конфигурации.
+    const effectiveOptions = { ...newOptions };
+    for (const key of Object.keys(oldOptions)) {
+      if (!(key in effectiveOptions)) {
+        (effectiveOptions as Record<string, unknown>)[key] = undefined;
+      }
+    }
+    if (shouldBeEnabled && tvist.__tvistInternal_isEnabled) {
+      tvist.__tvistInternal_notifyOptionsUpdate(effectiveOptions);
+    }
     // Синхронизируем модули с новыми опциями (инициализируем новые, уничтожаем деактивированные)
     // Вызываем до enable/disable, чтобы модули были готовы при включении слайдера
     if (shouldBeEnabled) {

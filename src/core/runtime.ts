@@ -110,6 +110,7 @@ export interface TvistRuntime {
   __tvistInternal_getModule<T extends Module>(name: string): T | undefined;
   __tvistInternal_removeModule(name: string): void;
   __tvistInternal_syncModules(destroyOnly?: boolean): void;
+  __tvistInternal_notifyOptionsUpdate(options: Partial<TvistOptions>): void;
   __tvistInternal_checkAndResetManualEnabledChange(): boolean;
   readonly __tvistInternal_isTogglingEnabled: boolean;
   __tvistInternal_updateSlidesList(): void;
@@ -319,7 +320,7 @@ export function createTvistRuntime(
     local_modules.forEach((module, name) => {
       if (name === 'breakpoints') return;
       try {
-        if (module.shouldBeActive?.() === false) {
+        if (!isBuiltinEnabled(name, local_options) || module.shouldBeActive?.() === false) {
           module.destroy();
           local_modules.delete(name);
         }
@@ -436,6 +437,8 @@ export function createTvistRuntime(
     return slider;
   }
   function local_updateOptions(newOptions: Partial<TvistOptions>): Tvist {
+    const updatesBreakpoints =
+      newOptions.breakpoints !== undefined || newOptions.breakpointsBase !== undefined;
     const needsRecalculation =
       newOptions.perPage !== undefined ||
       newOptions.slideMinSize !== undefined ||
@@ -457,10 +460,17 @@ export function createTvistRuntime(
     }
     const oldOptions = { ...local_options };
     // Обработка изменения breakpoints
-    if (newOptions.breakpoints !== undefined || newOptions.breakpointsBase !== undefined) {
+    if (updatesBreakpoints) {
       local_applyBreakpointsOptionsUpdate(newOptions);
     } else {
       local_applySimpleOptionsUpdate(newOptions);
+    }
+    if (newOptions.enabled !== undefined) {
+      if (local__originalOptions && !updatesBreakpoints) {
+        local__originalOptions.enabled = newOptions.enabled;
+      }
+      if (local_options.enabled === false) local_disable();
+      else local_enable();
     }
     // Обработка изменения direction
     if (newOptions.direction !== undefined && newOptions.direction !== oldOptions.direction) {
@@ -488,14 +498,18 @@ export function createTvistRuntime(
       local_engine.__tvistInternal_applyTransform();
     }
     // Уведомляем модули об изменении опций
-    local_modules.forEach((module) => {
-      module.onOptionsUpdate?.(newOptions);
-    });
+    if (!updatesBreakpoints) local_notifyOptionsUpdate(newOptions);
     // Синхронизируем модули с новыми опциями
     // Если слайдер выключен, передаём destroyOnly=true, чтобы новые модули не инициализировались
     local_syncModules(!local__isEnabled);
     local_emit('optionsUpdated', slider, newOptions);
     return slider;
+  }
+  function local_notifyOptionsUpdate(newOptions: Partial<TvistOptions>): void {
+    // Snapshot: hooks may activate/deactivate other components.
+    [...local_modules.values()].forEach((module) => {
+      if (module.name !== 'breakpoints') module.onOptionsUpdate?.(newOptions);
+    });
   }
   function local_applyBreakpointsOptionsUpdate(newOptions: Partial<TvistOptions>): void {
     // Если есть _originalOptions, восстанавливаем базовые опции (без breakpoints)
@@ -520,9 +534,16 @@ export function createTvistRuntime(
     }
     local__originalOptions = cloned;
     // Сбрасываем текущий breakpoint в BreakpointsModule чтобы он пересчитался
-    const breakpointsModule = local_modules.get('breakpoints');
+    if (!local_modules.has('breakpoints')) {
+      const factory = BUILTINS.get('breakpoints');
+      if (factory) local_tryInitModule('breakpoints', factory);
+    }
+    const breakpointsModule = local_modules.get('breakpoints') as BreakpointsModule | undefined;
     if (breakpointsModule) {
-      (breakpointsModule as BreakpointsModule).resetCurrentBreakpoint();
+      breakpointsModule.resetCurrentBreakpoint();
+      breakpointsModule.onResize();
+    } else {
+      local_notifyOptionsUpdate(local_options);
     }
   }
   function local_applySimpleOptionsUpdate(newOptions: Partial<TvistOptions>): void {
@@ -850,6 +871,7 @@ export function createTvistRuntime(
       local_allowClick = value;
     },
     __tvistInternal_syncModules: local_syncModules,
+    __tvistInternal_notifyOptionsUpdate: local_notifyOptionsUpdate,
     __tvistInternal_next: local_next,
     __tvistInternal_prev: local_prev,
     __tvistInternal_scrollTo: local_scrollTo,

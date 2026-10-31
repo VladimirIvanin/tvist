@@ -106,13 +106,15 @@ const innerSliders = innerRoots.map((root, groupIndex) => new TvistV1(root, {
     autoplayProgress: ({ progress, index }) => {
       if (groupIndex === activeGroup && !transitioning && index === innerSliders[groupIndex].realIndex) {
         renderProgress(groupIndex, index, progress);
+        if (progress === 1 && index === innerSliders[groupIndex].slides.length - 1) {
+          finishGroup(groupIndex);
+        }
       }
     },
     slideChangeStart: index => renderProgress(groupIndex, index, 0),
     slideChangeEnd: () => {
       if (groupIndex === activeGroup) renderControls();
     },
-    reachEnd: () => finishGroup(groupIndex),
     longPressStart: () => {
       if (groupIndex !== activeGroup) return;
       holding = true;
