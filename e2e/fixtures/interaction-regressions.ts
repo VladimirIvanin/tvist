@@ -55,7 +55,9 @@ export async function mountRegressionSlider(
 
 export async function trackPosition(page: Page, vertical = false): Promise<number> {
   return page.locator('#regression-slider .tvist-v1__container').evaluate((el, vertical) => {
-    const matrix = new DOMMatrix(getComputedStyle(el).transform);
+    // Read the local CSS-pixel translation written by Tvist. Firefox includes
+    // ancestor CSS zoom in the computed transform, unlike Chromium and WebKit.
+    const matrix = new DOMMatrix(el.style.transform);
     return vertical ? matrix.m42 : matrix.m41;
   }, vertical);
 }

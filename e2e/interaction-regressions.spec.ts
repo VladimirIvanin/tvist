@@ -218,9 +218,13 @@ for (const zoom of [0.8, 1.25]) {
     await page.mouse.move(x - 10, y);
     await page.mouse.move(x - 40, y);
     const before = await trackPosition(page);
+    const container = page.locator('#regression-slider .tvist-v1__container');
+    const renderedBefore = await container.evaluate((el) => el.getBoundingClientRect().left);
     await page.mouse.move(x - 70, y);
     // roundLengths rounds each transform independently to a CSS pixel.
     expect(Math.abs((await trackPosition(page)) - before + 30 / zoom)).toBeLessThan(1.1);
+    const renderedAfter = await container.evaluate((el) => el.getBoundingClientRect().left);
+    expect(Math.abs(renderedAfter - renderedBefore + 30)).toBeLessThan(1.1 * zoom);
     await page.mouse.up();
   });
 }
