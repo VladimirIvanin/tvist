@@ -147,6 +147,11 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
 
   let local_prevBaseEvent: DragPoint | null = null;
 
+  // Pointer coordinates are screen pixels; Engine positions are unscaled CSS pixels.
+  let local_pointerScaleX = 1;
+  let local_pointerScaleY = 1;
+  let local_lastDragEvent: TouchEvent | MouseEvent | PointerEvent | null = null;
+
   function local_init(): void {
     if (!local_shouldBeActive()) return;
     local_attachEvents();
@@ -196,7 +201,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     local_cancelHoldTracking();
     local_detachHoldEvents();
     local_detachEvents();
-    local_stopMomentum();
+    local_cancelDrag();
     base.__tvistInternal_off('positionShifted', local_onPositionShifted);
     base.__tvistInternal_off('loopFix', local_onLoopFix);
   }
@@ -567,6 +572,32 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
   }
 
   let local_dragPointerId: number | null = null;
+
+  function local_cancelDrag(snap = false): void {
+    const wasDragging = local_isDragging;
+    const wasMoving = wasDragging || local_animationId !== null || local_wasAnimating;
+    local_isDragging = false;
+    local_isPotentialDrag = false;
+    local_dragPointerId = null;
+    local_wasAnimating = false;
+    local_animationTarget = null;
+    local_manageDocumentEvents('remove');
+    local_stopMomentum();
+    tvist.__tvistInternal_root.classList.remove(TVIST_CLASSES.dragging);
+    tvist.__tvistInternal_allowClick = true;
+    if (snap && tvist.__tvistInternal_isEnabled) {
+      if (wasDragging && local_lastDragEvent)
+        base.__tvistInternal_emit('dragEnd', local_lastDragEvent);
+      if (wasMoving)
+        tvist.__tvistInternal_engine.__tvistInternal_scrollTo(
+          tvist.__tvistInternal_activeIndex,
+          true,
+          true
+        );
+    }
+    local_lastDragEvent = null;
+  }
+
   const local_onPointerDown: (e: TouchEvent | MouseEvent | PointerEvent) => void = (
     e: TouchEvent | MouseEvent | PointerEvent
   ): void => {
@@ -580,6 +611,13 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     if (target.closest(SLIDER_CONTROL_SELECTOR) || local_isFocusableElement(target)) return;
     const point = local_getPointerPosition(e);
     if (!point) return;
+    const track = tvist.__tvistInternal_track;
+    const rect = track.getBoundingClientRect();
+    local_pointerScaleX =
+      track.offsetWidth > 0 && rect.width > 0 ? rect.width / track.offsetWidth : 1;
+    local_pointerScaleY =
+      track.offsetHeight > 0 && rect.height > 0 ? rect.height / track.offsetHeight : 1;
+    local_lastDragEvent = e;
     local_isPotentialDrag = true;
     local_dragPointerId = 'pointerId' in e ? e.pointerId : null;
     local_startX = point.x;
@@ -615,6 +653,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     if ('pointerId' in e && local_dragPointerId !== null && e.pointerId !== local_dragPointerId)
       return;
     if (!local_isPotentialDrag && !local_isDragging) return;
+    local_lastDragEvent = e;
     const point = local_getPointerPosition(e);
     if (!point) return;
     const now = Date.now();
@@ -759,7 +798,8 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
   ): number {
     const dragSpeed = options.dragSpeed ?? 1;
     const delta = isHorizontal ? deltaX : deltaY;
-    const distance = delta * dragSpeed;
+    const scale = isHorizontal ? local_pointerScaleX : local_pointerScaleY;
+    const distance = (delta / scale) * dragSpeed;
     if (local_isMarqueeActive) {
       const newPosition = local_startPosition + distance;
       if (options.rubberband !== false && !read_isLoopEnabled()) {
@@ -970,7 +1010,8 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     if (timeDiff === 0 || timeDiff >= local_LOG_INTERVAL) return 0;
     const isHorizontal = options.direction !== 'vertical';
     const distance = isHorizontal ? currentPoint.x - basePoint.x : currentPoint.y - basePoint.y;
-    return distance / timeDiff;
+    const scale = isHorizontal ? local_pointerScaleX : local_pointerScaleY;
+    return distance / scale / timeDiff;
   }
 
   function local_startMomentum(initialVelocity: number): void {
@@ -1175,6 +1216,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
   }
 
   function local_onOptionsUpdate(): void {
+    if (options.drag === false) local_cancelDrag(true);
     local_finishHold();
     local_detachHoldEvents();
     local_setupHoldToPause();

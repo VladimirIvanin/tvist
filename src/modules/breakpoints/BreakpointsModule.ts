@@ -182,6 +182,16 @@ export function createBreakpointsModule(tvist: Tvist, options: TvistOptions): Br
     });
     Object.assign(tvist.__tvistInternal_options, newOptions);
     tvist.__tvistInternal_options.breakpoints = breakpoints;
+    // A fixed-size breakpoint wrote inline dimensions. Release them before
+    // measuring CSS sizes again, just as updateOptions() does for auto sizing.
+    if (newOptions.autoWidth && !oldOptions.autoWidth)
+      tvist.__tvistInternal_slides.forEach((slide) => {
+        slide.style.width = '';
+      });
+    if (newOptions.autoHeight && !oldOptions.autoHeight)
+      tvist.__tvistInternal_slides.forEach((slide) => {
+        slide.style.height = '';
+      });
     // Уведомляем уже работающие компоненты до синхронизации и пересчёта DOM.
     // Передаём также удалённые ключи, чтобы сбросить локальные конфигурации.
     const effectiveOptions = { ...newOptions };
