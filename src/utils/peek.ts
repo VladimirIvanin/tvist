@@ -134,9 +134,13 @@ export function applyPeek(
   const isVertical = options.direction === 'vertical'
 
   if (isVertical) {
+    element.style.paddingLeft = ''
+    element.style.paddingRight = ''
     setPaddingOrRemove(element, 'paddingTop', getCssPeek(options, 'top', maxNumericPx))
     setPaddingOrRemove(element, 'paddingBottom', getCssPeek(options, 'bottom', maxNumericPx))
   } else {
+    element.style.paddingTop = ''
+    element.style.paddingBottom = ''
     setPaddingOrRemove(element, 'paddingLeft', getCssPeek(options, 'left', maxNumericPx))
     setPaddingOrRemove(element, 'paddingRight', getCssPeek(options, 'right', maxNumericPx))
   }

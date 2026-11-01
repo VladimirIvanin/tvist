@@ -9,7 +9,7 @@
  * - События загрузки изображений
  */
 import { createComponent, type Component } from '../Component';
-import { addClass, removeClass, children } from '../../utils/dom';
+import { addClass, removeClass } from '../../utils/dom';
 import { TVIST_CLASSES } from '../../core/constants';
 import type { TvistRuntime as Tvist } from '../../core/runtime';
 import type { TvistOptions } from '../../core/types';
@@ -70,6 +70,7 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
    * Очередь изображений для загрузки
    */
   let local_entries: LazyLoadEntry[] = [];
+  const local_spinners = new Set<HTMLSpanElement>();
   /**
    * Количество слайдов для предзагрузки
    */
@@ -85,8 +86,8 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
   }
 
   function local_destroy(): void {
-    local_entries = [];
     local_removeSpinners();
+    local_entries = [];
   }
 
   function local_shouldBeActive(): boolean {
@@ -132,8 +133,8 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
   function local_register(): void {
     const slides = tvist.__tvistInternal_slides;
     slides.forEach((slide, index) => {
-      const images = children(slide).filter((el): el is HTMLImageElement =>
-        el.matches(IMAGE_SELECTOR)
+      const images = Array.from(slide.querySelectorAll<HTMLImageElement>(IMAGE_SELECTOR)).filter(
+        (img) => img.closest(`.${TVIST_CLASSES.block}`) === tvist.__tvistInternal_root
       );
       images.forEach((img) => {
         const dataSrc = img.getAttribute(SRC_DATA_ATTRIBUTE);
@@ -155,6 +156,7 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
           }
           // Добавляем в очередь
           local_entries.push([img, index, spinner]);
+          local_spinners.add(spinner);
           // Скрываем изображение, если у него нет src
           if (!img.src) {
             img.style.display = 'none';
@@ -223,6 +225,7 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
     const onLoad = () => {
       removeClass(slide, LOADING_CLASS);
       spinner.remove();
+      local_spinners.delete(spinner);
       img.style.display = '';
       // Emit события
       base.__tvistInternal_emit('lazyLoaded', img, slideIndex);
@@ -231,6 +234,7 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
       base.__tvistInternal_resources.__tvistInternal_unlisten(img, 'error', onError);
     };
     const onError = () => {
+      local_spinners.delete(spinner);
       removeClass(slide, LOADING_CLASS);
       spinner.remove();
       // Emit события об ошибке
@@ -258,9 +262,8 @@ export function createLazyLoadModule(tvist: Tvist, options: TvistOptions): LazyL
    * Удаление всех спиннеров
    */
   function local_removeSpinners(): void {
-    local_entries.forEach(([, , spinner]) => {
-      spinner.remove();
-    });
+    local_spinners.forEach((spinner) => spinner.remove());
+    local_spinners.clear();
   }
   /**
    * Публичное API для ручной загрузки изображений

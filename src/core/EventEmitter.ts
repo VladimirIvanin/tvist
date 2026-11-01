@@ -55,7 +55,8 @@ export class EventEmitter {
     // Вызываем обработчики конкретного события
     const handlers = this.__tvistInternal_listeners.get(event);
     if (handlers) {
-      handlers.forEach((handler) => {
+      [...handlers].forEach((handler) => {
+        if (!handlers.has(handler)) return;
         try {
           handler(...args);
         } catch (error) {
@@ -65,7 +66,7 @@ export class EventEmitter {
     }
 
     // Вызываем обработчики "любого" события
-    this.__tvistInternal_anyListeners.forEach((handler) => {
+    [...this.__tvistInternal_anyListeners].forEach((handler) => {
       try {
         handler(event, ...args);
       } catch (error) {
@@ -82,8 +83,8 @@ export class EventEmitter {
    */
   once(event: string, handler: EventHandler): this {
     const wrappedHandler = (...args: any[]) => {
-      handler(...args);
       this.off(event, wrappedHandler);
+      handler(...args);
     };
     return this.on(event, wrappedHandler);
   }

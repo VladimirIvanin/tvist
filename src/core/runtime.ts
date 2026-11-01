@@ -145,6 +145,9 @@ export function createTvistRuntime(
   const resources = createResources();
   let local_resizeHandler: () => void | undefined;
   let local_resizeObserver: ResizeObserver | undefined;
+  let local_resizeFrame: number | undefined;
+  let local_observedWidth = 0;
+  let local_observedHeight = 0;
   let local__lastNavAt = 0;
   let local__isEnabled = true;
   let local__manualEnabledChange = false;
@@ -228,6 +231,8 @@ export function createTvistRuntime(
     } else {
       local_clearSliderStyles();
     }
+    local_observedWidth = local_track.offsetWidth;
+    local_observedHeight = local_track.offsetHeight;
     local_root.classList.add(TVIST_CLASSES.created);
     local_emit('created', slider);
     local_setupSlideClick();
@@ -338,6 +343,8 @@ export function createTvistRuntime(
     local_root.classList.toggle(TVIST_CLASSES.vertical, local_options.direction === 'vertical');
   }
   function local_setupResizeListener(): void {
+    local_observedWidth = local_track.offsetWidth;
+    local_observedHeight = local_track.offsetHeight;
     local_resizeHandler = throttle(
       () => {
         local_update();
@@ -351,10 +358,21 @@ export function createTvistRuntime(
       // track имеет overflow: hidden и его размер определяется внешним layout,
       // а не содержимым — это предотвращает бесконечный цикл при display: grid
       // у родителя (когда applyFixedSize меняет слайды → меняется root → снова update).
-      local_resizeObserver = new ResizeObserver(() => {
-        local_resizeHandler?.();
+      local_resizeObserver = new ResizeObserver((entries) => {
+        const width = local_track.offsetWidth;
+        const height = local_track.offsetHeight;
+        // Initial/same-size delivery must not interrupt a transition that just started.
+        if (entries.length > 0 && width === local_observedWidth && height === local_observedHeight)
+          return;
+        local_observedWidth = width;
+        local_observedHeight = height;
+        if (local_resizeFrame !== undefined) return;
+        local_resizeFrame = resources.__tvistInternal_frame(() => {
+          local_resizeFrame = undefined;
+          local_resizeHandler?.();
+        });
       });
-      local_resizeObserver.observe(local_track);
+      local_resizeObserver.observe(local_track, { box: 'border-box' });
       resources.__tvistInternal_add(() => local_resizeObserver?.disconnect());
     } else {
       // Fallback для старых браузеров
@@ -409,7 +427,9 @@ export function createTvistRuntime(
     const loopOpt = local_options.loop;
     const isLoop = loopOpt === true || (typeof loopOpt === 'object' && loopOpt.enabled !== false);
     if (isLoop) {
-      const withClones = typeof loopOpt === 'object' && loopOpt.withClones === true;
+      const withClones = read_slides().some((slide) =>
+        slide.classList.contains(TVIST_CLASSES.slideClone)
+      );
       const domIndex = findDomIndexByRealIndex(read_slides(), index, {
         preferNonClone: withClones,
       });
@@ -422,11 +442,17 @@ export function createTvistRuntime(
   }
   function local_update(): Tvist {
     // Не обновляем, если слайдер отключен
-    if (local__isDestroyed || !local__isEnabled) return slider;
+    if (local__isDestroyed) return slider;
+    if (!local__isEnabled) {
+      local_modules.get('breakpoints')?.onResize?.();
+      return slider;
+    }
+    local_updateSlidesList();
     // Вызываем onResize на модулях ДО engine.update (для breakpoints)
     local_modules.forEach((module) => {
       module.onResize?.();
     });
+    if (!local__isEnabled) return slider;
     local_updateDirectionClass();
     local_engine.__tvistInternal_update();
     // Вызываем onUpdate на модулях
@@ -437,10 +463,19 @@ export function createTvistRuntime(
     return slider;
   }
   function local_updateOptions(newOptions: Partial<TvistOptions>): Tvist {
+    if (newOptions.loop !== undefined || newOptions.grid !== undefined) {
+      local_removeModule('loop');
+      if (newOptions.grid !== undefined) local_removeModule('grid');
+    }
     const updatesBreakpoints =
       newOptions.breakpoints !== undefined || newOptions.breakpointsBase !== undefined;
     const needsRecalculation =
       newOptions.perPage !== undefined ||
+      newOptions.autoWidth !== undefined ||
+      newOptions.autoHeight !== undefined ||
+      newOptions.grid !== undefined ||
+      newOptions.loop !== undefined ||
+      newOptions.effect !== undefined ||
       newOptions.slideMinSize !== undefined ||
       newOptions.fixedWidth !== undefined ||
       newOptions.fixedHeight !== undefined ||
@@ -465,6 +500,17 @@ export function createTvistRuntime(
     } else {
       local_applySimpleOptionsUpdate(newOptions);
     }
+    if (local_options.effect === 'fade' || local_options.effect === 'cube') {
+      local_options.perPage = 1;
+    }
+    if (newOptions.autoWidth && !oldOptions.autoWidth)
+      read_slides().forEach((slide) => {
+        slide.style.width = '';
+      });
+    if (newOptions.autoHeight && !oldOptions.autoHeight)
+      read_slides().forEach((slide) => {
+        slide.style.height = '';
+      });
     if (newOptions.enabled !== undefined) {
       if (local__originalOptions && !updatesBreakpoints) {
         local__originalOptions.enabled = newOptions.enabled;
@@ -502,6 +548,7 @@ export function createTvistRuntime(
     // Синхронизируем модули с новыми опциями
     // Если слайдер выключен, передаём destroyOnly=true, чтобы новые модули не инициализировались
     local_syncModules(!local__isEnabled);
+    if (local__isEnabled && needsRecalculation) local_update();
     local_emit('optionsUpdated', slider, newOptions);
     return slider;
   }
@@ -547,6 +594,9 @@ export function createTvistRuntime(
     }
   }
   function local_applySimpleOptionsUpdate(newOptions: Partial<TvistOptions>): void {
+    if (local__originalOptions && newOptions.thumbs !== undefined) {
+      local__originalOptions.thumbs = newOptions.thumbs;
+    }
     if (newOptions.browserFixes) {
       local_options.browserFixes = {
         ...local_options.browserFixes,
@@ -611,7 +661,7 @@ export function createTvistRuntime(
       if (name === 'breakpoints') return; // Не трогаем breakpoints
       modulesToDestroy.push(name);
     });
-    modulesToDestroy.forEach((name) => {
+    modulesToDestroy.reverse().forEach((name) => {
       try {
         local_modules.get(name)?.destroy();
         local_modules.delete(name);
@@ -677,7 +727,7 @@ export function createTvistRuntime(
     resources.__tvistInternal_clear();
     local_emit('destroyed', slider);
     // Уничтожаем модули
-    local_modules.forEach((module) => {
+    [...local_modules.values()].reverse().forEach((module) => {
       try {
         module.destroy();
       } catch (error) {
@@ -711,6 +761,10 @@ export function createTvistRuntime(
   function local_updateSlidesList(): void {
     local__slides = getSlidesInTvistRoot(local_container, local_root);
     local__originalSlideCountCache = null;
+    const loop = local_options.loop;
+    if (!(loop === true || (typeof loop === 'object' && loop.enabled !== false))) {
+      local_updateSlideIndices();
+    }
   }
   function local_updateSlideIndices(): void {
     local__slides.forEach((el, index) => {

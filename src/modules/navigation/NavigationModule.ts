@@ -100,14 +100,14 @@ export function createNavigationModule(tvist: Tvist, options: TvistOptions): Nav
       if (arrows.prev) {
         if (typeof arrows.prev === 'string') {
           local_prevButton = document.querySelector(arrows.prev);
-        } else if (arrows.prev instanceof HTMLElement) {
+        } else {
           local_prevButton = arrows.prev;
         }
       }
       if (arrows.next) {
         if (typeof arrows.next === 'string') {
           local_nextButton = document.querySelector(arrows.next);
-        } else if (arrows.next instanceof HTMLElement) {
+        } else {
           local_nextButton = arrows.next;
         }
       }

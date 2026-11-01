@@ -179,6 +179,10 @@ function restoreDomElements(
  */
 export function cloneOptions<T extends Record<string, unknown>>(options: T): T {
   const cloned = JSON.parse(JSON.stringify(options)) as T
+  const thumbs = options.thumbs as { slider?: unknown } | undefined
+  if (thumbs?.slider) {
+    ;(cloned as Record<string, unknown>).thumbs = { ...thumbs }
+  }
 
   // Список вложенных объектов опций, которые могут содержать DOM-элементы
   const nestedKeys = ['arrows', 'pagination', 'scrollbar'] as const

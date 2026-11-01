@@ -99,8 +99,10 @@ describe('BUG: бесконечная прокрутка при display: grid у
     // Отслеживаем вызовы update()
     const updateSpy = vi.spyOn(getRuntime(slider), '__tvistInternal_update')
 
-    // Первый вызов ResizeObserver — throttle пропускает сразу (lastCall=0)
+    // ResizeObserver не меняет layout внутри observer delivery.
     resizeCallback?.([], {} as ResizeObserver)
+    expect(updateSpy).not.toHaveBeenCalled()
+    vi.advanceTimersByTime(20)
     expect(updateSpy).toHaveBeenCalledTimes(1)
     updateSpy.mockClear()
 
@@ -115,7 +117,7 @@ describe('BUG: бесконечная прокрутка при display: grid у
     vi.useRealTimers()
   })
 
-  it('при 10 срабатываниях ResizeObserver подряд update() вызывается максимум 2 раза (throttle)', () => {
+  it('при 10 срабатываниях ResizeObserver подряд выполняет один update в следующем кадре', () => {
     vi.useFakeTimers()
 
     // Мокируем ResizeObserver с возможностью ручного триггера
@@ -147,15 +149,14 @@ describe('BUG: бесконечная прокрутка при display: grid у
       resizeCallback?.([], {} as ResizeObserver)
     }
 
-    // Первый вызов немедленный (throttle пропускает при lastCall=0)
-    // Остальные 9 откладываются и схлопываются в 1 отложенный вызов
-    expect(updateSpy).toHaveBeenCalledTimes(1)
+    // Все уведомления одного кадра объединяются, layout меняется в следующем RAF.
+    expect(updateSpy).not.toHaveBeenCalled()
 
     // После throttle задержки — ещё 1 вызов (отложенный)
     vi.advanceTimersByTime(150)
-    expect(updateSpy).toHaveBeenCalledTimes(2)
+    expect(updateSpy).toHaveBeenCalledTimes(1)
 
-    // Итого: максимум 2 вызова вместо 10 — throttle работает
+    // Итого: один пересчёт вместо десяти — RAF объединяет уведомления.
     vi.useRealTimers()
   })
 

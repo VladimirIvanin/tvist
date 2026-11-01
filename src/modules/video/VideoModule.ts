@@ -14,6 +14,7 @@
  * - Автоустановка атрибутов (muted, playsinline, loop)
  */
 import { createComponent, type Component } from '../Component';
+import { TVIST_CLASSES } from '../../core/constants';
 import type { TvistRuntime as Tvist } from '../../core/runtime';
 import type { TvistOptions, VideoOptions, VideoEvent, VideoProgressEvent } from '../../core/types';
 /** Дефолтные значения для VideoOptions */
@@ -279,6 +280,7 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
    * который может переставлять слайды в DOM.
    */
   function local_scanSlides(): void {
+    local_cleanupVideoListeners();
     local_videos.clear();
     local_iframes.clear();
     tvist.__tvistInternal_slides.forEach((slide, domIndex) => {
@@ -288,7 +290,7 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
       // HTML <video>
       const video = slide.querySelector('video');
       if (video) {
-        local_registerVideo(registrationIndex, slide, video);
+        local_registerVideo(registrationIndex, slide, video, domIndex);
       }
       // iframe (YouTube/Vimeo)
       const iframe = slide.querySelector('iframe');
@@ -303,7 +305,12 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
   /**
    * Зарегистрировать HTML video
    */
-  function local_registerVideo(index: number, slide: HTMLElement, video: HTMLVideoElement): void {
+  function local_registerVideo(
+    index: number,
+    slide: HTMLElement,
+    video: HTMLVideoElement,
+    domIndex: number
+  ): void {
     if (!local_config) return;
     // Установить атрибуты
     if (local_config.muted) {
@@ -328,7 +335,7 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
     };
     // Навешиваем слушатели
     local_setupVideoListeners(entry);
-    local_videos.set(index, entry);
+    local_videos.set(domIndex, entry);
   }
   /**
    * Зарегистрировать iframe
@@ -441,8 +448,13 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
   function local_activateSlideByRealIndex(realIndex: number): void {
     if (!local_config) return;
     // HTML video
-    const videoEntry = local_videos.get(realIndex);
+    const videoEntry = local_findVideo(realIndex);
     if (videoEntry && local_config.autoplay) {
+      if (local_config.pauseOnLeave) {
+        local_videos.forEach((entry) => {
+          if (entry !== videoEntry && entry.slideIndex === realIndex) entry.video.pause();
+        });
+      }
       local_safePlay(videoEntry.video);
     }
     // iframe
@@ -457,15 +469,15 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
   function local_deactivateSlideByRealIndex(realIndex: number): void {
     if (!local_config) return;
     // HTML video
-    const videoEntry = local_videos.get(realIndex);
-    if (videoEntry) {
-      if (local_config.pauseOnLeave) {
+    local_videos.forEach((videoEntry) => {
+      if (videoEntry.slideIndex !== realIndex) return;
+      if (local_config?.pauseOnLeave) {
         videoEntry.video.pause();
       }
-      if (local_config.resetOnLeave) {
+      if (local_config?.resetOnLeave) {
         local_safeResetVideoTime(videoEntry.video);
       }
-    }
+    });
     // iframe
     const iframeEntry = local_iframes.get(realIndex);
     if (iframeEntry) {
@@ -503,9 +515,11 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
    * - readyState (ожидание canplay если не загружено)
    * - Promise rejection (AbortError при быстром pause())
    */
-  function local_safePlay(video: HTMLVideoElement): void {
+  function local_safePlay(video: HTMLVideoElement, requireActive = true): void {
     video.muted = local_muted;
     const doPlay = () => {
+      if (requireActive && local_config?.pauseOnLeave && video !== local_getActiveVideo()) return;
+      if (local_pausedByVisibility || local_pausedByHold || local_pausedByAutoplayHover) return;
       video.play().catch((error: DOMException) => {
         if (error.name !== 'AbortError') {
           console.warn('Tvist VideoModule: playback failed:', error.message);
@@ -569,8 +583,19 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
   }
   // ==================== Visibility ====================
   function local_getActiveVideo(): HTMLVideoElement | undefined {
-    return local_videos.get(tvist.__tvistInternal_realIndex ?? tvist.__tvistInternal_activeIndex)
-      ?.video;
+    return (
+      tvist.__tvistInternal_slides[tvist.__tvistInternal_activeIndex]?.querySelector('video') ??
+      undefined
+    );
+  }
+  function local_findVideo(index: number): VideoEntry | undefined {
+    const active = tvist.__tvistInternal_slides[tvist.__tvistInternal_activeIndex];
+    const entries = [...local_videos.values()].filter((entry) => entry.slideIndex === index);
+    return (
+      entries.find((entry) => entry.slide === active) ??
+      entries.find((entry) => !entry.slide.classList.contains(TVIST_CLASSES.slideClone)) ??
+      entries[0]
+    );
   }
   /**
    * Настроить обработчики видимости (viewport + вкладка)
@@ -668,18 +693,18 @@ export function createVideoModule(tvist: Tvist, options: TvistOptions): VideoMod
    * Воспроизвести видео на слайде (текущем или по индексу)
    */
   function local_playVideo(index?: number): void {
-    const idx = index ?? tvist.__tvistInternal_activeIndex;
-    const entry = local_videos.get(idx);
+    const idx = index ?? tvist.__tvistInternal_realIndex;
+    const entry = local_findVideo(idx);
     if (entry) {
-      local_safePlay(entry.video);
+      local_safePlay(entry.video, index === undefined);
     }
   }
   /**
    * Поставить видео на паузу
    */
   function local_pauseVideo(index?: number): void {
-    const idx = index ?? tvist.__tvistInternal_activeIndex;
-    const entry = local_videos.get(idx);
+    const idx = index ?? tvist.__tvistInternal_realIndex;
+    const entry = local_findVideo(idx);
     if (entry) {
       entry.video.pause();
     }

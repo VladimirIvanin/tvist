@@ -27,6 +27,39 @@ export function createThumbsModule(tvist: Tvist, options: TvistOptions): ThumbsM
   let local_removeClickListeners: (() => void) | undefined;
 
   function local_init(): void {
+    const target = options.thumbs?.slider;
+    if (target) {
+      let syncing = false;
+      const toThumb = (index: number, data?: { isDrag?: boolean }) => {
+        if (syncing || (options.syncOnDrag === false && data?.isDrag)) return;
+        syncing = true;
+        try {
+          target.scrollTo(index);
+        } finally {
+          syncing = false;
+        }
+      };
+      const toMain = (index: number, data?: { isDrag?: boolean }) => {
+        if (syncing || (target.options.syncOnDrag === false && data?.isDrag)) return;
+        syncing = true;
+        try {
+          tvist.__tvistInternal_scrollTo(index);
+        } finally {
+          syncing = false;
+        }
+      };
+      const onClick = (index: number, slide: HTMLElement) => {
+        const logical = Number(slide.getAttribute('data-tvist-slide-index') ?? index);
+        toMain(logical);
+      };
+      base.__tvistInternal_on('slideChangeStart', toThumb);
+      target.on('slideChangeStart', toMain);
+      target.on('click', onClick);
+      base.__tvistInternal_resources.__tvistInternal_add(() => {
+        target.off('slideChangeStart', toMain);
+        target.off('click', onClick);
+      });
+    }
     // Если включен режим навигации (thumbnail mode)
     if (options.isNavigation) {
       local_initNavigation();
@@ -40,19 +73,24 @@ export function createThumbsModule(tvist: Tvist, options: TvistOptions): ThumbsM
     const listeners: (() => void)[] = [];
     const activeClass = TVIST_CLASSES.slideNavActive;
     // 1. Обработка кликов
-    slides.forEach((slide, index) => {
+    slides.forEach((slide) => {
       const handler = () => {
         if (tvist.__tvistInternal_options.isNavigation) {
+          if (!tvist.__tvistInternal_allowClick) return;
+          const logicalIndex = Number(
+            slide.getAttribute('data-tvist-slide-index') ??
+              tvist.__tvistInternal_slides.indexOf(slide)
+          );
           // Вызываем событие
-          tvist.__tvistInternal_emit('navigation:click', index);
-          if (index === tvist.__tvistInternal_activeIndex) {
+          tvist.__tvistInternal_emit('navigation:click', logicalIndex);
+          if (logicalIndex === tvist.__tvistInternal_realIndex) {
             // Если индекс совпадает с текущим, но классы не обновлены (например, после drag с syncOnDrag: false),
             // принудительно обновляем классы и эмитим slideChangeStart для синхронизации с главным слайдером.
-            updateClasses(index);
-            tvist.__tvistInternal_emit('slideChangeStart', index);
+            updateClasses(logicalIndex);
+            tvist.__tvistInternal_emit('slideChangeStart', logicalIndex);
           } else {
             // Переходим к слайду
-            tvist.__tvistInternal_scrollTo(index);
+            tvist.__tvistInternal_scrollTo(logicalIndex);
           }
         }
       };
@@ -72,8 +110,8 @@ export function createThumbsModule(tvist: Tvist, options: TvistOptions): ThumbsM
       }
     ) => {
       if (options.syncOnDrag === false && data?.isDrag) return;
-      slides.forEach((slide, i) => {
-        if (i === index) {
+      tvist.__tvistInternal_slides.forEach((slide, i) => {
+        if (Number(slide.getAttribute('data-tvist-slide-index') ?? i) === index) {
           slide.classList.add(activeClass);
         } else {
           slide.classList.remove(activeClass);
@@ -100,6 +138,13 @@ export function createThumbsModule(tvist: Tvist, options: TvistOptions): ThumbsM
       return local_name;
     },
     init: local_init,
+    onOptionsUpdate: (updates) => {
+      if (updates.thumbs !== undefined || updates.isNavigation !== undefined) {
+        local_removeClickListeners?.();
+        base.__tvistInternal_resources.__tvistInternal_clear();
+        local_init();
+      }
+    },
     destroy: () => {
       try {
         local_destroy();

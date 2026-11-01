@@ -200,17 +200,19 @@ export function createEngine(tvist: Tvist, options: TvistOptions): Engine {
   }
   /** Пересчитать позиции после перестановки тех же DOM-слайдов без повторного измерения. */
   function local_updateAfterReorder(previousSlides: readonly HTMLElement[]): void {
+    const gap = gapCssForMargin(local_options.gap);
+    const vertical = local_options.direction === 'vertical';
+    local_tvist.__tvistInternal_slides.forEach((slide, index) => {
+      slide.style[vertical ? 'marginBottom' : 'marginRight'] =
+        index === local_tvist.__tvistInternal_slides.length - 1 ? '' : gap;
+    });
     if (layout.__tvistInternal_isAutoSize()) {
       const sizes = new Map(
         previousSlides.map((slide, index) => [slide, layout.__tvistInternal_slideSizes[index] ?? 0])
       );
-      const gap = gapCssForMargin(local_options.gap);
-      const vertical = local_options.direction === 'vertical';
-      layout.__tvistInternal_slideSizes = local_tvist.__tvistInternal_slides.map((slide, index) => {
-        slide.style[vertical ? 'marginBottom' : 'marginRight'] =
-          index === local_tvist.__tvistInternal_slides.length - 1 ? '' : gap;
-        return sizes.get(slide) ?? 0;
-      });
+      layout.__tvistInternal_slideSizes = local_tvist.__tvistInternal_slides.map(
+        (slide) => sizes.get(slide) ?? 0
+      );
     }
     layout.__tvistInternal_calculatePositions();
     layout.__tvistInternal_updateCounterLimits();

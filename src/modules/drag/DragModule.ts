@@ -168,7 +168,9 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
   }
 
   function read_isLoopWithClonesEnabled(): boolean {
-    return typeof options.loop === 'object' && options.loop.withClones === true;
+    return tvist.__tvistInternal_slides.some((slide) =>
+      slide.classList.contains(TVIST_CLASSES.slideClone)
+    );
   }
   /**
    * Нет отдельной «страницы» прокрутки (все слайды помещаются в perPage) —
@@ -567,10 +569,11 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     local_holdCaptureTarget = null;
   }
 
+  let local_dragPointerId: number | null = null;
   const local_onPointerDown: (e: TouchEvent | MouseEvent | PointerEvent) => void = (
     e: TouchEvent | MouseEvent | PointerEvent
   ): void => {
-    if (local_isDragging) return;
+    if (local_isDragging || local_isPotentialDrag) return;
     if (tvist.__tvistInternal_engine.__tvistInternal_isLocked) return;
     if ('button' in e && e.button !== 0) return;
     const target = e.target as HTMLElement;
@@ -581,6 +584,7 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     const point = local_getPointerPosition(e);
     if (!point) return;
     local_isPotentialDrag = true;
+    local_dragPointerId = 'pointerId' in e ? e.pointerId : null;
     local_startX = point.x;
     local_startY = point.y;
     local_currentX = point.x;
@@ -611,6 +615,8 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
   const local_onPointerMove: (e: TouchEvent | MouseEvent | PointerEvent) => void = (
     e: TouchEvent | MouseEvent | PointerEvent
   ): void => {
+    if ('pointerId' in e && local_dragPointerId !== null && e.pointerId !== local_dragPointerId)
+      return;
     if (!local_isPotentialDrag && !local_isDragging) return;
     const point = local_getPointerPosition(e);
     if (!point) return;
@@ -787,9 +793,12 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
   const local_onPointerUp: (e: TouchEvent | MouseEvent | PointerEvent) => void = (
     e: TouchEvent | MouseEvent | PointerEvent
   ): void => {
+    if ('pointerId' in e && local_dragPointerId !== null && e.pointerId !== local_dragPointerId)
+      return;
     if (!local_isPotentialDrag && !local_isDragging) return;
     const wasDragging = local_isDragging;
     local_isPotentialDrag = false;
+    local_dragPointerId = null;
     if (local_isDragging) {
       local_isDragging = false;
       tvist.__tvistInternal_root.classList.remove(TVIST_CLASSES.dragging);
@@ -1028,6 +1037,26 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
         }
       }
       tvist.__tvistInternal_engine.__tvistInternal_location.set(newPosition);
+      if (read_isLoopEnabled() && local_loopModuleRef?.fix) {
+        const engine = tvist.__tvistInternal_engine;
+        const slides = tvist.__tvistInternal_slides;
+        const peek = engine.__tvistInternal_getPeek();
+        const last = slides.length - 1;
+        const start = engine.__tvistInternal_getSlidePosition(0);
+        const end =
+          engine.__tvistInternal_getSlidePosition(last) + engine.__tvistInternal_getSlideSize(last);
+        if (
+          -newPosition - peek.start < start ||
+          -newPosition + engine.__tvistInternal_containerSizeValue + peek.end > end
+        ) {
+          const anchor = distance > 0 ? 0 : local_findSlideNearViewportEdge(-newPosition, slides);
+          local_loopModuleRef.fix({
+            direction: distance > 0 ? 'prev' : 'next',
+            activeSlideIndex: anchor,
+            setTranslate: true,
+          });
+        }
+      }
       tvist.__tvistInternal_engine.__tvistInternal_applyTransform();
       base.__tvistInternal_emit('scroll');
       if (Math.abs(velocity) > local_MIN_VELOCITY && !hitBoundary) {

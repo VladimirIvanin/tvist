@@ -64,6 +64,7 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
   let local_draggable: boolean;
   // Состояние
   let local_isDragging = false;
+  let local_pointerId: number | null = null;
 
   let local_dragStartX = 0;
 
@@ -179,6 +180,7 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
     }
     // События слайдера
     base.__tvistInternal_on('scroll', local_handleScroll);
+    base.__tvistInternal_on('drag', local_handleScroll);
     base.__tvistInternal_on('slideChangeEnd', local_handleSlideChanged);
     // Автоскрытие (показать при наведении, скрыть по таймеру)
     local_updateAutoHideListeners();
@@ -214,7 +216,9 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
   const local_handleThumbPointerDown: (event: PointerEvent) => void = (
     event: PointerEvent
   ): void => {
+    if (local_isDragging) return;
     if (event.button !== 0 && event.pointerType === 'mouse') return;
+    local_pointerId = event.pointerId;
     // Останавливаем всплытие чтобы DragModule не перехватил событие
     event.stopPropagation();
     event.preventDefault();
@@ -229,6 +233,11 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
       'pointerup',
       local_handleThumbPointerUp
     );
+    base.__tvistInternal_resources.__tvistInternal_listen(
+      document,
+      'pointercancel',
+      local_handleThumbPointerUp
+    );
   };
   /**
    * Обработчик движения (Pointer API)
@@ -236,15 +245,22 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
   const local_handleThumbPointerMove: (event: PointerEvent) => void = (
     event: PointerEvent
   ): void => {
-    if (!local_isDragging) return;
+    if (!local_isDragging || event.pointerId !== local_pointerId) return;
     event.preventDefault();
     local_updateDrag(event.clientX, event.clientY);
   };
   /**
    * Завершить перетаскивание (Pointer API)
    */
-  const local_handleThumbPointerUp: () => void = (): void => {
+  const local_handleThumbPointerUp = (event: PointerEvent): void => {
+    if (!local_isDragging || event.pointerId !== local_pointerId) return;
+    local_pointerId = null;
     local_endDrag();
+    base.__tvistInternal_resources.__tvistInternal_unlisten(
+      document,
+      'pointercancel',
+      local_handleThumbPointerUp
+    );
     base.__tvistInternal_resources.__tvistInternal_unlisten(
       document,
       'pointermove',
@@ -343,7 +359,10 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
       trackSize = rect.width;
     }
     // Вычисляем процент перемещения
-    const percent = delta / trackSize;
+    const thumbSize = isVertical
+      ? (local_thumbEl?.offsetHeight ?? 0)
+      : (local_thumbEl?.offsetWidth ?? 0);
+    const percent = delta / Math.max(1, trackSize - thumbSize);
     // Вычисляем общий диапазон прокрутки
     const slideCount = tvist.__tvistInternal_slides.length;
     // Получаем позицию первого и последнего слайда
@@ -378,7 +397,13 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
       }
     }
     // Обновляем индекс без анимации
+    const previousIndex = tvist.__tvistInternal_engine.__tvistInternal_index.get();
     tvist.__tvistInternal_engine.__tvistInternal_index.set(closestIndex);
+    if (previousIndex !== tvist.__tvistInternal_activeIndex) {
+      tvist.__tvistInternal_emit('slideChangeStart', tvist.__tvistInternal_realIndex, {
+        isDrag: true,
+      });
+    }
     // Генерируем события прокрутки
     tvist.__tvistInternal_emit('scroll');
   }
@@ -462,12 +487,17 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
     const perPage = options.perPage ?? 1;
     const thumbSizePercent = (perPage / slideCount) * 100;
     // Текущая позиция
-    const currentPosition = Math.abs(tvist.__tvistInternal_engine.__tvistInternal_location.get());
-    const lastSlidePosition = Math.abs(
-      tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(slideCount - 1)
-    );
-    const progress = lastSlidePosition > 0 ? currentPosition / lastSlidePosition : 0;
-    const availableRange = 100 - thumbSizePercent;
+    const engine = tvist.__tvistInternal_engine;
+    const first = engine.__tvistInternal_getMinScrollPosition();
+    const last = engine.__tvistInternal_getMaxScrollPosition();
+    const progress =
+      first !== last ? (first - engine.__tvistInternal_location.get()) / (first - last) : 0;
+    const trackSize = isVertical ? local_trackEl.clientHeight : local_trackEl.clientWidth;
+    const actualSizePercent =
+      trackSize > 0
+        ? Math.max(thumbSizePercent, Math.min(100, (40 / trackSize) * 100))
+        : thumbSizePercent;
+    const availableRange = 100 - actualSizePercent;
     // Округляем до 0.1% — на кадрах с субпиксельным движением это nochange
     const positionPercent =
       Math.round(Math.max(0, Math.min(availableRange, progress * availableRange)) * 10) / 10;
@@ -570,23 +600,32 @@ export function createScrollbarModule(tvist: Tvist, options: TvistOptions): Scro
    */
   function local_onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
     if (newOptions.scrollbar !== undefined) {
+      local_destroy();
+      base.__tvistInternal_resources.__tvistInternal_clear();
+      local_scrollbarEl = undefined;
+      local_trackEl = undefined;
+      local_thumbEl = undefined;
+      local_isCustomContainer = false;
       const scrollbarOptions =
         typeof newOptions.scrollbar === 'boolean' ? {} : (newOptions.scrollbar ?? {});
       local_hide = scrollbarOptions.hide ?? false;
       local_hideDelay = scrollbarOptions.hideDelay ?? 1000;
       local_draggable = scrollbarOptions.draggable ?? true;
+      local_createScrollbar();
+      local_attachEventListeners();
       // Обновляем слушатели автоскрытия (добавить при hide: true, убрать при hide: false)
       local_updateAutoHideListeners();
       // Если автоскрытие включено — скроллбар изначально скрыт
-      if (local_hide) {
-        local_scrollbarEl?.classList.add(TVIST_CLASSES.scrollbarHidden);
-      }
       local_invalidateScrollbarCache();
       local_updateScrollbar();
     }
   }
 
   function local_destroy(): void {
+    local_isDragging = false;
+    local_pointerId = null;
+    local_scrollbarEl?.classList.remove(TVIST_CLASSES.scrollbarDragging);
+    local_trackEl?.remove();
     // Очищаем таймеры
     if (local_hideTimer) {
       base.__tvistInternal_resources.__tvistInternal_cancelTimeout(local_hideTimer);

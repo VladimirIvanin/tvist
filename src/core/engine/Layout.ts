@@ -375,27 +375,23 @@ export function createLayout(deps: LayoutContext): Layout {
     }
     const trimmed = gapValue.trim();
     const n = parseFloat(trimmed);
-    if (!Number.isFinite(n)) {
-      local_gapPxResolved = 0;
-      return;
-    }
-    if (trimmed.endsWith('px')) {
+    if (Number.isFinite(n) && trimmed.endsWith('px')) {
       local_gapPxResolved = n;
       return;
     }
-    if (trimmed.endsWith('rem')) {
+    if (Number.isFinite(n) && trimmed.endsWith('rem')) {
       const rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
       local_gapPxResolved = n * rootFontSize;
       return;
     }
-    if (trimmed.endsWith('em')) {
+    if (Number.isFinite(n) && trimmed.endsWith('em')) {
       const parentFontSize =
         parseFloat(getComputedStyle(deps.__tvistInternal_tvist.__tvistInternal_track).fontSize) ||
         16;
       local_gapPxResolved = n * parentFontSize;
       return;
     }
-    if (trimmed.endsWith('%')) {
+    if (Number.isFinite(n) && trimmed.endsWith('%')) {
       local_gapPxResolved = (n / 100) * local_getMarginPercentageBasePx();
       return;
     }
@@ -709,7 +705,7 @@ export function createLayout(deps: LayoutContext): Layout {
       return slideCount - 1;
     }
     const perPage = deps.__tvistInternal_options.perPage ?? 1;
-    return Math.max(0, Math.min(slideCount - perPage, slideCount - 1));
+    return Math.max(0, Math.min(Math.ceil(slideCount - perPage), slideCount - 1));
   }
 
   /**
@@ -754,10 +750,12 @@ export function createLayout(deps: LayoutContext): Layout {
   function local_calculateCounterEndIndex(): number {
     const slideCount = deps.__tvistInternal_tvist.__tvistInternal_slides.length;
     const perPage = deps.__tvistInternal_options.perPage ?? 1;
-    return lastScrollIndex(
-      slideCount,
-      perPage,
-      local_isLoopEnabled() || !!deps.__tvistInternal_options.isNavigation || local_isCenterMode()
+    return Math.ceil(
+      lastScrollIndex(
+        slideCount,
+        perPage,
+        local_isLoopEnabled() || !!deps.__tvistInternal_options.isNavigation || local_isCenterMode()
+      )
     );
   }
 
@@ -767,6 +765,8 @@ export function createLayout(deps: LayoutContext): Layout {
   function local_updateCounterLimits(): void {
     deps.__tvistInternal_index.endIndex = local_calculateCounterEndIndex();
     deps.__tvistInternal_index.max = deps.__tvistInternal_tvist.__tvistInternal_slides.length;
+    deps.__tvistInternal_index.loop = local_isLoopEnabled();
+    deps.__tvistInternal_index.set(deps.__tvistInternal_index.get());
   }
   const component: Layout = {
     __tvistInternal_getScrollPositionForIndex: local_getScrollPositionForIndex,

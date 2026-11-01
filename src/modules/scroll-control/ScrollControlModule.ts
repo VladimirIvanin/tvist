@@ -118,13 +118,6 @@ export function createScrollControlModule(
     if (Math.abs(mainDelta) < 1) {
       return;
     }
-    // Throttle для предотвращения слишком частых срабатываний
-    const now = Date.now();
-    if (now - local_lastWheelTime < local_wheelThrottle) {
-      event.preventDefault();
-      return;
-    }
-    local_lastWheelTime = now;
     // Проверяем границы слайдера
     const isAtStart = !tvist.__tvistInternal_engine.__tvistInternal_canScrollPrev();
     const isAtEnd = !tvist.__tvistInternal_engine.__tvistInternal_canScrollNext();
@@ -138,6 +131,9 @@ export function createScrollControlModule(
     }
     // Предотвращаем нативный скролл
     event.preventDefault();
+    const now = Date.now();
+    if (now - local_lastWheelTime < local_wheelThrottle) return;
+    local_lastWheelTime = now;
     // Если уже идёт прокрутка, игнорируем
     if (local_isScrolling) {
       return;

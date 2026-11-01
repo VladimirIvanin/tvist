@@ -75,7 +75,9 @@ describe('Engine - endIndex logic', () => {
 
       // В loop режиме можно перейти к любому индексу
       slider.scrollTo(5)
-      expect(slider.activeIndex).toBe(5)
+      expect(slider.realIndex).toBe(5)
+      expect(slider.slides[slider.activeIndex]!.textContent).toBe('6')
+      expect(slider.slides[slider.activeIndex]!.classList.contains(TVIST_CLASSES.slideActive)).toBe(true)
     })
 
     it('should work correctly with perPage = 1', () => {

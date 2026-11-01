@@ -23,9 +23,13 @@
  * - AutoplayOptions — полный контроль
  */
 import { createComponent, type Component } from '../Component';
-import { findSlideByRealIndex } from '../../utils/slideRealIndex';
 import type { TvistRuntime as Tvist } from '../../core/runtime';
-import type { AutoplayProgressEvent, TvistOptions, AutoplayOptions } from '../../core/types';
+import type {
+  AutoplayProgressEvent,
+  TvistOptions,
+  AutoplayOptions,
+  VideoEvent,
+} from '../../core/types';
 /** Дефолтные значения для AutoplayOptions */
 const AUTOPLAY_DEFAULTS: Required<AutoplayOptions> = {
   delay: 3000,
@@ -151,7 +155,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
   let local_waitingForVideo = false;
 
   let local_videoEndedWhilePaused = false; // видео закончилось пока autoplay на паузе (hover)
-  let local_videoEndedHandler: (() => void) | undefined;
+  let local_videoEndedHandler: ((event: VideoEvent) => void) | undefined;
 
   let local_videoProgressHandler: ((data: { progress: number; index: number }) => void) | undefined;
   /** Переход был инициирован autoplay (next() из таймера или videoEnded). Не сбрасываем таймер на slideChangeEnd. */
@@ -466,7 +470,7 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
     local_waitingForVideo = false;
     local_videoEndedWhilePaused = false;
     // index = realIndex. Ищем слайд по data-tvist-slide-index (loop) или по DOM-позиции (обычный)
-    const slide = findSlideByRealIndex(tvist.__tvistInternal_slides, index);
+    const slide = tvist.__tvistInternal_slides[tvist.__tvistInternal_activeIndex];
     // Если слайд не найден (некорректный индекс или проблема с DOM), запускаем обычный таймер
     // чтобы autoplay продолжил работу, а не остановился навсегда
     if (!slide) {
@@ -495,7 +499,9 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
     local_cancelTimer();
     local_stopProgressTracking();
     local_emitAutoplayProgress(index, 0);
-    local_videoEndedHandler = () => {
+    local_videoEndedHandler = (event: VideoEvent) => {
+      if (event && (event.video !== video || event.slide !== slide || event.index !== index))
+        return;
       if (local_stopped || !local_waitingForVideo) {
         return;
       }
@@ -942,7 +948,13 @@ export function createAutoplayModule(tvist: Tvist, options: TvistOptions): Autop
         local_stopped = false;
         local_start();
       },
-      stop: () => local_stop(),
+      stop: () => {
+        local_stopped = true;
+        local_paused = false;
+        local_videoEndedWhilePaused = false;
+        local_detachVideoEndedListener();
+        local_stop();
+      },
       pause: () => local_pause(),
       resume: () => local_resume(),
       isRunning: () => local_timer !== null && !local_paused,

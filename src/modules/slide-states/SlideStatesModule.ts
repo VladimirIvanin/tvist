@@ -52,8 +52,9 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
   let local_nativeLazyBeforeSlideChange: ((targetRealIndex: number) => void) | null = null;
   /** У клонов одинаковый data-tvist-slide-index — active/prev/next только по DOM. */
   function local_isLoopWithClonesEnabled(): boolean {
-    const l = options.loop;
-    return typeof l === 'object' && l !== null && l.withClones === true && l.enabled !== false;
+    return tvist.__tvistInternal_slides.some((slide) =>
+      slide.classList.contains(TVIST_CLASSES.slideClone)
+    );
   }
 
   function local_init(): void {
@@ -83,7 +84,10 @@ export function createSlideStatesModule(tvist: Tvist, options: TvistOptions): Sl
       local_updateVisibleClasses();
     });
     // slideChangeEnd: обновляем только visible (финальная позиция после анимации)
-    tvist.__tvistInternal_on('slideChangeEnd', () => local_updateVisibleClasses());
+    base.__tvistInternal_on('slideChangeEnd', () => {
+      local_updateActiveClasses();
+      local_updateVisibleClasses();
+    });
     // scroll (каждый тик анимации): обновляем visible через RAF-батчинг для экономии CPU
     tvist.__tvistInternal_on('scroll', () => local_scheduleVisibilityUpdate());
   }

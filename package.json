@@ -1,6 +1,6 @@
 {
   "name": "tvist",
-  "version": "1.20.1",
+  "version": "1.21.0",
   "description": "Слайдер с широким API для современного веба",
   "type": "module",
   "main": "./dist/tvist.cjs",
@@ -8,9 +8,14 @@
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/tvist.esm.js",
-      "require": "./dist/tvist.cjs"
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/tvist.esm.js"
+      },
+      "require": {
+        "types": "./dist/types-cjs/index.d.cts",
+        "default": "./dist/tvist.cjs"
+      }
     },
     "./dist/tvist.css": "./dist/tvist.css",
     "./browser-build/tvist.css": "./browser-build/tvist.css"
@@ -25,7 +30,7 @@
   "scripts": {
     "dev": "vite --config vite.sandbox.config.ts",
     "dev:watch": "concurrently \"npm run dev\" \"npm run typecheck -- --watch\"",
-    "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\" && tsc && vite build",
+    "build": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\" && tsc && tsx scripts/build-types.ts && vite build",
     "build:browser": "npm run typecheck && vite build --config vite.browser.config.ts",
     "build:watch": "tsc --watch",
     "docs:dev": "npm run docs:generate && vite --config vite.docs.config.ts",
@@ -38,6 +43,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
+    "test:package": "npm run build && tsx scripts/test-package.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:docs": "playwright test --config playwright.docs.config.ts",

@@ -74,7 +74,7 @@ export function createMotion(deps: MotionContext): Motion {
     const endIndex = deps.__tvistInternal_getEndIndex();
     const previousIndex = deps.__tvistInternal_index.get();
     const ctx = local_resolveTargetIndex(index, endIndex, previousIndex, afterDragSnap);
-    if (ctx.indexChanged && !instant) {
+    if (ctx.indexChanged) {
       local_handleBeforeTransition(ctx, previousIndex);
     }
     deps.__tvistInternal_index.set(ctx.clampedIndex);
@@ -84,6 +84,10 @@ export function createMotion(deps: MotionContext): Motion {
     );
     if (ctx.indexChanged) {
       deps.__tvistInternal_tvist.__tvistInternal_emit('beforeSlideChange', ctx.eventIndex);
+      if (instant)
+        deps.__tvistInternal_tvist.__tvistInternal_emit('slideChangeStart', ctx.eventIndex, {
+          isDrag: afterDragSnap,
+        });
     }
     if (instant) {
       local_performInstantScroll(targetPosition, ctx, endIndex);

@@ -61,6 +61,13 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
   let local__withClones = false;
 
   let local__clonesPerSide = 0;
+  const local_beforeTransition = (data: { index: number; direction: 'next' | 'prev' }) => {
+    local_loopFix({ direction: data.direction });
+    if (!local__withClones && (options.fixedWidth || options.autoWidth || options.autoHeight)) {
+      const target = findDomIndexByRealIndex(tvist.__tvistInternal_slides, data.index);
+      local_loopFix({ direction: data.direction, activeSlideIndex: target });
+    }
+  };
 
   function local_init(): void {
     const config = local_getLoopConfig();
@@ -90,12 +97,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
       direction: bothDirections || hasPeek ? undefined : 'next',
       initial: true,
     });
-    base.__tvistInternal_on(
-      'beforeTransitionStart',
-      (data: { index: number; direction: 'next' | 'prev' }) => {
-        local_loopFix({ direction: data.direction });
-      }
-    );
+    base.__tvistInternal_on('beforeTransitionStart', local_beforeTransition);
   }
 
   function local_onOptionsUpdate(newOptions: Partial<TvistOptions>): void {
@@ -177,15 +179,15 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
         slidesCount
       );
     }
-    const activeIndex =
-      activeSlideIndex ?? tvist.__tvistInternal_engine.__tvistInternal_index.get();
+    const activeIndex = tvist.__tvistInternal_engine.__tvistInternal_index.get();
+    const bufferIndex = activeSlideIndex ?? activeIndex;
     if (withClones && !initial) {
       local_teleportIfNeeded(activeIndex, slidesPerView, slidesCount);
     }
     const isNext = direction === 'next' || !direction;
     const isPrev = direction === 'prev' || !direction;
     const activeColIndexWithShift =
-      activeIndex +
+      bufferIndex +
       (bothDirections && typeof setTranslate === 'undefined' ? -slidesPerView / 2 + 0.5 : 0);
     const hasPeek = options.peek !== undefined;
     const needsPrepend = isPrev || hasPeek;
@@ -204,6 +206,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
           )
         : [];
     const oldSlidePositions: number[] = [];
+    const anchor = slides[bufferIndex];
     if (slideTo) {
       for (let i = 0; i < slides.length; i++) {
         oldSlidePositions[i] = tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(i);
@@ -233,10 +236,13 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
       }
     }
     const actualNewIndex = tvist.__tvistInternal_engine.__tvistInternal_index.get();
+    const oldPositionIndex = setTranslate ? bufferIndex : activeIndex;
+    const newPositionIndex =
+      setTranslate && anchor ? tvist.__tvistInternal_slides.indexOf(anchor) : actualNewIndex;
     if (prependIndexes.length > 0) {
-      local_correctPositionAfterRearrange(activeIndex, actualNewIndex, oldSlidePositions);
+      local_correctPositionAfterRearrange(oldPositionIndex, newPositionIndex, oldSlidePositions);
     } else if (appendIndexes.length > 0) {
-      local_correctPositionAfterRearrange(activeIndex, actualNewIndex, oldSlidePositions);
+      local_correctPositionAfterRearrange(oldPositionIndex, newPositionIndex, oldSlidePositions);
     }
     if (
       (initial || prependIndexes.length > 0 || appendIndexes.length > 0) &&
@@ -261,6 +267,26 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
   function local_getSlidesPerView(bothDirections: boolean): number {
     const perPage = options.perPage ?? 1;
     let slidesPerView = typeof perPage === 'number' ? perPage : 1;
+    if (options.fixedWidth || options.fixedHeight || options.autoWidth || options.autoHeight) {
+      const engine = tvist.__tvistInternal_engine;
+      const sizes = tvist.__tvistInternal_slides.map((_, index) =>
+        engine.__tvistInternal_getSlideSize(index)
+      );
+      const peek = engine.__tvistInternal_getPeek();
+      const viewport = engine.__tvistInternal_containerSizeValue + peek.start + peek.end;
+      const gap = engine.__tvistInternal_gapPxValue;
+      let needed = 1;
+      sizes.forEach((_, start) => {
+        let covered = 0;
+        let count = 0;
+        while (count < sizes.length && covered < viewport) {
+          covered += (sizes[(start + count) % sizes.length] ?? 0) + (count > 0 ? gap : 0);
+          count++;
+        }
+        needed = Math.max(needed, count);
+      });
+      slidesPerView = needed;
+    }
     if (bothDirections && slidesPerView % 2 === 0) {
       slidesPerView += 1;
     }
@@ -383,6 +409,8 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
 
   function local_destroy(): void {
     if (!local_isInitialized) return;
+    local_isInitialized = false;
+    base.__tvistInternal_off('beforeTransitionStart', local_beforeTransition);
     const slides = tvist.__tvistInternal_slides;
     const container = tvist.__tvistInternal_container;
     const realIndex = tvist.__tvistInternal_realIndex;
@@ -416,7 +444,6 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
     tvist.__tvistInternal_engine.__tvistInternal_index.set(realIndex);
     tvist.__tvistInternal_update();
     tvist.__tvistInternal_scrollTo(realIndex, true);
-    local_isInitialized = false;
   }
 
   function local_getLoopConfig(): { enabled: boolean; withClones: boolean } {
@@ -440,7 +467,11 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
       if (bothDirections) {
         requiredSlides += Math.floor(slidesPerView / 2);
       }
-      if (slidesCount > slidesPerView && slidesCount < requiredSlides) {
+      if (
+        slidesCount > 0 &&
+        !tvist.__tvistInternal_engine.__tvistInternal_isLocked &&
+        slidesCount < requiredSlides
+      ) {
         withClones = true;
       }
     }
@@ -465,7 +496,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
     for (let i = 0; i < clonesPerSide; i++) {
       const original = slides[i % originalCount];
       if (!original) continue;
-      const clone = original.cloneNode(true) as HTMLElement;
+      const clone = local_cloneSlide(original, `tail-${i}`);
       clone.classList.add(TVIST_CLASSES.slideClone);
       const realIndexAttr = original.getAttribute('data-tvist-slide-index');
       if (realIndexAttr != null) clone.setAttribute('data-tvist-slide-index', realIndexAttr);
@@ -476,7 +507,7 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
       const original =
         slides[(originalCount - 1 - (i % originalCount) + originalCount) % originalCount];
       if (!original) continue;
-      const clone = original.cloneNode(true) as HTMLElement;
+      const clone = local_cloneSlide(original, `head-${i}`);
       clone.classList.add(TVIST_CLASSES.slideClone);
       const realIndexAttr = original.getAttribute('data-tvist-slide-index');
       if (realIndexAttr != null) clone.setAttribute('data-tvist-slide-index', realIndexAttr);
@@ -484,6 +515,48 @@ export function createLoopModule(tvist: Tvist, options: TvistOptions): LoopModul
     }
     container.prepend(headFragment);
     tvist.__tvistInternal_updateSlidesList();
+  }
+  function local_cloneSlide(original: HTMLElement, suffix: string): HTMLElement {
+    const clone = original.cloneNode(true) as HTMLElement;
+    const nodes = [clone, ...clone.querySelectorAll<HTMLElement>('*')];
+    const ids = new Map<string, string>();
+    nodes.forEach((node) => {
+      if (!node.id) return;
+      const id = `${node.id}-${tvist.__tvistInternal_id}-${suffix}`;
+      ids.set(node.id, id);
+      node.id = id;
+    });
+    nodes.forEach((node) => {
+      for (const attribute of [
+        'for',
+        'list',
+        'form',
+        'headers',
+        'aria-labelledby',
+        'aria-describedby',
+        'aria-controls',
+        'aria-owns',
+        'aria-activedescendant',
+        'aria-details',
+        'aria-errormessage',
+      ]) {
+        const value = node.getAttribute(attribute);
+        if (value)
+          node.setAttribute(
+            attribute,
+            value
+              .split(/\s+/)
+              .map((id) => ids.get(id) ?? id)
+              .join(' ')
+          );
+      }
+      for (const attribute of ['href', 'xlink:href']) {
+        const value = node.getAttribute(attribute);
+        if (value?.startsWith('#') && ids.has(value.slice(1)))
+          node.setAttribute(attribute, `#${ids.get(value.slice(1))}`);
+      }
+    });
+    return clone;
   }
   const component: LoopModule = {
     shouldBeActive: base.__tvistInternal_shouldBeActive,

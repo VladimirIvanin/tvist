@@ -86,7 +86,9 @@ test('ships one complete JS/CSS pair and gzip copy within the byte budget', () =
     expect(css).toContain(selector);
 });
 
-test('minified pagination preserves fractional totals with grouped navigation', async ({ page }) => {
+test('minified pagination preserves fractional totals with grouped navigation', async ({
+  page,
+}) => {
   const frame = await isolatedFrame(page);
   await frame.addScriptTag({ path: bundlePath('tvist.min.js') });
   await createSlider(frame, {
@@ -97,7 +99,9 @@ test('minified pagination preserves fractional totals with grouped navigation', 
   });
   await expect(frame.locator('.tvist-v1__pagination-total')).toHaveText('2.5');
   const result = await frame.evaluate(() => {
-    const root = document.getElementById('browser-slider') as HTMLElement & { tvistInstance: Tvist };
+    const root = document.getElementById('browser-slider') as HTMLElement & {
+      tvistInstance: Tvist;
+    };
     const slider = root.tvistInstance;
     slider.scrollTo(1, true);
     const current = document.querySelector('.tvist-v1__pagination-current')?.textContent;
@@ -802,6 +806,7 @@ for (const effect of ['fade', 'cube'] as const) {
         starts,
         frames,
         transform: slider.container.style.transform,
+        faceTransforms: slider.slides.slice(0, 2).map((slide) => slide.style.transform),
         opacity: slider.slides.slice(0, 2).map((slide) => Number(getComputedStyle(slide).opacity)),
       };
       slider.destroy();
@@ -811,6 +816,10 @@ for (const effect of ['fade', 'cube'] as const) {
     expect(result.starts).toBe(1);
     expect(result.frames).toBeGreaterThan(0);
     if (effect === 'fade') expect(result.opacity).toEqual([0, 1]);
-    else expect(result.transform).toMatch(/rotateY\(-90deg\)/);
+    else {
+      expect(result.transform).toMatch(/rotateY\(0deg\)/);
+      expect(result.faceTransforms[0]).toMatch(/rotateY\(-90deg\)/);
+      expect(result.faceTransforms[1]).toMatch(/rotateY\(0deg\)/);
+    }
   });
 }

@@ -68,7 +68,7 @@ export function setCubeEffect(tvist: Tvist, translate: number, options: TvistOpt
   const numSlides = slidesList.length;
   const slidesInRange = getCubeSlidesInRange(translate, slideSize, numSlides);
 
-  // Calculate wrapper rotation
+  // Calculate cube rotation
   // translate corresponds to linear movement.
   // Width = 90 degrees.
   // We invert the rotation direction so that "next" slide (right) comes to front
@@ -79,9 +79,11 @@ export function setCubeEffect(tvist: Tvist, translate: number, options: TvistOpt
   // Fix: Rotate around the center of the cube (which is at 0,0,0 in local space because slides are pushed out)
   container.style.transformOrigin = `50% 50%`;
 
-  // Override engine's translate with rotate
+  // Override the engine's linear translation with cube depth.
   // Move the whole cube back by zOffset so the front face aligns with the screen plane (Z=0)
-  container.style.transform = `translate3d(0,0,-${zOffset}px) rotateY(${wrapperRotate}deg)`;
+  // Compose the two rotations on each face. WebKit can flatten the child planes
+  // before applying a wrapper rotation, leaving every face edge-on after resize.
+  container.style.transform = `translate3d(0,0,-${zOffset}px) rotateY(0deg)`;
 
   slidesList.forEach((slide, i) => {
     // Use the same wrapped position as visibility so the first/last slide
@@ -108,7 +110,7 @@ export function setCubeEffect(tvist: Tvist, translate: number, options: TvistOpt
     if (netAngle < 0) netAngle += 360;
 
     // Standard Cube Logic: Rotate around center, then push out by radius (zOffset)
-    const transform = `rotateY(${slideAngle}deg) translate3d(0, 0, ${zOffset}px)`;
+    const transform = `rotateY(${slideAngle + wrapperRotate}deg) translate3d(0, 0, ${zOffset}px)`;
     slide.style.transform = transform;
 
     // Cosine = how "front" the face is. 0°→1, 180°→-1. Keep z-index for stacking fallback.
@@ -155,7 +157,7 @@ function createSlideShadows(slide: HTMLElement, progress: number, tvist: Tvist) 
   let shadows = cache.shadows.get(slide);
 
   // Создаём тени если их ещё нет
-  if (!shadows) {
+  if (!shadows || !slide.contains(shadows.left)) {
     const shadowLeft = document.createElement('div');
     const shadowRight = document.createElement('div');
 
