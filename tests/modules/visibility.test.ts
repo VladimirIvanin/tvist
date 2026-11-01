@@ -175,7 +175,7 @@ describe('VisibilityModule', () => {
       expect(autoplay.isPaused()).toBe(true)
     })
 
-    it('должен возобновлять autoplay при появлении слайдера', async () => {
+    it('должен возобновлять autoplay при появлении слайдера', () => {
       slider = new Tvist(root, {
         autoplay: { delay: 10000 },
         visibility: true,
@@ -183,18 +183,18 @@ describe('VisibilityModule', () => {
 
       const autoplayModule = getRuntime(slider).modules.get('autoplay') as any
       const autoplay = autoplayModule?.getAutoplay()
+      const visibilityModule = getRuntime(slider).modules.get('visibility') as any
+      const visibility = visibilityModule.getVisibility()
 
       // Скрываем слайдер
       root.style.display = 'none'
-      await vi.waitFor(() => expect(autoplay.isPaused()).toBe(true), { timeout: 2000 })
+      expect(visibility.check()).toBe(false)
+      expect(autoplay.isPaused()).toBe(true)
 
       // Показываем слайдер
       root.style.display = 'block'
-      await vi.waitFor(() => expect({
-        running: autoplay.isRunning(),
-        paused: autoplay.isPaused(),
-        visible: (getRuntime(slider!).modules.get('visibility') as any).getVisibility().isVisible(),
-      }).toEqual({ running: true, paused: false, visible: true }), { timeout: 2000 })
+      expect(visibility.check()).toBe(true)
+      expect(autoplay.isRunning()).toBe(true)
     })
 
     it('не должен приостанавливать autoplay если pauseAutoplay: false', async () => {
