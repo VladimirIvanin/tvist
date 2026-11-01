@@ -10,6 +10,7 @@ pnpm-lock.yaml
 # Build output
 dist/
 build/
+browser-build/
 *.tsbuildinfo
 
 # Testing
@@ -50,5 +51,3 @@ docs/.vitepress/dist
 docs/.vitepress/cache
 docs/.generated/
 docs/dist/
-
-browser-build/stats.html

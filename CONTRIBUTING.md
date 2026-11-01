@@ -146,6 +146,10 @@ git commit -m "feat: add new feature"
 2. На GitHub создайте Release с тегом `v<версия>` на этом коммите. Для предварительного выпуска отметьте **Set as a pre-release**.
 3. Нажмите **Publish release**. В разделе **Actions → Publish to npm** можно проверить сборку, тесты и публикацию. Стабильный релиз получает npm-тег `latest`, предварительный — `next`.
 
+Workflow собирает `browser-build/` заново. Каталог добавлен в `.gitignore`. Одна сборка упаковывается в npm-архив, который публикуется в npm и прикрепляется к GitHub Release. Из этого же архива извлекаются отдельные вложения `tvist.min.js`, `tvist.css` и `tvist.min.js.gz`.
+
+CDN использует опубликованный npm-архив. Для jsDelivr путь имеет вид `https://cdn.jsdelivr.net/npm/tvist@<версия>/browser-build/tvist.min.js`, для UNPKG — `https://unpkg.com/tvist@<версия>/browser-build/tvist.min.js`. CSS подключается из того же каталога и той же версии.
+
 ## 📄 Лицензия
 
 Внося вклад, вы соглашаетесь с тем, что ваш код будет распространяться под лицензией MIT.

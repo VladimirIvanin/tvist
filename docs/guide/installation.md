@@ -22,19 +22,19 @@ pnpm add tvist
 
 ## CDN
 
-Браузерная сборка лежит в репозитории в каталоге **`browser-build/`** (не в `dist/` на npm). Подключение через CDN — **jsDelivr (GitHub)** или **raw.githubusercontent.com**.
+GitHub Actions собирает браузерные файлы и включает их в npm-архив в каталоге `browser-build/`. jsDelivr и UNPKG раздают эти файлы из опубликованного пакета npm.
 
-`@latest` в jsDelivr соответствует **последнему релизу на GitHub**; для фиксированной версии укажите тег (например `{{TVIST_VERSION_TAG}}`). Острие ветки `main`: замените `@latest` на `@main`.
+`@latest` соответствует стабильной версии npm, `@next` — предварительной. Для фиксированной версии укажите номер, например `{{TVIST_VERSION}}`. CDN-ссылки на новую версию доступны после успешной публикации в npm.
 
-Для магазина в production закрепите тег или разместите файлы на своём домене с долгим кешированием и версией в URL. Проверяйте фактические заголовки `Cache-Control` в браузере.
+Для магазина в production закрепите номер версии. Для UNPKG используйте тот же путь с базой `https://unpkg.com/tvist@{{TVIST_VERSION}}/`.
 
 ### Полная браузерная сборка
 
 Все встроенные возможности находятся в одной паре `tvist.min.js` + `tvist.css`. После загрузки доступен конструктор `TvistV1`. Необходимые возможности включаются опциями; дополнительные JS-файлы не загружаются.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@{{TVIST_VERSION_TAG}}/browser-build/tvist.css">
-<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@{{TVIST_VERSION_TAG}}/browser-build/tvist.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tvist@{{TVIST_VERSION}}/browser-build/tvist.css">
+<script defer src="https://cdn.jsdelivr.net/npm/tvist@{{TVIST_VERSION}}/browser-build/tvist.min.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     new TvistV1('.tvist-v1', { arrows: true, pagination: true, loop: true });
@@ -44,9 +44,15 @@ pnpm add tvist
 
 JS и CSS должны иметь одну версию. В npm используйте `import Tvist from 'tvist'` и `import 'tvist/dist/tvist.css'`.
 
+## Скачать файлы релиза
+
+Те же файлы извлекаются из npm-архива и прикрепляются к GitHub Release. Можно скачать [JS](https://github.com/VladimirIvanin/tvist/releases/download/{{TVIST_VERSION_TAG}}/tvist.min.js), [CSS](https://github.com/VladimirIvanin/tvist/releases/download/{{TVIST_VERSION_TAG}}/tvist.css), [gzip JS](https://github.com/VladimirIvanin/tvist/releases/download/{{TVIST_VERSION_TAG}}/tvist.min.js.gz) или [npm-архив](https://github.com/VladimirIvanin/tvist/releases/download/{{TVIST_VERSION_TAG}}/tvist-{{TVIST_VERSION}}.tgz).
+
 ## Сборка
 
 `npm run build:browser` выпускает полную пару `tvist.min.js` + `tvist.css` и gzip-копию `tvist.min.js.gz` в `browser-build/`. Сборка выводит размер gzip и проверяет, что полный JS вместе с баннером занимает не более 100 000 байт до gzip/Brotli. `npm run build` выпускает полную библиотеку в форматах ESM/CJS и определения типов в `dist/`.
+
+`browser-build/` создаётся локально или в CI и добавлен в `.gitignore`. Перед локальным `npm pack` выполните обе команды сборки. Поле `files` в `package.json` включает этот каталог в npm-архив.
 
 ## Переход с раздельных сборок
 

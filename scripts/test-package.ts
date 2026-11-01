@@ -78,5 +78,12 @@ execFileSync(process.execPath, [esmEntry]);
 const installed = JSON.parse(
   readFileSync(join(consumer, 'node_modules/tvist/package.json'), 'utf8')
 );
+for (const file of ['tvist.min.js', 'tvist.css', 'tvist.min.js.gz']) {
+  assert.deepEqual(
+    readFileSync(join(consumer, 'node_modules/tvist/browser-build', file)),
+    readFileSync(resolve('browser-build', file)),
+    `Packed browser asset must match the build: ${file}`
+  );
+}
 assert(installed.exports['.'].require.types.endsWith('.d.cts'));
 console.log('Packed consumers: Node16 + NodeNext × ESM/CJS types; ESM/CJS runtime passed.');

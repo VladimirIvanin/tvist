@@ -37,7 +37,6 @@ jobs:
 
       - run: npm ci
       - run: npm test -- --run
-      - run: npm run build:browser
       - run: npm run test:package
       - run: npm run docs:build
       - run: npm pack --pack-destination "$RUNNER_TEMP"
@@ -47,6 +46,29 @@ jobs:
           name: npm-package
           path: ${{ runner.temp }}/tvist-*.tgz
           if-no-files-found: error
+
+  release-assets:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-package
+          path: npm-package
+
+      - name: Extract browser files from the npm archive
+        run: |
+          mkdir browser-build
+          tar -xzf npm-package/tvist-*.tgz -C browser-build --strip-components=2 package/browser-build
+
+      - name: Attach package and browser files to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" npm-package/*.tgz browser-build/* --clobber
 
   publish:
     needs: build

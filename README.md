@@ -14,11 +14,11 @@ npm install tvist
 
 ### Скачать для браузера (без npm)
 
-Минифицированная сборка для `<script>` находится в папке [browser-build/](browser-build/). Команда `npm run build:browser` выпускает одну полную пару `tvist.min.js` + `tvist.css` и gzip-копию `tvist.min.js.gz`. Размер gzip выводится при сборке. В JS включены все встроенные возможности; сборка проверяет лимит 100 000 байт до gzip/Brotli.
+Готовые `tvist.min.js`, `tvist.css`, `tvist.min.js.gz` и npm-архив прикрепляются к [GitHub Release](https://github.com/VladimirIvanin/tvist/releases). jsDelivr раздаёт файлы из того же npm-архива. Версия в CDN-ссылках становится доступна после успешной публикации в npm.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css">
-<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tvist@1.21.2/browser-build/tvist.css">
+<script defer src="https://cdn.jsdelivr.net/npm/tvist@1.21.2/browser-build/tvist.min.js"></script>
 ```
 
 Создавайте слайдер после загрузки JS. При использовании `defer` инициализируйте его в `DOMContentLoaded`. JS и CSS должны иметь одну версию. [Миграция с API расширений](docs/api/modules.md). [Размер и результаты проверок](docs/browser-build.md).

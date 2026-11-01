@@ -26,11 +26,11 @@
 
 ## Подключение через CDN
 
-Подключите стили и скрипт из **`browser-build/`** через jsDelivr (GitHub). **`@latest`** — последний [релиз на GitHub](https://github.com/VladimirIvanin/tvist/releases); для ветки `main` используйте `@main`.
+Подключите стили и скрипт через jsDelivr из npm-пакета. В ссылках закреплена версия `{{TVIST_VERSION}}`, доступная после её публикации в npm.
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css">
-<script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tvist@{{TVIST_VERSION}}/browser-build/tvist.css">
+<script defer src="https://cdn.jsdelivr.net/npm/tvist@{{TVIST_VERSION}}/browser-build/tvist.min.js"></script>
 ```
 
 После загрузки скрипта доступен глобальный конструктор **`TvistV1`** — его используют примеры ниже. При подключении с `defer` запускайте код инициализации после `DOMContentLoaded`, как в полном HTML-примере ниже. Core включает стрелки, пагинацию, autoplay, loop и visibility. Для дополнительных возможностей подключите также `tvist.css` и `tvist.min.js` той же версии до создания слайдера. Можно вместо этих пар подключить полную сборку `tvist.min.js` и `tvist.css`, которая включает все модули. [Все способы подключения](/guide/installation).
@@ -165,7 +165,7 @@ console.log(slider.slides.length); // Количество слайдов
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Мой первый Tvist слайдер</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tvist@{{TVIST_VERSION}}/browser-build/tvist.css">
   <style>
     .tvist-v1 {
       max-width: 800px;
@@ -195,7 +195,7 @@ console.log(slider.slides.length); // Количество слайдов
     <div class="tvist-pagination"></div>
   </div>
 
-  <script defer src="https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@latest/browser-build/tvist.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/tvist@{{TVIST_VERSION}}/browser-build/tvist.min.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       var slider = new TvistV1('.tvist-v1', {

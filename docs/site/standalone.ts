@@ -4,8 +4,8 @@ type Code = { html: string; css: string; js: string }
 
 /** Собирает самодостаточную страницу из тех же исходников, что запускают предпросмотр. */
 export function standalonePage(code: Code): string {
-  const tagged = `https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@v${packageInfo.version}/browser-build`
-  const latest = 'https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@main/browser-build'
+  const tagged = `https://cdn.jsdelivr.net/npm/tvist@${packageInfo.version}/browser-build`
+  const fallback = `https://unpkg.com/tvist@${packageInfo.version}/browser-build`
   return `<!doctype html>
 <html lang="ru"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style id="tvist-example-style">body { font-family: system-ui; padding: 24px; }\n${code.css}\n</style></head>
@@ -40,7 +40,7 @@ async function loadTvistAssets(base) {
   }
 }
 loadTvistAssets('${tagged}')
-  .catch(() => loadTvistAssets('${latest}'))
+  .catch(() => loadTvistAssets('${fallback}'))
   .then(startTvistExample)
   .catch(error => console.error(error));
 </script></body></html>`

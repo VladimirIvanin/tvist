@@ -270,12 +270,12 @@ for (const failedFile of [null, 'tvist.css', 'tvist.min.js']) {
   }) => {
     const requests: string[] = [];
     await page.route(
-      'https://cdn.jsdelivr.net/gh/VladimirIvanin/tvist@**/browser-build/*',
+      /^https:\/\/(cdn\.jsdelivr\.net\/npm|unpkg\.com)\/tvist@[^/]+\/browser-build\/[^/]+$/,
       async (route) => {
         const url = route.request().url();
         requests.push(url);
         const file = url.slice(url.lastIndexOf('/') + 1);
-        if (failedFile && !url.includes('@main/') && file === failedFile) {
+        if (failedFile && !url.includes('unpkg.com/') && file === failedFile) {
           await route.abort();
         } else {
           await route.fulfill({
@@ -310,10 +310,10 @@ for (const failedFile of [null, 'tvist.css', 'tvist.min.js']) {
       buildFiles
     );
     expect(
-      result.assets.every((url) => (failedFile ? url.includes('@main/') : !url.includes('@main/')))
+      result.assets.every((url) => (failedFile ? url.includes('unpkg.com/') : url.includes('cdn.jsdelivr.net/')))
     ).toBe(true);
     await expect(frame.locator('.tvist-v1__slide').first()).toHaveCSS('position', 'absolute');
-    if (failedFile) expect(requests.filter((url) => url.includes('@main/'))).toHaveLength(2);
+    if (failedFile) expect(requests.filter((url) => url.includes('unpkg.com/'))).toHaveLength(2);
   });
 }
 
