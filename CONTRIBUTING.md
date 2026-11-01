@@ -138,6 +138,14 @@ git commit -m "feat: add new feature"
 - Альтернативы
 - Примеры использования
 
+## Публикация в npm
+
+В [настройках пакета tvist](https://www.npmjs.com/package/tvist/access) добавьте GitHub Actions как Trusted Publisher. Укажите владельца `VladimirIvanin`, репозиторий `tvist` и файл workflow `publish.yml`. Оставьте Environment пустым и разрешите `npm publish`. GitHub Actions получит доступ через OIDC. [Инструкция npm](https://docs.npmjs.com/trusted-publishers/)
+
+1. Убедитесь, что в `package.json` и `package-lock.json` указана нужная версия и она свободна в npm. Чтобы поднять версию, используйте, например, `npm version patch --no-git-tag-version` и включите оба файла в релизный коммит.
+2. На GitHub создайте Release с тегом `v<версия>` на этом коммите. Для предварительного выпуска отметьте **Set as a pre-release**.
+3. Нажмите **Publish release**. В разделе **Actions → Publish to npm** можно проверить сборку, тесты и публикацию. Стабильный релиз получает npm-тег `latest`, предварительный — `next`.
+
 ## 📄 Лицензия
 
 Внося вклад, вы соглашаетесь с тем, что ваш код будет распространяться под лицензией MIT.

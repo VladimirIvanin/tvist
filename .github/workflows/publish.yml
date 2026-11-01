@@ -1,40 +1,71 @@
-name: Publish to NPM
+name: Publish to npm
 
 on:
   release:
-    types: [created]
+    types: [published]
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'
-        registry-url: 'https://registry.npmjs.org'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Check release version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [[ "$RELEASE_TAG" != "v$version" ]]; then
+            echo "::error::Expected release tag v$version"
+            exit 1
+          fi
+          if [[ "${version%%+*}" == *-* && "$PRERELEASE" != "true" ]]; then
+            echo "::error::Mark this version as a GitHub pre-release"
+            exit 1
+          fi
 
-    - name: Run tests
-      run: npm test
+      - run: npm ci
+      - run: npm test -- --run
+      - run: npm run build:browser
+      - run: npm run test:package
+      - run: npm run docs:build
+      - run: npm pack --pack-destination "$RUNNER_TEMP"
 
-    - name: Build
-      run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-package
+          path: ${{ runner.temp }}/tvist-*.tgz
+          if-no-files-found: error
 
-    - name: Build browser bundle and enforce size
-      run: npm run build:browser
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-package
 
-    - name: Build documentation
-      run: npm run docs:build
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+          package-manager-cache: false
 
-    - name: Publish to NPM
-      run: npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
+      - name: Publish package
+        env:
+          DIST_TAG: ${{ github.event.release.prerelease && 'next' || 'latest' }}
+        run: npm publish ./tvist-*.tgz --access public --tag "$DIST_TAG"
