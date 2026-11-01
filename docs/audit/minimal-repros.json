@@ -1,0 +1,642 @@
+[
+  {
+    "id": "DEEP-0-0",
+    "project": "webkit",
+    "run": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T19-56-16-049Z-deep",
+    "family": 0,
+    "seed": 20261031,
+    "oracle": "active-identity",
+    "status": "verified",
+    "originalCommands": [
+      {
+        "action": "group",
+        "value": 327943025,
+        "direction": "next"
+      },
+      {
+        "action": "group",
+        "value": 1739786955,
+        "direction": "next"
+      },
+      {
+        "action": "cycle",
+        "value": 2915777845,
+        "direction": "next"
+      },
+      {
+        "action": "prev",
+        "value": 856857903,
+        "direction": "next"
+      },
+      {
+        "action": "next",
+        "value": 1247727929,
+        "direction": "next"
+      },
+      {
+        "action": "resize",
+        "value": 1452327891,
+        "direction": "next"
+      },
+      {
+        "action": "prev",
+        "value": 1047085949,
+        "direction": "next"
+      },
+      {
+        "action": "next",
+        "value": 1298571959,
+        "direction": "next"
+      },
+      {
+        "action": "prev",
+        "value": 1267947521,
+        "direction": "next"
+      },
+      {
+        "action": "group",
+        "value": 1986895323,
+        "direction": "next"
+      },
+      {
+        "action": "next",
+        "value": 256905925,
+        "direction": "next"
+      },
+      {
+        "action": "peek",
+        "value": 4160969023,
+        "direction": "next"
+      },
+      {
+        "action": "next",
+        "value": 1684060105,
+        "direction": "next"
+      },
+      {
+        "action": "group",
+        "value": 2418915555,
+        "direction": "next"
+      },
+      {
+        "action": "cycle",
+        "value": 3130575629,
+        "direction": "next"
+      },
+      {
+        "action": "resize",
+        "value": 4110344391,
+        "direction": "next"
+      },
+      {
+        "action": "cycle",
+        "value": 2833387665,
+        "direction": "next"
+      },
+      {
+        "action": "loop-mode",
+        "value": 2839098603,
+        "direction": "next"
+      },
+      {
+        "action": "peek",
+        "value": 1031834709,
+        "direction": "next"
+      },
+      {
+        "action": "loop-mode",
+        "value": 1764972879,
+        "direction": "next"
+      },
+      {
+        "action": "cycle",
+        "value": 3499524697,
+        "direction": "next"
+      },
+      {
+        "action": "loop-mode",
+        "value": 2482778611,
+        "direction": "next"
+      },
+      {
+        "action": "peek",
+        "value": 1558738589,
+        "direction": "next"
+      },
+      {
+        "action": "loop-mode",
+        "value": 884925143,
+        "direction": "next"
+      },
+      {
+        "action": "prev",
+        "value": 2732666145,
+        "direction": "next"
+      },
+      {
+        "action": "jump",
+        "value": 2422657019,
+        "direction": "next"
+      }
+    ],
+    "commands": [
+      {
+        "action": "jump",
+        "value": 2422657019,
+        "direction": "next"
+      }
+    ],
+    "commandSource": "saved browser command history through failure",
+    "originalCommandsRecovered": true,
+    "warnings": [
+      "The campaign harness changed since the source run. The production UMD is identical and concrete actions are replayed, but corrected assertions/setup can affect reproduction."
+    ],
+    "trials": 29,
+    "duration": 38249,
+    "verification": [
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=0 seed=20261031 step=0 command={\"action\":\"jump\",\"value\":2422657019,\"direction\":\"next\"} history=[{\"action\":\"jump\",\"value\":2422657019,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 851
+      },
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=0 seed=20261031 step=0 command={\"action\":\"jump\",\"value\":2422657019,\"direction\":\"next\"} history=[{\"action\":\"jump\",\"value\":2422657019,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 774
+      },
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=0 seed=20261031 step=0 command={\"action\":\"jump\",\"value\":2422657019,\"direction\":\"next\"} history=[{\"action\":\"jump\",\"value\":2422657019,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 902
+      }
+    ],
+    "baseline": {
+      "matched": true,
+      "oracle": "active-identity",
+      "error": "STATEFUL_FAILURE family=0 seed=20261031 step=25 command={\"action\":\"jump\",\"value\":2422657019,\"direction\":\"next\"} history=[{\"action\":\"group\",\"value\":327943025,\"direction\":\"next\"},{\"action\":\"group\",\"value\":1739786955,\"direction\":\"next\"},{\"action\":\"cycle\",\"value\":2915777845,\"direction\":\"next\"},{\"action\":\"prev\",\"value\":856857903,\"direction\":\"next\"},{\"action\":\"next\",\"value\":1247727929,\"direction\":\"next\"},{\"action\":\"resize\",\"value\":1452327891,\"direction\":\"next\"},{\"action\":\"prev\",\"value\":1047085949,\"direction\":\"next\"},{\"action\":\"next\",\"value\":1298571959,\"direction\":\"next\"},{\"action\":\"prev\",\"value\":1267947521,\"direction\":\"next\"},{\"action\":\"group\",\"value\":1986895323,\"direction\":\"next\"},{\"action\":\"next\",\"value\":256905925,\"direction\":\"next\"},{\"action\":\"peek\",\"value\":4160969023,\"direction\":\"next\"},{\"action\":\"next\",\"value\":1684060105,\"direction\":\"next\"},{\"action\":\"group\",\"value\":2418915555,\"direction\":\"next\"},{\"action\":\"cycle\",\"value\":3130575629,\"direction\":\"next\"},{\"action\":\"resize\",\"value\":4110344391,\"direction\":\"next\"},{\"action\":\"cycle\",\"value\":2833387665,\"direction\":\"next\"},{\"action\":\"loop-mode\",\"value\":2839098603,\"direction\":\"next\"},{\"action\":\"peek\",\"value\":1031834709,\"direction\":\"next\"},{\"action\":\"loop-mode\",\"value\":1764972879,\"direction\":\"next\"},{\"action\":\"cycle\",\"value\":3499524697,\"direction\":\"next\"},{\"action\":\"loop-mode\",\"value\":2482778611,\"direction\":\"next\"},{\"action\":\"peek\",\"value\":1558738589,\"direction\":\"next\"},{\"action\":\"loop-mode\",\"value\":884925143,\"direction\":\"next\"},{\"action\":\"prev\",\"value\":2732666145,\"direction\":\"next\"},{\"action\":\"jump\",\"value\":2422657019,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+      "pageErrors": [],
+      "duration": 2441
+    },
+    "oneMinimal": true,
+    "buildHash": "63f82928b9db2be2374e2824c62021aa8b7558d02658b8a2b8f87a421c234550",
+    "originalCampaignSourceHash": "fccc629c56a99f4ec9bb7bbec0cadb0dadc95d8556d94d2c8bee2de4e6f6c710",
+    "executedCampaignSourceHash": "d95d1b8be92e25e6b8da30ecafaa09312d0f7768e93d0151f346bd3ba6b89cc8",
+    "artifacts": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T19-56-16-049Z-deep\\minimized\\DEEP-0-0-webkit"
+  },
+  {
+    "id": "DEEP-0-0",
+    "project": "chromium",
+    "run": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T20-02-15-217Z-deep",
+    "family": 0,
+    "seed": 20261031,
+    "oracle": "active-identity",
+    "status": "verified",
+    "originalCommands": [
+      {
+        "action": "group",
+        "value": 1281027,
+        "direction": "next"
+      },
+      {
+        "action": "group",
+        "value": 6796042,
+        "direction": "prev"
+      },
+      {
+        "action": "cycle",
+        "value": 11389757,
+        "direction": "next"
+      },
+      {
+        "action": "prev",
+        "value": 3347101,
+        "direction": "next"
+      },
+      {
+        "action": "next",
+        "value": 4873937,
+        "direction": "next"
+      },
+      {
+        "action": "resize",
+        "value": 5673155,
+        "direction": "next"
+      },
+      {
+        "action": "prev",
+        "value": 4090179,
+        "direction": "next"
+      },
+      {
+        "action": "next",
+        "value": 5072546,
+        "direction": "prev"
+      },
+      {
+        "action": "prev",
+        "value": 4952920,
+        "direction": "prev"
+      },
+      {
+        "action": "group",
+        "value": 7761309,
+        "direction": "next"
+      },
+      {
+        "action": "next",
+        "value": 1003538,
+        "direction": "prev"
+      },
+      {
+        "action": "peek",
+        "value": 16253785,
+        "direction": "next"
+      },
+      {
+        "action": "next",
+        "value": 6578359,
+        "direction": "next"
+      },
+      {
+        "action": "group",
+        "value": 9448888,
+        "direction": "prev"
+      },
+      {
+        "action": "cycle",
+        "value": 12228811,
+        "direction": "next"
+      },
+      {
+        "action": "resize",
+        "value": 16056032,
+        "direction": "prev"
+      },
+      {
+        "action": "cycle",
+        "value": 11067920,
+        "direction": "prev"
+      },
+      {
+        "action": "loop-mode",
+        "value": 11090228,
+        "direction": "prev"
+      },
+      {
+        "action": "peek",
+        "value": 4030604,
+        "direction": "prev"
+      },
+      {
+        "action": "loop-mode",
+        "value": 6894425,
+        "direction": "next"
+      },
+      {
+        "action": "cycle",
+        "value": 13670018,
+        "direction": "prev"
+      },
+      {
+        "action": "loop-mode",
+        "value": 9698353,
+        "direction": "next"
+      },
+      {
+        "action": "peek",
+        "value": 6088822,
+        "direction": "prev"
+      },
+      {
+        "action": "loop-mode",
+        "value": 3456738,
+        "direction": "prev"
+      },
+      {
+        "action": "prev",
+        "value": 10674477,
+        "direction": "next"
+      },
+      {
+        "action": "jump",
+        "value": 9463503,
+        "direction": "next"
+      }
+    ],
+    "commands": [
+      {
+        "action": "jump",
+        "value": 9463503,
+        "direction": "next"
+      }
+    ],
+    "commandSource": "saved browser command history through failure",
+    "originalCommandsRecovered": true,
+    "warnings": [
+      "The campaign harness changed since the source run. The production UMD is identical and concrete actions are replayed, but corrected assertions/setup can affect reproduction."
+    ],
+    "trials": 13,
+    "duration": 15394,
+    "verification": [
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=0 seed=20261031 step=0 command={\"action\":\"jump\",\"value\":9463503,\"direction\":\"next\"} history=[{\"action\":\"jump\",\"value\":9463503,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 369
+      },
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=0 seed=20261031 step=0 command={\"action\":\"jump\",\"value\":9463503,\"direction\":\"next\"} history=[{\"action\":\"jump\",\"value\":9463503,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 374
+      },
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=0 seed=20261031 step=0 command={\"action\":\"jump\",\"value\":9463503,\"direction\":\"next\"} history=[{\"action\":\"jump\",\"value\":9463503,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 382
+      }
+    ],
+    "baseline": {
+      "matched": true,
+      "oracle": "active-identity",
+      "error": "STATEFUL_FAILURE family=0 seed=20261031 step=25 command={\"action\":\"jump\",\"value\":9463503,\"direction\":\"next\"} history=[{\"action\":\"group\",\"value\":1281027,\"direction\":\"next\"},{\"action\":\"group\",\"value\":6796042,\"direction\":\"prev\"},{\"action\":\"cycle\",\"value\":11389757,\"direction\":\"next\"},{\"action\":\"prev\",\"value\":3347101,\"direction\":\"next\"},{\"action\":\"next\",\"value\":4873937,\"direction\":\"next\"},{\"action\":\"resize\",\"value\":5673155,\"direction\":\"next\"},{\"action\":\"prev\",\"value\":4090179,\"direction\":\"next\"},{\"action\":\"next\",\"value\":5072546,\"direction\":\"prev\"},{\"action\":\"prev\",\"value\":4952920,\"direction\":\"prev\"},{\"action\":\"group\",\"value\":7761309,\"direction\":\"next\"},{\"action\":\"next\",\"value\":1003538,\"direction\":\"prev\"},{\"action\":\"peek\",\"value\":16253785,\"direction\":\"next\"},{\"action\":\"next\",\"value\":6578359,\"direction\":\"next\"},{\"action\":\"group\",\"value\":9448888,\"direction\":\"prev\"},{\"action\":\"cycle\",\"value\":12228811,\"direction\":\"next\"},{\"action\":\"resize\",\"value\":16056032,\"direction\":\"prev\"},{\"action\":\"cycle\",\"value\":11067920,\"direction\":\"prev\"},{\"action\":\"loop-mode\",\"value\":11090228,\"direction\":\"prev\"},{\"action\":\"peek\",\"value\":4030604,\"direction\":\"prev\"},{\"action\":\"loop-mode\",\"value\":6894425,\"direction\":\"next\"},{\"action\":\"cycle\",\"value\":13670018,\"direction\":\"prev\"},{\"action\":\"loop-mode\",\"value\":9698353,\"direction\":\"next\"},{\"action\":\"peek\",\"value\":6088822,\"direction\":\"prev\"},{\"action\":\"loop-mode\",\"value\":3456738,\"direction\":\"prev\"},{\"action\":\"prev\",\"value\":10674477,\"direction\":\"next\"},{\"action\":\"jump\",\"value\":9463503,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+      "pageErrors": [],
+      "duration": 2484
+    },
+    "oneMinimal": true,
+    "buildHash": "63f82928b9db2be2374e2824c62021aa8b7558d02658b8a2b8f87a421c234550",
+    "originalCampaignSourceHash": "d95d1b8be92e25e6b8da30ecafaa09312d0f7768e93d0151f346bd3ba6b89cc8",
+    "executedCampaignSourceHash": "e3bda59b56820907f99f3424ac4899aac8ebc8ca4c19c2ddceade2eff2f1b662",
+    "artifacts": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T20-02-15-217Z-deep\\minimized\\DEEP-0-0-chromium"
+  },
+  {
+    "id": "DEEP-2-0",
+    "project": "chromium",
+    "run": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T20-02-15-217Z-deep",
+    "family": 2,
+    "seed": 20263031,
+    "oracle": "active-identity",
+    "status": "verified",
+    "originalCommands": [
+      {
+        "action": "main-next",
+        "value": 8118251,
+        "direction": "next"
+      },
+      {
+        "action": "child-drag",
+        "value": 7345191,
+        "direction": "next"
+      }
+    ],
+    "commands": [
+      {
+        "action": "main-next",
+        "value": 8118251,
+        "direction": "next"
+      },
+      {
+        "action": "child-drag",
+        "value": 7345191,
+        "direction": "next"
+      }
+    ],
+    "commandSource": "saved browser command history through failure",
+    "originalCommandsRecovered": true,
+    "warnings": [
+      "The campaign harness changed since the source run. The production UMD is identical and concrete actions are replayed, but corrected assertions/setup can affect reproduction."
+    ],
+    "trials": 7,
+    "duration": 4904,
+    "verification": [
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=2 seed=20263031 step=1 command={\"action\":\"child-drag\",\"value\":7345191,\"direction\":\"next\"} history=[{\"action\":\"main-next\",\"value\":8118251,\"direction\":\"next\"},{\"action\":\"child-drag\",\"value\":7345191,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 838
+      },
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=2 seed=20263031 step=1 command={\"action\":\"child-drag\",\"value\":7345191,\"direction\":\"next\"} history=[{\"action\":\"main-next\",\"value\":8118251,\"direction\":\"next\"},{\"action\":\"child-drag\",\"value\":7345191,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 802
+      },
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=2 seed=20263031 step=1 command={\"action\":\"child-drag\",\"value\":7345191,\"direction\":\"next\"} history=[{\"action\":\"main-next\",\"value\":8118251,\"direction\":\"next\"},{\"action\":\"child-drag\",\"value\":7345191,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 839
+      }
+    ],
+    "baseline": {
+      "matched": true,
+      "oracle": "active-identity",
+      "error": "STATEFUL_FAILURE family=2 seed=20263031 step=1 command={\"action\":\"child-drag\",\"value\":7345191,\"direction\":\"next\"} history=[{\"action\":\"main-next\",\"value\":8118251,\"direction\":\"next\"},{\"action\":\"child-drag\",\"value\":7345191,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+      "pageErrors": [],
+      "duration": 836
+    },
+    "oneMinimal": true,
+    "buildHash": "63f82928b9db2be2374e2824c62021aa8b7558d02658b8a2b8f87a421c234550",
+    "originalCampaignSourceHash": "d95d1b8be92e25e6b8da30ecafaa09312d0f7768e93d0151f346bd3ba6b89cc8",
+    "executedCampaignSourceHash": "e3bda59b56820907f99f3424ac4899aac8ebc8ca4c19c2ddceade2eff2f1b662",
+    "artifacts": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T20-02-15-217Z-deep\\minimized\\DEEP-2-0-chromium"
+  },
+  {
+    "id": "DEEP-3-0",
+    "project": "chromium",
+    "run": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T20-02-15-217Z-deep",
+    "family": 3,
+    "seed": 20264031,
+    "oracle": "active-identity",
+    "status": "verified",
+    "originalCommands": [
+      {
+        "action": "jump",
+        "value": 3148255,
+        "direction": "next"
+      }
+    ],
+    "commands": [
+      {
+        "action": "jump",
+        "value": 3148255,
+        "direction": "next"
+      }
+    ],
+    "commandSource": "saved browser command history through failure",
+    "originalCommandsRecovered": true,
+    "warnings": [
+      "The campaign harness changed since the source run. The production UMD is identical and concrete actions are replayed, but corrected assertions/setup can affect reproduction."
+    ],
+    "trials": 6,
+    "duration": 2190,
+    "verification": [
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=3 seed=20264031 step=0 command={\"action\":\"jump\",\"value\":3148255,\"direction\":\"next\"} history=[{\"action\":\"jump\",\"value\":3148255,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 369
+      },
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=3 seed=20264031 step=0 command={\"action\":\"jump\",\"value\":3148255,\"direction\":\"next\"} history=[{\"action\":\"jump\",\"value\":3148255,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 391
+      },
+      {
+        "matched": true,
+        "oracle": "active-identity",
+        "error": "STATEFUL_FAILURE family=3 seed=20264031 step=0 command={\"action\":\"jump\",\"value\":3148255,\"direction\":\"next\"} history=[{\"action\":\"jump\",\"value\":3148255,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+        "pageErrors": [],
+        "duration": 388
+      }
+    ],
+    "baseline": {
+      "matched": true,
+      "oracle": "active-identity",
+      "error": "STATEFUL_FAILURE family=3 seed=20264031 step=0 command={\"action\":\"jump\",\"value\":3148255,\"direction\":\"next\"} history=[{\"action\":\"jump\",\"value\":3148255,\"direction\":\"next\"}]\nactive-identity\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: true\nReceived: false",
+      "pageErrors": [],
+      "duration": 381
+    },
+    "oneMinimal": true,
+    "buildHash": "63f82928b9db2be2374e2824c62021aa8b7558d02658b8a2b8f87a421c234550",
+    "originalCampaignSourceHash": "d95d1b8be92e25e6b8da30ecafaa09312d0f7768e93d0151f346bd3ba6b89cc8",
+    "executedCampaignSourceHash": "e3bda59b56820907f99f3424ac4899aac8ebc8ca4c19c2ddceade2eff2f1b662",
+    "artifacts": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T20-02-15-217Z-deep\\minimized\\DEEP-3-0-chromium"
+  },
+  {
+    "id": "DEEP-5-0",
+    "project": "chromium",
+    "run": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T20-02-15-217Z-deep",
+    "family": 5,
+    "seed": 20266031,
+    "oracle": "STATEFUL_GRID_DUPLICATED_ORIGINAL",
+    "status": "verified",
+    "originalCommands": [
+      {
+        "action": "axis",
+        "value": 9985480,
+        "direction": "prev"
+      },
+      {
+        "action": "prev",
+        "value": 8168914,
+        "direction": "prev"
+      },
+      {
+        "action": "cycle",
+        "value": 3912746,
+        "direction": "prev"
+      },
+      {
+        "action": "filter",
+        "value": 16178465,
+        "direction": "next"
+      },
+      {
+        "action": "filter",
+        "value": 8941871,
+        "direction": "next"
+      },
+      {
+        "action": "prev",
+        "value": 6694028,
+        "direction": "prev"
+      },
+      {
+        "action": "axis",
+        "value": 5568473,
+        "direction": "next"
+      },
+      {
+        "action": "append",
+        "value": 13060536,
+        "direction": "prev"
+      },
+      {
+        "action": "cycle",
+        "value": 4979054,
+        "direction": "prev"
+      },
+      {
+        "action": "append",
+        "value": 6144647,
+        "direction": "next"
+      }
+    ],
+    "commands": [
+      {
+        "action": "filter",
+        "value": 16178465,
+        "direction": "next"
+      },
+      {
+        "action": "cycle",
+        "value": 4979054,
+        "direction": "prev"
+      },
+      {
+        "action": "append",
+        "value": 6144647,
+        "direction": "next"
+      }
+    ],
+    "commandSource": "saved browser command history through failure",
+    "originalCommandsRecovered": true,
+    "warnings": [
+      "The campaign harness changed since the source run. The production UMD is identical and concrete actions are replayed, but corrected assertions/setup can affect reproduction."
+    ],
+    "trials": 22,
+    "duration": 15139,
+    "verification": [
+      {
+        "matched": true,
+        "oracle": "STATEFUL_GRID_DUPLICATED_ORIGINAL",
+        "error": "STATEFUL_FAILURE family=5 seed=20266031 step=2 command={\"action\":\"append\",\"value\":6144647,\"direction\":\"next\"} history=[{\"action\":\"filter\",\"value\":16178465,\"direction\":\"next\"},{\"action\":\"cycle\",\"value\":4979054,\"direction\":\"prev\"},{\"action\":\"append\",\"value\":6144647,\"direction\":\"next\"}]\nSTATEFUL_GRID_DUPLICATED_ORIGINAL\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: 12\nReceived: 11",
+        "pageErrors": [],
+        "duration": 577
+      },
+      {
+        "matched": true,
+        "oracle": "STATEFUL_GRID_DUPLICATED_ORIGINAL",
+        "error": "STATEFUL_FAILURE family=5 seed=20266031 step=2 command={\"action\":\"append\",\"value\":6144647,\"direction\":\"next\"} history=[{\"action\":\"filter\",\"value\":16178465,\"direction\":\"next\"},{\"action\":\"cycle\",\"value\":4979054,\"direction\":\"prev\"},{\"action\":\"append\",\"value\":6144647,\"direction\":\"next\"}]\nSTATEFUL_GRID_DUPLICATED_ORIGINAL\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: 12\nReceived: 11",
+        "pageErrors": [],
+        "duration": 545
+      },
+      {
+        "matched": true,
+        "oracle": "STATEFUL_GRID_DUPLICATED_ORIGINAL",
+        "error": "STATEFUL_FAILURE family=5 seed=20266031 step=2 command={\"action\":\"append\",\"value\":6144647,\"direction\":\"next\"} history=[{\"action\":\"filter\",\"value\":16178465,\"direction\":\"next\"},{\"action\":\"cycle\",\"value\":4979054,\"direction\":\"prev\"},{\"action\":\"append\",\"value\":6144647,\"direction\":\"next\"}]\nSTATEFUL_GRID_DUPLICATED_ORIGINAL\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: 12\nReceived: 11",
+        "pageErrors": [],
+        "duration": 568
+      }
+    ],
+    "baseline": {
+      "matched": true,
+      "oracle": "STATEFUL_GRID_DUPLICATED_ORIGINAL",
+      "error": "STATEFUL_FAILURE family=5 seed=20266031 step=9 command={\"action\":\"append\",\"value\":6144647,\"direction\":\"next\"} history=[{\"action\":\"axis\",\"value\":9985480,\"direction\":\"prev\"},{\"action\":\"prev\",\"value\":8168914,\"direction\":\"prev\"},{\"action\":\"cycle\",\"value\":3912746,\"direction\":\"prev\"},{\"action\":\"filter\",\"value\":16178465,\"direction\":\"next\"},{\"action\":\"filter\",\"value\":8941871,\"direction\":\"next\"},{\"action\":\"prev\",\"value\":6694028,\"direction\":\"prev\"},{\"action\":\"axis\",\"value\":5568473,\"direction\":\"next\"},{\"action\":\"append\",\"value\":13060536,\"direction\":\"prev\"},{\"action\":\"cycle\",\"value\":4979054,\"direction\":\"prev\"},{\"action\":\"append\",\"value\":6144647,\"direction\":\"next\"}]\nSTATEFUL_GRID_DUPLICATED_ORIGINAL\n\nexpect(received).toBe(expected) // Object.is equality\n\nExpected: 11\nReceived: 10",
+      "pageErrors": [],
+      "duration": 1138
+    },
+    "oneMinimal": true,
+    "buildHash": "63f82928b9db2be2374e2824c62021aa8b7558d02658b8a2b8f87a421c234550",
+    "originalCampaignSourceHash": "d95d1b8be92e25e6b8da30ecafaa09312d0f7768e93d0151f346bd3ba6b89cc8",
+    "executedCampaignSourceHash": "e3bda59b56820907f99f3424ac4899aac8ebc8ca4c19c2ddceade2eff2f1b662",
+    "artifacts": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T20-02-15-217Z-deep\\minimized\\DEEP-5-0-chromium"
+  }
+]

@@ -1,0 +1,13 @@
+{
+  "fixtureSHA256": "efbd8e2b244b4cedd4f0fbc202fc75b450097590cbd6b8f4e1a8561e670c7577",
+  "method": "Independent video element; explicit load+play; data URL removes transport; no Tvist",
+  "observation": {
+    "specificVP9": "probably",
+    "genericWebM": "probably",
+    "readyState": 0,
+    "currentTime": 0,
+    "networkState": 3,
+    "mediaError": 4,
+    "play": "NotSupportedError"
+  }
+}

@@ -1,0 +1,3196 @@
+{
+  "originalTestFiles": 114,
+  "candidates": [
+    {
+      "file": "tests\\integration\\disabled-cleanup.test.ts",
+      "line": 74,
+      "title": "'туда-сюда: второй переход на мобильный тоже очищает артефакты'",
+      "hasLog": false,
+      "hasTodo": false,
+      "status": "meaningful-helper-assertions",
+      "note": "Static screen false positive: invoked local helper contains substantive expectations.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/disabled-cleanup.test.ts",
+          "line": 74,
+          "endLine": 95
+        },
+        "fileSha256": "41f8ac587b30819a29e37900edb146bd09e661b7b9aea3276a403f7edf3087d8",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "checkDisabledCleanup",
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 16,
+            "endLine": 44,
+            "staticAssertionSites": 15,
+            "call": {
+              "file": "tests/integration/disabled-cleanup.test.ts",
+              "line": 94,
+              "endLine": 94
+            }
+          }
+        ],
+        "assertions": [
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 17,
+            "endLine": 17,
+            "expression": "expect(slider.isEnabled).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 21,
+            "endLine": 21,
+            "expression": "expect(slide.style.width).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 22,
+            "endLine": 22,
+            "expression": "expect(slide.style.height).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 23,
+            "endLine": 23,
+            "expression": "expect(slide.style.marginRight).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 24,
+            "endLine": 24,
+            "expression": "expect(slide.style.marginBottom).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 29,
+            "endLine": 29,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideActive)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 30,
+            "endLine": 30,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slidePrev)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 31,
+            "endLine": 31,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideNext)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 32,
+            "endLine": 32,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideVisible)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 36,
+            "endLine": 36,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.draggable)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 37,
+            "endLine": 37,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.dragging)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 38,
+            "endLine": 38,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.singlePage)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 39,
+            "endLine": 39,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.nav)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 40,
+            "endLine": 40,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.cube)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 43,
+            "endLine": 43,
+            "expression": "expect(slider.container.style.transform).toBe('')"
+          }
+        ],
+        "auditReplacements": [
+          {
+            "caseId": "CMT12",
+            "file": "tests/audit/commits.ts",
+            "line": 581,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Browser window breakpoint cycles preserve author controls; does not replace all style/class assertions of this helper."
+          }
+        ],
+        "conclusion": "15 static expect sites: disabled state; slide width/height/margins; active/prev/next/visible classes; five root classes; container transform. Slide assertions repeat for the six-card fixture."
+      }
+    },
+    {
+      "file": "tests\\integration\\disabled-cleanup.test.ts",
+      "line": 97,
+      "title": "'начальный рендер сразу в disabled breakpoint: нет артефактов'",
+      "hasLog": false,
+      "hasTodo": false,
+      "status": "meaningful-helper-assertions",
+      "note": "Static screen false positive: invoked local helper contains substantive expectations.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/disabled-cleanup.test.ts",
+          "line": 97,
+          "endLine": 109
+        },
+        "fileSha256": "41f8ac587b30819a29e37900edb146bd09e661b7b9aea3276a403f7edf3087d8",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "checkDisabledCleanup",
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 16,
+            "endLine": 44,
+            "staticAssertionSites": 15,
+            "call": {
+              "file": "tests/integration/disabled-cleanup.test.ts",
+              "line": 108,
+              "endLine": 108
+            }
+          }
+        ],
+        "assertions": [
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 17,
+            "endLine": 17,
+            "expression": "expect(slider.isEnabled).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 21,
+            "endLine": 21,
+            "expression": "expect(slide.style.width).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 22,
+            "endLine": 22,
+            "expression": "expect(slide.style.height).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 23,
+            "endLine": 23,
+            "expression": "expect(slide.style.marginRight).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 24,
+            "endLine": 24,
+            "expression": "expect(slide.style.marginBottom).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 29,
+            "endLine": 29,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideActive)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 30,
+            "endLine": 30,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slidePrev)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 31,
+            "endLine": 31,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideNext)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 32,
+            "endLine": 32,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideVisible)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 36,
+            "endLine": 36,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.draggable)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 37,
+            "endLine": 37,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.dragging)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 38,
+            "endLine": 38,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.singlePage)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 39,
+            "endLine": 39,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.nav)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 40,
+            "endLine": 40,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.cube)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 43,
+            "endLine": 43,
+            "expression": "expect(slider.container.style.transform).toBe('')"
+          }
+        ],
+        "auditReplacements": [
+          {
+            "caseId": "CMT12",
+            "file": "tests/audit/commits.ts",
+            "line": 581,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Browser window breakpoint cycles preserve author controls; does not replace all style/class assertions of this helper."
+          }
+        ],
+        "conclusion": "15 static expect sites: disabled state; slide width/height/margins; active/prev/next/visible classes; five root classes; container transform. Slide assertions repeat for the six-card fixture."
+      }
+    },
+    {
+      "file": "tests\\integration\\disabled-cleanup.test.ts",
+      "line": 111,
+      "title": "'peek + enabled: false в breakpoint: очищает width'",
+      "hasLog": false,
+      "hasTodo": false,
+      "status": "meaningful-helper-assertions",
+      "note": "Static screen false positive: invoked local helper contains substantive expectations.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/disabled-cleanup.test.ts",
+          "line": 111,
+          "endLine": 132
+        },
+        "fileSha256": "41f8ac587b30819a29e37900edb146bd09e661b7b9aea3276a403f7edf3087d8",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "checkDisabledCleanup",
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 16,
+            "endLine": 44,
+            "staticAssertionSites": 15,
+            "call": {
+              "file": "tests/integration/disabled-cleanup.test.ts",
+              "line": 131,
+              "endLine": 131
+            }
+          }
+        ],
+        "assertions": [
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 17,
+            "endLine": 17,
+            "expression": "expect(slider.isEnabled).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 21,
+            "endLine": 21,
+            "expression": "expect(slide.style.width).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 22,
+            "endLine": 22,
+            "expression": "expect(slide.style.height).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 23,
+            "endLine": 23,
+            "expression": "expect(slide.style.marginRight).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 24,
+            "endLine": 24,
+            "expression": "expect(slide.style.marginBottom).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 29,
+            "endLine": 29,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideActive)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 30,
+            "endLine": 30,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slidePrev)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 31,
+            "endLine": 31,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideNext)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 32,
+            "endLine": 32,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideVisible)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 36,
+            "endLine": 36,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.draggable)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 37,
+            "endLine": 37,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.dragging)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 38,
+            "endLine": 38,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.singlePage)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 39,
+            "endLine": 39,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.nav)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 40,
+            "endLine": 40,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.cube)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 43,
+            "endLine": 43,
+            "expression": "expect(slider.container.style.transform).toBe('')"
+          }
+        ],
+        "auditReplacements": [
+          {
+            "caseId": "CMT12",
+            "file": "tests/audit/commits.ts",
+            "line": 581,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Browser window breakpoint cycles preserve author controls; does not replace all style/class assertions of this helper."
+          }
+        ],
+        "conclusion": "15 static expect sites: disabled state; slide width/height/margins; active/prev/next/visible classes; five root classes; container transform. Slide assertions repeat for the six-card fixture."
+      }
+    },
+    {
+      "file": "tests\\integration\\disabled-cleanup.test.ts",
+      "line": 167,
+      "title": "'туда-сюда: второй переход на мобильный тоже очищает артефакты'",
+      "hasLog": false,
+      "hasTodo": false,
+      "status": "meaningful-helper-assertions",
+      "note": "Static screen false positive: invoked local helper contains substantive expectations.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/disabled-cleanup.test.ts",
+          "line": 167,
+          "endLine": 182
+        },
+        "fileSha256": "41f8ac587b30819a29e37900edb146bd09e661b7b9aea3276a403f7edf3087d8",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "checkDisabledCleanup",
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 16,
+            "endLine": 44,
+            "staticAssertionSites": 15,
+            "call": {
+              "file": "tests/integration/disabled-cleanup.test.ts",
+              "line": 181,
+              "endLine": 181
+            }
+          }
+        ],
+        "assertions": [
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 17,
+            "endLine": 17,
+            "expression": "expect(slider.isEnabled).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 21,
+            "endLine": 21,
+            "expression": "expect(slide.style.width).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 22,
+            "endLine": 22,
+            "expression": "expect(slide.style.height).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 23,
+            "endLine": 23,
+            "expression": "expect(slide.style.marginRight).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 24,
+            "endLine": 24,
+            "expression": "expect(slide.style.marginBottom).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 29,
+            "endLine": 29,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideActive)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 30,
+            "endLine": 30,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slidePrev)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 31,
+            "endLine": 31,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideNext)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 32,
+            "endLine": 32,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideVisible)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 36,
+            "endLine": 36,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.draggable)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 37,
+            "endLine": 37,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.dragging)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 38,
+            "endLine": 38,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.singlePage)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 39,
+            "endLine": 39,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.nav)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 40,
+            "endLine": 40,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.cube)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 43,
+            "endLine": 43,
+            "expression": "expect(slider.container.style.transform).toBe('')"
+          }
+        ],
+        "auditReplacements": [
+          {
+            "caseId": "CMT12",
+            "file": "tests/audit/commits.ts",
+            "line": 581,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Browser window breakpoint cycles preserve author controls; does not replace all style/class assertions of this helper."
+          }
+        ],
+        "conclusion": "15 static expect sites: disabled state; slide width/height/margins; active/prev/next/visible classes; five root classes; container transform. Slide assertions repeat for the six-card fixture."
+      }
+    },
+    {
+      "file": "tests\\integration\\disabled-cleanup.test.ts",
+      "line": 184,
+      "title": "'начальный рендер сразу в disabled breakpoint: нет артефактов'",
+      "hasLog": false,
+      "hasTodo": false,
+      "status": "meaningful-helper-assertions",
+      "note": "Static screen false positive: invoked local helper contains substantive expectations.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/disabled-cleanup.test.ts",
+          "line": 184,
+          "endLine": 196
+        },
+        "fileSha256": "41f8ac587b30819a29e37900edb146bd09e661b7b9aea3276a403f7edf3087d8",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "checkDisabledCleanup",
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 16,
+            "endLine": 44,
+            "staticAssertionSites": 15,
+            "call": {
+              "file": "tests/integration/disabled-cleanup.test.ts",
+              "line": 195,
+              "endLine": 195
+            }
+          }
+        ],
+        "assertions": [
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 17,
+            "endLine": 17,
+            "expression": "expect(slider.isEnabled).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 21,
+            "endLine": 21,
+            "expression": "expect(slide.style.width).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 22,
+            "endLine": 22,
+            "expression": "expect(slide.style.height).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 23,
+            "endLine": 23,
+            "expression": "expect(slide.style.marginRight).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 24,
+            "endLine": 24,
+            "expression": "expect(slide.style.marginBottom).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 29,
+            "endLine": 29,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideActive)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 30,
+            "endLine": 30,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slidePrev)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 31,
+            "endLine": 31,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideNext)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 32,
+            "endLine": 32,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideVisible)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 36,
+            "endLine": 36,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.draggable)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 37,
+            "endLine": 37,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.dragging)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 38,
+            "endLine": 38,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.singlePage)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 39,
+            "endLine": 39,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.nav)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 40,
+            "endLine": 40,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.cube)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 43,
+            "endLine": 43,
+            "expression": "expect(slider.container.style.transform).toBe('')"
+          }
+        ],
+        "auditReplacements": [
+          {
+            "caseId": "CMT12",
+            "file": "tests/audit/commits.ts",
+            "line": 581,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Browser window breakpoint cycles preserve author controls; does not replace all style/class assertions of this helper."
+          }
+        ],
+        "conclusion": "15 static expect sites: disabled state; slide width/height/margins; active/prev/next/visible classes; five root classes; container transform. Slide assertions repeat for the six-card fixture."
+      }
+    },
+    {
+      "file": "tests\\integration\\disabled-cleanup.test.ts",
+      "line": 240,
+      "title": "'disable() → enable() → disable(): артефактов нет'",
+      "hasLog": false,
+      "hasTodo": false,
+      "status": "meaningful-helper-assertions",
+      "note": "Static screen false positive: invoked local helper contains substantive expectations.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/disabled-cleanup.test.ts",
+          "line": 240,
+          "endLine": 253
+        },
+        "fileSha256": "41f8ac587b30819a29e37900edb146bd09e661b7b9aea3276a403f7edf3087d8",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "checkDisabledCleanup",
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 16,
+            "endLine": 44,
+            "staticAssertionSites": 15,
+            "call": {
+              "file": "tests/integration/disabled-cleanup.test.ts",
+              "line": 252,
+              "endLine": 252
+            }
+          }
+        ],
+        "assertions": [
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 17,
+            "endLine": 17,
+            "expression": "expect(slider.isEnabled).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 21,
+            "endLine": 21,
+            "expression": "expect(slide.style.width).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 22,
+            "endLine": 22,
+            "expression": "expect(slide.style.height).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 23,
+            "endLine": 23,
+            "expression": "expect(slide.style.marginRight).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 24,
+            "endLine": 24,
+            "expression": "expect(slide.style.marginBottom).toBe('')"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 29,
+            "endLine": 29,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideActive)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 30,
+            "endLine": 30,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slidePrev)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 31,
+            "endLine": 31,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideNext)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 32,
+            "endLine": 32,
+            "expression": "expect(slide.classList.contains(TVIST_CLASSES.slideVisible)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 36,
+            "endLine": 36,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.draggable)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 37,
+            "endLine": 37,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.dragging)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 38,
+            "endLine": 38,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.singlePage)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 39,
+            "endLine": 39,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.nav)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 40,
+            "endLine": 40,
+            "expression": "expect(root.classList.contains(TVIST_CLASSES.cube)).toBe(false)"
+          },
+          {
+            "file": "tests/integration/disabled-cleanup.test.ts",
+            "line": 43,
+            "endLine": 43,
+            "expression": "expect(slider.container.style.transform).toBe('')"
+          }
+        ],
+        "auditReplacements": [
+          {
+            "caseId": "CMT12",
+            "file": "tests/audit/commits.ts",
+            "line": 581,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Browser window breakpoint cycles preserve author controls; does not replace all style/class assertions of this helper."
+          }
+        ],
+        "conclusion": "15 static expect sites: disabled state; slide width/height/margins; active/prev/next/visible classes; five root classes; container transform. Slide assertions repeat for the six-card fixture."
+      }
+    },
+    {
+      "file": "tests\\integration\\marquee-drag-loop-issue.test.ts",
+      "line": 152,
+      "title": "'слайды должны быть перестроены если нужно'",
+      "hasLog": true,
+      "hasTodo": false,
+      "status": "assertionless-diagnostic",
+      "note": "Called drag and transform helpers contain no assertions; invalid outcomes only log.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/marquee-drag-loop-issue.test.ts",
+          "line": 152,
+          "endLine": 211
+        },
+        "fileSha256": "7103b595be12e367d11158dce26d6048a2ff808fa2319d634f5d48e4582bd793",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "simulateDrag",
+            "file": "tests/integration/marquee-drag-loop-issue.test.ts",
+            "line": 68,
+            "endLine": 102,
+            "staticAssertionSites": 0
+          },
+          {
+            "name": "getTranslateX",
+            "file": "tests/integration/marquee-drag-loop-issue.test.ts",
+            "line": 60,
+            "endLine": 66,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [],
+        "conclusion": "Records loop.fix calls and reorders; a missing reorder only console.logs.",
+        "remainingGap": "No exact new marquee+drag position/reorder replacement. CMT09/CMT10 stop/start RAF tests are not equivalent."
+      }
+    },
+    {
+      "file": "tests\\integration\\marquee-drag-loop-issue.test.ts",
+      "line": 215,
+      "title": "'должен учитывать текущую позицию marquee при drag'",
+      "hasLog": true,
+      "hasTodo": false,
+      "status": "assertionless-diagnostic",
+      "note": "Called drag and transform helpers contain no assertions; invalid outcomes only log.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/marquee-drag-loop-issue.test.ts",
+          "line": 215,
+          "endLine": 260
+        },
+        "fileSha256": "7103b595be12e367d11158dce26d6048a2ff808fa2319d634f5d48e4582bd793",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "simulateDrag",
+            "file": "tests/integration/marquee-drag-loop-issue.test.ts",
+            "line": 68,
+            "endLine": 102,
+            "staticAssertionSites": 0
+          },
+          {
+            "name": "getTranslateX",
+            "file": "tests/integration/marquee-drag-loop-issue.test.ts",
+            "line": 60,
+            "endLine": 66,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [],
+        "conclusion": "Measures initial/final transform and checks [-60,-40] only to print a warning; never fails for a wrong position.",
+        "remainingGap": "No exact new marquee+drag position/reorder replacement. CMT09/CMT10 stop/start RAF tests are not equivalent."
+      }
+    },
+    {
+      "file": "tests\\integration\\marquee-drag.test.ts",
+      "line": 256,
+      "title": "'drag должен приостанавливать marquee'",
+      "hasLog": false,
+      "hasTodo": true,
+      "status": "todo-blocked-placeholder",
+      "note": "Executed TODO placeholder; no assertion of spy calls or public pause/resume state. Comments do not establish current implementation support.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/marquee-drag.test.ts",
+          "line": 256,
+          "endLine": 283
+        },
+        "fileSha256": "a2ed3fea54cdba38ce144504334f37d5a90e93c9540500b0043293c01705bf05",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [],
+        "assertions": [],
+        "auditReplacements": [],
+        "conclusion": "Creates onMarqueePause spy and sends pointerdown; spy/state/transform never asserted.",
+        "todoEvidence": {
+          "file": "tests/integration/marquee-drag.test.ts",
+          "line": 281
+        },
+        "remainingGap": "No exact browser marquee-drag pause/resume replacement; CMT09/CMT10 exercise explicit stop/start only."
+      }
+    },
+    {
+      "file": "tests\\integration\\marquee-drag.test.ts",
+      "line": 285,
+      "title": "'marquee должен возобновляться после завершения драга'",
+      "hasLog": false,
+      "hasTodo": true,
+      "status": "todo-blocked-placeholder",
+      "note": "Executed TODO placeholder; no assertion of spy calls or public pause/resume state. Comments do not establish current implementation support.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/marquee-drag.test.ts",
+          "line": 285,
+          "endLine": 305
+        },
+        "fileSha256": "a2ed3fea54cdba38ce144504334f37d5a90e93c9540500b0043293c01705bf05",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "simulateDrag",
+            "file": "tests/integration/marquee-drag.test.ts",
+            "line": 47,
+            "endLine": 84,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [],
+        "conclusion": "Creates onMarqueeResume spy and sends a drag sequence; spy/state/resumed motion never asserted.",
+        "todoEvidence": {
+          "file": "tests/integration/marquee-drag.test.ts",
+          "line": 304
+        },
+        "remainingGap": "No exact browser marquee-drag pause/resume replacement; CMT09/CMT10 exercise explicit stop/start only."
+      }
+    },
+    {
+      "file": "tests\\integration\\test-loop-peek-2.test.ts",
+      "line": 22,
+      "title": "'should check transform at index 2'",
+      "hasLog": true,
+      "hasTodo": false,
+      "status": "assertionless-diagnostic",
+      "note": "Imported expect is never called; fixture/event helpers were inspected and contain no assertions. Success only proves no uncaught exception.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/test-loop-peek-2.test.ts",
+          "line": 22,
+          "endLine": 36
+        },
+        "fileSha256": "317d4253c010fd63dfc82a0010858bbc5f75c22d8e8c0a129fefcb60fe842ed6",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "createSliderFixture",
+            "file": "tests/fixtures/dom.ts",
+            "line": 54,
+            "endLine": 170,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [
+          {
+            "caseId": "SRC-G10",
+            "file": "tests/audit/source-geometry.ts",
+            "line": 284,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Measured initialization/no-jump and seam coverage with autoWidth/asymmetric peek; not the exact N5/P1/peek40/gap16 instant-target fixture."
+          }
+        ],
+        "conclusion": "Logs transforms, indices/order or private bounds after setup/navigation/drag; no failing behavioral comparison.",
+        "remainingGap": "Related audited family is not an exact replacement for the original fixture and intended oracle."
+      }
+    },
+    {
+      "file": "tests\\integration\\test-loop-peek-3.test.ts",
+      "line": 22,
+      "title": "'should check transform at last slide'",
+      "hasLog": true,
+      "hasTodo": false,
+      "status": "assertionless-diagnostic",
+      "note": "Imported expect is never called; fixture/event helpers were inspected and contain no assertions. Success only proves no uncaught exception.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/test-loop-peek-3.test.ts",
+          "line": 22,
+          "endLine": 36
+        },
+        "fileSha256": "e51732bcaad85f3a2ccf24798ccc0ec929ce5204577c2da2c22fb35bbcde2826",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "createSliderFixture",
+            "file": "tests/fixtures/dom.ts",
+            "line": 54,
+            "endLine": 170,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [
+          {
+            "caseId": "SRC-G10",
+            "file": "tests/audit/source-geometry.ts",
+            "line": 284,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Measured initialization/no-jump and seam coverage with autoWidth/asymmetric peek; not the exact N5/P1/peek40/gap16 instant-target fixture."
+          }
+        ],
+        "conclusion": "Logs transforms, indices/order or private bounds after setup/navigation/drag; no failing behavioral comparison.",
+        "remainingGap": "Related audited family is not an exact replacement for the original fixture and intended oracle."
+      }
+    },
+    {
+      "file": "tests\\integration\\test-loop-peek-4.test.ts",
+      "line": 23,
+      "title": "'should check drag to left'",
+      "hasLog": true,
+      "hasTodo": false,
+      "status": "assertionless-diagnostic",
+      "note": "Imported expect is never called; fixture/event helpers were inspected and contain no assertions. Success only proves no uncaught exception.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/test-loop-peek-4.test.ts",
+          "line": 23,
+          "endLine": 42
+        },
+        "fileSha256": "cc068f510b185b5564a9f24de3a46ba35037bce8308239732bb6cc036779517d",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "createSliderFixture",
+            "file": "tests/fixtures/dom.ts",
+            "line": 54,
+            "endLine": 170,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [
+          {
+            "caseId": "SRC-G01",
+            "file": "tests/audit/source-geometry.ts",
+            "line": 117,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Real short/long drag verifies viewport coverage and usable navigation; N2/no-peek differs from N5/peek40, not exact tiny-drag no-jump behavior."
+          }
+        ],
+        "conclusion": "Logs transforms, indices/order or private bounds after setup/navigation/drag; no failing behavioral comparison.",
+        "remainingGap": "Related audited family is not an exact replacement for the original fixture and intended oracle."
+      }
+    },
+    {
+      "file": "tests\\integration\\test-loop-peek-5.test.ts",
+      "line": 23,
+      "title": "'should check drag to left when on last slide'",
+      "hasLog": true,
+      "hasTodo": false,
+      "status": "assertionless-diagnostic",
+      "note": "Imported expect is never called; fixture/event helpers were inspected and contain no assertions. Success only proves no uncaught exception.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/test-loop-peek-5.test.ts",
+          "line": 23,
+          "endLine": 44
+        },
+        "fileSha256": "58026569b942e576fcab4655c1d77ed2db528392ea63b088b3cb1eece0998fa5",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "createSliderFixture",
+            "file": "tests/fixtures/dom.ts",
+            "line": 54,
+            "endLine": 170,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [
+          {
+            "caseId": "SRC-G01",
+            "file": "tests/audit/source-geometry.ts",
+            "line": 117,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Real short/long drag verifies viewport coverage and usable navigation; N2/no-peek differs from N5/peek40, not exact tiny-drag no-jump behavior."
+          }
+        ],
+        "conclusion": "Logs transforms, indices/order or private bounds after setup/navigation/drag; no failing behavioral comparison.",
+        "remainingGap": "Related audited family is not an exact replacement for the original fixture and intended oracle."
+      }
+    },
+    {
+      "file": "tests\\integration\\test-loop-peek-drag-bug-2.test.ts",
+      "line": 23,
+      "title": "'should not jump on drag and release'",
+      "hasLog": true,
+      "hasTodo": false,
+      "status": "assertionless-diagnostic",
+      "note": "Imported expect is never called; fixture/event helpers were inspected and contain no assertions. Success only proves no uncaught exception.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/test-loop-peek-drag-bug-2.test.ts",
+          "line": 23,
+          "endLine": 40
+        },
+        "fileSha256": "d13fb52cc3c52ac816034ef71b9029adca17cba73a34475e033e871020d54a2b",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "createSliderFixture",
+            "file": "tests/fixtures/dom.ts",
+            "line": 54,
+            "endLine": 170,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [
+          {
+            "caseId": "SRC-G01",
+            "file": "tests/audit/source-geometry.ts",
+            "line": 117,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Real short/long drag verifies viewport coverage and usable navigation; N2/no-peek differs from N5/peek40, not exact tiny-drag no-jump behavior."
+          }
+        ],
+        "conclusion": "Logs transforms, indices/order or private bounds after setup/navigation/drag; no failing behavioral comparison.",
+        "remainingGap": "Related audited family is not an exact replacement for the original fixture and intended oracle."
+      }
+    },
+    {
+      "file": "tests\\integration\\test-loop-peek-drag-bug-3.test.ts",
+      "line": 22,
+      "title": "'should snap to next slide on large drag'",
+      "hasLog": true,
+      "hasTodo": false,
+      "status": "assertionless-diagnostic",
+      "note": "Imported expect is never called; fixture/event helpers were inspected and contain no assertions. Success only proves no uncaught exception.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/test-loop-peek-drag-bug-3.test.ts",
+          "line": 22,
+          "endLine": 37
+        },
+        "fileSha256": "e6a29b7b6f8461fb93e2b141b00bc2300e3406d0fa13352a2b7f464209bb8c0b",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "createSliderFixture",
+            "file": "tests/fixtures/dom.ts",
+            "line": 54,
+            "endLine": 170,
+            "staticAssertionSites": 0
+          },
+          {
+            "name": "simulateDrag",
+            "file": "tests/fixtures/events.ts",
+            "line": 125,
+            "endLine": 220,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [
+          {
+            "caseId": "SRC-G01",
+            "file": "tests/audit/source-geometry.ts",
+            "line": 117,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Real short/long drag verifies viewport coverage and usable navigation; N2/no-peek differs from N5/peek40, not exact tiny-drag no-jump behavior."
+          }
+        ],
+        "conclusion": "Logs transforms, indices/order or private bounds after setup/navigation/drag; no failing behavioral comparison.",
+        "remainingGap": "Related audited family is not an exact replacement for the original fixture and intended oracle."
+      }
+    },
+    {
+      "file": "tests\\integration\\test-loop-peek-drag-bug.test.ts",
+      "line": 23,
+      "title": "'should not jump on small drag'",
+      "hasLog": true,
+      "hasTodo": false,
+      "status": "assertionless-diagnostic",
+      "note": "Imported expect is never called; fixture/event helpers were inspected and contain no assertions. Success only proves no uncaught exception.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/test-loop-peek-drag-bug.test.ts",
+          "line": 23,
+          "endLine": 51
+        },
+        "fileSha256": "2a551bb2e74d649eee0b207a48d5780bc5f0abdd16fa359068865a2d3745b2c5",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "createSliderFixture",
+            "file": "tests/fixtures/dom.ts",
+            "line": 54,
+            "endLine": 170,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [
+          {
+            "caseId": "SRC-G01",
+            "file": "tests/audit/source-geometry.ts",
+            "line": 117,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Real short/long drag verifies viewport coverage and usable navigation; N2/no-peek differs from N5/peek40, not exact tiny-drag no-jump behavior."
+          }
+        ],
+        "conclusion": "Logs transforms, indices/order or private bounds after setup/navigation/drag; no failing behavioral comparison.",
+        "remainingGap": "Related audited family is not an exact replacement for the original fixture and intended oracle."
+      }
+    },
+    {
+      "file": "tests\\integration\\test-loop-peek.test.ts",
+      "line": 23,
+      "title": "'should check transform at index 0'",
+      "hasLog": true,
+      "hasTodo": false,
+      "status": "assertionless-diagnostic",
+      "note": "Imported expect is never called; fixture/event helpers were inspected and contain no assertions. Success only proves no uncaught exception.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/test-loop-peek.test.ts",
+          "line": 23,
+          "endLine": 36
+        },
+        "fileSha256": "5299e2f5676d004107840686fc94f209c5d4dc4cd0f5b1ddbae656e355603b50",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "createSliderFixture",
+            "file": "tests/fixtures/dom.ts",
+            "line": 54,
+            "endLine": 170,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [
+          {
+            "caseId": "SRC-G10",
+            "file": "tests/audit/source-geometry.ts",
+            "line": 284,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Measured initialization/no-jump and seam coverage with autoWidth/asymmetric peek; not the exact N5/P1/peek40/gap16 instant-target fixture."
+          }
+        ],
+        "conclusion": "Logs transforms, indices/order or private bounds after setup/navigation/drag; no failing behavioral comparison.",
+        "remainingGap": "Related audited family is not an exact replacement for the original fixture and intended oracle."
+      }
+    },
+    {
+      "file": "tests\\integration\\test-peek-trim-2.test.ts",
+      "line": 23,
+      "title": "'should check transform at index 0'",
+      "hasLog": true,
+      "hasTodo": false,
+      "status": "assertionless-diagnostic",
+      "note": "Imported expect is never called; fixture/event helpers were inspected and contain no assertions. Success only proves no uncaught exception.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/integration/test-peek-trim-2.test.ts",
+          "line": 23,
+          "endLine": 39
+        },
+        "fileSha256": "a11ca2733b5eafbd1f79796a73cab23d3d72e5aaf6e070d8620a2059cc348a36",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [
+          {
+            "name": "createSliderFixture",
+            "file": "tests/fixtures/dom.ts",
+            "line": 54,
+            "endLine": 170,
+            "staticAssertionSites": 0
+          }
+        ],
+        "assertions": [],
+        "auditReplacements": [
+          {
+            "caseId": "G13",
+            "file": "tests/audit/geometry.ts",
+            "line": 490,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Independent first/last outer-edge alignment with asymmetric peek and focus; different options."
+          },
+          {
+            "caseId": "SRC-G02",
+            "file": "tests/audit/source-geometry.ts",
+            "line": 131,
+            "relationship": "partial-analogue",
+            "exactReplacement": false,
+            "scope": "Final boundary after peek changes and resize; different fixture."
+          }
+        ],
+        "conclusion": "Logs transforms, indices/order or private bounds after setup/navigation/drag; no failing behavioral comparison.",
+        "remainingGap": "Related audited family is not an exact replacement for the original fixture and intended oracle."
+      }
+    },
+    {
+      "file": "tests\\unit\\modules\\AutoplayVideoEndedBoundaryBug.test.ts",
+      "line": 141,
+      "title": "'should handle videoEndedWhilePaused correctly when navigation succeeds'",
+      "hasLog": false,
+      "hasTodo": false,
+      "status": "skipped-timing-placeholder",
+      "note": "it.skip body contains only a timing comment; baseline skip preserved.",
+      "reviewedEvidence": {
+        "reviewedAt": "2026-11-01",
+        "testDefinition": {
+          "file": "tests/unit/modules/AutoplayVideoEndedBoundaryBug.test.ts",
+          "line": 141,
+          "endLine": 143
+        },
+        "fileSha256": "84363e321a1d5dff20ac1989febdd7aaa647fe81695371dded21fb91f7f86a96",
+        "baselineCodeModified": false,
+        "directAssertionSites": 0,
+        "helperCalls": [],
+        "assertions": [],
+        "auditReplacements": [
+          {
+            "caseId": "MEDIA-014",
+            "file": "tests/audit/media.ts",
+            "line": 319,
+            "relationship": "behavioral-replacement",
+            "exactReplacement": false,
+            "scope": "Controlled video ended while paused: remains at0, resume advances once to1. Public API and virtual time cover missing successful navigation; no native-codec/private-flag equivalence."
+          }
+        ],
+        "conclusion": "No executable actions or helper assertions in skipped body."
+      }
+    }
+  ],
+  "confirmedExamples": [
+    "tests/integration/test-loop-peek-2.test.ts logs only",
+    "tests/integration/test-loop-peek-3.test.ts logs only",
+    "tests/integration/test-loop-peek-4.test.ts logs only",
+    "tests/integration/test-loop-peek-5.test.ts logs only"
+  ],
+  "mockLimitations": [
+    "ResizeObserver and IntersectionObserver do not deliver callbacks automatically",
+    "matchMedia supports max-width integers; matches captured at creation",
+    "getComputedStyle forces horizontal margins to zero",
+    "factory-probes rewrites calls and exposes state"
+  ],
+  "baseline": {
+    "firstCoverage": "1211 passed, 1 failed visibility, 1 skipped; load-sensitive",
+    "visibilityRepeat": "27/27 passed",
+    "coverageRepeat": "1212 passed, 1 skipped; retry enabled; ALL-source lines90.06%, recursive core lines90.94%, modules lines89.71%. See coverageReview counters/gaps.",
+    "baselineLog": ".tmp/audit/baseline-coverage-repeat.log"
+  },
+  "legacySkippedVideoCase": {
+    "file": "tests/unit/modules/AutoplayVideoEndedBoundaryBug.test.ts",
+    "reason": "Empty skipped timing test retained for baseline comparison",
+    "replacement": "MEDIA-014",
+    "replacementScope": "Controlled HTML media ended while paused; virtual time and successful navigation on resume; passed Chromium/Firefox/WebKit. Native decoding is a separate layer."
+  },
+  "review": {
+    "reviewedAt": "2026-11-01",
+    "method": "Read all20candidate bodies, hooks and called helpers. Assertions inside helpers count. No baseline tests edited or rerun.",
+    "candidateDenominator": 20,
+    "fileDenominator": 13,
+    "statusCounts": {
+      "meaningful-helper-assertions": 6,
+      "assertionless-diagnostic": 11,
+      "todo-blocked-placeholder": 2,
+      "skipped-timing-placeholder": 1
+    },
+    "interpretation": "Diagnostics still detect uncaught exceptions but not named behavior. TODO status describes incomplete tests, not an unsupported/broken feature. Partial analogues are not exact replacements."
+  },
+  "coverageReview": {
+    "source": "coverage/coverage-final.json",
+    "sha256": "b6c16983ae03cf2af876407cfc3dce2dd6aeb614563782e627a7b78a54a76efa",
+    "artifactModifiedAt": "2026-10-31T19:49:25.592Z",
+    "method": "istanbul-lib-coverage: sum covered/total counters over recursive paths; do not average percentages.",
+    "baselineLog": ".tmp/audit/baseline-coverage-repeat.log",
+    "baselineLogSha256": "1da5859586c17ccca70527abe6d2a0c8162745111345e11764fa9dcfa37819e0",
+    "baselineLogMatch": "All-files lines90.06, branches85.45 and functions88.59 exactly match saved baseline repeat table. Browser audits are not merged into these counters.",
+    "all": {
+      "files": 64,
+      "lines": {
+        "total": 9199,
+        "covered": 8285,
+        "skipped": 0,
+        "pct": 90.06
+      },
+      "statements": {
+        "total": 9199,
+        "covered": 8285,
+        "skipped": 0,
+        "pct": 90.06
+      },
+      "functions": {
+        "total": 842,
+        "covered": 746,
+        "skipped": 0,
+        "pct": 88.59
+      },
+      "branches": {
+        "total": 3033,
+        "covered": 2592,
+        "skipped": 0,
+        "pct": 85.45
+      }
+    },
+    "coreRecursive": {
+      "files": 11,
+      "lines": {
+        "total": 2662,
+        "covered": 2421,
+        "skipped": 0,
+        "pct": 90.94
+      },
+      "statements": {
+        "total": 2662,
+        "covered": 2421,
+        "skipped": 0,
+        "pct": 90.94
+      },
+      "functions": {
+        "total": 307,
+        "covered": 257,
+        "skipped": 0,
+        "pct": 83.71
+      },
+      "branches": {
+        "total": 938,
+        "covered": 852,
+        "skipped": 0,
+        "pct": 90.83
+      }
+    },
+    "modulesRecursive": {
+      "files": 38,
+      "lines": {
+        "total": 5943,
+        "covered": 5332,
+        "skipped": 0,
+        "pct": 89.71
+      },
+      "statements": {
+        "total": 5943,
+        "covered": 5332,
+        "skipped": 0,
+        "pct": 89.71
+      },
+      "functions": {
+        "total": 468,
+        "covered": 428,
+        "skipped": 0,
+        "pct": 91.45
+      },
+      "branches": {
+        "total": 1826,
+        "covered": 1483,
+        "skipped": 0,
+        "pct": 81.21
+      }
+    },
+    "utilsRecursive": {
+      "files": 13,
+      "lines": {
+        "total": 589,
+        "covered": 529,
+        "skipped": 0,
+        "pct": 89.81
+      },
+      "statements": {
+        "total": 589,
+        "covered": 529,
+        "skipped": 0,
+        "pct": 89.81
+      },
+      "functions": {
+        "total": 66,
+        "covered": 60,
+        "skipped": 0,
+        "pct": 90.9
+      },
+      "branches": {
+        "total": 268,
+        "covered": 256,
+        "skipped": 0,
+        "pct": 95.52
+      }
+    },
+    "coreFiles": [
+      {
+        "file": "src/core/Animator.ts",
+        "lines": {
+          "total": 96,
+          "covered": 96,
+          "skipped": 0,
+          "pct": 100
+        },
+        "statements": {
+          "total": 96,
+          "covered": 96,
+          "skipped": 0,
+          "pct": 100
+        },
+        "functions": {
+          "total": 17,
+          "covered": 17,
+          "skipped": 0,
+          "pct": 100
+        },
+        "branches": {
+          "total": 37,
+          "covered": 37,
+          "skipped": 0,
+          "pct": 100
+        },
+        "uncoveredLineRanges": []
+      },
+      {
+        "file": "src/core/Counter.ts",
+        "lines": {
+          "total": 33,
+          "covered": 33,
+          "skipped": 0,
+          "pct": 100
+        },
+        "statements": {
+          "total": 33,
+          "covered": 33,
+          "skipped": 0,
+          "pct": 100
+        },
+        "functions": {
+          "total": 6,
+          "covered": 6,
+          "skipped": 0,
+          "pct": 100
+        },
+        "branches": {
+          "total": 12,
+          "covered": 12,
+          "skipped": 0,
+          "pct": 100
+        },
+        "uncoveredLineRanges": []
+      },
+      {
+        "file": "src/core/Engine.ts",
+        "lines": {
+          "total": 351,
+          "covered": 323,
+          "skipped": 0,
+          "pct": 92.02
+        },
+        "statements": {
+          "total": 351,
+          "covered": 323,
+          "skipped": 0,
+          "pct": 92.02
+        },
+        "functions": {
+          "total": 54,
+          "covered": 46,
+          "skipped": 0,
+          "pct": 85.18
+        },
+        "branches": {
+          "total": 124,
+          "covered": 118,
+          "skipped": 0,
+          "pct": 95.16
+        },
+        "uncoveredLineRanges": [
+          {
+            "start": 204,
+            "end": 214
+          },
+          {
+            "start": 360,
+            "end": 361
+          },
+          {
+            "start": 369,
+            "end": 369
+          },
+          {
+            "start": 443,
+            "end": 444
+          },
+          {
+            "start": 464,
+            "end": 465
+          },
+          {
+            "start": 486,
+            "end": 487
+          },
+          {
+            "start": 489,
+            "end": 490
+          },
+          {
+            "start": 492,
+            "end": 493
+          },
+          {
+            "start": 495,
+            "end": 496
+          },
+          {
+            "start": 539,
+            "end": 540
+          }
+        ]
+      },
+      {
+        "file": "src/core/EventEmitter.ts",
+        "lines": {
+          "total": 84,
+          "covered": 82,
+          "skipped": 0,
+          "pct": 97.61
+        },
+        "statements": {
+          "total": 84,
+          "covered": 82,
+          "skipped": 0,
+          "pct": 97.61
+        },
+        "functions": {
+          "total": 12,
+          "covered": 12,
+          "skipped": 0,
+          "pct": 100
+        },
+        "branches": {
+          "total": 27,
+          "covered": 25,
+          "skipped": 0,
+          "pct": 92.59
+        },
+        "uncoveredLineRanges": [
+          {
+            "start": 140,
+            "end": 141
+          }
+        ]
+      },
+      {
+        "file": "src/core/Tvist.ts",
+        "lines": {
+          "total": 136,
+          "covered": 117,
+          "skipped": 0,
+          "pct": 86.02
+        },
+        "statements": {
+          "total": 136,
+          "covered": 117,
+          "skipped": 0,
+          "pct": 86.02
+        },
+        "functions": {
+          "total": 36,
+          "covered": 30,
+          "skipped": 0,
+          "pct": 83.33
+        },
+        "branches": {
+          "total": 32,
+          "covered": 30,
+          "skipped": 0,
+          "pct": 93.75
+        },
+        "uncoveredLineRanges": [
+          {
+            "start": 41,
+            "end": 42
+          },
+          {
+            "start": 220,
+            "end": 221
+          },
+          {
+            "start": 223,
+            "end": 225
+          },
+          {
+            "start": 234,
+            "end": 234
+          },
+          {
+            "start": 238,
+            "end": 239
+          },
+          {
+            "start": 241,
+            "end": 243
+          },
+          {
+            "start": 246,
+            "end": 248
+          },
+          {
+            "start": 250,
+            "end": 251
+          },
+          {
+            "start": 253,
+            "end": 253
+          }
+        ]
+      },
+      {
+        "file": "src/core/Vector1D.ts",
+        "lines": {
+          "total": 38,
+          "covered": 38,
+          "skipped": 0,
+          "pct": 100
+        },
+        "statements": {
+          "total": 38,
+          "covered": 38,
+          "skipped": 0,
+          "pct": 100
+        },
+        "functions": {
+          "total": 10,
+          "covered": 10,
+          "skipped": 0,
+          "pct": 100
+        },
+        "branches": {
+          "total": 14,
+          "covered": 14,
+          "skipped": 0,
+          "pct": 100
+        },
+        "uncoveredLineRanges": []
+      },
+      {
+        "file": "src/core/constants.ts",
+        "lines": {
+          "total": 60,
+          "covered": 60,
+          "skipped": 0,
+          "pct": 100
+        },
+        "statements": {
+          "total": 60,
+          "covered": 60,
+          "skipped": 0,
+          "pct": 100
+        },
+        "functions": {
+          "total": 0,
+          "covered": 0,
+          "skipped": 0,
+          "pct": 100
+        },
+        "branches": {
+          "total": 3,
+          "covered": 0,
+          "skipped": 0,
+          "pct": 0
+        },
+        "uncoveredLineRanges": []
+      },
+      {
+        "file": "src/core/runtime.ts",
+        "lines": {
+          "total": 839,
+          "covered": 747,
+          "skipped": 0,
+          "pct": 89.03
+        },
+        "statements": {
+          "total": 839,
+          "covered": 747,
+          "skipped": 0,
+          "pct": 89.03
+        },
+        "functions": {
+          "total": 85,
+          "covered": 70,
+          "skipped": 0,
+          "pct": 82.35
+        },
+        "branches": {
+          "total": 292,
+          "covered": 258,
+          "skipped": 0,
+          "pct": 88.35
+        },
+        "uncoveredLineRanges": [
+          {
+            "start": 131,
+            "end": 136
+          },
+          {
+            "start": 187,
+            "end": 188
+          },
+          {
+            "start": 241,
+            "end": 252
+          },
+          {
+            "start": 269,
+            "end": 270
+          },
+          {
+            "start": 276,
+            "end": 281
+          },
+          {
+            "start": 290,
+            "end": 291
+          },
+          {
+            "start": 308,
+            "end": 310
+          },
+          {
+            "start": 328,
+            "end": 329
+          },
+          {
+            "start": 361,
+            "end": 362
+          },
+          {
+            "start": 371,
+            "end": 374
+          },
+          {
+            "start": 391,
+            "end": 393
+          },
+          {
+            "start": 402,
+            "end": 403
+          },
+          {
+            "start": 498,
+            "end": 499
+          },
+          {
+            "start": 546,
+            "end": 547
+          },
+          {
+            "start": 551,
+            "end": 554
+          },
+          {
+            "start": 556,
+            "end": 557
+          },
+          {
+            "start": 619,
+            "end": 620
+          },
+          {
+            "start": 665,
+            "end": 666
+          },
+          {
+            "start": 684,
+            "end": 685
+          },
+          {
+            "start": 801,
+            "end": 802
+          },
+          {
+            "start": 838,
+            "end": 839
+          },
+          {
+            "start": 841,
+            "end": 842
+          },
+          {
+            "start": 844,
+            "end": 845
+          },
+          {
+            "start": 847,
+            "end": 848
+          },
+          {
+            "start": 850,
+            "end": 851
+          },
+          {
+            "start": 853,
+            "end": 854
+          },
+          {
+            "start": 856,
+            "end": 857
+          },
+          {
+            "start": 859,
+            "end": 860
+          },
+          {
+            "start": 862,
+            "end": 863
+          },
+          {
+            "start": 865,
+            "end": 866
+          },
+          {
+            "start": 868,
+            "end": 869
+          },
+          {
+            "start": 871,
+            "end": 872
+          },
+          {
+            "start": 927,
+            "end": 928
+          },
+          {
+            "start": 930,
+            "end": 931
+          }
+        ]
+      },
+      {
+        "file": "src/core/tvistSlides.ts",
+        "lines": {
+          "total": 14,
+          "covered": 14,
+          "skipped": 0,
+          "pct": 100
+        },
+        "statements": {
+          "total": 14,
+          "covered": 14,
+          "skipped": 0,
+          "pct": 100
+        },
+        "functions": {
+          "total": 2,
+          "covered": 2,
+          "skipped": 0,
+          "pct": 100
+        },
+        "branches": {
+          "total": 4,
+          "covered": 4,
+          "skipped": 0,
+          "pct": 100
+        },
+        "uncoveredLineRanges": []
+      },
+      {
+        "file": "src/core/engine/Layout.ts",
+        "lines": {
+          "total": 601,
+          "covered": 537,
+          "skipped": 0,
+          "pct": 89.35
+        },
+        "statements": {
+          "total": 601,
+          "covered": 537,
+          "skipped": 0,
+          "pct": 89.35
+        },
+        "functions": {
+          "total": 60,
+          "covered": 44,
+          "skipped": 0,
+          "pct": 73.33
+        },
+        "branches": {
+          "total": 250,
+          "covered": 226,
+          "skipped": 0,
+          "pct": 90.4
+        },
+        "uncoveredLineRanges": [
+          {
+            "start": 273,
+            "end": 273
+          },
+          {
+            "start": 286,
+            "end": 286
+          },
+          {
+            "start": 294,
+            "end": 294
+          },
+          {
+            "start": 305,
+            "end": 305
+          },
+          {
+            "start": 379,
+            "end": 381
+          },
+          {
+            "start": 383,
+            "end": 385
+          },
+          {
+            "start": 387,
+            "end": 390
+          },
+          {
+            "start": 392,
+            "end": 397
+          },
+          {
+            "start": 403,
+            "end": 411
+          },
+          {
+            "start": 580,
+            "end": 582
+          },
+          {
+            "start": 775,
+            "end": 776
+          },
+          {
+            "start": 778,
+            "end": 779
+          },
+          {
+            "start": 788,
+            "end": 789
+          },
+          {
+            "start": 791,
+            "end": 792
+          },
+          {
+            "start": 794,
+            "end": 795
+          },
+          {
+            "start": 797,
+            "end": 798
+          },
+          {
+            "start": 800,
+            "end": 801
+          },
+          {
+            "start": 803,
+            "end": 804
+          },
+          {
+            "start": 811,
+            "end": 812
+          },
+          {
+            "start": 814,
+            "end": 815
+          },
+          {
+            "start": 817,
+            "end": 818
+          },
+          {
+            "start": 820,
+            "end": 821
+          },
+          {
+            "start": 828,
+            "end": 829
+          },
+          {
+            "start": 831,
+            "end": 832
+          },
+          {
+            "start": 835,
+            "end": 836
+          },
+          {
+            "start": 838,
+            "end": 839
+          }
+        ]
+      },
+      {
+        "file": "src/core/engine/Motion.ts",
+        "lines": {
+          "total": 410,
+          "covered": 374,
+          "skipped": 0,
+          "pct": 91.21
+        },
+        "statements": {
+          "total": 410,
+          "covered": 374,
+          "skipped": 0,
+          "pct": 91.21
+        },
+        "functions": {
+          "total": 25,
+          "covered": 20,
+          "skipped": 0,
+          "pct": 80
+        },
+        "branches": {
+          "total": 143,
+          "covered": 128,
+          "skipped": 0,
+          "pct": 89.51
+        },
+        "uncoveredLineRanges": [
+          {
+            "start": 116,
+            "end": 117
+          },
+          {
+            "start": 170,
+            "end": 175
+          },
+          {
+            "start": 193,
+            "end": 193
+          },
+          {
+            "start": 268,
+            "end": 280
+          },
+          {
+            "start": 333,
+            "end": 334
+          },
+          {
+            "start": 375,
+            "end": 377
+          },
+          {
+            "start": 380,
+            "end": 380
+          },
+          {
+            "start": 506,
+            "end": 507
+          },
+          {
+            "start": 509,
+            "end": 510
+          },
+          {
+            "start": 515,
+            "end": 516
+          },
+          {
+            "start": 518,
+            "end": 519
+          }
+        ]
+      }
+    ],
+    "modules": [
+      {
+        "module": "_shared",
+        "files": 3,
+        "lines": {
+          "total": 94,
+          "covered": 93,
+          "skipped": 0,
+          "pct": 98.93
+        },
+        "statements": {
+          "total": 94,
+          "covered": 93,
+          "skipped": 0,
+          "pct": 98.93
+        },
+        "functions": {
+          "total": 11,
+          "covered": 11,
+          "skipped": 0,
+          "pct": 100
+        },
+        "branches": {
+          "total": 21,
+          "covered": 21,
+          "skipped": 0,
+          "pct": 100
+        }
+      },
+      {
+        "module": "autoplay",
+        "files": 2,
+        "lines": {
+          "total": 678,
+          "covered": 636,
+          "skipped": 0,
+          "pct": 93.8
+        },
+        "statements": {
+          "total": 678,
+          "covered": 636,
+          "skipped": 0,
+          "pct": 93.8
+        },
+        "functions": {
+          "total": 50,
+          "covered": 48,
+          "skipped": 0,
+          "pct": 96
+        },
+        "branches": {
+          "total": 213,
+          "covered": 169,
+          "skipped": 0,
+          "pct": 79.34
+        }
+      },
+      {
+        "module": "breakpoints",
+        "files": 2,
+        "lines": {
+          "total": 154,
+          "covered": 148,
+          "skipped": 0,
+          "pct": 96.1
+        },
+        "statements": {
+          "total": 154,
+          "covered": 148,
+          "skipped": 0,
+          "pct": 96.1
+        },
+        "functions": {
+          "total": 14,
+          "covered": 14,
+          "skipped": 0,
+          "pct": 100
+        },
+        "branches": {
+          "total": 54,
+          "covered": 47,
+          "skipped": 0,
+          "pct": 87.03
+        }
+      },
+      {
+        "module": "drag",
+        "files": 2,
+        "lines": {
+          "total": 933,
+          "covered": 808,
+          "skipped": 0,
+          "pct": 86.6
+        },
+        "statements": {
+          "total": 933,
+          "covered": 808,
+          "skipped": 0,
+          "pct": 86.6
+        },
+        "functions": {
+          "total": 60,
+          "covered": 57,
+          "skipped": 0,
+          "pct": 95
+        },
+        "branches": {
+          "total": 314,
+          "covered": 240,
+          "skipped": 0,
+          "pct": 76.43
+        }
+      },
+      {
+        "module": "effects",
+        "files": 5,
+        "lines": {
+          "total": 229,
+          "covered": 221,
+          "skipped": 0,
+          "pct": 96.5
+        },
+        "statements": {
+          "total": 229,
+          "covered": 221,
+          "skipped": 0,
+          "pct": 96.5
+        },
+        "functions": {
+          "total": 17,
+          "covered": 16,
+          "skipped": 0,
+          "pct": 94.11
+        },
+        "branches": {
+          "total": 60,
+          "covered": 53,
+          "skipped": 0,
+          "pct": 88.33
+        }
+      },
+      {
+        "module": "grid",
+        "files": 2,
+        "lines": {
+          "total": 351,
+          "covered": 323,
+          "skipped": 0,
+          "pct": 92.02
+        },
+        "statements": {
+          "total": 351,
+          "covered": 323,
+          "skipped": 0,
+          "pct": 92.02
+        },
+        "functions": {
+          "total": 26,
+          "covered": 25,
+          "skipped": 0,
+          "pct": 96.15
+        },
+        "branches": {
+          "total": 122,
+          "covered": 100,
+          "skipped": 0,
+          "pct": 81.96
+        }
+      },
+      {
+        "module": "lazyload",
+        "files": 2,
+        "lines": {
+          "total": 186,
+          "covered": 139,
+          "skipped": 0,
+          "pct": 74.73
+        },
+        "statements": {
+          "total": 186,
+          "covered": 139,
+          "skipped": 0,
+          "pct": 74.73
+        },
+        "functions": {
+          "total": 20,
+          "covered": 12,
+          "skipped": 0,
+          "pct": 60
+        },
+        "branches": {
+          "total": 37,
+          "covered": 29,
+          "skipped": 0,
+          "pct": 78.37
+        }
+      },
+      {
+        "module": "loop",
+        "files": 2,
+        "lines": {
+          "total": 421,
+          "covered": 408,
+          "skipped": 0,
+          "pct": 96.91
+        },
+        "statements": {
+          "total": 421,
+          "covered": 408,
+          "skipped": 0,
+          "pct": 96.91
+        },
+        "functions": {
+          "total": 20,
+          "covered": 19,
+          "skipped": 0,
+          "pct": 95
+        },
+        "branches": {
+          "total": 154,
+          "covered": 130,
+          "skipped": 0,
+          "pct": 84.41
+        }
+      },
+      {
+        "module": "marquee",
+        "files": 2,
+        "lines": {
+          "total": 314,
+          "covered": 278,
+          "skipped": 0,
+          "pct": 88.53
+        },
+        "statements": {
+          "total": 314,
+          "covered": 278,
+          "skipped": 0,
+          "pct": 88.53
+        },
+        "functions": {
+          "total": 38,
+          "covered": 35,
+          "skipped": 0,
+          "pct": 92.1
+        },
+        "branches": {
+          "total": 105,
+          "covered": 80,
+          "skipped": 0,
+          "pct": 76.19
+        }
+      },
+      {
+        "module": "navigation",
+        "files": 2,
+        "lines": {
+          "total": 280,
+          "covered": 275,
+          "skipped": 0,
+          "pct": 98.21
+        },
+        "statements": {
+          "total": 280,
+          "covered": 275,
+          "skipped": 0,
+          "pct": 98.21
+        },
+        "functions": {
+          "total": 27,
+          "covered": 27,
+          "skipped": 0,
+          "pct": 100
+        },
+        "branches": {
+          "total": 113,
+          "covered": 103,
+          "skipped": 0,
+          "pct": 91.15
+        }
+      },
+      {
+        "module": "pagination",
+        "files": 2,
+        "lines": {
+          "total": 544,
+          "covered": 530,
+          "skipped": 0,
+          "pct": 97.42
+        },
+        "statements": {
+          "total": 544,
+          "covered": 530,
+          "skipped": 0,
+          "pct": 97.42
+        },
+        "functions": {
+          "total": 41,
+          "covered": 41,
+          "skipped": 0,
+          "pct": 100
+        },
+        "branches": {
+          "total": 187,
+          "covered": 163,
+          "skipped": 0,
+          "pct": 87.16
+        }
+      },
+      {
+        "module": "scroll-control",
+        "files": 2,
+        "lines": {
+          "total": 132,
+          "covered": 112,
+          "skipped": 0,
+          "pct": 84.84
+        },
+        "statements": {
+          "total": 132,
+          "covered": 112,
+          "skipped": 0,
+          "pct": 84.84
+        },
+        "functions": {
+          "total": 11,
+          "covered": 10,
+          "skipped": 0,
+          "pct": 90.9
+        },
+        "branches": {
+          "total": 46,
+          "covered": 30,
+          "skipped": 0,
+          "pct": 65.21
+        }
+      },
+      {
+        "module": "scrollbar",
+        "files": 2,
+        "lines": {
+          "total": 507,
+          "covered": 400,
+          "skipped": 0,
+          "pct": 78.89
+        },
+        "statements": {
+          "total": 507,
+          "covered": 400,
+          "skipped": 0,
+          "pct": 78.89
+        },
+        "functions": {
+          "total": 31,
+          "covered": 24,
+          "skipped": 0,
+          "pct": 77.41
+        },
+        "branches": {
+          "total": 79,
+          "covered": 58,
+          "skipped": 0,
+          "pct": 73.41
+        }
+      },
+      {
+        "module": "slide-states",
+        "files": 2,
+        "lines": {
+          "total": 290,
+          "covered": 257,
+          "skipped": 0,
+          "pct": 88.62
+        },
+        "statements": {
+          "total": 290,
+          "covered": 257,
+          "skipped": 0,
+          "pct": 88.62
+        },
+        "functions": {
+          "total": 16,
+          "covered": 16,
+          "skipped": 0,
+          "pct": 100
+        },
+        "branches": {
+          "total": 98,
+          "covered": 81,
+          "skipped": 0,
+          "pct": 82.65
+        }
+      },
+      {
+        "module": "thumbs",
+        "files": 2,
+        "lines": {
+          "total": 76,
+          "covered": 73,
+          "skipped": 0,
+          "pct": 96.05
+        },
+        "statements": {
+          "total": 76,
+          "covered": 73,
+          "skipped": 0,
+          "pct": 96.05
+        },
+        "functions": {
+          "total": 10,
+          "covered": 9,
+          "skipped": 0,
+          "pct": 90
+        },
+        "branches": {
+          "total": 24,
+          "covered": 22,
+          "skipped": 0,
+          "pct": 91.66
+        }
+      },
+      {
+        "module": "video",
+        "files": 2,
+        "lines": {
+          "total": 527,
+          "covered": 432,
+          "skipped": 0,
+          "pct": 81.97
+        },
+        "statements": {
+          "total": 527,
+          "covered": 432,
+          "skipped": 0,
+          "pct": 81.97
+        },
+        "functions": {
+          "total": 54,
+          "covered": 44,
+          "skipped": 0,
+          "pct": 81.48
+        },
+        "branches": {
+          "total": 131,
+          "covered": 98,
+          "skipped": 0,
+          "pct": 74.8
+        }
+      },
+      {
+        "module": "visibility",
+        "files": 2,
+        "lines": {
+          "total": 227,
+          "covered": 199,
+          "skipped": 0,
+          "pct": 87.66
+        },
+        "statements": {
+          "total": 227,
+          "covered": 199,
+          "skipped": 0,
+          "pct": 87.66
+        },
+        "functions": {
+          "total": 22,
+          "covered": 20,
+          "skipped": 0,
+          "pct": 90.9
+        },
+        "branches": {
+          "total": 68,
+          "covered": 59,
+          "skipped": 0,
+          "pct": 86.76
+        }
+      }
+    ],
+    "coreRequirement": {
+      "source": "AGENTS.md: coverage >80% for core modules",
+      "interpretation": "90.06% is ALL-source lines. Recursive core90.94% (2421/2662); every measured core file exceeds80% lines. This satisfies a line-coverage reading, not every metric of every file.",
+      "coreLineAggregatePass": true,
+      "coreFilesAtOrBelow80Lines": [],
+      "coreFilesAtOrBelow80OtherMetrics": [
+        {
+          "file": "src/core/constants.ts",
+          "functions": {
+            "total": 0,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 100
+          },
+          "branches": {
+            "total": 3,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          }
+        },
+        {
+          "file": "src/core/engine/Layout.ts",
+          "functions": {
+            "total": 60,
+            "covered": 44,
+            "skipped": 0,
+            "pct": 73.33
+          },
+          "branches": {
+            "total": 250,
+            "covered": 226,
+            "skipped": 0,
+            "pct": 90.4
+          }
+        },
+        {
+          "file": "src/core/engine/Motion.ts",
+          "functions": {
+            "total": 25,
+            "covered": 20,
+            "skipped": 0,
+            "pct": 80
+          },
+          "branches": {
+            "total": 143,
+            "covered": 128,
+            "skipped": 0,
+            "pct": 89.51
+          }
+        }
+      ]
+    },
+    "gaps": {
+      "moduleGroupsBelow80Lines": [
+        "lazyload",
+        "scrollbar"
+      ],
+      "moduleGroupsBelow80Branches": [
+        "autoplay",
+        "drag",
+        "lazyload",
+        "marquee",
+        "scroll-control",
+        "scrollbar",
+        "video"
+      ],
+      "moduleFilesBelow80Lines": [
+        {
+          "file": "src/modules/index.ts",
+          "lines": {
+            "total": 1,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "statements": {
+            "total": 1,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "functions": {
+            "total": 1,
+            "covered": 1,
+            "skipped": 0,
+            "pct": 100
+          },
+          "branches": {
+            "total": 1,
+            "covered": 1,
+            "skipped": 0,
+            "pct": 100
+          },
+          "uncoveredLineRanges": [
+            {
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        {
+          "file": "src/modules/lazyload/LazyLoadModule.ts",
+          "lines": {
+            "total": 185,
+            "covered": 138,
+            "skipped": 0,
+            "pct": 74.59
+          },
+          "statements": {
+            "total": 185,
+            "covered": 138,
+            "skipped": 0,
+            "pct": 74.59
+          },
+          "functions": {
+            "total": 20,
+            "covered": 12,
+            "skipped": 0,
+            "pct": 60
+          },
+          "branches": {
+            "total": 37,
+            "covered": 29,
+            "skipped": 0,
+            "pct": 78.37
+          },
+          "uncoveredLineRanges": [
+            {
+              "start": 80,
+              "end": 81
+            },
+            {
+              "start": 105,
+              "end": 105
+            },
+            {
+              "start": 107,
+              "end": 108
+            },
+            {
+              "start": 112,
+              "end": 116
+            },
+            {
+              "start": 118,
+              "end": 122
+            },
+            {
+              "start": 124,
+              "end": 128
+            },
+            {
+              "start": 207,
+              "end": 209
+            },
+            {
+              "start": 224,
+              "end": 226
+            },
+            {
+              "start": 228,
+              "end": 228
+            },
+            {
+              "start": 230,
+              "end": 232
+            },
+            {
+              "start": 234,
+              "end": 235
+            },
+            {
+              "start": 237,
+              "end": 237
+            },
+            {
+              "start": 239,
+              "end": 241
+            },
+            {
+              "start": 262,
+              "end": 262
+            },
+            {
+              "start": 270,
+              "end": 273
+            },
+            {
+              "start": 278,
+              "end": 281
+            },
+            {
+              "start": 284,
+              "end": 285
+            }
+          ]
+        },
+        {
+          "file": "src/modules/scroll-control/index.ts",
+          "lines": {
+            "total": 1,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "statements": {
+            "total": 1,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "functions": {
+            "total": 1,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "branches": {
+            "total": 1,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "uncoveredLineRanges": [
+            {
+              "start": 1,
+              "end": 1
+            }
+          ]
+        },
+        {
+          "file": "src/modules/scrollbar/ScrollbarModule.ts",
+          "lines": {
+            "total": 506,
+            "covered": 399,
+            "skipped": 0,
+            "pct": 78.85
+          },
+          "statements": {
+            "total": 506,
+            "covered": 399,
+            "skipped": 0,
+            "pct": 78.85
+          },
+          "functions": {
+            "total": 31,
+            "covered": 24,
+            "skipped": 0,
+            "pct": 77.41
+          },
+          "branches": {
+            "total": 79,
+            "covered": 58,
+            "skipped": 0,
+            "pct": 73.41
+          },
+          "uncoveredLineRanges": [
+            {
+              "start": 98,
+              "end": 99
+            },
+            {
+              "start": 112,
+              "end": 120
+            },
+            {
+              "start": 165,
+              "end": 178
+            },
+            {
+              "start": 197,
+              "end": 198
+            },
+            {
+              "start": 264,
+              "end": 277
+            },
+            {
+              "start": 282,
+              "end": 284
+            },
+            {
+              "start": 286,
+              "end": 299
+            },
+            {
+              "start": 315,
+              "end": 318
+            },
+            {
+              "start": 323,
+              "end": 328
+            },
+            {
+              "start": 339,
+              "end": 340
+            },
+            {
+              "start": 389,
+              "end": 400
+            },
+            {
+              "start": 405,
+              "end": 416
+            },
+            {
+              "start": 514,
+              "end": 516
+            },
+            {
+              "start": 522,
+              "end": 526
+            },
+            {
+              "start": 550,
+              "end": 552
+            },
+            {
+              "start": 592,
+              "end": 593
+            }
+          ]
+        },
+        {
+          "file": "src/modules/thumbs/index.ts",
+          "lines": {
+            "total": 1,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "statements": {
+            "total": 1,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "functions": {
+            "total": 1,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "branches": {
+            "total": 1,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "uncoveredLineRanges": [
+            {
+              "start": 1,
+              "end": 1
+            }
+          ]
+        }
+      ],
+      "utilityFilesBelow80Lines": [
+        {
+          "file": "src/utils/cssLength.ts",
+          "lines": {
+            "total": 35,
+            "covered": 2,
+            "skipped": 0,
+            "pct": 5.71
+          },
+          "statements": {
+            "total": 35,
+            "covered": 2,
+            "skipped": 0,
+            "pct": 5.71
+          },
+          "functions": {
+            "total": 1,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "branches": {
+            "total": 0,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 100
+          },
+          "uncoveredLineRanges": [
+            {
+              "start": 19,
+              "end": 27
+            },
+            {
+              "start": 29,
+              "end": 31
+            },
+            {
+              "start": 33,
+              "end": 35
+            },
+            {
+              "start": 37,
+              "end": 40
+            },
+            {
+              "start": 42,
+              "end": 45
+            },
+            {
+              "start": 47,
+              "end": 49
+            },
+            {
+              "start": 51,
+              "end": 57
+            }
+          ]
+        },
+        {
+          "file": "src/utils/gridGap.ts",
+          "lines": {
+            "total": 34,
+            "covered": 27,
+            "skipped": 0,
+            "pct": 79.41
+          },
+          "statements": {
+            "total": 34,
+            "covered": 27,
+            "skipped": 0,
+            "pct": 79.41
+          },
+          "functions": {
+            "total": 4,
+            "covered": 3,
+            "skipped": 0,
+            "pct": 75
+          },
+          "branches": {
+            "total": 28,
+            "covered": 26,
+            "skipped": 0,
+            "pct": 92.85
+          },
+          "uncoveredLineRanges": [
+            {
+              "start": 30,
+              "end": 36
+            }
+          ]
+        },
+        {
+          "file": "src/utils/index.ts",
+          "lines": {
+            "total": 5,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "statements": {
+            "total": 5,
+            "covered": 0,
+            "skipped": 0,
+            "pct": 0
+          },
+          "functions": {
+            "total": 1,
+            "covered": 1,
+            "skipped": 0,
+            "pct": 100
+          },
+          "branches": {
+            "total": 1,
+            "covered": 1,
+            "skipped": 0,
+            "pct": 100
+          },
+          "uncoveredLineRanges": [
+            {
+              "start": 5,
+              "end": 9
+            }
+          ]
+        }
+      ],
+      "interpretation": "Execution coverage is not oracle strength. Diagnostics/TODOs can raise coverage. Unexercised entrypoint wrappers are kept in denominators. Lines, functions and branches are distinct; factory-probe instrumentation limitations remain applicable."
+    }
+  }
+}

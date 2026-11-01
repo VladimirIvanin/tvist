@@ -1,0 +1,22 @@
+{
+  "started": "2026-10-31T21:28:47.516Z",
+  "commit": "dea54d579239cd29224303c90646f00b577ec41c",
+  "bundleSha256": "63f82928b9db2be2374e2824c62021aa8b7558d02658b8a2b8f87a421c234550",
+  "cssSha256": "ffbc0e34077c94370133145d71e0d48026f142d0adf4c25339b7a44ff2d9b51e",
+  "port": 62465,
+  "reuseExistingServer": false,
+  "retries": 0,
+  "workers": 1,
+  "productionModified": false,
+  "suite": "unchanged existing e2e/*.spec.ts; legacy assertion limitations remain separate from new audit",
+  "runDir": "D:\\projects\\tvist\\.tmp\\audit\\baseline-e2e-2026-10-31T21-28-42-869Z",
+  "exitCode": 0,
+  "stats": {
+    "startTime": "2026-10-31T21:28:48.356Z",
+    "duration": 123816.345,
+    "expected": 102,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

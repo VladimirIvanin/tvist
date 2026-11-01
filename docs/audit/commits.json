@@ -1,0 +1,1237 @@
+[
+  {
+    "id": "COMMIT-1",
+    "repo": "Splidejs/splide",
+    "sha": "be6637f997219dfa9c707cf754bd2cc174c27775",
+    "parentSha": "53db4af6d1942fe2a7eaea428df3b9fba5b77abd",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/be6637f997219dfa9c707cf754bd2cc174c27775",
+    "mechanism": "snap from overscroll",
+    "trigger": "free+snap+fixedWidth outside bounds",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-09-06T06:08:01Z",
+    "changedFiles": [
+      {
+        "path": "dist/js/splide-renderer.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.cjs.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.esm.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js.gz",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "package.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/Scroll/Scroll.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT01"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "CMT01 performs freeSnap fixed-width overscroll and recovery at both finite edges.",
+    "scopeLimitations": [
+      "Only the declared boundary fixture is adapted, not the entire upstream Scroll implementation."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-2",
+    "repo": "Splidejs/splide",
+    "sha": "531ff9afdc69d65b3e692a919b9e848ebaa0dd0f",
+    "parentSha": "8695356dfc3d5411840188650553360d65496285",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/531ff9afdc69d65b3e692a919b9e848ebaa0dd0f",
+    "mechanism": "bounce lost completion callback",
+    "trigger": "free drag beyond first/last edge",
+    "upstreamTest": "Controller/test/scroll.test.ts",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-05-27T03:56:41Z",
+    "changedFiles": [
+      {
+        "path": "dist/js/splide.cjs.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.esm.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js.gz",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "package-lock.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "package.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/Controller/Controller.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/Controller/test/scroll.test.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/Scroll/Scroll.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT01"
+    ],
+    "auditDisposition": "partial",
+    "mappingScope": "CMT01 checks both overscroll recoveries and that subsequent navigation remains usable.",
+    "scopeLimitations": [
+      "Completion is inferred from settled geometry and navigation; an exact completion callback count/order is not asserted."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-3",
+    "repo": "Splidejs/splide",
+    "sha": "cf35dc2eac1fa22179f6ba3ac14666c636633d65",
+    "parentSha": "2586acd5296ea3565538f7028cd26682b3a6c917",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/cf35dc2eac1fa22179f6ba3ac14666c636633d65",
+    "mechanism": "refresh lazy entries and immediately load",
+    "trigger": "append lazy image+update without navigation",
+    "upstreamTest": "none; manual example only",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-09-03T06:45:54Z",
+    "changedFiles": [
+      {
+        "path": "dist/js/splide.cjs.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.esm.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js.gz",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "package-lock.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "package.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/LazyLoad/LazyLoad.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/test/php/examples/lazyLoad.php",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT07"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "CMT07 appends a lazy neighbor and calls update, then checks native image completion without another navigation.",
+    "scopeLimitations": [
+      "The specific one-to-two-card append path is represented."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-4",
+    "repo": "Splidejs/splide",
+    "sha": "e37a2071e956af2efbd576d6d87e71949cd1a1ed",
+    "parentSha": "77d8b17ddb08746adc1edc3ae704a2a966ef76fb",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/e37a2071e956af2efbd576d6d87e71949cd1a1ed",
+    "mechanism": "requery dynamic focusable descendants",
+    "trigger": "append link in hidden slide then reveal",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-09-02T08:40:53Z",
+    "changedFiles": [
+      {
+        "path": "dist/js/splide.cjs.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.esm.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js.gz",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "package.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/Slides/Slide.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "SRC-L01"
+    ],
+    "auditDisposition": "partial",
+    "mappingScope": "SRC-L01 appends a focusable descendant while hidden, reveals it and verifies dynamic drag exclusion and author tabindex preservation.",
+    "scopeLimitations": [
+      "Upstream automatic hidden-slide focusability management has no equivalent specified Tvist A11y lifecycle; preserving author attributes does not implement that policy."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-5",
+    "repo": "Splidejs/splide",
+    "sha": "ddd7d96ddc9dd03e2a67dbf054d38cec311682f4",
+    "parentSha": "2b0b7f489e0bcd575d1e6502242d8e489a9d4b37",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/ddd7d96ddc9dd03e2a67dbf054d38cec311682f4",
+    "mechanism": "native drag release over arrow",
+    "trigger": "image drag then mouseup over arrow/SVG",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-05-14T07:33:25Z",
+    "changedFiles": [
+      {
+        "path": "dist/js/splide.cjs.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.esm.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js.gz",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "package-lock.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "package.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/Drag/constants.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "SRC-L02"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "SRC-L02 exercises real image drag and release over button/SVG/image arrow targets, balanced drag end and subsequent navigation.",
+    "scopeLimitations": [
+      "Desktop mouse paths are represented; native touch behavior is not inferred."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-6",
+    "repo": "Splidejs/splide",
+    "sha": "f3793688441484c579f3feeca2258c5c792da8d8",
+    "parentSha": "b159099e54c98a49c4136e20d2a89ebc55722ad1",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/f3793688441484c579f3feeca2258c5c792da8d8",
+    "mechanism": "reentrant refresh duplicates clones",
+    "trigger": "clones+update inside refresh",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-09-09T13:33:58Z",
+    "changedFiles": [
+      {
+        "path": "dist/js/splide-renderer.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.cjs.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.esm.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js.gz",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "package.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/css/core/object/modifiers/fade.scss",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/Clones/Clones.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/test/php/examples/add.php",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/test/php/examples/overflow.php",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT08"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "CMT08 performs bounded reentrant refresh in explicit clone mode and checks clone cardinality, original nodes and destroy restoration.",
+    "scopeLimitations": [
+      "The callback recursion is deliberately bounded; arbitrary recursive application callbacks are not guaranteed safe."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-7",
+    "repo": "Splidejs/splide",
+    "sha": "7304828a1e3a21219686ae602d07713f6ec7b9ae",
+    "parentSha": "5761e4d844f0a123876064a390f1fb8b4ca49471",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/7304828a1e3a21219686ae602d07713f6ec7b9ae",
+    "mechanism": "last gap included in trim",
+    "trigger": "fixedWidth+gap+focus last edge",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-09-12T08:20:25Z",
+    "changedFiles": [
+      {
+        "path": "dist/js/splide.cjs.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.esm.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js.gz",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "src/js/components/Move/Move.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "SRC-G12"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "SRC-G12 verifies fixed-width focus centering, last-gap trimming and both finite edges after resize.",
+    "scopeLimitations": [
+      "Specific horizontal widths/gap/centering are used."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-8",
+    "repo": "Splidejs/splide",
+    "sha": "5761e4d844f0a123876064a390f1fb8b4ca49471",
+    "parentSha": "789bde698a1a572aacff343e07ab4a10289e8194",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/5761e4d844f0a123876064a390f1fb8b4ca49471",
+    "mechanism": "cancel triggers unintended loop shift",
+    "trigger": "interrupt seam transition",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "contract-gap; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-09-12T07:52:03Z",
+    "changedFiles": [
+      {
+        "path": "dist/js/splide.cjs.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.esm.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js.gz",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "src/js/components/Layout/Layout.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/Move/Move.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "SRC-L03"
+    ],
+    "auditDisposition": "contract-gap",
+    "mappingScope": "SRC-L03 interrupts a loop seam transition with a real stationary press/release and checks the intended resumed destination and delayed displacement.",
+    "scopeLimitations": [
+      "The implementation attempts to resume the saved animation target, but the public API does not specify resume-target versus nearest-snap policy after a stationary interruption. Treat the index mismatch as contract review, not an automatically confirmed defect. A first failure can leave the later clone branch unexecuted."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-9",
+    "repo": "Splidejs/splide",
+    "sha": "bfb52d543ab2bdcb9c64564a6c42c551a3af6127",
+    "parentSha": "cf27e4f1b9309fca78f047ca83b2d19f239c025d",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/bfb52d543ab2bdcb9c64564a6c42c551a3af6127",
+    "mechanism": "cancel stale RAF handle",
+    "trigger": "stop/destroy before first and later RAF",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-09-20T06:30:22Z",
+    "changedFiles": [
+      {
+        "path": "src/js/constructors/RequestInterval/RequestInterval.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT09",
+      "CMT10"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "CMT09 stops marquee before its first RAF; CMT10 stops later, restarts and checks no post-destroy style writes.",
+    "scopeLimitations": [
+      "The lifecycle mechanism is adapted through public marquee controls, not through an upstream private RAF utility."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-10",
+    "repo": "Splidejs/splide",
+    "sha": "fe6b65c300b2ec3abc7aa8af8b21e426f819db7c",
+    "parentSha": "4a0ead2565232b829d7748bc406ddf048bf707e7",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/fe6b65c300b2ec3abc7aa8af8b21e426f819db7c",
+    "mechanism": "cross realm HTMLElement detection",
+    "trigger": "iframe root and DOMParser nodes",
+    "upstreamTest": "utils/type/type.test.ts",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-09-23T08:21:47Z",
+    "changedFiles": [
+      {
+        "path": "dist/js/splide-renderer.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide-renderer.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "src/js/utils/type/type.test.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/utils/type/type.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT11"
+    ],
+    "auditDisposition": "partial",
+    "mappingScope": "CMT11 passes a foreign-realm iframe root and controls into the parent constructor and checks DOM identity.",
+    "scopeLimitations": [
+      "DOMParser-created elements are not exercised."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-11",
+    "repo": "Splidejs/splide",
+    "sha": "fdb38e4f4c66895258a3cb62daebc9ee3ac95891",
+    "parentSha": "f060c77a5cf24418b39c784644163be2f08a21df",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/fdb38e4f4c66895258a3cb62daebc9ee3ac95891",
+    "mechanism": "explicit grouping wrongly page-aligned",
+    "trigger": "loop+explicit group at seam",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-06-11T18:19:11Z",
+    "changedFiles": [
+      {
+        "path": "dist/js/splide.cjs.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.esm.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js.gz",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "src/js/components/Controller/Controller.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "SRC-L04"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "SRC-L04 asserts the exact explicit group-two sequence against perPage-three at forward and reverse loop seams.",
+    "scopeLimitations": [
+      "One coprime count/group configuration is transferred."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-12",
+    "repo": "Splidejs/splide",
+    "sha": "3449e06e86f34a434f2eadf5ac075a28b38060e4",
+    "parentSha": "784d649a28e56badacff258fde104554b18cd55b",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/Splidejs/splide/commit/3449e06e86f34a434f2eadf5ac075a28b38060e4",
+    "mechanism": "cleanup without pagination DOM; base option merge",
+    "trigger": "pagination disabled+breakpoint teardown",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2022-04-06T17:25:38Z",
+    "changedFiles": [
+      {
+        "path": "dist/js/splide-renderer.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide-renderer.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.cjs.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.esm.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/splide.min.js.gz",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/splide.min.js.map",
+        "patchAvailable": false
+      },
+      {
+        "path": "dist/js/utils/splide-utils.cjs.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/js/utils/splide-utils.esm.js",
+        "patchAvailable": true
+      },
+      {
+        "path": "dist/types/index.d.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "package-lock.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "package.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/Media/Media.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/Pagination/Pagination.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/components/Sync/Sync.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/core/Splide/Splide.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/test/php/examples/ttb.php",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/js/utils/object/merge/merge.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT12"
+    ],
+    "auditDisposition": "partial",
+    "mappingScope": "CMT12 exercises breakpoint disable/re-enable without pagination DOM, preserves author controls and checks post-destroy control cleanup.",
+    "scopeLimitations": [
+      "The commit also changes base option merging; unrelated nested option merge semantics are not asserted here."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-13",
+    "repo": "nolimits4web/swiper",
+    "sha": "ef055a6dbfe175fd13590eef7bcf384fee20a133",
+    "parentSha": "e17098c56de19b50ff628f072265d080305c27e5",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/ef055a6dbfe175fd13590eef7bcf384fee20a133",
+    "mechanism": "autoplay controls after destroy",
+    "trigger": "retained controls+pending start/stop",
+    "upstreamTest": "tests/element-dom/element-dom.test.mjs",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-10-30T20:33:47Z",
+    "changedFiles": [
+      {
+        "path": "src/modules/autoplay/autoplay.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "tests/element-dom/element-dom.test.mjs",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "SRC-M01"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "SRC-M01 retains autoplay controls across destroy/reinit and invokes immediate and delayed start/stop while asserting old/new DOM and callback isolation.",
+    "scopeLimitations": [
+      "This does not assert arbitrary user-held object lifetime or garbage collection."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-14",
+    "repo": "nolimits4web/swiper",
+    "sha": "58b4c8595ae8e34a708bbdcdb387ca7ad164e82b",
+    "parentSha": "ef055a6dbfe175fd13590eef7bcf384fee20a133",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/58b4c8595ae8e34a708bbdcdb387ca7ad164e82b",
+    "mechanism": "grid update without measured size",
+    "trigger": "hidden init+update+show",
+    "upstreamTest": "tests/grid/hidden-update.test.mjs",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-10-30T20:52:05Z",
+    "changedFiles": [
+      {
+        "path": "package.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/core/core.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "tests/grid/hidden-update.test.mjs",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT03",
+      "CMT04"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "CMT03/CMT04 distinguish never-measured hidden grid from previously visible grid, then update/reveal at a new size and check page/card geometry.",
+    "scopeLimitations": [
+      "Only the concrete two-by-two grid fixtures are transferred."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-15",
+    "repo": "nolimits4web/swiper",
+    "sha": "fd7113743a634aaf50d44f6264783163826b631d",
+    "parentSha": "e7d7bdc94c8c38c74eeec8f27abc45e4297cfd33",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/fd7113743a634aaf50d44f6264783163826b631d",
+    "mechanism": "scrollbar stale transform",
+    "trigger": "resize active end+hide true",
+    "upstreamTest": "tests/element-dom/element-dom.test.mjs",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-10-30T22:01:53Z",
+    "changedFiles": [
+      {
+        "path": "src/modules/scrollbar/scrollbar.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "tests/element-dom/element-dom.test.mjs",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT05"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "CMT05 resizes at the finite end with scrollbar hiding enabled and verifies thumb size and final end alignment.",
+    "scopeLimitations": [
+      "Other scrollbar axes and custom containers are covered elsewhere rather than by this source mapping."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-16",
+    "repo": "nolimits4web/swiper",
+    "sha": "6818feae4b52c62fbabbcb6c2605ee6734cfdb7b",
+    "parentSha": "fefcc9c90235cda4f74d3f5d32b7f464cb771bee",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/6818feae4b52c62fbabbcb6c2605ee6734cfdb7b",
+    "mechanism": "stale observer entry vs live size",
+    "trigger": "continuous resize+final settle",
+    "upstreamTest": "tests/element-dom/element-dom.test.mjs",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-09-28T16:33:29Z",
+    "changedFiles": [
+      {
+        "path": "src/core/modules/resize/resize.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "tests/element-dom/element-dom.test.mjs",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT06"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "CMT06 changes real container size repeatedly during motion without explicit update and asserts the final live size and absence of resize feedback.",
+    "scopeLimitations": [
+      "Actual browser observer delivery is used; every upstream observer-entry scheduling order is not enumerated."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-17",
+    "repo": "nolimits4web/swiper",
+    "sha": "95696d00811c042410609746296e9fc99bcce8d3",
+    "parentSha": "d3c325aa1b39d8504bd90c6c9c64fae02b02f6d3",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/95696d00811c042410609746296e9fc99bcce8d3",
+    "mechanism": "descendant transitionend consumes once listener",
+    "trigger": "child opacity ends during slider transform",
+    "upstreamTest": "tests/element-dom/element-transition-end.test.mjs",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-09-28T13:49:58Z",
+    "changedFiles": [
+      {
+        "path": "package.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/shared/utils.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "tests/element-dom/element-transition-end.test.mjs",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT02"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "CMT02 ends descendant opacity while the slider transform is running and asserts no early parent completion plus one final transitionEnd.",
+    "scopeLimitations": [
+      "The concrete descendant CSS transition is transferred; arbitrary animation event combinations are not exhaustive."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-18",
+    "repo": "nolimits4web/swiper",
+    "sha": "eb02f3ce28aec376a055ac7ca9490f6c3788d0c2",
+    "parentSha": "944ba567503653ceca914170e3a281d97ad993cc",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/eb02f3ce28aec376a055ac7ca9490f6c3788d0c2",
+    "mechanism": "lazy listeners retain destroyed instance",
+    "trigger": "pending load/error after destroy",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-08-28T21:22:22Z",
+    "changedFiles": [
+      {
+        "path": "src/core/core.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/core/events/index.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/core/events/onLoad.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "SRC-M02",
+      "SRC-M03"
+    ],
+    "auditDisposition": "partial",
+    "mappingScope": "SRC-M02/SRC-M03 complete real pending native image load/error after destroy while keeping old DOM connected and assert no slider callback or DOM mutation.",
+    "scopeLimitations": [
+      "Late-event isolation is proven; detached listener retention and garbage collection of the destroyed instance are not directly measured in these cases."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-19",
+    "repo": "nolimits4web/swiper",
+    "sha": "9b78f71ac271d71a8811011dbb86d058d7ac5e2a",
+    "parentSha": "d91654d48b8ad6688aa8198f7b86b6574c2aa67c",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/9b78f71ac271d71a8811011dbb86d058d7ac5e2a",
+    "mechanism": "loop coordinate compensation emits fake index changes",
+    "trigger": "seam+far scrollTo event log",
+    "upstreamTest": "tests/element-dom/element-dom.test.mjs",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-08-25T17:47:59Z",
+    "changedFiles": [
+      {
+        "path": "src/core/core.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/core/loop/loopFix.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/core/update/updateActiveIndex.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "tests/element-dom/element-dom.test.mjs",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "SRC-L05"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "SRC-L05 observes actual DOM reorder while asserting exactly one logical start/end pair per animated seam and far navigation.",
+    "scopeLimitations": [
+      "Instant scrollTo follows a separate event path and is deliberately excluded from this assertion."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-20",
+    "repo": "nolimits4web/swiper",
+    "sha": "bc4a6588a81d3c5c2ea9ae345eba35fc3f1ed3d9",
+    "parentSha": "93154fc3d793f9f44c7c987a53091fe36fc82e74",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/bc4a6588a81d3c5c2ea9ae345eba35fc3f1ed3d9",
+    "mechanism": "offset mistaken for centering buffer",
+    "trigger": "auto widths+small asymmetric peek+loop",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-08-25T22:51:09Z",
+    "changedFiles": [
+      {
+        "path": "src/core/loop/loopFix.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "RISK-02-000",
+      "RISK-02-001",
+      "RISK-02-002",
+      "RISK-02-003",
+      "RISK-02-004",
+      "RISK-02-005",
+      "RISK-02-006",
+      "RISK-02-007",
+      "RISK-02-008",
+      "RISK-02-009",
+      "RISK-02-010",
+      "RISK-02-011",
+      "RISK-02-012",
+      "RISK-02-013",
+      "RISK-02-014",
+      "RISK-02-015",
+      "RISK-02-016",
+      "RISK-02-017",
+      "RISK-02-018",
+      "RISK-02-019",
+      "RISK-02-020",
+      "RISK-02-021",
+      "RISK-02-022",
+      "RISK-02-023",
+      "SRC-G10"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "SRC-G10 uses non-centered auto widths and small asymmetric peek, then checks initial/update alignment and repeated seams. R02 adds loop mode × auto/fixed sizing × center/peek definitions. The variable-width non-centered asymmetric-peek subset overlaps this commit. SRC-G10 retains the direct seam regression.",
+    "scopeLimitations": [
+      "The selected horizontal buffer/offset configuration is represented."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-21",
+    "repo": "nolimits4web/swiper",
+    "sha": "88560f839e1b24fcea69c7317a08f82160b8b632",
+    "parentSha": "fd7113743a634aaf50d44f6264783163826b631d",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/88560f839e1b24fcea69c7317a08f82160b8b632",
+    "mechanism": "thumb previous DOM vs logical index",
+    "trigger": "two loop cycles+reverse seam+thumb click",
+    "upstreamTest": "none",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-10-30T22:12:46Z",
+    "changedFiles": [
+      {
+        "path": "src/modules/thumbs/thumbs.ts",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "SRC-L06"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "SRC-L06 runs two complete cycles with both sliders looping, reverses a seam and clicks a physically visible thumbnail by author identity.",
+    "scopeLimitations": [
+      "One main/thumb sizing configuration and DOM-reorder loop mode are transferred."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-22",
+    "repo": "nolimits4web/swiper",
+    "sha": "4bb6cafebcfdeb736695b49b6f2d94d4265a4ecf",
+    "parentSha": "e8a92bf8af4e20609850e81ecc42e477534d004c",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/4bb6cafebcfdeb736695b49b6f2d94d4265a4ecf",
+    "mechanism": "cross realm options lose defaults",
+    "trigger": "parent options passed into iframe slider",
+    "upstreamTest": "tests/params/cross-realm-params.test.mjs",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-08-06T16:20:22Z",
+    "changedFiles": [
+      {
+        "path": "package.json",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/shared/utils.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "tests/params/cross-realm-params.test.mjs",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "CMT11"
+    ],
+    "auditDisposition": "partial",
+    "mappingScope": "CMT11 checks foreign iframe-created options and elements passed into a parent-realm slider constructor, including retained defaults.",
+    "scopeLimitations": [
+      "The reverse direction, a constructor executing inside the iframe receiving parent-created options, is not separately exercised."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-23",
+    "repo": "nolimits4web/swiper",
+    "sha": "0d100d43003eb4b88392969a5bfe2921aad9e839",
+    "parentSha": "43b0d48ac41466a0c937c917cd645cdf992adbc0",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/0d100d43003eb4b88392969a5bfe2921aad9e839",
+    "mechanism": "nested document listeners init order",
+    "trigger": "3 levels+two init orders+move on body",
+    "upstreamTest": "tests/element-dom/element-dom.test.mjs",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-09-28T15:10:46Z",
+    "changedFiles": [
+      {
+        "path": "src/core/core.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/core/events/onTouchEnd.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/core/events/onTouchMove.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/core/events/onTouchStart.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "tests/element-dom/element-dom.test.mjs",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "SRC-L07"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "SRC-L07 constructs all three levels in each complete initialization order and drags beyond all roots onto body before release.",
+    "scopeLimitations": [
+      "All levels are horizontal and input is real mouse; cross-axis and native touch sequences remain separate scope."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  },
+  {
+    "id": "COMMIT-24",
+    "repo": "nolimits4web/swiper",
+    "sha": "f5f9adc9947da3d99b781dcb6246cee943673a9f",
+    "parentSha": "58b4c8595ae8e34a708bbdcdb387ca7ad164e82b",
+    "parentVerification": "GitHub commit API verified",
+    "url": "https://github.com/nolimits4web/swiper/commit/f5f9adc9947da3d99b781dcb6246cee943673a9f",
+    "mechanism": "centered far jump buffer insufficient",
+    "trigger": "small N+center+all from-to pairs",
+    "upstreamTest": "tests/element-dom/loop-few-slides.test.mjs",
+    "diffReview": "source and test hunks read during planning; upstream tests not executed",
+    "compatibility": "adapt to Tvist public API; upstream formula is not an oracle",
+    "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+    "date": "2026-10-30T20:53:04Z",
+    "changedFiles": [
+      {
+        "path": "src/core/loop/loopFix.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "src/core/slide/slideToLoop.ts",
+        "patchAvailable": true
+      },
+      {
+        "path": "tests/element-dom/loop-few-slides.test.mjs",
+        "patchAvailable": true
+      }
+    ],
+    "mappedCases": [
+      "SRC-G11"
+    ],
+    "auditDisposition": "mapped",
+    "mappingScope": "SRC-G11 covers every from/to pair for six cards, four visible centered cards and a large gap in implicit and explicit clone modes.",
+    "scopeLimitations": [
+      "The selected small-N centered geometry is a targeted transfer, not every loop buffer configuration."
+    ],
+    "relatedCases": [],
+    "provenanceGap": false
+  }
+]

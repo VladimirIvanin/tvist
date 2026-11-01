@@ -1,0 +1,1711 @@
+{
+  "runId": "2026-10-31T20-07-42-245Z",
+  "source": "isolated docs source build",
+  "commit": "dea54d579239cd29224303c90646f00b577ec41c",
+  "demos": [
+    "basic",
+    "perpage",
+    "peek",
+    "center",
+    "auto-width",
+    "fixed-size",
+    "responsive",
+    "product-cards",
+    "update-options",
+    "loop",
+    "marquee",
+    "autoplay",
+    "effect-fade",
+    "effect-cube",
+    "vertical",
+    "drag-free",
+    "scroll-control",
+    "scrollbar",
+    "lock",
+    "navigation",
+    "pagination",
+    "lazyload",
+    "video",
+    "stories",
+    "visibility",
+    "modules",
+    "grid",
+    "nested-sliders",
+    "thumbs"
+  ],
+  "node": "v22.23.1",
+  "platform": "win32",
+  "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged.",
+  "baseline": {
+    "runId": "2026-10-31T20-01-49-351Z",
+    "report": "D:\\projects\\tvist\\.tmp\\audit\\docs\\2026-10-31T20-01-49-351Z\\results.json",
+    "replacedEngine": "webkit"
+  },
+  "generatedHtmlHash": "b962e68c1803abd7cc5521f6c1c735c2eba8da4f33e9c112a53e62c6846cb1e3",
+  "artifactDirectory": "D:\\projects\\tvist\\.tmp\\audit\\docs\\2026-10-31T20-07-42-245Z",
+  "complete": true,
+  "executed": 87,
+  "executedThisRun": 29,
+  "reused": 58,
+  "planned": 87,
+  "infrastructure": [
+    {
+      "engine": "chromium",
+      "stage": "server-close",
+      "error": "Error: chromium server close timed out after 10000 ms"
+    },
+    {
+      "engine": "chromium",
+      "stage": "server-kill",
+      "error": "Error: chromium server kill timed out after 10000 ms"
+    }
+  ],
+  "results": [
+    {
+      "id": "basic",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "perpage",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "peek",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "center",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "auto-width",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "fixed-size",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "responsive",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "product-cards",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "update-options",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "loop",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "marquee",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "autoplay",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "effect-fade",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "effect-cube",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "vertical",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "drag-free",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "scroll-control",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "scrollbar",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "lock",
+      "engine": "chromium",
+      "status": "limitation",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "limitation",
+          "reason": "Locked content fits viewport; geometry and active identity checked, movement not exercised.",
+          "before": 0
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "artifact": "D:\\projects\\tvist\\.tmp\\audit\\docs\\2026-10-31T20-01-49-351Z\\chromium-lock",
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "navigation",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "pagination",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "lazyload",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "video",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [
+        "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4: net::ERR_ABORTED"
+      ],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "stories",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 1,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 2,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 3,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "visibility",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "modules",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "grid",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "nested-sliders",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 1,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "thumbs",
+      "engine": "chromium",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 1,
+          "status": "pass",
+          "before": 1,
+          "after": 2,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "basic",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "perpage",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "peek",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "center",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "auto-width",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "fixed-size",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "responsive",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "product-cards",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "update-options",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "loop",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "marquee",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "autoplay",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "effect-fade",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "effect-cube",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "vertical",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "drag-free",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "scroll-control",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "scrollbar",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "lock",
+      "engine": "firefox",
+      "status": "limitation",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "limitation",
+          "reason": "Locked content fits viewport; geometry and active identity checked, movement not exercised.",
+          "before": 0
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "artifact": "D:\\projects\\tvist\\.tmp\\audit\\docs\\2026-10-31T20-01-49-351Z\\firefox-lock",
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "navigation",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "pagination",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "lazyload",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "video",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [
+        "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4: NS_BINDING_ABORTED"
+      ],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "stories",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 1,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 2,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 3,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "visibility",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "modules",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "grid",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "nested-sliders",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 1,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "thumbs",
+      "engine": "firefox",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 1,
+          "status": "pass",
+          "before": 1,
+          "after": 2,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "fixture": "Google Fonts requests are aborted; all demos use their declared local font fallback."
+    },
+    {
+      "id": "basic",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "perpage",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "peek",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "center",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "auto-width",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "fixed-size",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "responsive",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "product-cards",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "update-options",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "loop",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "marquee",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "autoplay",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "effect-fade",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "effect-cube",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "vertical",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "drag-free",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "scroll-control",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "scrollbar",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "lock",
+      "engine": "webkit",
+      "status": "limitation",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "limitation",
+          "reason": "Locked content fits viewport; geometry and active identity checked, movement not exercised.",
+          "before": 0
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged.",
+      "artifact": "D:\\projects\\tvist\\.tmp\\audit\\docs\\2026-10-31T20-07-42-245Z\\webkit-lock"
+    },
+    {
+      "id": "navigation",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "pagination",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "lazyload",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "video",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "stories",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 1,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 2,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 3,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "visibility",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "modules",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "grid",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "nested-sliders",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 1,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    },
+    {
+      "id": "thumbs",
+      "engine": "webkit",
+      "status": "pass",
+      "instances": [
+        {
+          "instance": 0,
+          "status": "pass",
+          "before": 0,
+          "after": 1,
+          "action": "next"
+        },
+        {
+          "instance": 1,
+          "status": "pass",
+          "before": 1,
+          "after": 2,
+          "action": "next"
+        }
+      ],
+      "errors": [],
+      "externalNetwork": [],
+      "localNetwork": [],
+      "consoleErrors": [],
+      "fixture": "External images use a local SVG placeholder; external CSS uses an empty stylesheet; external fonts/media/other requests are blocked. Local docs scripts and CSS are unchanged."
+    }
+  ]
+}

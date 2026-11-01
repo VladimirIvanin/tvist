@@ -1,0 +1,391 @@
+{
+  "generatedAt": "2026-11-01T07:18:08.047Z",
+  "branch": "audit",
+  "productionCommit": "dea54d579239cd29224303c90646f00b577ec41c",
+  "bundleSha256": "63f82928b9db2be2374e2824c62021aa8b7558d02658b8a2b8f87a421c234550",
+  "productionModified": false,
+  "noAuditCI": true,
+  "cohorts": [
+    {
+      "name": "smoke",
+      "run": "2026-11-01T07-10-45-885Z-smoke-all-6aebdbf8",
+      "expected": 1230,
+      "executed": 1230,
+      "statuses": {
+        "reproduced": 415,
+        "contract-gap": 54,
+        "pass": 740,
+        "unsupported": 12,
+        "test-harness-issue": 9
+      },
+      "browsers": {
+        "chromium": {
+          "version": "149.0.7827.55",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "firefox": {
+          "version": "151.0",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "webkit": {
+          "version": "26.5",
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "perProject": [
+        {
+          "project": "chromium",
+          "statuses": {
+            "reproduced": 163,
+            "contract-gap": 18,
+            "pass": 269
+          }
+        },
+        {
+          "project": "firefox",
+          "statuses": {
+            "reproduced": 126,
+            "contract-gap": 18,
+            "pass": 240,
+            "unsupported": 6
+          }
+        },
+        {
+          "project": "webkit",
+          "statuses": {
+            "reproduced": 126,
+            "contract-gap": 18,
+            "pass": 231,
+            "test-harness-issue": 9,
+            "unsupported": 6
+          }
+        }
+      ]
+    },
+    {
+      "name": "matrix",
+      "run": "2026-11-01T07-10-46-231Z-matrix-all-f6ee692f",
+      "expected": 1264,
+      "executed": 1264,
+      "statuses": {
+        "pass": 946,
+        "reproduced": 271,
+        "contract-gap": 45,
+        "unsupported": 2
+      },
+      "browsers": {
+        "chromium": {
+          "version": "149.0.7827.55",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "firefox": {
+          "version": "151.0",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "webkit": {
+          "version": "26.5",
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "chromium-mobile": {
+          "version": "149.0.7827.55",
+          "userAgent": "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.7827.55 Mobile Safari/537.36",
+          "dpr": 2.625,
+          "viewport": {
+            "width": 412,
+            "height": 839
+          }
+        },
+        "webkit-mobile": {
+          "version": "26.5",
+          "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Mobile/15E148 Safari/604.1",
+          "dpr": 3,
+          "viewport": {
+            "width": 390,
+            "height": 664
+          }
+        }
+      },
+      "perProject": [
+        {
+          "project": "chromium",
+          "statuses": {
+            "pass": 276,
+            "reproduced": 85,
+            "contract-gap": 15
+          }
+        },
+        {
+          "project": "firefox",
+          "statuses": {
+            "pass": 278,
+            "reproduced": 83,
+            "contract-gap": 15
+          }
+        },
+        {
+          "project": "webkit",
+          "statuses": {
+            "pass": 276,
+            "reproduced": 85,
+            "contract-gap": 15
+          }
+        },
+        {
+          "project": "chromium-mobile",
+          "statuses": {
+            "pass": 60,
+            "reproduced": 8
+          }
+        },
+        {
+          "project": "webkit-mobile",
+          "statuses": {
+            "pass": 56,
+            "reproduced": 10,
+            "unsupported": 2
+          }
+        }
+      ]
+    },
+    {
+      "name": "deep",
+      "run": "2026-11-01T07-10-46-269Z-deep-all-bf7210aa",
+      "expected": 900,
+      "executed": 900,
+      "statuses": {
+        "reproduced": 600,
+        "pass": 300
+      },
+      "browsers": {
+        "chromium": {
+          "version": "149.0.7827.55",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "firefox": {
+          "version": "151.0",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "webkit": {
+          "version": "26.5",
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "perProject": [
+        {
+          "project": "chromium",
+          "statuses": {
+            "reproduced": 200,
+            "pass": 100
+          }
+        },
+        {
+          "project": "firefox",
+          "statuses": {
+            "reproduced": 200,
+            "pass": 100
+          }
+        },
+        {
+          "project": "webkit",
+          "statuses": {
+            "reproduced": 200,
+            "pass": 100
+          }
+        }
+      ]
+    },
+    {
+      "name": "R03",
+      "run": "2026-10-31T22-24-43-947Z-smoke-all-aec8de17",
+      "expected": 72,
+      "executed": 72,
+      "statuses": {
+        "pass": 36,
+        "reproduced": 36
+      },
+      "browsers": {
+        "chromium": {
+          "version": "149.0.7827.55",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "firefox": {
+          "version": "151.0",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "webkit": {
+          "version": "26.5",
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "perProject": [
+        {
+          "project": "chromium",
+          "statuses": {
+            "pass": 12,
+            "reproduced": 12
+          }
+        },
+        {
+          "project": "firefox",
+          "statuses": {
+            "pass": 12,
+            "reproduced": 12
+          }
+        },
+        {
+          "project": "webkit",
+          "statuses": {
+            "pass": 12,
+            "reproduced": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "performance",
+      "run": "2026-10-31T21-54-54-421Z-performance-all-c02b98f9",
+      "expected": 75,
+      "executed": 75,
+      "statuses": {
+        "pass": 75
+      },
+      "browsers": {
+        "chromium": {
+          "version": "149.0.7827.55",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "firefox": {
+          "version": "151.0",
+          "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        },
+        "webkit": {
+          "version": "26.5",
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+          "dpr": 1,
+          "viewport": {
+            "width": 1280,
+            "height": 720
+          }
+        }
+      },
+      "perProject": [
+        {
+          "project": "chromium",
+          "statuses": {
+            "pass": 25
+          }
+        },
+        {
+          "project": "firefox",
+          "statuses": {
+            "pass": 25
+          }
+        },
+        {
+          "project": "webkit",
+          "statuses": {
+            "pass": 25
+          }
+        }
+      ]
+    }
+  ],
+  "resolvedMatrixStatuses": {
+    "pass": 948,
+    "reproduced": 269,
+    "contract-gap": 45,
+    "unsupported": 2
+  },
+  "deep": {
+    "attempted": 19071,
+    "verified": 18471,
+    "blocked": 25929,
+    "review": "deep-review.json; raw 600 failures include 18 fixture ID collisions. Remaining related failures have qualified grouped causes; grid insertion/filter policy is partly unresolved."
+  },
+  "sliderUnitDeep": {
+    "sequences": 3000,
+    "passed": 2386,
+    "failures": 614,
+    "harnessErrors": 0,
+    "plannedCommands": 377532,
+    "attemptedCommands": 313351,
+    "verifiedCommands": 312737,
+    "blockedTailCommands": 64181
+  },
+  "historicalSoak": {
+    "observations": 21,
+    "status": "pass",
+    "note": "Source-reviewed historical runs: 100 lifecycle cycles at1/10/50instances and four10minute motion modes per engine. No fake clock used. Older format lacks strict execution-plan/browser-version/per-cycle timelines."
+  },
+  "rawStorage": "D:/projects/tvist/.tmp/audit (not pushed). Resume rows reference original parent artifacts. Copying only resumed directories loses evidence."
+}

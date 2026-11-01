@@ -1,0 +1,296 @@
+[
+  {
+    "id": "EV01",
+    "project": "chromium",
+    "fingerprint": "ad0fa8c09e0c723132e0",
+    "issue": "TVIST-AUDIT-001",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "EV01",
+    "project": "firefox",
+    "fingerprint": "2dd7c2ca2c6099ea67ab",
+    "issue": "TVIST-AUDIT-001",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "EV01",
+    "project": "webkit",
+    "fingerprint": "a1e3a8edc89b2f860e70",
+    "issue": "TVIST-AUDIT-001",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "LC01",
+    "project": "chromium",
+    "fingerprint": "e17071a249b72462f73d",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "LC02",
+    "project": "chromium",
+    "fingerprint": "8af25e13624aba9ec1f3",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "LC03",
+    "project": "chromium",
+    "fingerprint": "8396072005926a981e5a",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "LC01",
+    "project": "firefox",
+    "fingerprint": "b7f0bad42592a1a68f8e",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "LC02",
+    "project": "firefox",
+    "fingerprint": "bd76ba1de28aa59fa2b2",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "LC03",
+    "project": "firefox",
+    "fingerprint": "2b3e160faf5e97fd45cd",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "LC01",
+    "project": "webkit",
+    "fingerprint": "f5f3639394a4798314ab",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "LC02",
+    "project": "webkit",
+    "fingerprint": "24911caf134084c82d36",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "LC03",
+    "project": "webkit",
+    "fingerprint": "f65c38e7008f4b1e3db9",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CMT07",
+    "project": "chromium",
+    "fingerprint": "52ccc47e3041b15d4587",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CMT07",
+    "project": "firefox",
+    "fingerprint": "54984f267396b0ebf9d0",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CMT07",
+    "project": "webkit",
+    "fingerprint": "f8d88a98f050c0547fe1",
+    "issue": "TVIST-AUDIT-002",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G24",
+    "project": "chromium",
+    "fingerprint": "b4170ea2af159eb001c6",
+    "issue": "TVIST-AUDIT-003",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "SY01",
+    "project": "chromium",
+    "fingerprint": "a6438288e78a8576353a",
+    "issue": "TVIST-AUDIT-003",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G24",
+    "project": "firefox",
+    "fingerprint": "2f64b79ee7750e41d7a8",
+    "issue": "TVIST-AUDIT-003",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "SY01",
+    "project": "firefox",
+    "fingerprint": "e8ee8f42f7551e3dc8bc",
+    "issue": "TVIST-AUDIT-003",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G24",
+    "project": "webkit",
+    "fingerprint": "a6ecd628008f893c4b6f",
+    "issue": "TVIST-AUDIT-003",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "SY01",
+    "project": "webkit",
+    "fingerprint": "3a7efeae022e3627566d",
+    "issue": "TVIST-AUDIT-003",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G08",
+    "project": "chromium",
+    "fingerprint": "d2b3abcb443c6d991e14",
+    "issue": "TVIST-AUDIT-004",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G09",
+    "project": "chromium",
+    "fingerprint": "6d0391432c8c6ccacd6a",
+    "issue": "TVIST-AUDIT-004",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G19",
+    "project": "chromium",
+    "fingerprint": "3db112809b134c00035b",
+    "issue": "TVIST-AUDIT-004",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G08",
+    "project": "firefox",
+    "fingerprint": "70c68f0e2011f785a8d0",
+    "issue": "TVIST-AUDIT-004",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G09",
+    "project": "firefox",
+    "fingerprint": "f6f482dba75421983364",
+    "issue": "TVIST-AUDIT-004",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G19",
+    "project": "firefox",
+    "fingerprint": "4a5d424baf46b9e0ace6",
+    "issue": "TVIST-AUDIT-004",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G08",
+    "project": "webkit",
+    "fingerprint": "1ebbaf3d8bc25480b619",
+    "issue": "TVIST-AUDIT-004",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G09",
+    "project": "webkit",
+    "fingerprint": "4f2a44fd12d1914d41eb",
+    "issue": "TVIST-AUDIT-004",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "G19",
+    "project": "webkit",
+    "fingerprint": "b8ecb9fe67783f43f398",
+    "issue": "TVIST-AUDIT-004",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CT01",
+    "project": "chromium",
+    "fingerprint": "aba07940343f47eeb9a3",
+    "issue": "TVIST-AUDIT-006",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CT01",
+    "project": "firefox",
+    "fingerprint": "2b066697edcc1289784e",
+    "issue": "TVIST-AUDIT-006",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CT01",
+    "project": "webkit",
+    "fingerprint": "961f4c80a50a50d54c6c",
+    "issue": "TVIST-AUDIT-006",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CT03",
+    "project": "chromium",
+    "fingerprint": "d4c028c3da905c3860c7",
+    "issue": "TVIST-AUDIT-007",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CT03",
+    "project": "firefox",
+    "fingerprint": "26bfab98ecf7a23ae9f9",
+    "issue": "TVIST-AUDIT-007",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CT03",
+    "project": "webkit",
+    "fingerprint": "09b25650fe2851e5a57b",
+    "issue": "TVIST-AUDIT-007",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CT05",
+    "project": "chromium",
+    "fingerprint": "30e6919afd95342fe62d",
+    "issue": "TVIST-AUDIT-008",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CT05",
+    "project": "firefox",
+    "fingerprint": "da06ef503bca8d8a8f88",
+    "issue": "TVIST-AUDIT-008",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CT05",
+    "project": "webkit",
+    "fingerprint": "da117158f74ad2451ec7",
+    "issue": "TVIST-AUDIT-008",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CMT05",
+    "project": "chromium",
+    "fingerprint": "7d7230351cda90d87d4a",
+    "issue": "TVIST-AUDIT-009",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CMT05",
+    "project": "firefox",
+    "fingerprint": "0f41397d8a6bf939f4c5",
+    "issue": "TVIST-AUDIT-009",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  },
+  {
+    "id": "CMT05",
+    "project": "webkit",
+    "fingerprint": "6327ac57c632df4f9c38",
+    "issue": "TVIST-AUDIT-009",
+    "review": "Manually selected reviewed contract violation; 3 independent repeat observations required."
+  }
+]

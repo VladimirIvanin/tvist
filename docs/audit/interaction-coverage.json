@@ -1,0 +1,6707 @@
+{
+  "generatedAt": "2026-11-01T07:18:08.016Z",
+  "matrixRun": "2026-11-01T07-10-46-231Z-matrix-all-f6ee692f",
+  "scope": "Finite declared levels only. Invoked means a witness started; completedPass means its whole case returned successfully. Failed/gap tails are unverified. No claim of every option interaction.",
+  "substitutions": [
+    {
+      "family": "R03",
+      "run": "2026-10-31T22-24-43-947Z-smoke-all-aec8de17",
+      "reason": "Replaced teardown abort with successful local image fulfillment; preserves two original Chromium cleanup-console failures as harness evidence."
+    }
+  ],
+  "geometry": {
+    "rows": 192,
+    "required": 1917,
+    "missing": []
+  },
+  "modules": {
+    "rows": 27,
+    "required": 405,
+    "missing": []
+  },
+  "risk": {
+    "errors": [],
+    "families": [
+      {
+        "family": "R01",
+        "domains": {
+          "loop": [
+            "off",
+            "on",
+            "clones",
+            "auto"
+          ],
+          "count": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            17
+          ],
+          "group": [
+            1,
+            2,
+            3,
+            4
+          ]
+        },
+        "required": 192,
+        "witnessed": 192,
+        "missing": [],
+        "witnesses": [
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-0"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-48"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-96"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-144"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-1"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-49"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-97"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-145"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-2"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-50"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-98"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-146"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-3"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-51"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-99"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                0
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-147"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-4"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-52"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-100"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-148"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-5"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-53"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-101"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-149"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-6"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-54"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-102"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-150"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-7"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-55"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-103"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                1
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-151"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-8"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-56"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-104"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-152"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-9"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-57"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-105"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-153"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-10"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-58"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-106"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-154"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-11"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-59"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-107"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                2
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-155"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-12"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-60"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-108"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-156"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-13"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-61"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-109"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-157"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-14"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-62"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-110"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-158"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-15"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-63"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-111"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                3
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-159"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-16"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-64"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-112"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-160"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-17"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-65"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-113"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-161"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-18"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-66"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-114"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-162"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-19"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-67"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-115"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                4
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-163"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-20"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-68"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-116"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-164"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-21"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-69"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-117"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-165"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-22"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-70"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-118"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-166"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-23"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-71"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-119"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                5
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-167"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-24"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-72"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-120"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-168"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-25"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-73"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-121"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-169"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-26"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-74"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-122"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-170"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-27"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-75"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-123"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                6
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-171"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-28"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-76"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-124"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-172"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-29"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-77"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-125"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-173"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-30"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-78"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-126"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-174"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-31"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-79"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-127"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                7
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-175"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-32"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-80"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-128"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-176"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-33"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-81"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-129"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-177"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-34"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-82"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-130"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-178"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-35"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-83"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-131"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                8
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-179"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-36"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-84"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-132"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-180"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-37"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-85"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-133"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-181"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-38"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-86"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-134"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-182"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-39"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-87"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-135"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                9
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-183"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-40"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-88"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-136"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-184"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-41"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-89"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-137"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-185"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-42"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-90"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-138"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-186"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-43"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-91"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-139"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                10
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-187"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-44"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-92"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-140"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                1
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-188"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-45"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-93"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-141"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                2
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-189"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-46"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-94"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-142"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                3
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-190"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "MATRIX-47"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "on"
+              ]
+            ],
+            "cases": [
+              "MATRIX-95"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "MATRIX-143"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "count",
+                17
+              ],
+              [
+                "group",
+                4
+              ],
+              [
+                "loop",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "MATRIX-191"
+            ]
+          }
+        ]
+      },
+      {
+        "family": "R02",
+        "domains": {
+          "loop": [
+            "off",
+            "ordinary",
+            "clones",
+            "auto"
+          ],
+          "sizing": [
+            "auto",
+            "fixed"
+          ],
+          "alignment": [
+            "center",
+            "peek",
+            "center-peek"
+          ]
+        },
+        "required": 24,
+        "witnessed": 24,
+        "missing": [],
+        "witnesses": [
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center"
+              ],
+              [
+                "loop",
+                "off"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-000"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center"
+              ],
+              [
+                "loop",
+                "off"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-003"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-006"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-009"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center"
+              ],
+              [
+                "loop",
+                "clones"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-012"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center"
+              ],
+              [
+                "loop",
+                "clones"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-015"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center"
+              ],
+              [
+                "loop",
+                "auto"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-018"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center"
+              ],
+              [
+                "loop",
+                "auto"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-021"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "peek"
+              ],
+              [
+                "loop",
+                "off"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-001"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "peek"
+              ],
+              [
+                "loop",
+                "off"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-004"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "peek"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-007"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "peek"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-010"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "peek"
+              ],
+              [
+                "loop",
+                "clones"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-013"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "peek"
+              ],
+              [
+                "loop",
+                "clones"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-016"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "peek"
+              ],
+              [
+                "loop",
+                "auto"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-019"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "peek"
+              ],
+              [
+                "loop",
+                "auto"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-022"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center-peek"
+              ],
+              [
+                "loop",
+                "off"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-002"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center-peek"
+              ],
+              [
+                "loop",
+                "off"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-005"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center-peek"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-008"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center-peek"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-011"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center-peek"
+              ],
+              [
+                "loop",
+                "clones"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-014"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center-peek"
+              ],
+              [
+                "loop",
+                "clones"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-017"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center-peek"
+              ],
+              [
+                "loop",
+                "auto"
+              ],
+              [
+                "sizing",
+                "auto"
+              ]
+            ],
+            "cases": [
+              "RISK-02-020"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "alignment",
+                "center-peek"
+              ],
+              [
+                "loop",
+                "auto"
+              ],
+              [
+                "sizing",
+                "fixed"
+              ]
+            ],
+            "cases": [
+              "RISK-02-023"
+            ]
+          }
+        ]
+      },
+      {
+        "family": "R06",
+        "domains": {
+          "effect": [
+            "slide",
+            "fade",
+            "cube"
+          ],
+          "axis": [
+            "horizontal",
+            "vertical"
+          ],
+          "interruption": [
+            "resize",
+            "reverse",
+            "disable"
+          ]
+        },
+        "required": 18,
+        "witnessed": 18,
+        "missing": [],
+        "witnesses": [
+          {
+            "tuple": [
+              [
+                "axis",
+                "horizontal"
+              ],
+              [
+                "effect",
+                "slide"
+              ],
+              [
+                "interruption",
+                "resize"
+              ]
+            ],
+            "cases": [
+              "RISK-06-000"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "horizontal"
+              ],
+              [
+                "effect",
+                "slide"
+              ],
+              [
+                "interruption",
+                "reverse"
+              ]
+            ],
+            "cases": [
+              "RISK-06-001"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "horizontal"
+              ],
+              [
+                "effect",
+                "slide"
+              ],
+              [
+                "interruption",
+                "disable"
+              ]
+            ],
+            "cases": [
+              "RISK-06-002"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "horizontal"
+              ],
+              [
+                "effect",
+                "fade"
+              ],
+              [
+                "interruption",
+                "resize"
+              ]
+            ],
+            "cases": [
+              "RISK-06-006"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "horizontal"
+              ],
+              [
+                "effect",
+                "fade"
+              ],
+              [
+                "interruption",
+                "reverse"
+              ]
+            ],
+            "cases": [
+              "RISK-06-007"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "horizontal"
+              ],
+              [
+                "effect",
+                "fade"
+              ],
+              [
+                "interruption",
+                "disable"
+              ]
+            ],
+            "cases": [
+              "RISK-06-008"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "horizontal"
+              ],
+              [
+                "effect",
+                "cube"
+              ],
+              [
+                "interruption",
+                "resize"
+              ]
+            ],
+            "cases": [
+              "RISK-06-012"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "horizontal"
+              ],
+              [
+                "effect",
+                "cube"
+              ],
+              [
+                "interruption",
+                "reverse"
+              ]
+            ],
+            "cases": [
+              "RISK-06-013"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "horizontal"
+              ],
+              [
+                "effect",
+                "cube"
+              ],
+              [
+                "interruption",
+                "disable"
+              ]
+            ],
+            "cases": [
+              "RISK-06-014"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "vertical"
+              ],
+              [
+                "effect",
+                "slide"
+              ],
+              [
+                "interruption",
+                "resize"
+              ]
+            ],
+            "cases": [
+              "RISK-06-003"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "vertical"
+              ],
+              [
+                "effect",
+                "slide"
+              ],
+              [
+                "interruption",
+                "reverse"
+              ]
+            ],
+            "cases": [
+              "RISK-06-004"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "vertical"
+              ],
+              [
+                "effect",
+                "slide"
+              ],
+              [
+                "interruption",
+                "disable"
+              ]
+            ],
+            "cases": [
+              "RISK-06-005"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "vertical"
+              ],
+              [
+                "effect",
+                "fade"
+              ],
+              [
+                "interruption",
+                "resize"
+              ]
+            ],
+            "cases": [
+              "RISK-06-009"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "vertical"
+              ],
+              [
+                "effect",
+                "fade"
+              ],
+              [
+                "interruption",
+                "reverse"
+              ]
+            ],
+            "cases": [
+              "RISK-06-010"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "vertical"
+              ],
+              [
+                "effect",
+                "fade"
+              ],
+              [
+                "interruption",
+                "disable"
+              ]
+            ],
+            "cases": [
+              "RISK-06-011"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "vertical"
+              ],
+              [
+                "effect",
+                "cube"
+              ],
+              [
+                "interruption",
+                "resize"
+              ]
+            ],
+            "cases": [
+              "RISK-06-015"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "vertical"
+              ],
+              [
+                "effect",
+                "cube"
+              ],
+              [
+                "interruption",
+                "reverse"
+              ]
+            ],
+            "cases": [
+              "RISK-06-016"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axis",
+                "vertical"
+              ],
+              [
+                "effect",
+                "cube"
+              ],
+              [
+                "interruption",
+                "disable"
+              ]
+            ],
+            "cases": [
+              "RISK-06-017"
+            ]
+          }
+        ]
+      },
+      {
+        "family": "R08",
+        "domains": {
+          "grid": [
+            "2x2",
+            "2x3"
+          ],
+          "filter": [
+            "none",
+            "hide-return"
+          ],
+          "loop": [
+            "off",
+            "ordinary",
+            "clones"
+          ]
+        },
+        "required": 12,
+        "witnessed": 12,
+        "missing": [],
+        "witnesses": [
+          {
+            "tuple": [
+              [
+                "filter",
+                "none"
+              ],
+              [
+                "grid",
+                "2x2"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-08-000"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "filter",
+                "none"
+              ],
+              [
+                "grid",
+                "2x2"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-08-001"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "filter",
+                "none"
+              ],
+              [
+                "grid",
+                "2x2"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-08-002"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "filter",
+                "none"
+              ],
+              [
+                "grid",
+                "2x3"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-08-006"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "filter",
+                "none"
+              ],
+              [
+                "grid",
+                "2x3"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-08-007"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "filter",
+                "none"
+              ],
+              [
+                "grid",
+                "2x3"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-08-008"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "filter",
+                "hide-return"
+              ],
+              [
+                "grid",
+                "2x2"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-08-003"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "filter",
+                "hide-return"
+              ],
+              [
+                "grid",
+                "2x2"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-08-004"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "filter",
+                "hide-return"
+              ],
+              [
+                "grid",
+                "2x2"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-08-005"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "filter",
+                "hide-return"
+              ],
+              [
+                "grid",
+                "2x3"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-08-009"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "filter",
+                "hide-return"
+              ],
+              [
+                "grid",
+                "2x3"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-08-010"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "filter",
+                "hide-return"
+              ],
+              [
+                "grid",
+                "2x3"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-08-011"
+            ]
+          }
+        ]
+      },
+      {
+        "family": "R03",
+        "domains": {
+          "clones": [
+            "explicit",
+            "automatic"
+          ],
+          "content": [
+            "video",
+            "lazy"
+          ],
+          "lifecycle": [
+            "disable-enable",
+            "destroy-reinit"
+          ]
+        },
+        "required": 8,
+        "witnessed": 8,
+        "missing": [],
+        "witnesses": [
+          {
+            "tuple": [
+              [
+                "clones",
+                "explicit"
+              ],
+              [
+                "content",
+                "video"
+              ],
+              [
+                "lifecycle",
+                "disable-enable"
+              ]
+            ],
+            "cases": [
+              "RISK-03-000"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "clones",
+                "explicit"
+              ],
+              [
+                "content",
+                "video"
+              ],
+              [
+                "lifecycle",
+                "destroy-reinit"
+              ]
+            ],
+            "cases": [
+              "RISK-03-001"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "clones",
+                "explicit"
+              ],
+              [
+                "content",
+                "lazy"
+              ],
+              [
+                "lifecycle",
+                "disable-enable"
+              ]
+            ],
+            "cases": [
+              "RISK-03-002"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "clones",
+                "explicit"
+              ],
+              [
+                "content",
+                "lazy"
+              ],
+              [
+                "lifecycle",
+                "destroy-reinit"
+              ]
+            ],
+            "cases": [
+              "RISK-03-003"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "clones",
+                "automatic"
+              ],
+              [
+                "content",
+                "video"
+              ],
+              [
+                "lifecycle",
+                "disable-enable"
+              ]
+            ],
+            "cases": [
+              "RISK-03-004"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "clones",
+                "automatic"
+              ],
+              [
+                "content",
+                "video"
+              ],
+              [
+                "lifecycle",
+                "destroy-reinit"
+              ]
+            ],
+            "cases": [
+              "RISK-03-005"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "clones",
+                "automatic"
+              ],
+              [
+                "content",
+                "lazy"
+              ],
+              [
+                "lifecycle",
+                "disable-enable"
+              ]
+            ],
+            "cases": [
+              "RISK-03-006"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "clones",
+                "automatic"
+              ],
+              [
+                "content",
+                "lazy"
+              ],
+              [
+                "lifecycle",
+                "destroy-reinit"
+              ]
+            ],
+            "cases": [
+              "RISK-03-007"
+            ]
+          }
+        ]
+      },
+      {
+        "family": "R04",
+        "domains": {
+          "drag": [
+            "off",
+            "snap",
+            "free"
+          ],
+          "loop": [
+            "off",
+            "ordinary",
+            "clones"
+          ],
+          "cancel": [
+            "pointercancel",
+            "lostcapture",
+            "touchcancel"
+          ]
+        },
+        "required": 27,
+        "witnessed": 27,
+        "missing": [],
+        "witnesses": [
+          {
+            "tuple": [
+              [
+                "cancel",
+                "pointercancel"
+              ],
+              [
+                "drag",
+                "off"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-04-000"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "pointercancel"
+              ],
+              [
+                "drag",
+                "off"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-04-003"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "pointercancel"
+              ],
+              [
+                "drag",
+                "off"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-04-006"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "pointercancel"
+              ],
+              [
+                "drag",
+                "snap"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-04-009"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "pointercancel"
+              ],
+              [
+                "drag",
+                "snap"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-04-012"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "pointercancel"
+              ],
+              [
+                "drag",
+                "snap"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-04-015"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "pointercancel"
+              ],
+              [
+                "drag",
+                "free"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-04-018"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "pointercancel"
+              ],
+              [
+                "drag",
+                "free"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-04-021"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "pointercancel"
+              ],
+              [
+                "drag",
+                "free"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-04-024"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "lostcapture"
+              ],
+              [
+                "drag",
+                "off"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-04-001"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "lostcapture"
+              ],
+              [
+                "drag",
+                "off"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-04-004"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "lostcapture"
+              ],
+              [
+                "drag",
+                "off"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-04-007"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "lostcapture"
+              ],
+              [
+                "drag",
+                "snap"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-04-010"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "lostcapture"
+              ],
+              [
+                "drag",
+                "snap"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-04-013"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "lostcapture"
+              ],
+              [
+                "drag",
+                "snap"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-04-016"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "lostcapture"
+              ],
+              [
+                "drag",
+                "free"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-04-019"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "lostcapture"
+              ],
+              [
+                "drag",
+                "free"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-04-022"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "lostcapture"
+              ],
+              [
+                "drag",
+                "free"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-04-025"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "touchcancel"
+              ],
+              [
+                "drag",
+                "off"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-04-002"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "touchcancel"
+              ],
+              [
+                "drag",
+                "off"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-04-005"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "touchcancel"
+              ],
+              [
+                "drag",
+                "off"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-04-008"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "touchcancel"
+              ],
+              [
+                "drag",
+                "snap"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-04-011"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "touchcancel"
+              ],
+              [
+                "drag",
+                "snap"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-04-014"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "touchcancel"
+              ],
+              [
+                "drag",
+                "snap"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-04-017"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "touchcancel"
+              ],
+              [
+                "drag",
+                "free"
+              ],
+              [
+                "loop",
+                "off"
+              ]
+            ],
+            "cases": [
+              "RISK-04-020"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "touchcancel"
+              ],
+              [
+                "drag",
+                "free"
+              ],
+              [
+                "loop",
+                "ordinary"
+              ]
+            ],
+            "cases": [
+              "RISK-04-023"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "cancel",
+                "touchcancel"
+              ],
+              [
+                "drag",
+                "free"
+              ],
+              [
+                "loop",
+                "clones"
+              ]
+            ],
+            "cases": [
+              "RISK-04-026"
+            ]
+          }
+        ]
+      },
+      {
+        "family": "R05",
+        "domains": {
+          "base": [
+            "window",
+            "container"
+          ],
+          "enabled": [
+            true,
+            false
+          ],
+          "modules": [
+            "controls",
+            "autoplay",
+            "lazy"
+          ]
+        },
+        "required": 12,
+        "witnessed": 12,
+        "missing": [],
+        "witnesses": [
+          {
+            "tuple": [
+              [
+                "base",
+                "window"
+              ],
+              [
+                "enabled",
+                true
+              ],
+              [
+                "modules",
+                "controls"
+              ]
+            ],
+            "cases": [
+              "RISK-05-000"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "base",
+                "window"
+              ],
+              [
+                "enabled",
+                true
+              ],
+              [
+                "modules",
+                "autoplay"
+              ]
+            ],
+            "cases": [
+              "RISK-05-001"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "base",
+                "window"
+              ],
+              [
+                "enabled",
+                true
+              ],
+              [
+                "modules",
+                "lazy"
+              ]
+            ],
+            "cases": [
+              "RISK-05-002"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "base",
+                "window"
+              ],
+              [
+                "enabled",
+                false
+              ],
+              [
+                "modules",
+                "controls"
+              ]
+            ],
+            "cases": [
+              "RISK-05-003"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "base",
+                "window"
+              ],
+              [
+                "enabled",
+                false
+              ],
+              [
+                "modules",
+                "autoplay"
+              ]
+            ],
+            "cases": [
+              "RISK-05-004"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "base",
+                "window"
+              ],
+              [
+                "enabled",
+                false
+              ],
+              [
+                "modules",
+                "lazy"
+              ]
+            ],
+            "cases": [
+              "RISK-05-005"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "base",
+                "container"
+              ],
+              [
+                "enabled",
+                true
+              ],
+              [
+                "modules",
+                "controls"
+              ]
+            ],
+            "cases": [
+              "RISK-05-006"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "base",
+                "container"
+              ],
+              [
+                "enabled",
+                true
+              ],
+              [
+                "modules",
+                "autoplay"
+              ]
+            ],
+            "cases": [
+              "RISK-05-007"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "base",
+                "container"
+              ],
+              [
+                "enabled",
+                true
+              ],
+              [
+                "modules",
+                "lazy"
+              ]
+            ],
+            "cases": [
+              "RISK-05-008"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "base",
+                "container"
+              ],
+              [
+                "enabled",
+                false
+              ],
+              [
+                "modules",
+                "controls"
+              ]
+            ],
+            "cases": [
+              "RISK-05-009"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "base",
+                "container"
+              ],
+              [
+                "enabled",
+                false
+              ],
+              [
+                "modules",
+                "autoplay"
+              ]
+            ],
+            "cases": [
+              "RISK-05-010"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "base",
+                "container"
+              ],
+              [
+                "enabled",
+                false
+              ],
+              [
+                "modules",
+                "lazy"
+              ]
+            ],
+            "cases": [
+              "RISK-05-011"
+            ]
+          }
+        ]
+      },
+      {
+        "family": "R09",
+        "domains": {
+          "nested": [
+            "2levels",
+            "3levels"
+          ],
+          "init": [
+            "parentfirst",
+            "childfirst"
+          ],
+          "axes": [
+            "same",
+            "mixed"
+          ]
+        },
+        "required": 8,
+        "witnessed": 8,
+        "missing": [],
+        "witnesses": [
+          {
+            "tuple": [
+              [
+                "axes",
+                "same"
+              ],
+              [
+                "init",
+                "parentfirst"
+              ],
+              [
+                "nested",
+                "2levels"
+              ]
+            ],
+            "cases": [
+              "RISK-09-000"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axes",
+                "same"
+              ],
+              [
+                "init",
+                "parentfirst"
+              ],
+              [
+                "nested",
+                "3levels"
+              ]
+            ],
+            "cases": [
+              "RISK-09-004"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axes",
+                "same"
+              ],
+              [
+                "init",
+                "childfirst"
+              ],
+              [
+                "nested",
+                "2levels"
+              ]
+            ],
+            "cases": [
+              "RISK-09-002"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axes",
+                "same"
+              ],
+              [
+                "init",
+                "childfirst"
+              ],
+              [
+                "nested",
+                "3levels"
+              ]
+            ],
+            "cases": [
+              "RISK-09-006"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axes",
+                "mixed"
+              ],
+              [
+                "init",
+                "parentfirst"
+              ],
+              [
+                "nested",
+                "2levels"
+              ]
+            ],
+            "cases": [
+              "RISK-09-001"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axes",
+                "mixed"
+              ],
+              [
+                "init",
+                "parentfirst"
+              ],
+              [
+                "nested",
+                "3levels"
+              ]
+            ],
+            "cases": [
+              "RISK-09-005"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axes",
+                "mixed"
+              ],
+              [
+                "init",
+                "childfirst"
+              ],
+              [
+                "nested",
+                "2levels"
+              ]
+            ],
+            "cases": [
+              "RISK-09-003"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "axes",
+                "mixed"
+              ],
+              [
+                "init",
+                "childfirst"
+              ],
+              [
+                "nested",
+                "3levels"
+              ]
+            ],
+            "cases": [
+              "RISK-09-007"
+            ]
+          }
+        ]
+      },
+      {
+        "family": "R10",
+        "domains": {
+          "freeSnap": [
+            false,
+            true
+          ],
+          "pagination": [
+            "bullets",
+            "fraction",
+            "progress"
+          ],
+          "scrollbar": [
+            false,
+            true
+          ]
+        },
+        "required": 12,
+        "witnessed": 12,
+        "missing": [],
+        "witnesses": [
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                false
+              ],
+              [
+                "pagination",
+                "bullets"
+              ],
+              [
+                "scrollbar",
+                false
+              ]
+            ],
+            "cases": [
+              "RISK-10-000"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                false
+              ],
+              [
+                "pagination",
+                "bullets"
+              ],
+              [
+                "scrollbar",
+                true
+              ]
+            ],
+            "cases": [
+              "RISK-10-001"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                false
+              ],
+              [
+                "pagination",
+                "fraction"
+              ],
+              [
+                "scrollbar",
+                false
+              ]
+            ],
+            "cases": [
+              "RISK-10-002"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                false
+              ],
+              [
+                "pagination",
+                "fraction"
+              ],
+              [
+                "scrollbar",
+                true
+              ]
+            ],
+            "cases": [
+              "RISK-10-003"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                false
+              ],
+              [
+                "pagination",
+                "progress"
+              ],
+              [
+                "scrollbar",
+                false
+              ]
+            ],
+            "cases": [
+              "RISK-10-004"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                false
+              ],
+              [
+                "pagination",
+                "progress"
+              ],
+              [
+                "scrollbar",
+                true
+              ]
+            ],
+            "cases": [
+              "RISK-10-005"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                true
+              ],
+              [
+                "pagination",
+                "bullets"
+              ],
+              [
+                "scrollbar",
+                false
+              ]
+            ],
+            "cases": [
+              "RISK-10-006"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                true
+              ],
+              [
+                "pagination",
+                "bullets"
+              ],
+              [
+                "scrollbar",
+                true
+              ]
+            ],
+            "cases": [
+              "RISK-10-007"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                true
+              ],
+              [
+                "pagination",
+                "fraction"
+              ],
+              [
+                "scrollbar",
+                false
+              ]
+            ],
+            "cases": [
+              "RISK-10-008"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                true
+              ],
+              [
+                "pagination",
+                "fraction"
+              ],
+              [
+                "scrollbar",
+                true
+              ]
+            ],
+            "cases": [
+              "RISK-10-009"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                true
+              ],
+              [
+                "pagination",
+                "progress"
+              ],
+              [
+                "scrollbar",
+                false
+              ]
+            ],
+            "cases": [
+              "RISK-10-010"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "freeSnap",
+                true
+              ],
+              [
+                "pagination",
+                "progress"
+              ],
+              [
+                "scrollbar",
+                true
+              ]
+            ],
+            "cases": [
+              "RISK-10-011"
+            ]
+          }
+        ]
+      },
+      {
+        "family": "R07",
+        "domains": {
+          "autoplay": [
+            "timer",
+            "waitForVideo"
+          ],
+          "videoEnded": [
+            "active",
+            "inactive"
+          ],
+          "pauseReason": [
+            "hover",
+            "focus",
+            "manual-stop"
+          ]
+        },
+        "required": 12,
+        "witnessed": 12,
+        "missing": [],
+        "witnesses": [
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "timer"
+              ],
+              [
+                "pauseReason",
+                "hover"
+              ],
+              [
+                "videoEnded",
+                "active"
+              ]
+            ],
+            "cases": [
+              "RISK-07-000"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "timer"
+              ],
+              [
+                "pauseReason",
+                "hover"
+              ],
+              [
+                "videoEnded",
+                "inactive"
+              ]
+            ],
+            "cases": [
+              "RISK-07-003"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "timer"
+              ],
+              [
+                "pauseReason",
+                "focus"
+              ],
+              [
+                "videoEnded",
+                "active"
+              ]
+            ],
+            "cases": [
+              "RISK-07-001"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "timer"
+              ],
+              [
+                "pauseReason",
+                "focus"
+              ],
+              [
+                "videoEnded",
+                "inactive"
+              ]
+            ],
+            "cases": [
+              "RISK-07-004"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "timer"
+              ],
+              [
+                "pauseReason",
+                "manual-stop"
+              ],
+              [
+                "videoEnded",
+                "active"
+              ]
+            ],
+            "cases": [
+              "RISK-07-002"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "timer"
+              ],
+              [
+                "pauseReason",
+                "manual-stop"
+              ],
+              [
+                "videoEnded",
+                "inactive"
+              ]
+            ],
+            "cases": [
+              "RISK-07-005"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "waitForVideo"
+              ],
+              [
+                "pauseReason",
+                "hover"
+              ],
+              [
+                "videoEnded",
+                "active"
+              ]
+            ],
+            "cases": [
+              "RISK-07-006"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "waitForVideo"
+              ],
+              [
+                "pauseReason",
+                "hover"
+              ],
+              [
+                "videoEnded",
+                "inactive"
+              ]
+            ],
+            "cases": [
+              "RISK-07-009"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "waitForVideo"
+              ],
+              [
+                "pauseReason",
+                "focus"
+              ],
+              [
+                "videoEnded",
+                "active"
+              ]
+            ],
+            "cases": [
+              "RISK-07-007"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "waitForVideo"
+              ],
+              [
+                "pauseReason",
+                "focus"
+              ],
+              [
+                "videoEnded",
+                "inactive"
+              ]
+            ],
+            "cases": [
+              "RISK-07-010"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "waitForVideo"
+              ],
+              [
+                "pauseReason",
+                "manual-stop"
+              ],
+              [
+                "videoEnded",
+                "active"
+              ]
+            ],
+            "cases": [
+              "RISK-07-008"
+            ]
+          },
+          {
+            "tuple": [
+              [
+                "autoplay",
+                "waitForVideo"
+              ],
+              [
+                "pauseReason",
+                "manual-stop"
+              ],
+              [
+                "videoEnded",
+                "inactive"
+              ]
+            ],
+            "cases": [
+              "RISK-07-011"
+            ]
+          }
+        ]
+      }
+    ],
+    "executions": [
+      {
+        "family": "R01",
+        "project": "chromium",
+        "required": 192,
+        "invoked": 192,
+        "completedPass": 142,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R01",
+        "project": "firefox",
+        "required": 192,
+        "invoked": 192,
+        "completedPass": 142,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R01",
+        "project": "webkit",
+        "required": 192,
+        "invoked": 192,
+        "completedPass": 142,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R02",
+        "project": "chromium",
+        "required": 24,
+        "invoked": 24,
+        "completedPass": 16,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R02",
+        "project": "firefox",
+        "required": 24,
+        "invoked": 24,
+        "completedPass": 16,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R02",
+        "project": "webkit",
+        "required": 24,
+        "invoked": 24,
+        "completedPass": 16,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R06",
+        "project": "chromium",
+        "required": 18,
+        "invoked": 18,
+        "completedPass": 18,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R06",
+        "project": "firefox",
+        "required": 18,
+        "invoked": 18,
+        "completedPass": 18,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R06",
+        "project": "webkit",
+        "required": 18,
+        "invoked": 18,
+        "completedPass": 16,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R08",
+        "project": "chromium",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 8,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R08",
+        "project": "firefox",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 8,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R08",
+        "project": "webkit",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 8,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R03",
+        "project": "chromium",
+        "required": 8,
+        "invoked": 8,
+        "completedPass": 4,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R03",
+        "project": "firefox",
+        "required": 8,
+        "invoked": 8,
+        "completedPass": 4,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R03",
+        "project": "webkit",
+        "required": 8,
+        "invoked": 8,
+        "completedPass": 4,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R04",
+        "project": "chromium",
+        "required": 27,
+        "invoked": 27,
+        "completedPass": 21,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R04",
+        "project": "firefox",
+        "required": 27,
+        "invoked": 27,
+        "completedPass": 21,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R04",
+        "project": "webkit",
+        "required": 27,
+        "invoked": 27,
+        "completedPass": 21,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R05",
+        "project": "chromium",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 9,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R05",
+        "project": "firefox",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 9,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R05",
+        "project": "webkit",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 9,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R09",
+        "project": "chromium",
+        "required": 8,
+        "invoked": 8,
+        "completedPass": 8,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R09",
+        "project": "firefox",
+        "required": 8,
+        "invoked": 8,
+        "completedPass": 8,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R09",
+        "project": "webkit",
+        "required": 8,
+        "invoked": 8,
+        "completedPass": 8,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R10",
+        "project": "chromium",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 3,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R10",
+        "project": "firefox",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 3,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R10",
+        "project": "webkit",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 3,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R07",
+        "project": "chromium",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 6,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R07",
+        "project": "firefox",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 6,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      },
+      {
+        "family": "R07",
+        "project": "webkit",
+        "required": 12,
+        "invoked": 12,
+        "completedPass": 6,
+        "note": "Invocation is not full action/assertion completion. Non-pass cases retain blocked tails in raw evidence."
+      }
+    ]
+  },
+  "mobile": [
+    {
+      "project": "chromium-mobile",
+      "risk": {
+        "pass": 36
+      },
+      "invokedRiskCases": 36
+    },
+    {
+      "project": "webkit-mobile",
+      "risk": {
+        "pass": 34,
+        "reproduced": 2
+      },
+      "invokedRiskCases": 36
+    }
+  ]
+}

@@ -1,0 +1,3068 @@
+{
+  "run": "2026-10-31T21-54-54-421Z-performance-all-c02b98f9",
+  "manifestPath": ".tmp/audit/2026-10-31T21-54-54-421Z-performance-all-c02b98f9/manifest.json",
+  "manifestSha256": "5d070349e0edd20a542eed63c243c09e770e50832c92be6ec0ab7bc6e253dfd8",
+  "commit": "dea54d579239cd29224303c90646f00b577ec41c",
+  "buildHash": "63f82928b9db2be2374e2824c62021aa8b7558d02658b8a2b8f87a421c234550",
+  "cssHash": "ffbc0e34077c94370133145d71e0d48026f142d0adf4c25339b7a44ff2d9b51e",
+  "browserVersions": {
+    "chromium": {
+      "version": "149.0.7827.55",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.7827.55 Safari/537.36",
+      "dpr": 1,
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      }
+    },
+    "firefox": {
+      "version": "151.0",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:151.0) Gecko/20100101 Firefox/151.0",
+      "dpr": 1,
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      }
+    },
+    "webkit": {
+      "version": "26.5",
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.5 Safari/605.1.15",
+      "dpr": 1,
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      }
+    }
+  },
+  "environment": {
+    "platform": "win32",
+    "release": "10.0.19045",
+    "arch": "x64",
+    "cpu": "11th Gen Intel(R) Core(TM) i7-11700K @ 3.60GHz",
+    "logicalCPUs": 16,
+    "node": "v22.23.1",
+    "headless": true
+  },
+  "passed": 75,
+  "total": 75,
+  "aggregates": [
+    {
+      "engine": "chromium",
+      "count": 10,
+      "instances": 1,
+      "repetitions": 5,
+      "constructorMs": 0.7800000190734864,
+      "updateMs": 0.42000000476837157,
+      "destroyMs": 0.12000000476837158,
+      "meanPhaseP95Ms": 16.730000000000114,
+      "longTasks": 0
+    },
+    {
+      "engine": "chromium",
+      "count": 100,
+      "instances": 1,
+      "repetitions": 5,
+      "constructorMs": 2.3,
+      "updateMs": 0.8999999761581421,
+      "destroyMs": 0.14000000953674316,
+      "meanPhaseP95Ms": 16.730000000000132,
+      "longTasks": 0
+    },
+    {
+      "engine": "chromium",
+      "count": 1000,
+      "instances": 1,
+      "repetitions": 5,
+      "constructorMs": 16.97999999523163,
+      "updateMs": 9.060000014305114,
+      "destroyMs": 0.4199999809265137,
+      "meanPhaseP95Ms": 16.74000000000003,
+      "longTasks": 0
+    },
+    {
+      "engine": "chromium",
+      "count": 100,
+      "instances": 10,
+      "repetitions": 5,
+      "constructorMs": 23.2400000333786,
+      "updateMs": 11.87999997138977,
+      "destroyMs": 0.8800000190734864,
+      "meanPhaseP95Ms": 16.720000000000095,
+      "longTasks": 0
+    },
+    {
+      "engine": "chromium",
+      "count": 100,
+      "instances": 50,
+      "repetitions": 5,
+      "constructorMs": 119.04000000953674,
+      "updateMs": 44.02000000476837,
+      "destroyMs": 2.219999980926514,
+      "meanPhaseP95Ms": 16.72000000000012,
+      "longTasks": 0
+    },
+    {
+      "engine": "firefox",
+      "count": 10,
+      "instances": 1,
+      "repetitions": 5,
+      "constructorMs": 2,
+      "updateMs": 1,
+      "destroyMs": 0,
+      "meanPhaseP95Ms": 16.680000000000156,
+      "longTasks": 0
+    },
+    {
+      "engine": "firefox",
+      "count": 100,
+      "instances": 1,
+      "repetitions": 5,
+      "constructorMs": 2.6,
+      "updateMs": 2.2,
+      "destroyMs": 0.2,
+      "meanPhaseP95Ms": 16.68000000000013,
+      "longTasks": 0
+    },
+    {
+      "engine": "firefox",
+      "count": 1000,
+      "instances": 1,
+      "repetitions": 5,
+      "constructorMs": 19.4,
+      "updateMs": 9.8,
+      "destroyMs": 0.6,
+      "meanPhaseP95Ms": 16.68000000000011,
+      "longTasks": 0
+    },
+    {
+      "engine": "firefox",
+      "count": 100,
+      "instances": 10,
+      "repetitions": 5,
+      "constructorMs": 37.4,
+      "updateMs": 18.8,
+      "destroyMs": 1.4,
+      "meanPhaseP95Ms": 16.680000000000085,
+      "longTasks": 0
+    },
+    {
+      "engine": "firefox",
+      "count": 100,
+      "instances": 50,
+      "repetitions": 5,
+      "constructorMs": 165.2,
+      "updateMs": 89.2,
+      "destroyMs": 4.4,
+      "meanPhaseP95Ms": 16.680000000000064,
+      "longTasks": 0
+    },
+    {
+      "engine": "webkit",
+      "count": 10,
+      "instances": 1,
+      "repetitions": 5,
+      "constructorMs": 1.8,
+      "updateMs": 0.8,
+      "destroyMs": 0.2,
+      "meanPhaseP95Ms": 16.9,
+      "longTasks": 0
+    },
+    {
+      "engine": "webkit",
+      "count": 100,
+      "instances": 1,
+      "repetitions": 5,
+      "constructorMs": 4.8,
+      "updateMs": 2,
+      "destroyMs": 0,
+      "meanPhaseP95Ms": 17.2,
+      "longTasks": 0
+    },
+    {
+      "engine": "webkit",
+      "count": 1000,
+      "instances": 1,
+      "repetitions": 5,
+      "constructorMs": 27,
+      "updateMs": 11,
+      "destroyMs": 0.4,
+      "meanPhaseP95Ms": 17.7,
+      "longTasks": 0
+    },
+    {
+      "engine": "webkit",
+      "count": 100,
+      "instances": 10,
+      "repetitions": 5,
+      "constructorMs": 56.4,
+      "updateMs": 27.4,
+      "destroyMs": 1,
+      "meanPhaseP95Ms": 17.6,
+      "longTasks": 0
+    },
+    {
+      "engine": "webkit",
+      "count": 100,
+      "instances": 50,
+      "repetitions": 5,
+      "constructorMs": 255.4,
+      "updateMs": 140.4,
+      "destroyMs": 5.2,
+      "meanPhaseP95Ms": 31.1,
+      "longTasks": 0
+    }
+  ],
+  "trials": [
+    {
+      "engine": "chromium",
+      "id": "PERF-10-I1-0",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 0.7000000476837158,
+      "updateMs": 0.30000007152557373,
+      "destroyMs": 0.09999990463256836,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.69999999999999,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-0-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-10-I1-1",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 0.6000000238418579,
+      "updateMs": 0.2999999523162842,
+      "destroyMs": 0.10000002384185791,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.69999999999999,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.799999999999955,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-1-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-10-I1-2",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 0.7000000476837158,
+      "updateMs": 0.5,
+      "destroyMs": 0.10000002384185791,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-2-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-10-I1-3",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 0.6999999284744263,
+      "updateMs": 0.5,
+      "destroyMs": 0.10000002384185791,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.80000000000001,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-3-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-10-I1-4",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 1.2000000476837158,
+      "updateMs": 0.5,
+      "destroyMs": 0.20000004768371582,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.799999999999955,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-4-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I1-0",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 2,
+      "updateMs": 1.0999999046325684,
+      "destroyMs": 0.20000004768371582,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.69999999999999,
+          "p95FrameMs": 16.799999999999955,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-0-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I1-1",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 3.6999999284744263,
+      "updateMs": 0.8999999761581421,
+      "destroyMs": 0.10000002384185791,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.69999999999999,
+          "p95FrameMs": 16.799999999999955,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-1-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I1-2",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 2,
+      "updateMs": 0.8999999761581421,
+      "destroyMs": 0.10000002384185791,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-2-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I1-3",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 1.899999976158142,
+      "updateMs": 0.7999999523162842,
+      "destroyMs": 0.20000004768371582,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.69999999999999,
+          "p95FrameMs": 16.799999999999955,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-3-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I1-4",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 1.9000000953674316,
+      "updateMs": 0.8000000715255737,
+      "destroyMs": 0.09999990463256836,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-4-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-1000-I1-0",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 14,
+      "updateMs": 17.700000047683716,
+      "destroyMs": 0.5,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.799999999999955,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.799999999999727,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-0-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-1000-I1-1",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 14.799999952316284,
+      "updateMs": 6.5,
+      "destroyMs": 0.3999999761581421,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.799999999999955,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-1-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-1000-I1-2",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 14.5,
+      "updateMs": 6.199999928474426,
+      "destroyMs": 0.30000007152557373,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-2-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-1000-I1-3",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 20.40000009536743,
+      "updateMs": 9.5,
+      "destroyMs": 0.5999999046325684,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.799999999999727,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-3-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-1000-I1-4",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 21.199999928474426,
+      "updateMs": 5.400000095367432,
+      "destroyMs": 0.2999999523162842,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.69999999999999,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-4-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I10-0",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 24.300000071525574,
+      "updateMs": 11.200000047683716,
+      "destroyMs": 0.7999999523162842,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-0-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I10-1",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 22.399999976158142,
+      "updateMs": 16.799999952316284,
+      "destroyMs": 1,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-1-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I10-2",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 24.200000047683716,
+      "updateMs": 9.299999952316284,
+      "destroyMs": 0.7000000476837158,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.799999999999955,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-2-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I10-3",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 23.100000023841858,
+      "updateMs": 11.799999952316284,
+      "destroyMs": 1.2000000476837158,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.799999999999727,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-3-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I10-4",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 22.200000047683716,
+      "updateMs": 10.299999952316284,
+      "destroyMs": 0.7000000476837158,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-4-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I50-0",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 114.19999992847443,
+      "updateMs": 44.10000002384186,
+      "destroyMs": 2,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.69999999999999,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 73,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-0-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I50-1",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 110,
+      "updateMs": 46.299999952316284,
+      "destroyMs": 2.600000023841858,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.69999999999999,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 72,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-1-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I50-2",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 121,
+      "updateMs": 42.799999952316284,
+      "destroyMs": 2.100000023841858,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.700000000000273,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-2-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I50-3",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 106.90000009536743,
+      "updateMs": 44.200000047683716,
+      "destroyMs": 2.1999999284744263,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.699999999999932,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.800000000000182,
+          "frames": 71,
+          "movedFrames": 54,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-3-chromium.metrics.json"
+    },
+    {
+      "engine": "chromium",
+      "id": "PERF-100-I50-4",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 143.10000002384186,
+      "updateMs": 42.700000047683716,
+      "destroyMs": 2.1999999284744263,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.700000000000045,
+          "p95FrameMs": 16.700000000000045,
+          "frames": 72,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.699999999999818,
+          "p95FrameMs": 16.799999999999955,
+          "frames": 72,
+          "movedFrames": 55,
+          "longTaskSupported": true,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-4-chromium.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-10-I1-0",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 2,
+      "updateMs": 1,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.68000000000029,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-0-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-10-I1-1",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 2,
+      "updateMs": 2,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-1-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-10-I1-2",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 2,
+      "updateMs": 1,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.68000000000029,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-2-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-10-I1-3",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 2,
+      "updateMs": 1,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.68000000000029,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-3-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-10-I1-4",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 2,
+      "updateMs": 0,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.68000000000029,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-4-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I1-0",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 3,
+      "updateMs": 1,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.68000000000029,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-0-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I1-1",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 2,
+      "updateMs": 3,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-1-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I1-2",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 2,
+      "updateMs": 2,
+      "destroyMs": 1,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.68000000000029,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-2-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I1-3",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 3,
+      "updateMs": 2,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-3-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I1-4",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 3,
+      "updateMs": 3,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.68000000000029,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-4-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-1000-I1-0",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 20,
+      "updateMs": 10,
+      "destroyMs": 1,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.66000000000031,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-0-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-1000-I1-1",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 18,
+      "updateMs": 13,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.68000000000029,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-1-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-1000-I1-2",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 16,
+      "updateMs": 9,
+      "destroyMs": 1,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.68000000000029,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-2-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-1000-I1-3",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 22,
+      "updateMs": 9,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.66000000000031,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-3-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-1000-I1-4",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 21,
+      "updateMs": 8,
+      "destroyMs": 1,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 68,
+          "movedFrames": 54,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 1
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-4-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I10-0",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 34,
+      "updateMs": 16,
+      "destroyMs": 1,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-0-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I10-1",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 44,
+      "updateMs": 19,
+      "destroyMs": 2,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 69,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-1-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I10-2",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 35,
+      "updateMs": 22,
+      "destroyMs": 2,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000025,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.68000000000029,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-2-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I10-3",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 36,
+      "updateMs": 21,
+      "destroyMs": 1,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-3-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I10-4",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 38,
+      "updateMs": 16,
+      "destroyMs": 1,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-4-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I50-0",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 165,
+      "updateMs": 96,
+      "destroyMs": 4,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.66000000000031,
+          "p95FrameMs": 16.68000000000029,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-0-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I50-1",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 158,
+      "updateMs": 80,
+      "destroyMs": 5,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.66000000000031,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-1-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I50-2",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 164,
+      "updateMs": 105,
+      "destroyMs": 4,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.66000000000031,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-2-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I50-3",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 169,
+      "updateMs": 90,
+      "destroyMs": 5,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.66000000000031,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 72,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-3-firefox.metrics.json"
+    },
+    {
+      "engine": "firefox",
+      "id": "PERF-100-I50-4",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 170,
+      "updateMs": 75,
+      "destroyMs": 4,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16.660000000000082,
+          "p95FrameMs": 16.680000000000064,
+          "frames": 70,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16.66000000000031,
+          "p95FrameMs": 16.679999999999836,
+          "frames": 71,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-4-firefox.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-10-I1-0",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 2,
+      "updateMs": 1,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 16,
+          "frames": 79,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 75,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-0-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-10-I1-1",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 2,
+      "updateMs": 0,
+      "destroyMs": 1,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 76,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 16,
+          "frames": 78,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-1-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-10-I1-2",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 1,
+      "updateMs": 1,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 78,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 78,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-2-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-10-I1-3",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 3,
+      "updateMs": 1,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 76,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 18,
+          "frames": 76,
+          "movedFrames": 58,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-3-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-10-I1-4",
+      "count": 10,
+      "instances": 1,
+      "constructorMs": 1,
+      "updateMs": 1,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 77,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 77,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-10-I1-4-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I1-0",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 5,
+      "updateMs": 2,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 76,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 76,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-0-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I1-1",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 4,
+      "updateMs": 2,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16,
+          "p95FrameMs": 18,
+          "frames": 75,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 78,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-1-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I1-2",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 5,
+      "updateMs": 2,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 76,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 77,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-2-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I1-3",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 6,
+      "updateMs": 2,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 78,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 18,
+          "frames": 76,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-3-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I1-4",
+      "count": 100,
+      "instances": 1,
+      "constructorMs": 4,
+      "updateMs": 2,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 77,
+          "movedFrames": 58,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 75,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I1-4-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-1000-I1-0",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 25,
+      "updateMs": 10,
+      "destroyMs": 1,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16,
+          "p95FrameMs": 17,
+          "frames": 75,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 76,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-0-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-1000-I1-1",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 27,
+      "updateMs": 11,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16,
+          "p95FrameMs": 17,
+          "frames": 76,
+          "movedFrames": 58,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 77,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-1-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-1000-I1-2",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 29,
+      "updateMs": 12,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 18,
+          "frames": 76,
+          "movedFrames": 57,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 75,
+          "movedFrames": 61,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-2-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-1000-I1-3",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 28,
+      "updateMs": 11,
+      "destroyMs": 0,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 77,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 23,
+          "frames": 73,
+          "movedFrames": 57,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 1
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-3-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-1000-I1-4",
+      "count": 1000,
+      "instances": 1,
+      "constructorMs": 26,
+      "updateMs": 11,
+      "destroyMs": 1,
+      "timedInstanceCount": 1,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 76,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 76,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-1000-I1-4-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I10-0",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 45,
+      "updateMs": 28,
+      "destroyMs": 1,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16,
+          "p95FrameMs": 17,
+          "frames": 75,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 18,
+          "frames": 79,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-0-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I10-1",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 47,
+      "updateMs": 26,
+      "destroyMs": 1,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 18,
+          "frames": 80,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 18,
+          "frames": 77,
+          "movedFrames": 58,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-1-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I10-2",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 75,
+      "updateMs": 28,
+      "destroyMs": 1,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 78,
+          "movedFrames": 60,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 19,
+          "frames": 76,
+          "movedFrames": 57,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-2-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I10-3",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 57,
+      "updateMs": 33,
+      "destroyMs": 1,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16,
+          "p95FrameMs": 17,
+          "frames": 78,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 78,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-3-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I10-4",
+      "count": 100,
+      "instances": 10,
+      "constructorMs": 58,
+      "updateMs": 22,
+      "destroyMs": 1,
+      "timedInstanceCount": 10,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 15,
+          "p95FrameMs": 18,
+          "frames": 77,
+          "movedFrames": 58,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 15,
+          "p95FrameMs": 17,
+          "frames": 78,
+          "movedFrames": 59,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I10-4-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I50-0",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 265,
+      "updateMs": 136,
+      "destroyMs": 6,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16,
+          "p95FrameMs": 31,
+          "frames": 68,
+          "movedFrames": 53,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 1
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16,
+          "p95FrameMs": 30,
+          "frames": 69,
+          "movedFrames": 51,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-0-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I50-1",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 268,
+      "updateMs": 130,
+      "destroyMs": 4,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16,
+          "p95FrameMs": 36,
+          "frames": 65,
+          "movedFrames": 50,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 4
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16,
+          "p95FrameMs": 30,
+          "frames": 71,
+          "movedFrames": 56,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 2
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-1-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I50-2",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 248,
+      "updateMs": 178,
+      "destroyMs": 6,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16,
+          "p95FrameMs": 31,
+          "frames": 70,
+          "movedFrames": 53,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 1
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16,
+          "p95FrameMs": 30,
+          "frames": 72,
+          "movedFrames": 56,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-2-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I50-3",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 254,
+      "updateMs": 123,
+      "destroyMs": 4,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16,
+          "p95FrameMs": 31,
+          "frames": 71,
+          "movedFrames": 52,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 0
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16,
+          "p95FrameMs": 31,
+          "frames": 71,
+          "movedFrames": 53,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 1
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-3-webkit.metrics.json"
+    },
+    {
+      "engine": "webkit",
+      "id": "PERF-100-I50-4",
+      "count": 100,
+      "instances": 50,
+      "constructorMs": 242,
+      "updateMs": 135,
+      "destroyMs": 6,
+      "timedInstanceCount": 50,
+      "phases": [
+        {
+          "subscribed": false,
+          "p50FrameMs": 16,
+          "p95FrameMs": 30,
+          "frames": 68,
+          "movedFrames": 51,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 1
+        },
+        {
+          "subscribed": true,
+          "p50FrameMs": 16,
+          "p95FrameMs": 31,
+          "frames": 73,
+          "movedFrames": 55,
+          "longTaskSupported": false,
+          "longTasks": [],
+          "styleWrites": 15,
+          "domWrites": 40,
+          "framesOver34ms": 1
+        }
+      ],
+      "instrumentation": "Constructor/update/destroy are synchronous bulk-call timings for timedInstanceCount after fixture warmup; root cloning precedes constructor timing. RAF/computed-style and root MutationObserver samples affect frame timing. Style/DOM writes cover the primary root only. No universal FPS gate is inferred.",
+      "rawMetrics": "D:\\projects\\tvist\\.tmp\\audit\\2026-10-31T21-54-54-421Z-performance-all-c02b98f9\\PERF-100-I50-4-webkit.metrics.json"
+    }
+  ],
+  "scope": "Separate idle campaign after fixture warmup; synchronous bulk API-call timings, not paint completion. 5 repeats per engine/count/instance configuration. Frame p95 here averages 10 per-phase p95 values, not a pooled percentile. Root MutationObserver and computed-style RAF sampling add overhead; extra peers can be offscreen, all receive movement. No universal FPS or heap guarantee."
+}

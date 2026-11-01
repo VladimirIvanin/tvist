@@ -1,0 +1,530 @@
+{
+  "started": "2026-10-31T19:59:15.239Z",
+  "node": "v22.23.1",
+  "platform": "win32",
+  "commit": "dea54d579239cd29224303c90646f00b577ec41c",
+  "runDir": ".tmp/audit/package-2026-10-31T19-59-15-232Z",
+  "sourceFiles": [
+    {
+      "path": "LICENSE",
+      "sha256": "221e76b455c2a0f7b0d0576c26ed7fd3a232a3a984d8fa92469e2cb87fb4ff54"
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "831fc58e06b42f0ed12b5eefce5050ffed9508c82519a5a7182d44089d0e6c24"
+    },
+    {
+      "path": "package.json",
+      "sha256": "dfba0d9974f9c362445cfbf83f3e9ced5b0ca7e2797b0ef85dd332785210d9f4"
+    },
+    {
+      "path": "README.md",
+      "sha256": "f688f124303f237b3ac2082af18706a6aa989db7fd9ec6ab5e6a322172f75f55"
+    },
+    {
+      "path": "scripts/check-browser-size.ts",
+      "sha256": "ad02a0d357b97d24e91c3fa0194d742837dae63550fb21c4f8d1c7eb71b7a075"
+    },
+    {
+      "path": "src/core/Animator.ts",
+      "sha256": "e1adfe433500b22d8898f9f4d02b2567071653b3cdd6a447f7a4f2dc2aca4398"
+    },
+    {
+      "path": "src/core/constants.ts",
+      "sha256": "a7c5102579df803f89abc8956404c91ce4f0c8cc08fa51824e9e9f71b0853c8b"
+    },
+    {
+      "path": "src/core/Counter.ts",
+      "sha256": "4f49cab0f83e9ea714188b4ed07dcf1d8f7a0d08e398e1ff62b6b69662a40955"
+    },
+    {
+      "path": "src/core/Engine.ts",
+      "sha256": "69adc87026ab326ec7d3c90764a123d30cfc91cec0988c20839137142f1c65d2"
+    },
+    {
+      "path": "src/core/engine/Layout.ts",
+      "sha256": "9679dbe9e73cc8b76bfd317dba35c436016b9bc78c7095a3ebb2fe42f4511e15"
+    },
+    {
+      "path": "src/core/engine/Motion.ts",
+      "sha256": "1f2f38e0fe164ed905319e3fd7a575fd7342662624e20f3e1cfbd469db0142fd"
+    },
+    {
+      "path": "src/core/EventEmitter.ts",
+      "sha256": "f494cab2a82aa5e3debd6f6a7fdb17af07dd0e695946a85a21aabd99d08307d9"
+    },
+    {
+      "path": "src/core/runtime.ts",
+      "sha256": "c1945834ccd6bdad9dea94ee711f3bb7687d30baf251ade6c707c62edffb3511"
+    },
+    {
+      "path": "src/core/Tvist.ts",
+      "sha256": "abe489b53107890162605bb731998c2ae955168fca28652bd3c8469d68c01949"
+    },
+    {
+      "path": "src/core/tvistSlides.ts",
+      "sha256": "e3e47ed247b56179583bda8ad17e1a4a01922cbeb6a93e459480580db798080c"
+    },
+    {
+      "path": "src/core/types.ts",
+      "sha256": "0ac6353d60a8da84e483bf5ed61b4fa696db2e54b61bcd2a267971e07222736d"
+    },
+    {
+      "path": "src/core/Vector1D.ts",
+      "sha256": "127682934a91a60cb6956827ccf7ec600df7a5c0b3c8a3d7c39bc8ab25f3ae34"
+    },
+    {
+      "path": "src/index.browser-full.ts",
+      "sha256": "3f3cca958f4cedd9f08fb43085460b69417bcc252b7defc755decba8e3bcd736"
+    },
+    {
+      "path": "src/index.ts",
+      "sha256": "4a2e1042651ba9c3dd84862d3571df57aeffbc87ac64dc229bf8eadc18bc5175"
+    },
+    {
+      "path": "src/modules/autoplay/AutoplayModule.ts",
+      "sha256": "6e2fc93bee90881afc81237f50b1b399fc2e3f66243eb0e3596d8dc70b89d855"
+    },
+    {
+      "path": "src/modules/autoplay/index.ts",
+      "sha256": "746e5d2c2bbed51dec778f5ba91cfb8d3d22edfa76c7dc0643159d495a013552"
+    },
+    {
+      "path": "src/modules/breakpoints/BreakpointsModule.ts",
+      "sha256": "b69e93ef967466212111222967a6f5b49a9161387f9bd44e791bc1a8cd7b4c79"
+    },
+    {
+      "path": "src/modules/breakpoints/index.ts",
+      "sha256": "ea5ea3df58b2e7b84e8f36b668f1f1d8fe9c52dff0be9dd6e8f06afdba7733b9"
+    },
+    {
+      "path": "src/modules/builtins.ts",
+      "sha256": "8488b0a979aa28a051cae35ccd3edf810275b6820e035058ef1df17d29d2d559"
+    },
+    {
+      "path": "src/modules/Component.ts",
+      "sha256": "86d396a760abf14dc35c49e8d4a8c2fb1ea0767fee52c1fe15c927de00288cda"
+    },
+    {
+      "path": "src/modules/drag/DragModule.ts",
+      "sha256": "1cac7e7d3fcf8d3583fc5c8fd69c2ca2ad743931dad75b921f240d8568d4519a"
+    },
+    {
+      "path": "src/modules/drag/index.ts",
+      "sha256": "3cab27307cc99d82285139b3f33c06d4efddf28750cd56d26d9dbded4dabd8e9"
+    },
+    {
+      "path": "src/modules/effects/cube.ts",
+      "sha256": "034ea2f8e3da10a0e98e5d1df0f40418b78ad315f626571eaa190d580c2863ed"
+    },
+    {
+      "path": "src/modules/effects/cubeSlideInRange.ts",
+      "sha256": "44302eb8686d497b82e4a8577c6f3e67a77f401c6a9867cf43326f6510eada6e"
+    },
+    {
+      "path": "src/modules/effects/EffectModule.ts",
+      "sha256": "b4d632ee8af338afafb522fa50304dff9981a6925bebd123d30116ef1dd444a1"
+    },
+    {
+      "path": "src/modules/effects/fade.ts",
+      "sha256": "cc3e9a22f49a16be41ccb872ba09b786f79172896ff543e389436aa58f3471a4"
+    },
+    {
+      "path": "src/modules/effects/index.ts",
+      "sha256": "a37443c17a562288b845958130de06ad8e0d24e3cd5cb14fb5724afdbd336dbe"
+    },
+    {
+      "path": "src/modules/grid/GridModule.ts",
+      "sha256": "64363a721d87980826c00a9390444a75c3bfc9a211264982c132e7bcb3c84024"
+    },
+    {
+      "path": "src/modules/grid/index.ts",
+      "sha256": "2a2239e48611f1899faa3d4bdeedc5b1675a49fc066a30dcf17d2082fec245cf"
+    },
+    {
+      "path": "src/modules/index.ts",
+      "sha256": "60d8775214c9dbbb13bc30d065a045cbc85b39d7d666bd9f8f39cdf8189bfb6c"
+    },
+    {
+      "path": "src/modules/lazyload/index.ts",
+      "sha256": "1c3df71346a01684e2f29176a8ed8152176c70bd347083679cba1eb352200960"
+    },
+    {
+      "path": "src/modules/lazyload/LazyLoadModule.ts",
+      "sha256": "a2e3379418a17117b9c842eb060ef8a281ddcdea0e6047dd4cfe5d4dd432f69e"
+    },
+    {
+      "path": "src/modules/lazyload/README.md",
+      "sha256": "6d08dcf312f772e7b5083403ba52ef16b46608f313cb6f475de187bda7dbbf35"
+    },
+    {
+      "path": "src/modules/loop/index.ts",
+      "sha256": "bf69f87cf56bc71021631e9c21fb1f6fbe30af272a9b7af188579034b1e5d4cc"
+    },
+    {
+      "path": "src/modules/loop/LoopModule.ts",
+      "sha256": "17b6a225dd55010cbfa15c89ebfc45469bda2d40ad59905913376559201ca114"
+    },
+    {
+      "path": "src/modules/marquee/index.ts",
+      "sha256": "4768cef9ca4fc33e4e5637e97e1c3c785a654e7cbaae5d0df8cb3d514e8e70c0"
+    },
+    {
+      "path": "src/modules/marquee/MarqueeModule.ts",
+      "sha256": "cc7dbb2b2e9697cbe4f488b97669b303f786624639a7a5ac55e50f14e1e40ac0"
+    },
+    {
+      "path": "src/modules/navigation/index.ts",
+      "sha256": "d2a3c59cb95a863529562c40856910dcb4b998905a93e8bd0a924e9d2723d160"
+    },
+    {
+      "path": "src/modules/navigation/NavigationModule.ts",
+      "sha256": "573391032eebc05ab9018e784f427441bc777080a88d52b9e5201998dc245c11"
+    },
+    {
+      "path": "src/modules/pagination/index.ts",
+      "sha256": "3b8f9a8dde9761bad004b905fa0f6463a80dfcd39c18d818c2785496b208cfde"
+    },
+    {
+      "path": "src/modules/pagination/PaginationModule.ts",
+      "sha256": "ebeebd7d8fc7ce99c949c084d720d0aef0de8716d60cb8492248c80237abb717"
+    },
+    {
+      "path": "src/modules/scroll-control/index.ts",
+      "sha256": "21a1d38bec678cab42924704d21f77210420bc811c4bcaa8aaf7825da690f84c"
+    },
+    {
+      "path": "src/modules/scroll-control/ScrollControlModule.ts",
+      "sha256": "7f34b84f75c09563f206c1a527f1ac706a5ac5e5bb4d7293eee66a4fa9d285c6"
+    },
+    {
+      "path": "src/modules/scrollbar/index.ts",
+      "sha256": "656d0c06770d61d56cbc9b8e77b2a9249c6d4c9c48d08ade658bb503926fdb6b"
+    },
+    {
+      "path": "src/modules/scrollbar/ScrollbarModule.ts",
+      "sha256": "3398ed334973857e5ec94546451357e0b5541e2f54bf62a52c0bd1aa7b562f21"
+    },
+    {
+      "path": "src/modules/slide-states/index.ts",
+      "sha256": "2a2987bc6fd5d6ecebc857fe34396b155bc4c3bbf3b1332a577f3454c4b2c090"
+    },
+    {
+      "path": "src/modules/slide-states/SlideStatesModule.ts",
+      "sha256": "e466da33a75871e81ad9b4a9bcdcaf8a44f116eb80a8b35cff61aeeefcc58a93"
+    },
+    {
+      "path": "src/modules/thumbs/index.ts",
+      "sha256": "6df97d99d5086efa7c526b4bb030168a78e14a9926c05e5f7204f8ef17bd2d60"
+    },
+    {
+      "path": "src/modules/thumbs/ThumbsModule.ts",
+      "sha256": "8a6e34cb90bce0e2b57a27241bc90e131a96dc2cad732fbfee338d05ed9d90e4"
+    },
+    {
+      "path": "src/modules/video/index.ts",
+      "sha256": "00bf729cd2026cd1d65c0cc51df0187332887dca0079185623fe3c354b815388"
+    },
+    {
+      "path": "src/modules/video/VideoModule.ts",
+      "sha256": "bc80ce2f0528a5503e380d7f411c4c644815e4fa9b0d750b4873c30d35e02283"
+    },
+    {
+      "path": "src/modules/visibility/index.ts",
+      "sha256": "15b04d5bfb81c872ac47f3d174bf9ad30a0df2ad09c650e82aa7b50c5d9ebbb2"
+    },
+    {
+      "path": "src/modules/visibility/VisibilityModule.ts",
+      "sha256": "835347fe0f5987fc5213433a7f3437544557a1a275a339763f1d8128fd7d0d1b"
+    },
+    {
+      "path": "src/styles/core/_base.scss",
+      "sha256": "2daf5ffdfb18cbbb741ca6507b1f8c3239c7260f3ac426985c23ca961f02f11c"
+    },
+    {
+      "path": "src/styles/core/_defaults.scss",
+      "sha256": "de889e3ac164721a9fb20962771b27d13bc60c400d2ae5dd12185efb8ea30fcb"
+    },
+    {
+      "path": "src/styles/core/_variables.scss",
+      "sha256": "7774e627d32603dc46d796afc7bcdf69d5054dd6a97af6f9e9140c59a567b187"
+    },
+    {
+      "path": "src/styles/modules/_cube.scss",
+      "sha256": "8ee10e2a914617b93b0680f014bccbd1f067a2c6b46e496f2ab9989d1ed8d751"
+    },
+    {
+      "path": "src/styles/modules/_grid.scss",
+      "sha256": "6c8bbdf32727b4a61e9cc99c2d596566e776016ac5a3348da763e1374f4afd0a"
+    },
+    {
+      "path": "src/styles/modules/_lazyload.scss",
+      "sha256": "405cefa0c65ae4df7b603244630ae387fc0de1582436799d166ad568fd0025b5"
+    },
+    {
+      "path": "src/styles/modules/_navigation.scss",
+      "sha256": "e96bb92bed7f9372ee51d42d79e58795a560155c14e55d97018982a111bd10b7"
+    },
+    {
+      "path": "src/styles/modules/_pagination.scss",
+      "sha256": "48579f0f1f7cfc61726e6cd14e764cdef28541bfaea5a9b9ef6897901e03d516"
+    },
+    {
+      "path": "src/styles/modules/_scrollbar.scss",
+      "sha256": "84ac0dd294ab1d4a4776c91d5772f212a672de1eb675d100cab85e02fb2c8c2d"
+    },
+    {
+      "path": "src/styles/modules/_thumbs.scss",
+      "sha256": "50213b53e0e77f63e4efb5aa7162a936bcb15927696fc73a6304be9a3edbdcec"
+    },
+    {
+      "path": "src/styles/tvist.core.scss",
+      "sha256": "fee2fc60affb308c7ac3f0cf10b8725ccb174adf3cf85729715ef109bbc61db1"
+    },
+    {
+      "path": "src/styles/tvist.modules.scss",
+      "sha256": "ea01a446d13896722d349b6d7976f9ae9ce9e016997662e6b174949f8f7e2a7d"
+    },
+    {
+      "path": "src/styles/tvist.scss",
+      "sha256": "f34bdee332bb0858b58e1a579fff89a4aeb6ff552c1f5e7abe8f85216c791f62"
+    },
+    {
+      "path": "src/utils/axis.ts",
+      "sha256": "e3fcbc9941a2022992e98ca580d9464caac37fa13ad271f40c266802e7302216"
+    },
+    {
+      "path": "src/utils/breakpoints.ts",
+      "sha256": "0dd40dbd43cc965a1af43523e1c947c59cef039cea72a389044f1715b4dcfb44"
+    },
+    {
+      "path": "src/utils/browser.ts",
+      "sha256": "bd0b7b573a14e45034110fdcc9a67ec5128520158cbf2b043124c67cf9fe0f0f"
+    },
+    {
+      "path": "src/utils/cssLength.ts",
+      "sha256": "809ec885f413d4d2c7b79a2360234158c7a1193393f7ca1db27a79dae564323a"
+    },
+    {
+      "path": "src/utils/dom.ts",
+      "sha256": "65037fa11a69df7ce36a9736db1d490d082b71e83c1857af2198b06968efae3a"
+    },
+    {
+      "path": "src/utils/gridGap.ts",
+      "sha256": "b080fc68c783bd356fb968fe4087240e909f6185df71b4bdb958df7d49b40280"
+    },
+    {
+      "path": "src/utils/index.ts",
+      "sha256": "1875cffdf27ccfa805791e00321eeefb18d39a7aab94e9c222df292e26e96d2f"
+    },
+    {
+      "path": "src/utils/math.ts",
+      "sha256": "669d6dddbfe9d3c33ed1d9671d93025dc33ca9880af07f4588e960387928e9d3"
+    },
+    {
+      "path": "src/utils/nativeLazyImages.ts",
+      "sha256": "1eb1613016e47acab28c4dfaae8974c88375bf683679b4b03c21317f87c7ebfb"
+    },
+    {
+      "path": "src/utils/peek.ts",
+      "sha256": "2877f17659a98d9947d3415144ddb3b6e8656cc9f9dee19dc65f40673d1368c2"
+    },
+    {
+      "path": "src/utils/positions.ts",
+      "sha256": "7d7c2e4686947843325afbf739b13e96d74fa490794e1a8ed9fa7e5756d3e2c2"
+    },
+    {
+      "path": "src/utils/resources.ts",
+      "sha256": "f125704e8b52b00bccbf4c0920e92680dd3078a25d85038488865cc1c1370484"
+    },
+    {
+      "path": "src/utils/slideRealIndex.ts",
+      "sha256": "9a783fb634e26149e3b3781b9b10d9d518b9f8b41ecb1338acf509d369568e73"
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "d69e58c2c38d7101b506a48da81b2d44f5f285b0e0ebfd17cfdf33dd3adf2770"
+    },
+    {
+      "path": "vite.browser.config.ts",
+      "sha256": "862f57e2ffa0385aa8d49ee5fcd4699f5456d789e64de470fe493ddd4d840aa5"
+    },
+    {
+      "path": "vite.config.ts",
+      "sha256": "afa4c90f16df079de90152f6c2f2e4820c44e09517edeea0c17bed9f498e66ae"
+    }
+  ],
+  "packageVersion": "1.20.1",
+  "tarball": ".tmp/audit/package-2026-10-31T19-59-15-232Z/packs/tvist-1.20.1.tgz",
+  "browserHash": "63f82928b9db2be2374e2824c62021aa8b7558d02658b8a2b8f87a421c234550",
+  "note": "Node import checks module evaluation without DOM; no SSR rendering support is claimed. Direct CSS evaluation in Node requires a loader and is reported separately.",
+  "updated": "2026-10-31T20:00:57.825Z",
+  "results": [
+    {
+      "id": "PKG-BUILD-TYPES",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 5017,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-BUILD-TYPES.log"
+    },
+    {
+      "id": "PKG-BUILD-ESM-CJS",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 12101,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-BUILD-ESM-CJS.log"
+    },
+    {
+      "id": "PKG-BUILD-UMD",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 11657,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-BUILD-UMD.log"
+    },
+    {
+      "id": "PKG-PACK",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 2426,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-PACK.log"
+    },
+    {
+      "id": "PKG-CONTENTS",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 2,
+      "detail": "220 packed files; tarball SHA256 6a933cb14b5ae657431fc850e963ed8456421b57012c4804363c5dd195a8b144"
+    },
+    {
+      "id": "PKG-CONSUMER-INSTALL",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 8445,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-CONSUMER-INSTALL.log"
+    },
+    {
+      "id": "PKG-INSTALL-ISOLATION",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 2
+    },
+    {
+      "id": "PKG-NODE-ESM-NO-DOM",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 205,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-NODE-ESM-NO-DOM.log"
+    },
+    {
+      "id": "PKG-NODE-CJS-NO-DOM",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 177,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-NODE-CJS-NO-DOM.log"
+    },
+    {
+      "id": "PKG-CSS-EXPORT-RESOLUTION",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 311,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-CSS-EXPORT-RESOLUTION.log"
+    },
+    {
+      "id": "PKG-NATIVE-NODE-CSS",
+      "status": "unsupported",
+      "classification": "native-node-css-needs-loader",
+      "durationMs": 260,
+      "detail": "Node rejects direct .css module evaluation without a loader. Export path resolution passed separately; this is not a Tvist defect.",
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-NATIVE-NODE-CSS.log"
+    },
+    {
+      "id": "PKG-TYPES-NODE16-MTS",
+      "status": "reproduced",
+      "classification": "package-contract",
+      "durationMs": 3709,
+      "detail": "consumer.mts(2,119): error TS7006: Parameter 'index' implicitly has an 'any' type.\r\nconsumer.mts(7,1): error TS2578: Unused '@ts-expect-error' directive.\r\nconsumer.mts(9,1): error TS2578: Unused '@ts-expect-error' directive.\r\nconsumer.mts(11,1): error TS2578: Unused '@ts-expect-error' directive.\r\nnode_modules/tvist/dist/types/index.d.ts(3,82): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.\r\nnode_modules/tvist/dist/types/index.d.ts(4,104): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.\r\nnode_modules/tvist/dist/types/index.d.ts(5,376): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.",
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-TYPES-NODE16-MTS.log"
+    },
+    {
+      "id": "PKG-TYPES-NODE16-CTS",
+      "status": "reproduced",
+      "classification": "package-contract",
+      "durationMs": 3410,
+      "detail": "consumer.cts(1,22): error TS1471: Module 'tvist' cannot be imported using this construct. The specifier only resolves to an ES module, which cannot be imported with 'require'. Use an ECMAScript import instead.\r\nconsumer.cts(4,119): error TS7006: Parameter 'index' implicitly has an 'any' type.\r\nconsumer.cts(9,1): error TS2578: Unused '@ts-expect-error' directive.\r\nconsumer.cts(11,1): error TS2578: Unused '@ts-expect-error' directive.\r\nconsumer.cts(13,1): error TS2578: Unused '@ts-expect-error' directive.\r\nnode_modules/tvist/dist/types/index.d.ts(3,82): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.\r\nnode_modules/tvist/dist/types/index.d.ts(4,104): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.\r\nnode_modules/tvist/dist/types/index.d.ts(5,376): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.",
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-TYPES-NODE16-CTS.log"
+    },
+    {
+      "id": "PKG-TYPES-NODENEXT-MTS",
+      "status": "reproduced",
+      "classification": "package-contract",
+      "durationMs": 3111,
+      "detail": "consumer.mts(2,119): error TS7006: Parameter 'index' implicitly has an 'any' type.\r\nconsumer.mts(7,1): error TS2578: Unused '@ts-expect-error' directive.\r\nconsumer.mts(9,1): error TS2578: Unused '@ts-expect-error' directive.\r\nconsumer.mts(11,1): error TS2578: Unused '@ts-expect-error' directive.\r\nnode_modules/tvist/dist/types/index.d.ts(3,82): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.\r\nnode_modules/tvist/dist/types/index.d.ts(4,104): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.\r\nnode_modules/tvist/dist/types/index.d.ts(5,376): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.",
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-TYPES-NODENEXT-MTS.log"
+    },
+    {
+      "id": "PKG-TYPES-NODENEXT-CTS",
+      "status": "reproduced",
+      "classification": "package-contract",
+      "durationMs": 3207,
+      "detail": "consumer.cts(4,119): error TS7006: Parameter 'index' implicitly has an 'any' type.\r\nconsumer.cts(9,1): error TS2578: Unused '@ts-expect-error' directive.\r\nconsumer.cts(11,1): error TS2578: Unused '@ts-expect-error' directive.\r\nconsumer.cts(13,1): error TS2578: Unused '@ts-expect-error' directive.\r\nnode_modules/tvist/dist/types/index.d.ts(3,82): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.\r\nnode_modules/tvist/dist/types/index.d.ts(4,104): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.\r\nnode_modules/tvist/dist/types/index.d.ts(5,376): error TS2834: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Consider adding an extension to the import path.",
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-TYPES-NODENEXT-CTS.log"
+    },
+    {
+      "id": "PKG-TYPES-BUNDLER-MTS",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 2947,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/PKG-TYPES-BUNDLER-MTS.log"
+    },
+    {
+      "id": "PKG-UMD-SIZE-GZIP-HASH",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 3,
+      "detail": "{\"bytes\":93836,\"gzip\":30827,\"sha256\":\"63f82928b9db2be2374e2824c62021aa8b7558d02658b8a2b8f87a421c234550\"}"
+    },
+    {
+      "id": "DOCS-METADATA",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 2375,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/DOCS-METADATA.log"
+    },
+    {
+      "id": "DOCS-GENERATE",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 5733,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/DOCS-GENERATE.log"
+    },
+    {
+      "id": "DOCS-TYPES",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 5736,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/DOCS-TYPES.log"
+    },
+    {
+      "id": "DOCS-BUILD",
+      "status": "pass",
+      "classification": "package-contract",
+      "durationMs": 4554,
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/DOCS-BUILD.log"
+    },
+    {
+      "id": "DOCS-EXTERNAL-ASSETS",
+      "status": "unsupported",
+      "classification": "external-network-excluded",
+      "durationMs": 0,
+      "detail": "Copied tests use an empty Google Fonts stylesheet and deterministic external image placeholders; other external requests are blocked. Real CDN delivery, media playback and original font metrics are not validated. Built local documentation scripts/styles and all existing test assertions remain unchanged."
+    },
+    {
+      "id": "DOCS-PLAYWRIGHT-ALL",
+      "status": "pass",
+      "classification": "documentation-browser-tests",
+      "durationMs": 25044,
+      "detail": "{\"startTime\":\"2026-10-31T20:00:34.402Z\",\"duration\":23350.12,\"expected\":23,\"skipped\":0,\"unexpected\":0,\"flaky\":0}",
+      "artifact": ".tmp/audit/package-2026-10-31T19-59-15-232Z/docs-playwright-results.json"
+    }
+  ]
+}

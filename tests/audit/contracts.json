@@ -1,0 +1,2330 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "TypeScript AST extraction from src/core/types.ts, src/core/Tvist.ts and src/modules/builtins.ts; explicitly reviewed case mapping",
+  "sourceCommit": "dea54d579239cd29224303c90646f00b577ec41c",
+  "sourceHashes": {
+    "src/core/types.ts": "0ac6353d60a8da84e483bf5ed61b4fa696db2e54b61bcd2a267971e07222736d",
+    "src/core/Tvist.ts": "abe489b53107890162605bb731998c2ae955168fca28652bd3c8469d68c01949",
+    "src/modules/builtins.ts": "8488b0a979aa28a051cae35ccd3edf810275b6820e035058ef1df17d29d2d559"
+  },
+  "mappingSemantics": "mapped means a named executable case asserts part of this contract, not complete coverage. uncovered and contract-gap are deliberate visible exclusions. Matrix participation is not semantic coverage. This file describes the new audit, not the pre-existing unit/integration suite.",
+  "counts": {
+    "options": 53,
+    "builtins": 16,
+    "publicAPI": 36,
+    "events": 35,
+    "controlAPIs": 27
+  },
+  "options": [
+    {
+      "name": "perPage",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 374,
+      "type": "number",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G01",
+        "G06",
+        "G18"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Количество слайдов на странице (видимых одновременно).\r\n   * @default 1\r\n   */"
+    },
+    {
+      "name": "slidesPerGroup",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 380,
+      "type": "number",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G05"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Количество слайдов, пролистываемых за один раз.\r\n   * @default 1\r\n   */"
+    },
+    {
+      "name": "autoWidth",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 387,
+      "type": "boolean",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G07",
+        "G08"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Если true, ширина слайдов определяется их содержимым (не задаётся слайдером).\r\n   * Рекомендуется perPage: 1.\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "autoHeight",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 394,
+      "type": "boolean",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G09"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Если true, высота слайдов определяется их содержимым (для вертикального направления).\r\n   * Рекомендуется perPage: 1.\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "fixedWidth",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 402,
+      "type": "number | string",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G12"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Фиксированная ширина слайда (px или CSS, например `'12rem'`, `'30%'`).\r\n   * Для горизонтального направления: число видимых слайдов считается по ширине контейнера,\r\n   * опция `perPage` перезаписывается при каждом пересчёте и не задаёт ширину слайда.\r\n   * Для вертикального направления задаёт только ширину слайда (высота — как без этой опции).\r\n   */"
+    },
+    {
+      "name": "fixedHeight",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 410,
+      "type": "number | string",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "Present in matrix domain but not a targeted semantic case; do not call that coverage.",
+      "documentation": "/**\r\n   * Фиксированная высота слайда (px или CSS).\r\n   * Для вертикального направления: число видимых рядов считается по высоте контейнера,\r\n   * `perPage` перезаписывается при пересчёте.\r\n   * Для горизонтального направления задаёт только высоту слайда.\r\n   */"
+    },
+    {
+      "name": "slideMinSize",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 416,
+      "type": "number",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "Present in matrix domain but not a targeted semantic case.",
+      "documentation": "/**\r\n   * Минимальный размер слайда (ширина или высота) для автоматического расчета perPage\r\n   * @default undefined\r\n   */"
+    },
+    {
+      "name": "gap",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 423,
+      "type": "number | string",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G10",
+        "G11",
+        "G15"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Расстояние между слайдами: число (px) или CSS-строка (например `'1rem'`, `'12px'`).\r\n   * Строковые значения измеряются в DOM относительно трека слайдера.\r\n   * @default 0\r\n   */"
+    },
+    {
+      "name": "roundLengths",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 431,
+      "type": "boolean",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G15"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Округлять translate и размеры до целых пикселей при применении в DOM.\r\n   * Помогает убрать субпиксельные щели/мыло на некоторых DPR и браузерах.\r\n   * Аналогично `roundLengths` в Swiper.\r\n   * @default true\r\n   */"
+    },
+    {
+      "name": "peek",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 443,
+      "type": "| number\r\n    | string\r\n    | {\r\n        left?: number | string;\r\n        right?: number | string;\r\n      }\r\n    | {\r\n        top?: number | string;\r\n        bottom?: number | string;\r\n      }",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G13",
+        "G17"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Peek — отступы, показывающие часть соседних слайдов (чтобы было видно, что есть ещё слайды).\r\n   * Для горизонтального слайдера: left/right, для вертикального: top/bottom.\r\n   * @default undefined\r\n   * @example\r\n   * peek: 10\r\n   * peek: '1rem'\r\n   * peek: { left: 10, right: 20 }\r\n   * peek: { top: 10, bottom: 20 }\r\n   */"
+    },
+    {
+      "name": "peekTrim",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 460,
+      "type": "boolean",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G13"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Peek trim: при true (по умолчанию) концовка прижимается к краю — последний слайд без дыры справа/снизу.\r\n   * При включённом loop не применяется.\r\n   * @default true\r\n   */"
+    },
+    {
+      "name": "speed",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 466,
+      "type": "number",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G16",
+        "G23"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Скорость анимации перехода в миллисекундах\r\n   * @default 300\r\n   */"
+    },
+    {
+      "name": "navThrottleMs",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 474,
+      "type": "number",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "Existing regression tests are outside this new audit map; add a focused throttle oracle.",
+      "documentation": "/**\r\n   * Минимальный интервал (мс) между вызовами next()/prev().\r\n   * В loop повторные шаги в том же направлении игнорируются до завершения перехода.\r\n   * Полезно при speed: 0 или при серии программных вызовов.\r\n   * @default 0\r\n   */"
+    },
+    {
+      "name": "direction",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 480,
+      "type": "'horizontal' | 'vertical'",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G09",
+        "G11",
+        "G17",
+        "G18"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Направление прокрутки слайдера\r\n   * @default 'horizontal'\r\n   */"
+    },
+    {
+      "name": "center",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 491,
+      "type": "boolean | CenterOptions",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G07",
+        "G13",
+        "G14"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Центрирование слайдов.\r\n   * - `true` — центрирует активный слайд в viewport (режим \"active\").\r\n   * - Объект `{ active?, focus?, justify? }` — тонкая настройка:\r\n   *   - `active: true` — центрирует активный слайд всегда, включая края (аналог `center: true`)\r\n   *   - `focus: true` — центрирует активный слайд, когда возможно; у краёв без пустот (как Splide focus:center)\r\n   *   - `justify: true` — визуально центрирует все слайды когда locked (как `justify-content: center`)\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "debug",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 497,
+      "type": "boolean",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/**\r\n   * Режим отладки: вывод предупреждений в консоль (arrows not found, container not found и т.д.)\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "start",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 505,
+      "type": "number",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "New audit has no targeted initial-index boundary/invalid-index oracle.",
+      "documentation": "/**\r\n   * Индекс начального слайда\r\n   * @default 0\r\n   */"
+    },
+    {
+      "name": "drag",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 513,
+      "type": "boolean | 'free'",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "IN01",
+        "IN02",
+        "IN03",
+        "IN04",
+        "SY04"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Включить перетаскивание слайдов. 'free' - свободная прокрутка без привязки к слайдам\r\n   * @default true\r\n   */"
+    },
+    {
+      "name": "dragSpeed",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 519,
+      "type": "number",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No focused pointer-distance multiplier oracle.",
+      "documentation": "/**\r\n   * Множитель скорости перетаскивания\r\n   * @default 1\r\n   */"
+    },
+    {
+      "name": "rubberband",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 525,
+      "type": "boolean",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No focused edge-resistance oracle.",
+      "documentation": "/**\r\n   * Эффект \"резинки\" при перетаскивании за границы\r\n   * @default true\r\n   */"
+    },
+    {
+      "name": "freeSnap",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 531,
+      "type": "boolean",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No focused snap/momentum oracle in the new browser cases.",
+      "documentation": "/**\r\n   * Привязка к слайдам в free режиме. Если true, после momentum scroll будет snap к ближайшему слайду\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "flickPower",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 538,
+      "type": "number",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No focused velocity/distance contract oracle.",
+      "documentation": "/**\r\n   * Сила инерции (flick power). Множитель скорости при расчёте дистанции\r\n   * momentum scroll и snap после drag в обычном режиме (`drag: true`)\r\n   * @default 600\r\n   */"
+    },
+    {
+      "name": "flickMaxPages",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 545,
+      "type": "number",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No focused short-flick limit oracle.",
+      "documentation": "/**\r\n   * Максимальное количество слайдов для короткого flick в обычном режиме.\r\n   * Длинное перетаскивание может пройти больше слайдов.\r\n   * @default 1\r\n   */"
+    },
+    {
+      "name": "focusableElements",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 551,
+      "type": "string",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "IN07"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * CSS селектор для элементов, которые должны сохранять фокус при перетаскивании\r\n   * @default 'input, textarea, select, [tabindex]'\r\n   */"
+    },
+    {
+      "name": "preventClicks",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 557,
+      "type": "boolean",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "IN06"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Предотвращать клики по слайдам во время перетаскивания\r\n   * @default true\r\n   */"
+    },
+    {
+      "name": "preventClicksPropagation",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 563,
+      "type": "boolean",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "IN06"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Предотвращать распространение событий клика во время анимации\r\n   * @default true\r\n   */"
+    },
+    {
+      "name": "arrows",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 572,
+      "type": "| boolean\r\n    | {\r\n        /** Селектор или элемент для кнопки \"назад\". Может быть вне root — поиск по document */\r\n        prev?: string | HTMLElement;\r\n        /** Селектор или элемент для кнопки \"вперёд\". Может быть вне root */\r\n        next?: string | HTMLElement;\r\n        /** CSS класс для неактивных стрелок. @default Tvist.CLASSES.arrowDisabled */\r\n        disabledClass?: string;\r\n        /** CSS класс для скрытых стрелок. @default Tvist.CLASSES.arrowHidden */\r\n        hiddenClass?: string;\r\n        /** Автоматически добавлять SVG иконки в кнопки навигации. @default true */\r\n        addIcons?: boolean;\r\n        /** Автоматически скрывать стрелки когда всего одна страница (нечего листать). @default true */\r\n        hideWhenSinglePage?: boolean;\r\n      }",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "LC05",
+        "MEDIA-027",
+        "MEDIA-028"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Навигационные стрелки. true — поиск по стандартным классам и создание недостающих кнопок внутри root,\r\n   * объект — кастомная настройка. Созданные кнопки удаляются при отключении опции или destroy().\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "pagination",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 596,
+      "type": "| boolean\r\n    | {\r\n        /** Селектор или элемент контейнера для пагинации. Может быть вне root */\r\n        container?: string | HTMLElement;\r\n        /** Тип пагинации. @default 'bullets' */\r\n        type?: 'bullets' | 'fraction' | 'progress' | 'custom';\r\n        /** Включить клики по буллетам для навигации. @default true */\r\n        clickable?: boolean;\r\n        /** CSS класс для буллета. @default Tvist.CLASSES.bullet */\r\n        bulletClass?: string;\r\n        /** CSS класс для активного буллета. @default Tvist.CLASSES.bulletActive */\r\n        bulletActiveClass?: string;\r\n        /** Функция рендеринга буллета */\r\n        renderBullet?: (index: number, className: string) => string;\r\n        /** Функция рендеринга дробной пагинации */\r\n        renderFraction?: (current: number, total: number) => string;\r\n        /** Функция рендеринга кастомной пагинации */\r\n        renderCustom?: (current: number, total: number) => string;\r\n        /** Автоматически скрывать пагинацию когда всего одна страница (нечего листать). @default true */\r\n        hideWhenSinglePage?: boolean;\r\n\r\n        // Лимит точек\r\n        /**\r\n         * Максимальное количество видимых точек (только для type: 'bullets')\r\n         * Если не указано - показываются все точки\r\n         * @default undefined\r\n         */\r\n        limit?: number;\r\n        /**\r\n         * Стратегия распределения слайдов по точкам при использовании limit\r\n         * - 'even': равномерное распределение - каждая точка представляет равное количество слайдов\r\n         * - 'center': центральное распределение - крайние точки по 1 слайду, остальные группируются в центре\r\n         * @default 'even'\r\n         */\r\n        strategy?: 'even' | 'center';\r\n        /**\r\n         * Стратегия распределения остатка при равномерном делении (только для strategy: 'even')\r\n         * - 'left': остаток добавляется к левым точкам\r\n         * - 'center': остаток добавляется к центральным точкам\r\n         * - 'right': остаток добавляется к правым точкам\r\n         * @default 'center'\r\n         */\r\n        remainderStrategy?: 'left' | 'center' | 'right';\r\n      }",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G05",
+        "G06",
+        "LC01",
+        "LC03",
+        "LC05"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Пагинация. true — буллеты в стандартном контейнере внутри root (создаётся, если отсутствует),\r\n   * объект — кастомная настройка. Созданный контейнер удаляется при отключении опции или destroy().\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "autoplay",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 652,
+      "type": "boolean | number | AutoplayOptions",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "IN05",
+        "MEDIA-001",
+        "MEDIA-002",
+        "MEDIA-003",
+        "MEDIA-004",
+        "MEDIA-009",
+        "MEDIA-010",
+        "MEDIA-011",
+        "MEDIA-012"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Автопрокрутка слайдов.\r\n   * - `false` — выключена (по умолчанию)\r\n   * - `true` — включена с задержкой 3000мс и дефолтными настройками\r\n   * - `number` — включена с указанной задержкой в миллисекундах\r\n   * - `AutoplayOptions` — полный контроль: delay, pauseOnHover, pauseOnFocus, pauseOnInteraction, disableOnInteraction, waitForVideo\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "video",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 663,
+      "type": "boolean | VideoOptions",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-013",
+        "MEDIA-014",
+        "MEDIA-015",
+        "MEDIA-016",
+        "MEDIA-017"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Управление видео внутри слайдов (HTML `<video>` и iframe YouTube/Vimeo).\r\n   * - `false` — выключено (по умолчанию)\r\n   * - `true` — включено с дефолтными настройками\r\n   * - `VideoOptions` — полный контроль\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "holdToPause",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 672,
+      "type": "boolean | HoldToPauseOptions",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "IN05"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Удержание для сценариев историй:\r\n   * - `false` / `undefined` — выключено (по умолчанию)\r\n   * - `true` — включено с дефолтными настройками\r\n   * - `HoldToPauseOptions` — полный контроль\r\n   * @default undefined\r\n   */"
+    },
+    {
+      "name": "visibility",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 683,
+      "type": "boolean | VisibilityOptions",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-005",
+        "MEDIA-006",
+        "MEDIA-007",
+        "MEDIA-008",
+        "MEDIA-025"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Отслеживание видимости слайдера для приостановки autoplay/marquee.\r\n   * - `false` — выключено\r\n   * - `true` — включено с дефолтными настройками (по умолчанию)\r\n   * - `VisibilityOptions` — полный контроль\r\n   * @default true\r\n   */"
+    },
+    {
+      "name": "browserFixes",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 689,
+      "type": "BrowserFixesOptions",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No Firefox decoding=sync contract assertion in the new cases.",
+      "documentation": "/**\r\n   * Специфичные фиксы для браузеров\r\n   * @default { firefoxImageDecoding: true }\r\n   */"
+    },
+    {
+      "name": "loop",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 704,
+      "type": "boolean | 'auto' | LoopOptions",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G01",
+        "G02",
+        "G03",
+        "G04",
+        "G05",
+        "G07",
+        "G15",
+        "G20",
+        "IN08",
+        "SY02",
+        "MEDIA-026"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Бесконечная прокрутка. 'auto' - определяется автоматически на основе количества слайдов.\r\n   *\r\n   * Поддерживаются следующие варианты:\r\n   * - `false` — выключено (по умолчанию)\r\n   * - `true`  — включено (эквивалентно `{ enabled: true, withClones: false }`)\r\n   * - `'auto'` — режим автоопределения (как и раньше)\r\n   * - `LoopOptions` — объект с расширенной конфигурацией\r\n   *\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "rewind",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 711,
+      "type": "boolean",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-012"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Автоматически возвращаться к первому слайду после достижения последнего (работает без loop)\r\n   * Применяется к навигации, autoplay и другим способам перехода между слайдами\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "rewindByDrag",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 717,
+      "type": "boolean",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No focused drag-boundary rewind oracle.",
+      "documentation": "/**\r\n   * Разрешить перемотку карусели перетаскиванием, если включён `rewind`.\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "lazy",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 725,
+      "type": "| boolean\r\n    | {\r\n        /** Количество соседних слайдов для предзагрузки с каждой стороны. @default 1 */\r\n        preloadPrevNext?: number;\r\n      }",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-018",
+        "MEDIA-019",
+        "MEDIA-020",
+        "MEDIA-021",
+        "MEDIA-022",
+        "MEDIA-030"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Ленивая загрузка изображений\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "nativeLazyAdjacent",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 738,
+      "type": "boolean | NativeLazyAdjacentOptions",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G26",
+        "MEDIA-023",
+        "MEDIA-024"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Предзагрузка изображений с нативным `loading=\"lazy\"` у соседних слайдов и/или целевого при переходе.\r\n   * Полезно для `effect: 'cube'`, когда соседняя грань видна до подгрузки браузером.\r\n   * `true` — по умолчанию только при начале перехода; соседи при init — `onInit: true`.\r\n   * @default false (выключено)\r\n   */"
+    },
+    {
+      "name": "effect",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 746,
+      "type": "'slide' | 'fade' | 'cube'",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G16",
+        "G22",
+        "G23"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Эффект перехода между слайдами\r\n   * @default 'slide'\r\n   */"
+    },
+    {
+      "name": "fadeEffect",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 751,
+      "type": "{\r\n    /** Настройка кросс-фейда; в текущей реализации fade не используется. */\r\n    crossFade?: boolean;\r\n  }",
+      "optional": true,
+      "status": "contract-gap",
+      "cases": [],
+      "note": "crossFade is explicitly documented as unused.",
+      "documentation": "/**\r\n   * Настройки fade эффекта\r\n   */"
+    },
+    {
+      "name": "cubeEffect",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 759,
+      "type": "{\r\n    /** Тени на гранях куба. @default true */\r\n    slideShadows?: boolean;\r\n    /** Общая тень куба; в текущей реализации не используется. */\r\n    shadow?: boolean;\r\n    /** Смещение общей тени; в текущей реализации не используется. */\r\n    shadowOffset?: number;\r\n    /** Масштаб общей тени; в текущей реализации не используется. */\r\n    shadowScale?: number;\r\n    /** Расстояние перспективы (px). Меньше = сильнее эффект глубины. @default 800 */\r\n    perspective?: number;\r\n    /** Точка перспективы по Y (%). @default 60 */\r\n    perspectiveOriginY?: number;\r\n    /** Внутренний отступ для предотвращения обрезки вращающихся граней (px). @default 10 */\r\n    viewportPadding?: number;\r\n  }",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "Some shadow options are explicitly unused; perspective/shadow variants are not directly asserted by the new cases.",
+      "documentation": "/**\r\n   * Настройки cube эффекта\r\n   */"
+    },
+    {
+      "name": "thumbs",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 781,
+      "type": "{\r\n    /** Экземпляр слайдера-миниатюр */\r\n    slider: Tvist;\r\n  }",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "SY01"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Связь с thumbnail-слайдером\r\n   */"
+    },
+    {
+      "name": "isNavigation",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 791,
+      "type": "boolean",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "SY01",
+        "SY02",
+        "SY03",
+        "SY04"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Если true, слайдер будет вести себя как навигация (клики по слайдам делают их активными).\r\n   * Используется для создания thumbnail-слайдеров\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "grid",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 799,
+      "type": "{\r\n    /**\r\n     * Количество рядов.\r\n     * Если задан только `cols`, по умолчанию 1 (как splide-extension-grid: rows 1, cols 1).\r\n     * @default 1 при заданном cols\r\n     */\r\n    rows?: number;\r\n    /**\r\n     * Количество колонок.\r\n     * Если задан только `rows`, по умолчанию 1.\r\n     * @default 1 при заданном rows\r\n     */\r\n    cols?: number;\r\n    /**\r\n     * Отступы сетки. Можно задать отдельно для строк и колонок.\r\n     * Если не задано, используется глобальный gap.\r\n     * @default gap\r\n     */\r\n    gap?:\r\n      | {\r\n          /** Отступ между рядами. @default gap */\r\n          row?: number | string;\r\n          /** Отступ между колонками. @default gap */\r\n          col?: number | string;\r\n        }\r\n      | number\r\n      | string;\r\n    /**\r\n     * Размеры ячеек для каждого слайда [colSpan, rowSpan]\r\n     * Массив повторяется, если слайдов больше, чем определений\r\n     * @example [[2, 1], [1, 2]]\r\n     */\r\n    dimensions?: [number, number][];\r\n  }",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G18",
+        "G19",
+        "G20"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Сетка слайдов\r\n   * @default undefined\r\n   */"
+    },
+    {
+      "name": "marquee",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 840,
+      "type": "| boolean\r\n    | {\r\n        /** Скорость прокрутки в пикселях в секунду. @default 50 */\r\n        speed?: number;\r\n        /** Направление прокрутки. @default 'left' для horizontal, 'up' для vertical */\r\n        direction?: 'left' | 'right' | 'up' | 'down';\r\n        /** Пауза при наведении. @default true для marquee: true; undefined для объекта */\r\n        pauseOnHover?: boolean;\r\n      }",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-025"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Режим бегущей строки (непрерывная прокрутка)\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "keyboard",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 857,
+      "type": "| boolean\r\n    | {\r\n        /** Включить управление с клавиатуры */\r\n        enabled?: boolean;\r\n        /** Реагировать только когда слайдер в видимой области */\r\n        onlyInViewport?: boolean;\r\n      }",
+      "optional": true,
+      "status": "contract-gap",
+      "cases": [],
+      "note": "Documented as unimplemented; assess feature gap, do not demand an implementation in this audit.",
+      "documentation": "/**\r\n   * Настройки управления с клавиатуры; в текущей версии обработчики не реализованы.\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "wheel",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 872,
+      "type": "| boolean\r\n    | {\r\n        /** Чувствительность (количество пикселей на тик колёсика). @default 1 */\r\n        sensitivity?: number;\r\n        /** Разрешить прокрутку страницы на краях слайдера. @default true */\r\n        releaseOnEdges?: boolean;\r\n      }",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "CT01",
+        "CT02",
+        "LC05"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Управление колёсиком мыши\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "scrollbar",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 887,
+      "type": "| boolean\r\n    | {\r\n        /** Селектор или элемент для контейнера скроллбара */\r\n        container?: string | HTMLElement;\r\n        /** Автоматически скрывать скроллбар при бездействии. @default false */\r\n        hide?: boolean;\r\n        /** Задержка перед скрытием (мс). @default 1000 */\r\n        hideDelay?: number;\r\n        /** CSS класс для скроллбара. @default Tvist.CLASSES.scrollbar */\r\n        scrollbarClass?: string;\r\n        /** CSS класс для трека скроллбара. @default Tvist.CLASSES.scrollbarTrack */\r\n        trackClass?: string;\r\n        /** CSS класс для ползунка. @default Tvist.CLASSES.scrollbarThumb */\r\n        thumbClass?: string;\r\n        /** Возможность перетаскивания ползунка. @default true */\r\n        draggable?: boolean;\r\n      }",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "CT03",
+        "CT04",
+        "CT05",
+        "LC05"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Кастомный скроллбар для навигации\r\n   * @default false\r\n   */"
+    },
+    {
+      "name": "breakpoints",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 912,
+      "type": "Record<number, Partial<TvistOptions> & { enabled?: boolean }>",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G04",
+        "G24"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Адаптивные настройки по breakpoints. Ключ - ширина экрана в пикселях\r\n   * @default undefined\r\n   */"
+    },
+    {
+      "name": "breakpointsBase",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 918,
+      "type": "'window' | 'container'",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "G04",
+        "G24"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * База для расчёта breakpoints\r\n   * @default 'window'\r\n   */"
+    },
+    {
+      "name": "enabled",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 924,
+      "type": "boolean",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "IN04",
+        "SY03",
+        "G24",
+        "MEDIA-009"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Включить/выключить слайдер. При false слайдер не инициализируется (статичный контент)\r\n   * @default true\r\n   */"
+    },
+    {
+      "name": "syncOnDrag",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 932,
+      "type": "boolean",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "SY04"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Синхронизировать ли слайдеры при перетаскивании (drag).\r\n   * Если false, то при перетаскивании одного слайдера другой не будет переключаться,\r\n   * синхронизация сработает только при клике или переключении стрелками.\r\n   * @default true\r\n   */"
+    },
+    {
+      "name": "on",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 939,
+      "type": "{\r\n    /** После создания слайдера */\r\n    created?: (tvist: Tvist) => void;\r\n    /** Перед уничтожением */\r\n    beforeDestroy?: (tvist: Tvist) => void;\r\n    /** При уничтожении */\r\n    destroyed?: (tvist: Tvist) => void;\r\n    /** Клик по слайду */\r\n    click?: (index: number, slide: HTMLElement, event: MouseEvent) => void;\r\n    /** Вызван update() — пересчитаны размеры/позиции */\r\n    refresh?: () => void;\r\n    /** Завершилось изменение размера контейнера */\r\n    resized?: () => void;\r\n    /** Перед сменой слайда */\r\n    beforeSlideChange?: (index: number) => void;\r\n    /** Начало смены слайда (старт анимации) */\r\n    slideChangeStart?: (index: number, data?: { isDrag?: boolean }) => void;\r\n    /** Смена слайда завершена (после анимации) */\r\n    slideChangeEnd?: (index: number, data?: { isDrag?: boolean }) => void;\r\n    /** Перед началом анимации перехода (для loop fix) */\r\n    beforeTransitionStart?: (data: { index: number; direction: 'next' | 'prev' }) => void;\r\n    /** Начало анимации перехода */\r\n    transitionStart?: (index: number) => void;\r\n    /** Конец анимации перехода */\r\n    transitionEnd?: (index: number) => void;\r\n    /**\r\n     * Слайд вошёл в видимую область (по расчёту движка: пересечение с viewport; для effect cube —\r\n     * та же геометрия граней, что и у эффекта куба).\r\n     * За одну анимацию или кадр событие может прийти для нескольких слайдов (например perPage>1\r\n     * или при кубе — до двух граней, пока идёт переход).\r\n     * Для логики «текущий слайд» используйте slideChangeEnd / activeIndex, а не этот колбэк.\r\n     * В обработчике опирайтесь на аргумент index, а не на activeIndex в момент вызова.\r\n     */\r\n    visible?: (slide: HTMLElement, index: number) => void;\r\n    /** Слайд вышел из видимой области (см. замечания к visible) */\r\n    hidden?: (slide: HTMLElement, index: number) => void;\r\n    /** Во время прокрутки (тики анимации / драг) */\r\n    scroll?: () => void;\r\n    /** Прогресс прокрутки 0..1, только при !loop */\r\n    progress?: (progress: number) => void;\r\n    /** Достигнут первый слайд */\r\n    reachBeginning?: () => void;\r\n    /** Достигнут последний слайд */\r\n    reachEnd?: () => void;\r\n    /** Начало перетаскивания */\r\n    dragStart?: () => void;\r\n    /** Во время перетаскивания */\r\n    drag?: () => void;\r\n    /** Конец перетаскивания */\r\n    dragEnd?: () => void;\r\n    /** Смена breakpoint */\r\n    breakpoint?: (breakpoint: number | null) => void;\r\n    /** Слайдер заблокирован (контент помещается в область) */\r\n    lock?: () => void;\r\n    /** Слайдер разблокирован */\r\n    unlock?: () => void;\r\n    /** Обновлены опции через updateOptions() */\r\n    optionsUpdated?: (tvist: Tvist, newOptions: Partial<TvistOptions>) => void;\r\n    /** Видео загрузило метаданные и готово к воспроизведению */\r\n    videoReady?: (data: VideoEvent) => void;\r\n    /** Видео начало воспроизведение */\r\n    videoPlay?: (data: VideoEvent) => void;\r\n    /** Видео поставлено на паузу */\r\n    videoPause?: (data: VideoEvent) => void;\r\n    /** Видео завершило воспроизведение */\r\n    videoEnded?: (data: VideoEvent) => void;\r\n    /** Прогресс воспроизведения видео (0..1) */\r\n    videoProgress?: (data: VideoProgressEvent) => void;\r\n    /** Прогресс активного сегмента (текущий слайд, 0..1) */\r\n    autoplayProgress?: (data: AutoplayProgressEvent) => void;\r\n    /** Начало long press удержания */\r\n    longPressStart?: (data: { index: number; pointerType: string }) => void;\r\n    /** Конец long press удержания */\r\n    longPressEnd?: (data: { index: number; pointerType: string }) => void;\r\n    /** Слайдер стал видимым */\r\n    sliderVisible?: () => void;\r\n    /** Слайдер скрыт */\r\n    sliderHidden?: () => void;\r\n    /* eslint-disable-next-line @typescript-eslint/no-explicit-any -- event handler args are untyped */\r\n    [key: string]: ((...args: any[]) => void) | undefined;\r\n  }",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "EV03"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Обработчики событий слайдера\r\n   */"
+    }
+  ],
+  "builtins": [
+    {
+      "name": "drag",
+      "factory": "createDragModule",
+      "source": "src/modules/builtins.ts",
+      "line": 21,
+      "status": "mapped",
+      "cases": [
+        "IN01",
+        "IN02",
+        "IN03",
+        "IN04",
+        "IN05",
+        "IN06",
+        "IN07"
+      ]
+    },
+    {
+      "name": "navigation",
+      "factory": "createNavigationModule",
+      "source": "src/modules/builtins.ts",
+      "line": 22,
+      "status": "mapped",
+      "cases": [
+        "LC05",
+        "MEDIA-027",
+        "MEDIA-028"
+      ]
+    },
+    {
+      "name": "pagination",
+      "factory": "createPaginationModule",
+      "source": "src/modules/builtins.ts",
+      "line": 23,
+      "status": "mapped",
+      "cases": [
+        "G05",
+        "G06",
+        "LC01",
+        "LC03",
+        "LC05"
+      ]
+    },
+    {
+      "name": "autoplay",
+      "factory": "createAutoplayModule",
+      "source": "src/modules/builtins.ts",
+      "line": 24,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-001",
+        "MEDIA-002",
+        "MEDIA-003",
+        "MEDIA-004",
+        "MEDIA-009",
+        "MEDIA-010",
+        "MEDIA-011",
+        "MEDIA-012"
+      ]
+    },
+    {
+      "name": "breakpoints",
+      "factory": "createBreakpointsModule",
+      "source": "src/modules/builtins.ts",
+      "line": 25,
+      "status": "mapped",
+      "cases": [
+        "G04",
+        "G24"
+      ]
+    },
+    {
+      "name": "loop",
+      "factory": "createLoopModule",
+      "source": "src/modules/builtins.ts",
+      "line": 26,
+      "status": "mapped",
+      "cases": [
+        "G01",
+        "G02",
+        "G03",
+        "G05",
+        "G07",
+        "G15",
+        "G20",
+        "IN08"
+      ]
+    },
+    {
+      "name": "slide-states",
+      "factory": "createSlideStatesModule",
+      "source": "src/modules/builtins.ts",
+      "line": 27,
+      "status": "mapped",
+      "cases": [
+        "G01",
+        "G20",
+        "G22"
+      ]
+    },
+    {
+      "name": "visibility",
+      "factory": "createVisibilityModule",
+      "source": "src/modules/builtins.ts",
+      "line": 28,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-005",
+        "MEDIA-006",
+        "MEDIA-007",
+        "MEDIA-008"
+      ]
+    },
+    {
+      "name": "thumbs",
+      "factory": "createThumbsModule",
+      "source": "src/modules/builtins.ts",
+      "line": 29,
+      "status": "mapped",
+      "cases": [
+        "SY01",
+        "SY02",
+        "SY03",
+        "SY04"
+      ]
+    },
+    {
+      "name": "effect",
+      "factory": "createEffectModule",
+      "source": "src/modules/builtins.ts",
+      "line": 30,
+      "status": "mapped",
+      "cases": [
+        "G22",
+        "G23"
+      ]
+    },
+    {
+      "name": "grid",
+      "factory": "createGridModule",
+      "source": "src/modules/builtins.ts",
+      "line": 31,
+      "status": "mapped",
+      "cases": [
+        "G18",
+        "G19",
+        "G20"
+      ]
+    },
+    {
+      "name": "scroll-control",
+      "factory": "createScrollControlModule",
+      "source": "src/modules/builtins.ts",
+      "line": 32,
+      "status": "mapped",
+      "cases": [
+        "CT01",
+        "CT02"
+      ]
+    },
+    {
+      "name": "scrollbar",
+      "factory": "createScrollbarModule",
+      "source": "src/modules/builtins.ts",
+      "line": 33,
+      "status": "mapped",
+      "cases": [
+        "CT03",
+        "CT04",
+        "CT05"
+      ]
+    },
+    {
+      "name": "marquee",
+      "factory": "createMarqueeModule",
+      "source": "src/modules/builtins.ts",
+      "line": 34,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-025"
+      ]
+    },
+    {
+      "name": "lazyload",
+      "factory": "createLazyLoadModule",
+      "source": "src/modules/builtins.ts",
+      "line": 35,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-018",
+        "MEDIA-019",
+        "MEDIA-020",
+        "MEDIA-021",
+        "MEDIA-022",
+        "MEDIA-030"
+      ]
+    },
+    {
+      "name": "video",
+      "factory": "createVideoModule",
+      "source": "src/modules/builtins.ts",
+      "line": 36,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-013",
+        "MEDIA-014",
+        "MEDIA-015",
+        "MEDIA-016",
+        "MEDIA-017"
+      ]
+    }
+  ],
+  "publicAPI": [
+    {
+      "name": "VERSION",
+      "kind": "property",
+      "source": "src/core/Tvist.ts",
+      "line": 22,
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Library version. */"
+    },
+    {
+      "name": "CLASSES",
+      "kind": "property",
+      "source": "src/core/Tvist.ts",
+      "line": 24,
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** BEM class names. */"
+    },
+    {
+      "name": "CSS_PREFIX",
+      "kind": "property",
+      "source": "src/core/Tvist.ts",
+      "line": 26,
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** @deprecated Use Tvist.CLASSES.block. */"
+    },
+    {
+      "name": "constructor",
+      "kind": "constructor",
+      "source": "src/core/Tvist.ts",
+      "line": 28,
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "LC04"
+      ],
+      "documentation": "/** Mount a complete slider on an element or selector. */"
+    },
+    {
+      "name": "id",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 32,
+      "type": "string",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Уникальный идентификатор экземпляра. */"
+    },
+    {
+      "name": "root",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 36,
+      "type": "HTMLElement",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "LC04"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Корневой элемент слайдера. */"
+    },
+    {
+      "name": "track",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 40,
+      "type": "HTMLElement",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G10"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Элемент viewport, обрезающий видимую область. */"
+    },
+    {
+      "name": "container",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 44,
+      "type": "HTMLElement",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G16"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Контейнер слайдов, к которому применяется transform. */"
+    },
+    {
+      "name": "options",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 48,
+      "type": "TvistOptions",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G04",
+        "G08"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Текущая конфигурация. Для изменения используйте updateOptions(). */"
+    },
+    {
+      "name": "next",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 55,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G05",
+        "LC05"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Следующий слайд (или страница при perPage > 1)\r\n   */"
+    },
+    {
+      "name": "prev",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 62,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G05",
+        "G07"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Предыдущий слайд (или страница при perPage > 1)\r\n   */"
+    },
+    {
+      "name": "scrollTo",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 71,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G06",
+        "G13",
+        "IN08"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Переход к слайду по индексу\r\n   * @param index - логический индекс слайда (realIndex)\r\n   * @param instant - мгновенный переход без анимации\r\n   */"
+    },
+    {
+      "name": "update",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 78,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G12",
+        "LC01",
+        "LC02",
+        "LC03"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Обновить размеры и пересчитать позиции\r\n   */"
+    },
+    {
+      "name": "updateOptions",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 86,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G03",
+        "G08",
+        "CT04",
+        "CT05",
+        "EV03"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Обновить опции слайдера динамически (без пересоздания)\r\n   * @param newOptions - новые опции для применения\r\n   */"
+    },
+    {
+      "name": "disable",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 94,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "IN04",
+        "SY03"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Отключить слайдер (превратить в статичный контент)\r\n   * Убирает transform, отключает модули, но сохраняет экземпляр\r\n   */"
+    },
+    {
+      "name": "enable",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 101,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "IN04",
+        "SY03"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Включить слайдер (восстановить функциональность)\r\n   */"
+    },
+    {
+      "name": "isEnabled",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 108,
+      "type": "boolean",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "IN04"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Проверить, включен ли слайдер\r\n   */"
+    },
+    {
+      "name": "destroy",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 116,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "LC04",
+        "EV02",
+        "SY05"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Уничтожить экземпляр и очистить ресурсы.\r\n   * Вложенные Tvist по умолчанию **не** уничтожаются — задайте `{ destroyNested: true }`, если нужно снести всё поддерево.\r\n   * Повторный вызов безопасен (no-op).\r\n   */"
+    },
+    {
+      "name": "slides",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 123,
+      "type": "HTMLElement[]",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "LC01",
+        "LC02",
+        "LC03"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Получить список слайдов\r\n   */"
+    },
+    {
+      "name": "originalSlideCount",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 130,
+      "type": "number",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G01",
+        "G20"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Количество оригинальных слайдов (без клонов).\r\n   * В режиме loop.withClones не учитывает клонированные слайды по краям.\r\n   */"
+    },
+    {
+      "name": "slideCount",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 138,
+      "type": "number",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "LC01",
+        "LC02",
+        "LC03"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Общее количество слайдов в DOM (включая клоны).\r\n   * В режиме loop.withClones включает клонированные слайды по краям.\r\n   * Совпадает с originalSlideCount если loop.withClones не используется.\r\n   */"
+    },
+    {
+      "name": "activeIndex",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 144,
+      "type": "number",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G01",
+        "IN08"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Получить текущий индекс активного слайда\r\n   */"
+    },
+    {
+      "name": "realIndex",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 150,
+      "type": "number",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G05",
+        "IN08",
+        "SY04"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Получить текущий логический индекс слайда (с учётом loop)\r\n   */"
+    },
+    {
+      "name": "canScrollNext",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 156,
+      "type": "boolean",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G25"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Проверить, можно ли листать вперёд\r\n   */"
+    },
+    {
+      "name": "canScrollPrev",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 162,
+      "type": "boolean",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "G25"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Проверить, можно ли листать назад\r\n   */"
+    },
+    {
+      "name": "autoplay",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 168,
+      "type": "AutoplayControls | undefined",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "IN05",
+        "MEDIA-001",
+        "MEDIA-002",
+        "MEDIA-006"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Получить публичное API autoplay модуля\r\n   */"
+    },
+    {
+      "name": "video",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 174,
+      "type": "VideoControls | undefined",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-015"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Получить публичное API video модуля\r\n   */"
+    },
+    {
+      "name": "on",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 182,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "IN08",
+        "EV02",
+        "EV03"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Подписаться на событие\r\n   */"
+    },
+    {
+      "name": "off",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 190,
+      "type": "this",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/**\r\n   * Отписаться от события\r\n   */"
+    },
+    {
+      "name": "emit",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 198,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "EV01"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Вызвать событие\r\n   */"
+    },
+    {
+      "name": "once",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 206,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "EV01"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Подписаться на событие один раз\r\n   */"
+    },
+    {
+      "name": "sync",
+      "kind": "method",
+      "source": "src/core/Tvist.ts",
+      "line": 214,
+      "type": "this",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "SY02",
+        "SY03",
+        "SY04"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/**\r\n   * Синхронизация с другим экземпляром Tvist\r\n   * @param target - целевой экземпляр для синхронизации\r\n   */"
+    },
+    {
+      "name": "marquee",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 219,
+      "type": "MarqueeControls | undefined",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-025"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Continuous motion controls, when enabled. */"
+    },
+    {
+      "name": "lazyload",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 227,
+      "type": "LazyloadControls | undefined",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-019",
+        "MEDIA-020"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Explicit lazy image loading, when enabled. */"
+    },
+    {
+      "name": "visibility",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 237,
+      "type": "VisibilityControls | undefined",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-005",
+        "MEDIA-006",
+        "MEDIA-007"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Visibility controls, when enabled. */"
+    },
+    {
+      "name": "currentBreakpoint",
+      "kind": "getter",
+      "source": "src/core/Tvist.ts",
+      "line": 245,
+      "type": "number | null",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Matching breakpoint, or null when no breakpoint applies. */"
+    }
+  ],
+  "events": [
+    {
+      "name": "created",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 941,
+      "type": "(tvist: Tvist) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** После создания слайдера */"
+    },
+    {
+      "name": "beforeDestroy",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 943,
+      "type": "(tvist: Tvist) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Перед уничтожением */"
+    },
+    {
+      "name": "destroyed",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 945,
+      "type": "(tvist: Tvist) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** При уничтожении */"
+    },
+    {
+      "name": "click",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 947,
+      "type": "(index: number, slide: HTMLElement, event: MouseEvent) => void",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "IN08"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Клик по слайду */"
+    },
+    {
+      "name": "refresh",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 949,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Вызван update() — пересчитаны размеры/позиции */"
+    },
+    {
+      "name": "resized",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 951,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Завершилось изменение размера контейнера */"
+    },
+    {
+      "name": "beforeSlideChange",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 953,
+      "type": "(index: number) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Перед сменой слайда */"
+    },
+    {
+      "name": "slideChangeStart",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 955,
+      "type": "(index: number, data?: { isDrag?: boolean }) => void",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "LC05",
+        "EV02",
+        "EV03"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Начало смены слайда (старт анимации) */"
+    },
+    {
+      "name": "slideChangeEnd",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 957,
+      "type": "(index: number, data?: { isDrag?: boolean }) => void",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "EV02",
+        "MEDIA-011"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Смена слайда завершена (после анимации) */"
+    },
+    {
+      "name": "beforeTransitionStart",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 959,
+      "type": "(data: { index: number; direction: 'next' | 'prev' }) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Перед началом анимации перехода (для loop fix) */"
+    },
+    {
+      "name": "transitionStart",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 961,
+      "type": "(index: number) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Начало анимации перехода */"
+    },
+    {
+      "name": "transitionEnd",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 963,
+      "type": "(index: number) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Конец анимации перехода */"
+    },
+    {
+      "name": "visible",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 972,
+      "type": "(slide: HTMLElement, index: number) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/**\r\n     * Слайд вошёл в видимую область (по расчёту движка: пересечение с viewport; для effect cube —\r\n     * та же геометрия граней, что и у эффекта куба).\r\n     * За одну анимацию или кадр событие может прийти для нескольких слайдов (например perPage>1\r\n     * или при кубе — до двух граней, пока идёт переход).\r\n     * Для логики «текущий слайд» используйте slideChangeEnd / activeIndex, а не этот колбэк.\r\n     * В обработчике опирайтесь на аргумент index, а не на activeIndex в момент вызова.\r\n     */"
+    },
+    {
+      "name": "hidden",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 974,
+      "type": "(slide: HTMLElement, index: number) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Слайд вышел из видимой области (см. замечания к visible) */"
+    },
+    {
+      "name": "scroll",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 976,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Во время прокрутки (тики анимации / драг) */"
+    },
+    {
+      "name": "progress",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 978,
+      "type": "(progress: number) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Прогресс прокрутки 0..1, только при !loop */"
+    },
+    {
+      "name": "reachBeginning",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 980,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Достигнут первый слайд */"
+    },
+    {
+      "name": "reachEnd",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 982,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Достигнут последний слайд */"
+    },
+    {
+      "name": "dragStart",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 984,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Начало перетаскивания */"
+    },
+    {
+      "name": "drag",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 986,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Во время перетаскивания */"
+    },
+    {
+      "name": "dragEnd",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 988,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Конец перетаскивания */"
+    },
+    {
+      "name": "breakpoint",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 990,
+      "type": "(breakpoint: number | null) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Смена breakpoint */"
+    },
+    {
+      "name": "lock",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 992,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Слайдер заблокирован (контент помещается в область) */"
+    },
+    {
+      "name": "unlock",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 994,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Слайдер разблокирован */"
+    },
+    {
+      "name": "optionsUpdated",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 996,
+      "type": "(tvist: Tvist, newOptions: Partial<TvistOptions>) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Обновлены опции через updateOptions() */"
+    },
+    {
+      "name": "videoReady",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 998,
+      "type": "(data: VideoEvent) => void",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-017"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Видео загрузило метаданные и готово к воспроизведению */"
+    },
+    {
+      "name": "videoPlay",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 1000,
+      "type": "(data: VideoEvent) => void",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-017"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Видео начало воспроизведение */"
+    },
+    {
+      "name": "videoPause",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 1002,
+      "type": "(data: VideoEvent) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Видео поставлено на паузу */"
+    },
+    {
+      "name": "videoEnded",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 1004,
+      "type": "(data: VideoEvent) => void",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-017"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Видео завершило воспроизведение */"
+    },
+    {
+      "name": "videoProgress",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 1006,
+      "type": "(data: VideoProgressEvent) => void",
+      "optional": true,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-017"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Прогресс воспроизведения видео (0..1) */"
+    },
+    {
+      "name": "autoplayProgress",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 1008,
+      "type": "(data: AutoplayProgressEvent) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Прогресс активного сегмента (текущий слайд, 0..1) */"
+    },
+    {
+      "name": "longPressStart",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 1010,
+      "type": "(data: { index: number; pointerType: string }) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Начало long press удержания */"
+    },
+    {
+      "name": "longPressEnd",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 1012,
+      "type": "(data: { index: number; pointerType: string }) => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Конец long press удержания */"
+    },
+    {
+      "name": "sliderVisible",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 1014,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Слайдер стал видимым */"
+    },
+    {
+      "name": "sliderHidden",
+      "kind": "property",
+      "source": "src/core/types.ts",
+      "line": 1016,
+      "type": "() => void",
+      "optional": true,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Слайдер скрыт */"
+    }
+  ],
+  "controlAPIs": [
+    {
+      "name": "AutoplayControls.start",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 32,
+      "type": "void",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-001"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Запустить прокрутку. */"
+    },
+    {
+      "name": "AutoplayControls.stop",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 34,
+      "type": "void",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-002"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Остановить прокрутку. */"
+    },
+    {
+      "name": "AutoplayControls.pause",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 36,
+      "type": "void",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-006"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Приостановить прокрутку. */"
+    },
+    {
+      "name": "AutoplayControls.resume",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 38,
+      "type": "void",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-014"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Продолжить после паузы. */"
+    },
+    {
+      "name": "AutoplayControls.isRunning",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 40,
+      "type": "boolean",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Проверить, запущена ли прокрутка. */"
+    },
+    {
+      "name": "AutoplayControls.isPaused",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 42,
+      "type": "boolean",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "IN05"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Проверить состояние паузы. */"
+    },
+    {
+      "name": "AutoplayControls.isStopped",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 44,
+      "type": "boolean",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Проверить, остановлена ли прокрутка. */"
+    },
+    {
+      "name": "VideoControls.play",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 83,
+      "type": "void",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Воспроизвести видео выбранного или активного слайда. */"
+    },
+    {
+      "name": "VideoControls.pause",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 85,
+      "type": "void",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Поставить видео выбранного или активного слайда на паузу. */"
+    },
+    {
+      "name": "VideoControls.mute",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 87,
+      "type": "void",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-015"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Выключить звук всех видео. */"
+    },
+    {
+      "name": "VideoControls.unmute",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 89,
+      "type": "void",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-015"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Включить звук всех видео. */"
+    },
+    {
+      "name": "VideoControls.isMuted",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 91,
+      "type": "boolean",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-015"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Проверить, выключен ли звук. */"
+    },
+    {
+      "name": "MarqueeControls.start",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 55,
+      "type": "void",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Запустить прокрутку. */"
+    },
+    {
+      "name": "MarqueeControls.stop",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 57,
+      "type": "void",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-025"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": "/** Остановить прокрутку. */"
+    },
+    {
+      "name": "MarqueeControls.pause",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 59,
+      "type": "void",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Приостановить прокрутку. */"
+    },
+    {
+      "name": "MarqueeControls.resume",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 61,
+      "type": "void",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Продолжить после паузы. */"
+    },
+    {
+      "name": "MarqueeControls.isRunning",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 63,
+      "type": "boolean",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Проверить, запущена ли прокрутка. */"
+    },
+    {
+      "name": "MarqueeControls.isPaused",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 65,
+      "type": "boolean",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Проверить состояние паузы. */"
+    },
+    {
+      "name": "MarqueeControls.isStopped",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 67,
+      "type": "boolean",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Проверить, остановлена ли прокрутка. */"
+    },
+    {
+      "name": "MarqueeControls.setSpeed",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 69,
+      "type": "void",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": "/** Установить скорость в пикселях в секунду. */"
+    },
+    {
+      "name": "MarqueeControls.getSpeed",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 70,
+      "type": "number",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": ""
+    },
+    {
+      "name": "MarqueeControls.setDirection",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 71,
+      "type": "void",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": ""
+    },
+    {
+      "name": "MarqueeControls.getDirection",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 72,
+      "type": "'left' | 'right' | 'up' | 'down'",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": ""
+    },
+    {
+      "name": "LazyloadControls.loadAll",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 1024,
+      "type": "void",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-020"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": ""
+    },
+    {
+      "name": "LazyloadControls.loadSlide",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 1025,
+      "type": "void",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-019"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": ""
+    },
+    {
+      "name": "VisibilityControls.isVisible",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 1030,
+      "type": "boolean",
+      "optional": false,
+      "status": "uncovered",
+      "cases": [],
+      "note": "No targeted case in the new audit. Existing suite coverage was not inferred.",
+      "documentation": ""
+    },
+    {
+      "name": "VisibilityControls.check",
+      "kind": "method",
+      "source": "src/core/types.ts",
+      "line": 1031,
+      "type": "void",
+      "optional": false,
+      "status": "mapped",
+      "cases": [
+        "MEDIA-005",
+        "MEDIA-006",
+        "MEDIA-007"
+      ],
+      "note": "Targeted interaction coverage only; this does not establish all values or nested settings.",
+      "documentation": ""
+    }
+  ]
+}

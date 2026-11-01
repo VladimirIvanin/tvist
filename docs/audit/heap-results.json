@@ -1,0 +1,89 @@
+{
+  "buildHash": "63f82928b9db2be2374e2824c62021aa8b7558d02658b8a2b8f87a421c234550",
+  "engine": "chromium",
+  "warmupBatches": 5,
+  "measuredBatches": 5,
+  "observations": [
+    {
+      "batch": 0,
+      "cycles": 100,
+      "retainedRoots": 0,
+      "dom": {
+        "documents": 2,
+        "nodes": 11,
+        "jsEventListeners": 16
+      },
+      "heap": {
+        "usedSize": 1688704,
+        "totalSize": 2412544,
+        "embedderHeapUsedSize": 377024,
+        "backingStorageSize": 95894
+      }
+    },
+    {
+      "batch": 1,
+      "cycles": 100,
+      "retainedRoots": 0,
+      "dom": {
+        "documents": 2,
+        "nodes": 11,
+        "jsEventListeners": 16
+      },
+      "heap": {
+        "usedSize": 1707080,
+        "totalSize": 2674688,
+        "embedderHeapUsedSize": 377424,
+        "backingStorageSize": 95894
+      }
+    },
+    {
+      "batch": 2,
+      "cycles": 100,
+      "retainedRoots": 0,
+      "dom": {
+        "documents": 2,
+        "nodes": 11,
+        "jsEventListeners": 16
+      },
+      "heap": {
+        "usedSize": 1708132,
+        "totalSize": 2674688,
+        "embedderHeapUsedSize": 377824,
+        "backingStorageSize": 95894
+      }
+    },
+    {
+      "batch": 3,
+      "cycles": 100,
+      "retainedRoots": 0,
+      "dom": {
+        "documents": 2,
+        "nodes": 11,
+        "jsEventListeners": 16
+      },
+      "heap": {
+        "usedSize": 1710312,
+        "totalSize": 2674688,
+        "embedderHeapUsedSize": 378224,
+        "backingStorageSize": 95894
+      }
+    },
+    {
+      "batch": 4,
+      "cycles": 100,
+      "retainedRoots": 0,
+      "dom": {
+        "documents": 2,
+        "nodes": 11,
+        "jsEventListeners": 16
+      },
+      "heap": {
+        "usedSize": 1711956,
+        "totalSize": 2674688,
+        "embedderHeapUsedSize": 378640,
+        "backingStorageSize": 95894
+      }
+    }
+  ],
+  "interpretation": "WeakRefs are cleared each batch. Nonzero retained roots or heap growth require retaining-path investigation; no universal zero-heap assertion."
+}

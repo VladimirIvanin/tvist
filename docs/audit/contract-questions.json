@@ -1,0 +1,108 @@
+{
+  "purpose": "Observed capability gaps and unspecified contracts, separate from confirmed defects. Raw checks remain visible.",
+  "questions": [
+    {
+      "id": "TVIST-CONTRACT-001",
+      "cases": [
+        "IN08"
+      ],
+      "topic": "Click index space",
+      "observed": "Click target identity is correct; event index is the physical DOM index after reorder/cloning.",
+      "decisionNeeded": "Document whether click index is logical or physical. Existing event documentation leaves it unspecified.",
+      "status": "contract-gap"
+    },
+    {
+      "id": "TVIST-CONTRACT-002",
+      "cases": [
+        "G02"
+      ],
+      "topic": "loop auto implementation and selection policy",
+      "observed": "Declared string mode does not activate looping for 7 slides/perPage1.",
+      "decisionNeeded": "Reconcile the advertised mode with implementation and define its content threshold.",
+      "status": "contract-gap"
+    },
+    {
+      "id": "TVIST-CONTRACT-003",
+      "cases": [
+        "SRC-L03"
+      ],
+      "topic": "Stationary press/release during a transition",
+      "observed": "Interrupted target0 returns to6. Implementation saves a DOM target then passes it to logical scrollTo.",
+      "decisionNeeded": "Specify resume-target versus nearest-snap behavior before imposing a final index expectation. Subsequent clone branch is blocked.",
+      "status": "contract-gap"
+    },
+    {
+      "id": "TVIST-CONTRACT-004",
+      "cases": [
+        "SRC-L08"
+      ],
+      "topic": "Nested instance behavior inside visible loop clones",
+      "observed": "Original child remains functional after ordinary reorder; visible deep clones have no live child instance and may retain inert copied controls.",
+      "decisionNeeded": "Define clone initialization and lifecycle responsibilities for nested sliders.",
+      "status": "contract-gap"
+    },
+    {
+      "id": "TVIST-CONTRACT-005",
+      "cases": [
+        "SRC-M01"
+      ],
+      "topic": "Retained controls after destroy",
+      "observed": "Explicit late start on old autoplay controls restarts its owner and changes a root reused by a new slider.",
+      "decisionNeeded": "Specify whether controls obtained before destroy must become inert or calls are unsupported.",
+      "status": "contract-gap"
+    },
+    {
+      "id": "TVIST-CONTRACT-006",
+      "cases": [
+        "MEDIA-032"
+      ],
+      "topic": "Generated pagination keyboard access",
+      "observed": "Generated span bullets have no Tab entry; keyboard activation tail cannot run.",
+      "decisionNeeded": "Define accessible generated pagination behavior. This is separate from the documented unimplemented keyboard option.",
+      "status": "contract-gap"
+    },
+    {
+      "id": "TVIST-CONTRACT-007",
+      "cases": [
+        "G06"
+      ],
+      "topic": "Fractional pagination and terminal selected card policy",
+      "observed": "Existing legacy test intentionally expects fractional total2.5. The audit separately detects inconsistent active identity.",
+      "decisionNeeded": "Define fractional position/page totals and terminal selected-card semantics without treating fractional text alone as a defect.",
+      "status": "contract-gap"
+    },
+    {
+      "id": "TVIST-CONTRACT-008",
+      "cases": [
+        "RISK-04-010",
+        "RISK-04-013",
+        "RISK-04-016",
+        "RISK-04-019",
+        "RISK-04-022",
+        "RISK-04-025"
+      ],
+      "topic": "Ordinary drag after the author root releases pointer capture",
+      "observed": "Browser delivered lostpointercapture from the actual owner. dragStart1/dragEnd0 and dragging class remain. Other pointercancel/touchcancel branches pass.",
+      "decisionNeeded": "Specify whether losing capture must end/reset Tvist drag or document-level tracking intentionally continues. Gesture cleanup tail after contract-gap is blocked.",
+      "status": "contract-gap"
+    },
+    {
+      "id": "TVIST-CONTRACT-009",
+      "cases": [
+        "RISK-10-000",
+        "RISK-10-002",
+        "RISK-10-004"
+      ],
+      "topic": "Pagination between snap points in unsnapped free drag",
+      "observed": "Committed realIndex remains0 while nearest rendered card1; exact snap navigation and teardown are verified. Scrollbar physical-position violations are tracked separately in035.",
+      "decisionNeeded": "Specify committed versus nearest-card page semantics for freeSnap:false. Audit accepts both at interim position and records ambiguity only after other non-scrollbar checks finish.",
+      "status": "contract-gap"
+    }
+  ],
+  "documentedUnsupported": [
+    "scrollControl.keyboard handlers are not implemented",
+    "Some effect shadow/crossFade parameters are declared but unused",
+    "No standalone RTL API",
+    "Fractional perPage with grid is excluded by the public API reference"
+  ]
+}

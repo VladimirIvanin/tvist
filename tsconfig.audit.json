@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": ".",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noUncheckedIndexedAccess": false,
+    "types": ["node"],
+    "lib": ["ES2021", "DOM", "DOM.Iterable"]
+  },
+  "include": ["tests/audit/**/*.ts", "scripts/audit*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

@@ -1,0 +1,8 @@
+[
+  {
+    "file": "tests/audit/oracles.audit.ts",
+    "fullName": "audit infrastructure and uninstrumented public contracts once remains once during recursive dispatch",
+    "message": "once-reentrant: expected 3 to be 1",
+    "issue": "TVIST-AUDIT-001"
+  }
+]

@@ -1,0 +1,1481 @@
+{
+  "schemaVersion": 1,
+  "researchDate": "2026-10-31",
+  "purpose": "Source-derived audit candidates, not evidence that Tvist is defective.",
+  "issues": [
+    {
+      "id": "S01",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1384,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1384",
+      "topic": "autoWidth/breakpoint leaves inline widths",
+      "adaptation": "autoWidth true → false/perPage 1 → true, repeat resize",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G08"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G08 asserts immediate restoration of author widths when changing perPage sizing to autoWidth.",
+      "scopeLimitations": [
+        "No breakpoint-driven true/false/true autoWidth sequence or repeated resize is asserted."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S02",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1193,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1193",
+      "topic": "Updating finite slider to loop",
+      "adaptation": "fixedWidth + gap + updateOptions loop, navigate across seams",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G03"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G03 changes an already-looping slider to explicit clones and disables loop while retaining selection.",
+      "scopeLimitations": [
+        "The original finite-to-loop trigger with fixedWidth plus gap and subsequent seam navigation is not combined in this case."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S03",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1362,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1362",
+      "topic": "Few slides with loop and autoplay",
+      "adaptation": "N near perPage, lock/unlock through breakpoints",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G01",
+        "G25",
+        "MEDIA-012"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G01/G25 cover few-card geometry and locking; MEDIA-012 separately covers rewind autoplay.",
+      "scopeLimitations": [
+        "Few-card loop plus running autoplay plus breakpoint lock/unlock is not asserted as one interaction."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S04",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1208,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1208",
+      "topic": "Two-slide loop and long drag",
+      "adaptation": "N=2, short flick vs long multi-viewport drag",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "SRC-G01"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-G01 uses two cards, a short flick and a three-viewport real mouse drag, then verifies navigation and viewport coverage.",
+      "scopeLimitations": [
+        "Native touch-device behavior is outside this mouse fixture."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S05",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 851,
+      "status": "closed-fixed-4.0.16",
+      "url": "https://github.com/Splidejs/splide/issues/851",
+      "topic": "Free snap with fixedWidth",
+      "adaptation": "drag free + freeSnap + fixedWidth, incomplete last viewport",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "RISK-10-000",
+        "RISK-10-001",
+        "RISK-10-002",
+        "RISK-10-003",
+        "RISK-10-004",
+        "RISK-10-005",
+        "RISK-10-006",
+        "RISK-10-007",
+        "RISK-10-008",
+        "RISK-10-009",
+        "RISK-10-010",
+        "RISK-10-011"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "Twelve R10 cases explicitly link this issue. They compare freeSnap on/off after a real drag at perPage=1 and check final control state. Related CMT01 supplies fixedWidth plus freeSnap recovery at finite bounds.",
+      "scopeLimitations": [
+        "The R10 fixtures use full-page cards. They do not combine fixedWidth with interior momentum-to-snap targets across the fixed-width snap set. CMT01 covers the finite boundaries with a separate commit URL."
+      ],
+      "relatedCases": [
+        "CMT01"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "S06",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 810,
+      "status": "closed-fixed-4.0.6",
+      "url": "https://github.com/Splidejs/splide/issues/810",
+      "topic": "Free drag desynchronizes pagination",
+      "adaptation": "drag beyond finite boundaries; verify index, geometry and controls",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "RISK-10-000",
+        "RISK-10-001",
+        "RISK-10-002",
+        "RISK-10-003",
+        "RISK-10-004",
+        "RISK-10-005",
+        "RISK-10-006",
+        "RISK-10-007",
+        "RISK-10-008",
+        "RISK-10-009",
+        "RISK-10-010",
+        "RISK-10-011"
+      ],
+      "auditDisposition": "contract-gap",
+      "mappingStatus": "contract-gap; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "Twelve R10 cases explicitly link this issue and cross freeSnap on/off with bullets, fraction or progress and scrollbar on/off. They compare pagination with rendered geometry at exact snap points and record both the committed public index and nearest card between snaps.",
+      "scopeLimitations": [
+        "Tvist does not specify whether pagination between snap points follows the committed realIndex or nearest rendered card. R10 accepts both, then checks reachable exact navigation, independent scrollbar geometry and teardown before raising a policy gap if needed.",
+        "A declared case can stop early. The expanded matrix run supplies the actual stage evidence."
+      ],
+      "relatedCases": [
+        "CMT01"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "S07",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1268,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1268",
+      "topic": "Sync after breakpoint destruction",
+      "adaptation": "disable thumbs at breakpoint, navigate main, re-enable thumbs",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G24",
+        "SY03",
+        "RISK-05-000",
+        "RISK-05-001",
+        "RISK-05-002",
+        "RISK-05-003",
+        "RISK-05-004",
+        "RISK-05-005",
+        "RISK-05-006",
+        "RISK-05-007",
+        "RISK-05-008",
+        "RISK-05-009",
+        "RISK-05-010",
+        "RISK-05-011"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G24 and SY03 exercise thumbnail synchronization across breakpoint and explicit disable/enable cycles. R05 declares independent window/container breakpoint cycles with accessible controls, autoplay or lazy modules.",
+      "scopeLimitations": [
+        "R05 has no thumbnail pair. Its module lifecycles do not establish thumbnail synchronization across every breakpoint or after destruction/remount."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S08",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 649,
+      "status": "closed",
+      "url": "https://github.com/Splidejs/splide/issues/649",
+      "topic": "Rapid thumbnail clicks",
+      "adaptation": "multiple clicks within one transition; check accepted navigation",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G24",
+        "SY02"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G24 and SY02 exercise thumbnail synchronization after lifecycle changes and loop DOM reorder.",
+      "scopeLimitations": [
+        "They do not send multiple thumbnail clicks within one nonzero-duration transition, so the rapid-click trigger remains uncovered."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S09",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 561,
+      "status": "closed",
+      "url": "https://github.com/Splidejs/splide/issues/561",
+      "topic": "Nested sliders in loop clones",
+      "adaptation": "outer loop, inner slider, both initialization orders",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "SRC-L08"
+      ],
+      "auditDisposition": "contract-gap",
+      "mappingStatus": "contract-gap; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-L08 proves the original child survives real DOM reorder, then measures visible nested clones during a running seam transition in both explicit init orders and automatic clone fallback.",
+      "scopeLimitations": [
+        "Visible clones have no JavaScript instance in observed runs. Automatic child-instance replication and clone control ownership are not specified Tvist guarantees; this is a lifecycle policy gap, not an asserted production defect."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S10",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1260,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1260",
+      "topic": "Checkboxes and duplicate clone IDs",
+      "adaptation": "label/for and controls through explicit and fallback clones",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "IN07",
+        "IN08",
+        "MEDIA-026"
+      ],
+      "auditDisposition": "contract-gap",
+      "mappingStatus": "contract-gap; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "MEDIA-026 observes duplicate IDs in cloned form markup; IN07 checks focusable descendant exclusion. IN08 verifies click target identity and records DOM index versus logical identity; it emits CONTRACT_GAP when these differ because click(index, slide, event) does not specify the index space.",
+      "scopeLimitations": [
+        "IN08 observes original slides in clone mode and does not prove clicks on every clone or an implementation defect in the undocumented index space.",
+        "Automatic rewriting of cloned form IDs and label-for ownership is not specified; duplicate DOM IDs alone do not establish the intended cloning policy.",
+        "Actual label-for activation against the intended checkbox is not verified in both explicit and automatic clone modes."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S11",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1365,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1365",
+      "topic": "Touch blocks document scrolling",
+      "adaptation": "horizontal swipe then vertical page scroll, cancel and edge gestures",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "IN01",
+        "IN03",
+        "RISK-04-000",
+        "RISK-04-001",
+        "RISK-04-002",
+        "RISK-04-003",
+        "RISK-04-004",
+        "RISK-04-005",
+        "RISK-04-006",
+        "RISK-04-007",
+        "RISK-04-008",
+        "RISK-04-009",
+        "RISK-04-010",
+        "RISK-04-011",
+        "RISK-04-012",
+        "RISK-04-013",
+        "RISK-04-014",
+        "RISK-04-015",
+        "RISK-04-016",
+        "RISK-04-017",
+        "RISK-04-018",
+        "RISK-04-019",
+        "RISK-04-020",
+        "RISK-04-021",
+        "RISK-04-022",
+        "RISK-04-023",
+        "RISK-04-024",
+        "RISK-04-025",
+        "RISK-04-026"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "IN01 and IN03 cover synthetic pointer cancellation and perpendicular real mouse drag. R04 adds 27 drag-mode/loop/cancel configurations, including the separate legacy touch event path and an actual DOM owner releasing pointer capture.",
+      "scopeLimitations": [
+        "R04 pointercancel and legacy touchcancel are synthetic. A real mouse lostpointercapture event does not establish native OS touch scrolling.",
+        "Related NINPUT-001/002 use trusted Chromium CDP gestures. NINPUT-002 tests vertical document pan followed by horizontal slider control. Physical touchscreen behavior, the opposite ordering and equivalent trusted WebKit/Firefox gestures are outside that fixture."
+      ],
+      "relatedCases": [
+        "NINPUT-001",
+        "NINPUT-002"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "S12",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1364,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1364",
+      "topic": "Dynamic peek at end boundary",
+      "adaptation": "change peek on final slide and resize",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "RISK-02-000",
+        "RISK-02-001",
+        "RISK-02-002",
+        "RISK-02-003",
+        "RISK-02-004",
+        "RISK-02-005",
+        "RISK-02-006",
+        "RISK-02-007",
+        "RISK-02-008",
+        "RISK-02-009",
+        "RISK-02-010",
+        "RISK-02-011",
+        "RISK-02-012",
+        "RISK-02-013",
+        "RISK-02-014",
+        "RISK-02-015",
+        "RISK-02-016",
+        "RISK-02-017",
+        "RISK-02-018",
+        "RISK-02-019",
+        "RISK-02-020",
+        "RISK-02-021",
+        "RISK-02-022",
+        "RISK-02-023",
+        "SRC-G02"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-G02 changes peek at the finite final boundary and repeats container resizing with edge/coverage assertions. R02 additionally declares static center/peek alignment combinations across loop and sizing modes. SRC-G02 remains the direct changing-peek-at-end trigger.",
+      "scopeLimitations": [
+        "Only the concrete finite horizontal fixture is represented."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S13",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1125,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1125",
+      "topic": "Subpixel translation",
+      "adaptation": "fractional dimensions, roundLengths and DPR",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G15"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G15 checks thirty loop steps at fractional viewport/gap dimensions with roundLengths both enabled and disabled.",
+      "scopeLimitations": [
+        "DOM geometry assertions do not certify physical-device rasterization at every DPR."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S14",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 575,
+      "status": "closed",
+      "url": "https://github.com/Splidejs/splide/issues/575",
+      "topic": "Hidden vertical initialization",
+      "adaptation": "display none at init, show, resize, disable/enable",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G21",
+        "MEDIA-007",
+        "MEDIA-008"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G21 initializes a vertical slider while display:none, reveals it and asserts the active position and card height; media cases separately cover visibility pausing.",
+      "scopeLimitations": [
+        "The direct reveal/update fixture does not cover every ancestor display and enable lifecycle combination."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S15",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 461,
+      "status": "closed",
+      "url": "https://github.com/Splidejs/splide/issues/461",
+      "topic": "Fade/lazy and dynamic slides",
+      "adaptation": "fade + lazy + update after DOM changes",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "MEDIA-019",
+        "MEDIA-020",
+        "MEDIA-022"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "Linked cases assert lazy loadSlide/loadAll and image-error cleanup.",
+      "scopeLimitations": [
+        "The combined fade effect plus lazy loading plus dynamic slide insertion is not exercised. Related CMT07 covers append/update without fade."
+      ],
+      "relatedCases": [
+        "CMT07"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "S16",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 527,
+      "status": "closed",
+      "url": "https://github.com/Splidejs/splide/issues/527",
+      "topic": "Lazy loading during free drag",
+      "adaptation": "stop between snaps; load genuinely visible images",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G26",
+        "MEDIA-021"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G26 checks native lazy neighbors in clone modes and MEDIA-021 checks successful loading/spinner cleanup.",
+      "scopeLimitations": [
+        "There is no free-drag fixture stopped between snap points with loading assertions based on actual visible image intersections."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S17",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 117,
+      "status": "closed-with-fix-and-later-reports",
+      "url": "https://github.com/Splidejs/splide/issues/117",
+      "topic": "Autoplay focus and interaction pauses",
+      "adaptation": "overlapping pause reasons and manual stop",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "MEDIA-002",
+        "MEDIA-003",
+        "MEDIA-006",
+        "MEDIA-014",
+        "MEDIA-025",
+        "MEDIA-033",
+        "MEDIA-034",
+        "RISK-07-000",
+        "RISK-07-001",
+        "RISK-07-002",
+        "RISK-07-003",
+        "RISK-07-004",
+        "RISK-07-005",
+        "RISK-07-006",
+        "RISK-07-007",
+        "RISK-07-008",
+        "RISK-07-009",
+        "RISK-07-010",
+        "RISK-07-011"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "Linked cases assert overlapping focus/hover/visibility pauses, manual stop, long press and controlled video-ended handling. R07 crosses controlled active/inactive video ended with timer/waitForVideo autoplay and hover, focus or manual stop. These media events are controlled fixtures.",
+      "scopeLimitations": [
+        "Timer/media-control fixtures establish state coordination, not native media decoding or all interruption schedules."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S18",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1307,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1307",
+      "topic": "Destroy leaves tabindex",
+      "adaptation": "disable and destroy preserve author focus settings",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "MEDIA-029"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "MEDIA-029 checks author tabindex values after disable and destroy.",
+      "scopeLimitations": [
+        "Only author attribute preservation is asserted; no complete carousel accessibility policy is implied."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S19",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1185,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1185",
+      "topic": "Author tabindex is lost",
+      "adaptation": "hidden/visible and loop must preserve tabindex -1",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "MEDIA-029"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "MEDIA-029 verifies author tabindex -1/0/absent values through disable/destroy.",
+      "scopeLimitations": [
+        "The exact linked case does not combine hidden/visible transitions with loop cloning. Related SRC-L01 adds hidden/reveal preservation but is linked to a commit, not this issue."
+      ],
+      "relatedCases": [
+        "SRC-L01"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "S20",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1359,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1359",
+      "topic": "aria-hidden retains focus",
+      "adaptation": "focused link + fast drag through loop seam",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "MEDIA-028"
+      ],
+      "auditDisposition": "contract-gap",
+      "mappingStatus": "contract-gap; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "MEDIA-028 observes focus preservation during navigation.",
+      "scopeLimitations": [
+        "Tvist has no defined automatic aria-hidden/inert/tab-order lifecycle for inactive slides. Focused content crossing a fast loop seam is not an asserted supported accessibility contract."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S21",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 1289,
+      "status": "open",
+      "url": "https://github.com/Splidejs/splide/issues/1289",
+      "topic": "Grid thumbnail mapping",
+      "adaptation": "click every grid cell and verify logical original index",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G20"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G20 checks grid original-card identity and lifecycle after loop navigation.",
+      "scopeLimitations": [
+        "No grid-cell thumbnail click is mapped to a synchronized main slider; grid order is not a substitute for grid thumbnail mapping."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "S22",
+      "kind": "issue",
+      "repository": "Splidejs/splide",
+      "number": 408,
+      "status": "closed",
+      "url": "https://github.com/Splidejs/splide/issues/408",
+      "topic": "Firefox image drag and vertical sizing",
+      "adaptation": "drag from image/text/link; cancel and vertical fixedHeight",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "SRC-L02"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-L02 performs native image drags released over arrow button, SVG and image descendants, then checks balanced release and subsequent control use.",
+      "scopeLimitations": [
+        "The vertical fixedHeight portion and equivalent text/link drag targets from the source are not combined in this fixture."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW01",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 6559,
+      "status": "closed-integration-css",
+      "url": "https://github.com/nolimits4web/swiper/issues/6559",
+      "topic": "Auto-width loop center and nth-child",
+      "adaptation": "width identity under DOM reorder; style by stable logical index",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G04"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G04 verifies identity and viewport coverage across loop-buffer breakpoints using stable card identities.",
+      "scopeLimitations": [
+        "The linked fixture does not enable autoWidth or centering and does not compare nth-child styling against logical-index styling. Related G07 covers centered variable widths but has another source URL."
+      ],
+      "relatedCases": [
+        "G07"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW02",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 7964,
+      "status": "closed-unconfirmed",
+      "url": "https://github.com/nolimits4web/swiper/issues/7964",
+      "topic": "Few-slide loop with percentage height",
+      "adaptation": "N near perPage; both loop modes and auto",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; no exact issue URL occurs in executable case.sources; relatedCases are contextual only",
+      "mappingScope": "Related G01/G04/SRC-G11 cover few-slide loop buffer thresholds, clone configurations and centered navigation.",
+      "scopeLimitations": [
+        "No exact issue URL is declared in case.sources. There is no percentage-height ancestor/slide fixture, so the height-resolution trigger is not covered."
+      ],
+      "relatedCases": [
+        "G01",
+        "G04",
+        "SRC-G11"
+      ],
+      "provenanceGap": true
+    },
+    {
+      "id": "SW03",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 2942,
+      "status": "closed-bug-confirmed",
+      "url": "https://github.com/nolimits4web/swiper/issues/2942",
+      "topic": "Free auto-width loop can freeze",
+      "adaptation": "fast direction reversals, long speed, freeSnap modes",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "RISK-02-000",
+        "RISK-02-001",
+        "RISK-02-002",
+        "RISK-02-003",
+        "RISK-02-004",
+        "RISK-02-005",
+        "RISK-02-006",
+        "RISK-02-007",
+        "RISK-02-008",
+        "RISK-02-009",
+        "RISK-02-010",
+        "RISK-02-011",
+        "RISK-02-012",
+        "RISK-02-013",
+        "RISK-02-014",
+        "RISK-02-015",
+        "RISK-02-016",
+        "RISK-02-017",
+        "RISK-02-018",
+        "RISK-02-019",
+        "RISK-02-020",
+        "RISK-02-021",
+        "RISK-02-022",
+        "RISK-02-023",
+        "SRC-G03"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-G03 exercises centered variable-width free loop, rapid direction reversals and both freeSnap states, with movement/settle and coverage checks. R02 adds separate auto/fixed sizing, center/peek and loop navigation checks. SRC-G03 supplies the direct free-drag reversal trigger.",
+      "scopeLimitations": [
+        "The finite fixture is not an exhaustive speed, width or gesture-duration matrix."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW04",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 6472,
+      "status": "closed-bug-confirmed",
+      "url": "https://github.com/nolimits4web/swiper/issues/6472",
+      "topic": "Incomplete grouped loop pagination",
+      "adaptation": "N 7/8/10, perPage/group 3, arbitrary bullet paths",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G05"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G05 verifies reachability and coverage for seven cards with perPage 3 and group 2.",
+      "scopeLimitations": [
+        "It does not assert arbitrary pagination bullet routes for N=7/8/10 with perPage/group 3. Reachability alone does not validate bullet identity."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW05",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 7981,
+      "status": "open",
+      "url": "https://github.com/nolimits4web/swiper/issues/7981",
+      "topic": "Auto widths and group pagination",
+      "adaptation": "last bullet → drag → first after changing group",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "RISK-10-000",
+        "RISK-10-001",
+        "RISK-10-002",
+        "RISK-10-003",
+        "RISK-10-004",
+        "RISK-10-005",
+        "RISK-10-006",
+        "RISK-10-007",
+        "RISK-10-008",
+        "RISK-10-009",
+        "RISK-10-010",
+        "RISK-10-011",
+        "SRC-G04"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-G04 clicks last bullet, drags, changes grouping, then verifies first/last bullet activity and finite-end reachability with variable widths. R10 contributes free drag with pagination and scrollbar under single-page sizing. It does not combine variable-width cards or grouped pagination; SRC-G04 supplies that trigger.",
+      "scopeLimitations": [
+        "Only the selected finite horizontal width/group combination is transferred."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW06",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 6113,
+      "status": "closed",
+      "url": "https://github.com/nolimits4web/swiper/issues/6113",
+      "topic": "Loop breakpoints change groups",
+      "adaptation": "resize near seam preserving logical identity",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "SRC-G05"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-G05 performs twenty round trips at both window and container breakpoints, starting near the loop seam and asserting selection and group changes.",
+      "scopeLimitations": [
+        "This targets the stated breakpoint interaction rather than every loop option combination."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW07",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 8027,
+      "status": "closed",
+      "url": "https://github.com/nolimits4web/swiper/issues/8027",
+      "topic": "Resize cycles accumulate pagination",
+      "adaptation": "20 round-trip breakpoint cycles",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "SRC-G05"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-G05 asserts exactly one pagination root and the expected bullet count after each of twenty breakpoint round trips.",
+      "scopeLimitations": [
+        "Other pagination renderer types are outside this fixture."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW08",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 6263,
+      "status": "open",
+      "url": "https://github.com/nolimits4web/swiper/issues/6263",
+      "topic": "Navigation handlers duplicate after breakpoints",
+      "adaptation": "arrows false/object through breakpoint and enabled cycles",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "LC05",
+        "MEDIA-009",
+        "RISK-05-000",
+        "RISK-05-001",
+        "RISK-05-002",
+        "RISK-05-003",
+        "RISK-05-004",
+        "RISK-05-005",
+        "RISK-05-006",
+        "RISK-05-007",
+        "RISK-05-008",
+        "RISK-05-009",
+        "RISK-05-010",
+        "RISK-05-011"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "LC05 checks exact click counts across option/enabled cycles and MEDIA-009 checks autoplay timer duplication. R05 uses actual window/container breakpoint crossings, disables/enables the slider and checks exactly one arrow step for enabled controls.",
+      "scopeLimitations": [
+        "R05 switches generated controls as a group. It does not replace an external custom arrow selector/element object at the threshold. Related CMT12 covers author controls with a separate commit URL."
+      ],
+      "relatedCases": [
+        "CMT12"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW09",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 8171,
+      "status": "closed-fixed-12.1.3",
+      "url": "https://github.com/nolimits4web/swiper/issues/8171",
+      "topic": "Grid and fractional visible count",
+      "adaptation": "complete page ±1 cell, fractional view or peek",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "RISK-08-000",
+        "RISK-08-001",
+        "RISK-08-002",
+        "RISK-08-003",
+        "RISK-08-004",
+        "RISK-08-005",
+        "RISK-08-006",
+        "RISK-08-007",
+        "RISK-08-008",
+        "RISK-08-009",
+        "RISK-08-010",
+        "RISK-08-011",
+        "SRC-G06"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-G06 transfers partial visibility to supported integer grid plus peek and checks incomplete page membership/order across loop seams. R08 crosses integer 2×2/2×3 grids with hide-return filters and off/ordinary/cloned loop. Fractional grid perPage remains explicitly outside the supported grid domain.",
+      "scopeLimitations": [
+        "Fractional perPage with grid is explicitly unsupported; peek is a supported adaptation, not proof of the upstream fractional-grid behavior."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW10",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 7870,
+      "status": "open",
+      "url": "https://github.com/nolimits4web/swiper/issues/7870",
+      "topic": "Grid order changes during loop",
+      "adaptation": "multiple full circles with identifiable cards",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "RISK-08-000",
+        "RISK-08-001",
+        "RISK-08-002",
+        "RISK-08-003",
+        "RISK-08-004",
+        "RISK-08-005",
+        "RISK-08-006",
+        "RISK-08-007",
+        "RISK-08-008",
+        "RISK-08-009",
+        "RISK-08-010",
+        "RISK-08-011",
+        "SRC-G06"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-G06 checks page and cell order over repeated loop circles for incomplete integer grids, plus restored author order at destroy. R08 checks original node membership, visible card order, page geometry, filtering and loop behavior for two declared integer grid shapes.",
+      "scopeLimitations": [
+        "Assertions concern Tvist grid page semantics, not Swiper grid.fill modes."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW11",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 8065,
+      "status": "open",
+      "url": "https://github.com/nolimits4web/swiper/issues/8065",
+      "topic": "Filtering hidden grid slides",
+      "adaptation": "display none groups + update + restore",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "LC03"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "LC03 hides and restores ordinary slides around update and asserts the public navigation collection.",
+      "scopeLimitations": [
+        "The only exact-source-linked case LC03 filters an ordinary slider. Related R08 hide-return cases cover two integer grid shapes and off/ordinary/explicit-clone loop, but their metadata cites other grid issues. These related cases do not establish exact-source provenance for #8065.",
+        "Hiding every possible subset or an entire active grid page is outside the declared R08 fixture."
+      ],
+      "relatedCases": [
+        "RISK-08-003",
+        "RISK-08-004",
+        "RISK-08-005",
+        "RISK-08-009",
+        "RISK-08-010",
+        "RISK-08-011"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW12",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 7702,
+      "status": "closed",
+      "url": "https://github.com/nolimits4web/swiper/issues/7702",
+      "topic": "Deep nested initialization order",
+      "adaptation": "three levels, both init orders, same/cross axes",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "SY05",
+        "RISK-09-000",
+        "RISK-09-001",
+        "RISK-09-002",
+        "RISK-09-003",
+        "RISK-09-004",
+        "RISK-09-005",
+        "RISK-09-006",
+        "RISK-09-007"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SY05 checks child gesture isolation and survival after parent destroy. The eight R09 cases cover two/three levels, complete parent-first/child-first initialization and same/mixed axes using real drags, then drag the child again after parent teardown.",
+      "scopeLimitations": [
+        "The R09 axis domain is all-horizontal or alternating horizontal/vertical by depth. It does not enumerate every axis assignment, partial initialization permutation or native mobile gesture. Related SRC-L07 separately covers a three-level drag crossing all roots."
+      ],
+      "relatedCases": [
+        "SRC-L07"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW13",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 8118,
+      "status": "open-unconfirmed",
+      "url": "https://github.com/nolimits4web/swiper/issues/8118",
+      "topic": "Thumbnail clicks intermittently ignored",
+      "adaptation": "click → tiny drag → click, resize and boundaries",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "IN06",
+        "SY01",
+        "SY04"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "IN06 checks click suppression after link drag; SY01/SY04 exercise thumbnail binding and a click after unsynchronized thumbnail drag.",
+      "scopeLimitations": [
+        "The tiny-drag/click/resize/boundary sequence and rapid clicks during a transition are not all represented in one linked fixture."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW14",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 7614,
+      "status": "open",
+      "url": "https://github.com/nolimits4web/swiper/issues/7614",
+      "topic": "Autoplay hover at long speed",
+      "adaptation": "overlapping hover/focus/visibility reasons",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "MEDIA-004",
+        "RISK-07-000",
+        "RISK-07-001",
+        "RISK-07-002",
+        "RISK-07-003",
+        "RISK-07-004",
+        "RISK-07-005",
+        "RISK-07-006",
+        "RISK-07-007",
+        "RISK-07-008",
+        "RISK-07-009",
+        "RISK-07-010",
+        "RISK-07-011"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "MEDIA-004 checks overlapping hover and focus pause reasons. R07 adds end events under a held hover/focus/manual-stop reason with controlled media and clock. The original long-speed hover timing is not reproduced by these fixtures.",
+      "scopeLimitations": [
+        "It uses the normal zero-speed fixture rather than a long in-flight transition, leaving the source timing trigger untested."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW15",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 3846,
+      "status": "closed",
+      "url": "https://github.com/nolimits4web/swiper/issues/3846",
+      "topic": "Autoplay after slide count changes",
+      "adaptation": "1→5→1→0→3, preserve manual stop",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "LC01",
+        "MEDIA-001",
+        "MEDIA-005",
+        "MEDIA-011",
+        "MEDIA-013",
+        "RISK-07-000",
+        "RISK-07-001",
+        "RISK-07-002",
+        "RISK-07-003",
+        "RISK-07-004",
+        "RISK-07-005",
+        "RISK-07-006",
+        "RISK-07-007",
+        "RISK-07-008",
+        "RISK-07-009",
+        "RISK-07-010",
+        "RISK-07-011"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "LC01 checks append/update collection refresh; linked media cases separately check autoplay ticking, manual stop, finite end and video wait. R07 covers autoplay/video-ended/pause combinations with a fixed set of slides. It does not add a dynamic slide-count mutation to that same fixture.",
+      "scopeLimitations": [
+        "No case combines the 1-to-5-to-1-to-0-to-3 slide-count sequence with autoplay and preserved manual stop."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW16",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 8036,
+      "status": "closed",
+      "url": "https://github.com/nolimits4web/swiper/issues/8036",
+      "topic": "Callbacks after destroy",
+      "adaptation": "late autoplay start/media/load/RAF/resize; remount same root",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "LC04",
+        "EV02",
+        "MEDIA-010",
+        "MEDIA-017",
+        "MEDIA-030",
+        "RISK-03-000",
+        "RISK-03-001",
+        "RISK-03-002",
+        "RISK-03-003",
+        "RISK-03-004",
+        "RISK-03-005",
+        "RISK-03-006",
+        "RISK-03-007",
+        "SRC-M01"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "Linked cases exercise destroy during motion, old input after replacement, late autoplay/video/lazy callbacks and retained autoplay controls after same-root reinit. R03 checks actual native image completion or synthetic video readiness after disable/destroy in explicit and automatic clones, followed by enable/reinit and a fresh navigation.",
+      "scopeLimitations": [
+        "These assert callback/DOM isolation, not garbage collection of every retained closure. Late native image paths are related SRC-M02/SRC-M03 with their own source URLs."
+      ],
+      "relatedCases": [
+        "SRC-M02",
+        "SRC-M03"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW17",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 8078,
+      "status": "open",
+      "url": "https://github.com/nolimits4web/swiper/issues/8078",
+      "topic": "Vertical fade autoplay scrolls page",
+      "adaptation": "check document scroll and focus during autoplay",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "G22",
+        "G23"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "G22/G23 check effect cleanup and overlapping vertical fade geometry.",
+      "scopeLimitations": [
+        "Autoplay is not enabled and document scroll/focus positions are not asserted, so the vertical-fade page-scroll trigger remains uncovered."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW18",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 7656,
+      "status": "open",
+      "url": "https://github.com/nolimits4web/swiper/issues/7656",
+      "topic": "Fade flashes on resize",
+      "adaptation": "resize/orientation during transition, intermediate frames",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "RISK-06-000",
+        "RISK-06-001",
+        "RISK-06-002",
+        "RISK-06-003",
+        "RISK-06-004",
+        "RISK-06-005",
+        "RISK-06-006",
+        "RISK-06-007",
+        "RISK-06-008",
+        "RISK-06-009",
+        "RISK-06-010",
+        "RISK-06-011",
+        "RISK-06-012",
+        "RISK-06-013",
+        "RISK-06-014",
+        "RISK-06-015",
+        "RISK-06-016",
+        "RISK-06-017",
+        "SRC-G07"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-G07 samples intermediate fade frames during a live mid-transition resize and asserts finite geometry and visible content. R06 includes both axes and compares enabled frame visibility across mid-transition resize, reversal and disable. The fade × resize witnesses are the direct additional adaptation.",
+      "scopeLimitations": [
+        "DOM opacity/geometry sampling is not physical display/compositor pixel certification."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW19",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 8168,
+      "status": "open",
+      "url": "https://github.com/nolimits4web/swiper/issues/8168",
+      "topic": "Cube WebKit face rendering",
+      "adaptation": "shadows, axes, loop, content, intermediate rotation",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "RISK-06-000",
+        "RISK-06-001",
+        "RISK-06-002",
+        "RISK-06-003",
+        "RISK-06-004",
+        "RISK-06-005",
+        "RISK-06-006",
+        "RISK-06-007",
+        "RISK-06-008",
+        "RISK-06-009",
+        "RISK-06-010",
+        "RISK-06-011",
+        "RISK-06-012",
+        "RISK-06-013",
+        "RISK-06-014",
+        "RISK-06-015",
+        "RISK-06-016",
+        "RISK-06-017",
+        "SRC-G08"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-G08 samples cube transforms, face hit-testing and shadow opacity in available browser engines. R06 includes horizontal/vertical cube interruptions with finite DOM transforms, center hit-testing and slide-shadow opacity. These DOM checks do not certify physical Safari compositor output.",
+      "scopeLimitations": [
+        "Physical Safari/iOS compositor rendering, pixel-level face visibility and all axis/shadow combinations are not established by DOM hit-testing."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW20",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 7664,
+      "status": "open",
+      "url": "https://github.com/nolimits4web/swiper/issues/7664",
+      "topic": "Safari video and text move separately",
+      "adaptation": "inline video and text geometry during transition",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "MEDIA-015",
+        "MEDIA-016",
+        "RISK-03-000",
+        "RISK-03-001",
+        "RISK-03-004",
+        "RISK-03-005"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "MEDIA-015/MEDIA-016 exercise HTML video mute, pause and reset state. R03 adds clone lifecycle checks for synthetic video readiness. It does not reproduce native iOS video/text compositor separation.",
+      "scopeLimitations": [
+        "No inline-video versus text position comparison is made during motion. Related native playback cases do not establish Safari compositor alignment."
+      ],
+      "relatedCases": [
+        "NATIVE-001",
+        "NATIVE-002",
+        "NATIVE-003"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW21",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 6684,
+      "status": "closed",
+      "url": "https://github.com/nolimits4web/swiper/issues/6684",
+      "topic": "Native lazy adjacent preloading",
+      "adaptation": "nonzero start, prev/seam, symmetric neighbor loading",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "MEDIA-018",
+        "MEDIA-023",
+        "MEDIA-024",
+        "RISK-03-002",
+        "RISK-03-003",
+        "RISK-03-006",
+        "RISK-03-007"
+      ],
+      "auditDisposition": "partial",
+      "mappingStatus": "partial; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "Linked lazy cases assert neighbor promotion at initial index zero and promotion of a distant navigated target. R03 adds real pending image load after lifecycle teardown in cloned slides using the lazy module. This is distinct from nativeLazyAdjacent promotion in MEDIA-023/024.",
+      "scopeLimitations": [
+        "Nonzero initial start, backward seam navigation and symmetric neighbor assertions through loop copies are not combined in these linked cases. Related G26 tests clone-neighbor geometry separately."
+      ],
+      "relatedCases": [
+        "G26"
+      ],
+      "provenanceGap": false
+    },
+    {
+      "id": "SW22",
+      "kind": "issue",
+      "repository": "nolimits4web/swiper",
+      "number": 2914,
+      "status": "closed-has-workaround",
+      "url": "https://github.com/nolimits4web/swiper/issues/2914",
+      "topic": "CSS grid/flex oversizing",
+      "adaptation": "1fr/flex ancestor with and without min-width 0",
+      "evidence": "Issue body and relevant discussion reviewed during planning; hypothesis for Tvist, not confirmed Tvist defect.",
+      "mappedCases": [
+        "SRC-G09"
+      ],
+      "auditDisposition": "mapped",
+      "mappingStatus": "mapped; exact source URL occurs in executable case.sources; scope is limited to the named assertions",
+      "mappingScope": "SRC-G09 observes intrinsic flex/grid sizing and verifies responsive dimensions after explicitly applying min-width:0.",
+      "scopeLimitations": [
+        "The baseline is not called a library bug and the case does not claim Tvist automatically changes host CSS constraints."
+      ],
+      "relatedCases": [],
+      "provenanceGap": false
+    }
+  ],
+  "donors": [
+    {
+      "repository": "Splidejs/splide",
+      "sha": "d7e1f08e6b4f4b02a7c6ccbfbeb2d569d85715e6",
+      "files": 102,
+      "kind": "test/spec",
+      "environment": "Jest + jsdom",
+      "patterns": [
+        "Controller loop",
+        "Layout axis variants",
+        "Sync event counts",
+        "LazyLoad positive and negative assertions",
+        "Elements attribute restoration"
+      ],
+      "url": "https://github.com/Splidejs/splide/tree/d7e1f08e6b4f4b02a7c6ccbfbeb2d569d85715e6",
+      "executed": false,
+      "countMeaning": "File inventory at pinned revision; not coverage or passing-test count."
+    },
+    {
+      "repository": "davidjerleke/embla-carousel",
+      "sha": "0423b61463dd6f095d7aca810a49bbf194d6c291",
+      "files": 41,
+      "kind": "test/spec; 37 core, 3 SSR, 1 reactive-utils",
+      "environment": "Jest + jsdom",
+      "patterns": [
+        "37 measured geometry fixtures",
+        "Loop threshold ±0.01px",
+        "Content overflow boundaries",
+        "Resize batching and teardown",
+        "Reinitialization after changed content"
+      ],
+      "url": "https://github.com/davidjerleke/embla-carousel/tree/0423b61463dd6f095d7aca810a49bbf194d6c291",
+      "executed": false,
+      "countMeaning": "File inventory at pinned revision; not coverage or passing-test count."
+    },
+    {
+      "repository": "naver/egjs-flicking",
+      "sha": "357f14a5cd8270eaf58f4e785e53a4b77df3a984",
+      "files": 82,
+      "kind": "slider specs; 23 unit, 7 plugins, 5 cross-framework, 47 E2E",
+      "environment": "Vitest browser + Playwright Chromium",
+      "patterns": [
+        "Interrupted animation",
+        "Click suppression",
+        "Nested gestures",
+        "Sync",
+        "Fractional geometry",
+        "Late image loading"
+      ],
+      "url": "https://github.com/naver/egjs-flicking/tree/357f14a5cd8270eaf58f4e785e53a4b77df3a984",
+      "executed": false,
+      "countMeaning": "File inventory at pinned revision; not coverage or passing-test count."
+    },
+    {
+      "repository": "glidejs/glide",
+      "sha": "5a153fce1ea78c0f79d144bfc2afa9021c0fb15e",
+      "files": 16,
+      "kind": "test files",
+      "environment": "Jest + jsdom",
+      "patterns": [
+        "Clone buffer boundaries",
+        "Update options",
+        "Destroy cleanup",
+        "Event frequency"
+      ],
+      "url": "https://github.com/glidejs/glide/tree/5a153fce1ea78c0f79d144bfc2afa9021c0fb15e",
+      "executed": false,
+      "countMeaning": "File inventory at pinned revision; not coverage or passing-test count."
+    },
+    {
+      "repository": "akiran/react-slick",
+      "sha": "97442318e9a442bd4a84eb25133ef62087f98232",
+      "files": 19,
+      "kind": "16 Jest + 3 Playwright CT",
+      "environment": "Jest + jsdom; Playwright Chromium",
+      "patterns": [
+        "count equals perPage",
+        "One-slide disabled state",
+        "Nonzero initial index",
+        "Vertical height",
+        "Breakpoint round trips"
+      ],
+      "url": "https://github.com/akiran/react-slick/tree/97442318e9a442bd4a84eb25133ef62087f98232",
+      "executed": false,
+      "countMeaning": "File inventory at pinned revision; not coverage or passing-test count."
+    },
+    {
+      "repository": "metafizzy/flickity",
+      "sha": "a64cc33052150417bb84c724b937097308519d6e",
+      "files": 24,
+      "kind": "browser QUnit files",
+      "environment": "Manual browser runner; observed CI only lints",
+      "patterns": [
+        "Empty→append→destroy→reinit",
+        "Loop after content growth",
+        "Resize preserves selected card"
+      ],
+      "licenseNote": "GPL-3.0 in checked package.json; independently reimplement scenario ideas, do not copy code.",
+      "url": "https://github.com/metafizzy/flickity/tree/a64cc33052150417bb84c724b937097308519d6e",
+      "executed": false,
+      "countMeaning": "File inventory at pinned revision; not coverage or passing-test count."
+    },
+    {
+      "repository": "nolimits4web/swiper",
+      "sha": "82cb393aaf3793c92bd31ae23006215c813ab984",
+      "files": 9,
+      "kind": "7 runtime test.mjs + 2 test-d.ts; separate consumer-types runner",
+      "environment": "node:test/happy-dom/type fixtures",
+      "patterns": [
+        "Few-slide loop table",
+        "Hidden grid update",
+        "Cross-realm options",
+        "Dist contract",
+        "Consumer type resolution"
+      ],
+      "url": "https://github.com/nolimits4web/swiper/tree/82cb393aaf3793c92bd31ae23006215c813ab984",
+      "executed": false,
+      "countMeaning": "File inventory at pinned revision; not coverage or passing-test count."
+    }
+  ],
+  "commitResearch": "See docs/audit/commits.json, maintained separately by the audit coordinator.",
+  "excludedDonors": [
+    {
+      "repository": "rcbyr/keen-slider",
+      "sha": "520c757a80aa10ff224e9c89b0917edfa811adcf",
+      "reason": "No test/spec corpus found at checked revision."
+    },
+    {
+      "repository": "kenwheeler/slick",
+      "sha": "7b2b3a76def3309d235d9ad9683a8d82941896cd",
+      "reason": "No test/spec corpus found at checked revision; react-slick is a better regression source."
+    }
+  ],
+  "mappingProvenance": {
+    "reviewedAt": "2026-11-01",
+    "catalogueCaseCount": 263,
+    "catalogueMetadataSha256": "4866cbc4f2504a767c769cc4681bfdafae437605f948f0522072e136c820b411",
+    "catalogueExports": [
+      "geometryCases",
+      "inputCases",
+      "mediaCases",
+      "commitCases",
+      "nativeMediaCases",
+      "nativeInputCases",
+      "unitRegressionCases",
+      "eventRegressionCases",
+      "riskGeometryCases",
+      "riskInputCases",
+      "riskMediaCases",
+      "sourceGeometryCases",
+      "sourceLifecycleCases",
+      "sourceMediaCases"
+    ],
+    "method": "Live TypeScript imports from auditCatalogueSuites, the shared registry of executable browser suites. mappedCases is the exact URL join against case.sources across all registered case arrays.",
+    "semantics": "A mapping identifies an executable scenario definition, not a passing result, full upstream transfer, or all branches reached. partial states the missing trigger/assertion; contract-gap requires a product contract decision; unsupported is reserved for explicitly unavailable capabilities. relatedCases do not establish source provenance. Run ledgers, including early failures and unsupported environments, remain separate evidence.",
+    "issues": {
+      "total": 44,
+      "exactUrlLinked": 43,
+      "dispositions": {
+        "mapped": 16,
+        "partial": 24,
+        "unsupported": 0,
+        "contract-gap": 4
+      }
+    },
+    "commits": {
+      "total": 24,
+      "exactUrlLinked": 24,
+      "dispositions": {
+        "mapped": 17,
+        "partial": 6,
+        "unsupported": 0,
+        "contract-gap": 1
+      }
+    },
+    "catalogueSuiteCount": 14,
+    "catalogueMetadataHashDefinition": "SHA-256 of UTF-8 JSON.stringify over live suite registration order, using suiteFile, casesExport, id, title, family, priority, sources in that field order.",
+    "catalogueSource": "tests/audit/catalogue.ts#auditCatalogueSuites"
+  }
+}
