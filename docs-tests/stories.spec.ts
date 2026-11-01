@@ -81,7 +81,13 @@ test('мобильный вид включает куб и копирует по
   await expect(frame.locator('.stories-groups')).toHaveClass(/--cube/)
   await frame.locator('[data-story-group="1"]').click()
   await expect(frame.locator('.stories-status')).toHaveText('Саша · история 1 из 2')
-  await expect(frame.locator('.stories-groups > .tvist-v1__track > .tvist-v1__container')).toHaveAttribute('style', /rotateY\(-90deg\)/)
+  // Поворот может быть распределён между контейнером и гранями куба.
+  // Активная группа смотрит вперёд, соседние повернуты на четверть оборота.
+  await expect.poll(() => frame.locator('.stories-group-slide').evaluateAll(slides => slides.map(slide => {
+    const faceAngle = Number((slide as HTMLElement).style.transform.match(/rotateY\(([-\d.]+)deg\)/)?.[1])
+    const containerAngle = Number(slide.parentElement?.style.transform.match(/rotateY\(([-\d.]+)deg\)/)?.[1])
+    return Math.round(((((faceAngle + containerAngle + 180) % 360) + 360) % 360) - 180)
+  }))).toEqual([-90, 0, 90])
   const overflow = await frame.locator('html').evaluate(root => root.scrollWidth - root.clientWidth)
   expect(overflow).toBeLessThanOrEqual(1)
   const clipped = await frame.locator('.stories-demo').evaluate(root => root.getBoundingClientRect().bottom > window.innerHeight)

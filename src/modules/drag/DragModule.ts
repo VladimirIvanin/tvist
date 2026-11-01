@@ -136,9 +136,6 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
   let local_holdCaptureTarget: HTMLElement | null = null;
 
   let local_isFirstMove = true;
-  // Frame-based cooldown: после любого loopFix пропускаем N pointermove событий,
-  // предотвращая каскадный ping-pong при быстрых drag-ах в маленьких каруселях.
-  let local_coverageFixCooldown = 0;
 
   let local_accumulatedDeltaBeforeDragStart: { x: number; y: number } = { x: 0, y: 0 };
 
@@ -751,7 +748,6 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
     local_startX = point.x;
     local_startY = point.y;
     local_startIndex = tvist.__tvistInternal_engine.__tvistInternal_index.get();
-    local_coverageFixCooldown = 5;
   }
   /**
    * Вычисляет новую позицию track с учётом режима (marquee, center, обычный).
@@ -870,52 +866,47 @@ export function createDragModule(tvist: Tvist, options: TvistOptions): DragModul
   ): void {
     const loopModule = local_loopModuleRef;
     if (!loopModule?.fix) return;
-    const loopFix = loopModule.fix.bind(loopModule);
     const viewportSize = tvist.__tvistInternal_engine.__tvistInternal_containerSizeValue;
+    if (viewportSize <= 0) return;
     const peek = tvist.__tvistInternal_engine.__tvistInternal_getPeek();
     // Нет «страниц» для прокрутки (все слайды в одном perPage) — перестановки не нужны.
     // Раньше отсекали slidesCount <= perPage + 1, из‑за чего при 2 слайдах и perPage 1
     // loopFix вызывался только после mouseup.
     if (!local_isMarqueeActive && local_shouldSkipLoopDomReorderDuringDrag()) return;
-    // Видимая область включает peek
-    const vpStart = -currentPosition - peek.start;
-    const vpEnd = -currentPosition + viewportSize + peek.end;
-    const slides = tvist.__tvistInternal_slides;
-    if (slides.length === 0) return;
-    const contentStart = tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(0);
-    const lastIdx = slides.length - 1;
-    const contentEnd =
-      tvist.__tvistInternal_engine.__tvistInternal_getSlidePosition(lastIdx) +
-      tvist.__tvistInternal_engine.__tvistInternal_getSlideSize(lastIdx);
-    const isHoriz = options.direction !== 'vertical';
-    const dragDelta = isHoriz ? point.x - local_startX : point.y - local_startY;
-    // Пропускаем если |dragDelta| слишком мал — направление ненадёжно.
-    // После каждого loopFix startX сбрасывается к point.x, и на следующем кадре
-    // dragDelta ≈ 0.4px с произвольным знаком, что вызывает ложные срабатывания.
-    const MIN_COVERAGE_DRAG_DELTA = 10;
-    if (Math.abs(dragDelta) < MIN_COVERAGE_DRAG_DELTA) return;
-    if (local_coverageFixCooldown > 0) {
-      local_coverageFixCooldown--;
-      return;
-    }
-    // Буфер -5px: игнорируем субпиксельные зазоры, реагируем только на реальные пустоты.
-    const buffer = -5;
     let fixed = false;
-    if (dragDelta > 0 && vpStart < contentStart + buffer) {
-      loopFix({ direction: 'prev', activeSlideIndex: 0 });
+    const engine = tvist.__tvistInternal_engine;
+    // Один pointermove может пересечь несколько буферов. Восстанавливаем всё
+    // покрытие сразу: следующего события может не быть до отпускания мыши.
+    while (true) {
+      const slides = tvist.__tvistInternal_slides;
+      if (slides.length === 0) break;
+      const vpStart = -currentPosition - peek.start;
+      const vpEnd = -currentPosition + viewportSize + peek.end;
+      const contentStart = engine.__tvistInternal_getSlidePosition(0);
+      const lastIdx = slides.length - 1;
+      const contentEnd =
+        engine.__tvistInternal_getSlidePosition(lastIdx) +
+        engine.__tvistInternal_getSlideSize(lastIdx);
+      const missingStart = contentStart - vpStart;
+      const missingEnd = vpEnd - contentEnd;
+      // Не переставляем DOM туда-сюда, если контента физически меньше viewport.
+      if (contentEnd - contentStart < viewportSize + peek.start + peek.end) break;
+      if (missingStart <= 0 && missingEnd <= 0) break;
+      const direction = missingStart > 0 ? 'prev' : 'next';
+      const activeSlideIndex =
+        direction === 'prev' ? 0 : local_findSlideNearViewportEdge(vpStart, slides);
+      loopModule.fix({ direction, activeSlideIndex, setTranslate: true });
       fixed = true;
-    } else if (dragDelta < 0 && vpEnd > contentEnd - buffer) {
-      const coverageActiveIdx = local_findSlideNearViewportEdge(vpStart, slides);
-
-      loopFix({ direction: 'next', activeSlideIndex: coverageActiveIdx });
-      fixed = true;
+      const correctedPosition = engine.__tvistInternal_location.get();
+      // Не зацикливаемся, если модуль не смог сдвинуть контент.
+      if (correctedPosition === currentPosition) break;
+      currentPosition = correctedPosition;
     }
     if (fixed) {
       local_startPosition = tvist.__tvistInternal_engine.__tvistInternal_location.get();
       local_startX = point.x;
       local_startY = point.y;
       local_startIndex = tvist.__tvistInternal_engine.__tvistInternal_index.get();
-      local_coverageFixCooldown = 5;
     }
   }
   /**

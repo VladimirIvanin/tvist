@@ -42,6 +42,12 @@ describe('Marquee + Drag + Loop: Локализация проблемы с ды
     Object.defineProperty(root, 'clientWidth', { configurable: true, value: 800 })
     Object.defineProperty(root, 'offsetHeight', { configurable: true, value: 400 })
     Object.defineProperty(root, 'clientHeight', { configurable: true, value: 400 })
+    // Engine измеряет viewport по track, а не по root или container.
+    const track = root.querySelector(`.${TVIST_CLASSES.track}`) as HTMLElement
+    Object.defineProperty(track, 'offsetWidth', { configurable: true, value: 800 })
+    Object.defineProperty(track, 'clientWidth', { configurable: true, value: 800 })
+    Object.defineProperty(track, 'offsetHeight', { configurable: true, value: 400 })
+    Object.defineProperty(track, 'clientHeight', { configurable: true, value: 400 })
     Object.defineProperty(container, 'offsetWidth', { configurable: true, value: 800 })
     Object.defineProperty(container, 'clientWidth', { configurable: true, value: 800 })
     const slides = container.querySelectorAll(`.${TVIST_CLASSES.slide}`)

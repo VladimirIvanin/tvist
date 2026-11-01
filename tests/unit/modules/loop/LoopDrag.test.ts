@@ -236,6 +236,46 @@ describe('LoopModule + DragModule Integration', () => {
     })
   })
 
+  describe('Длинный drag в узком loop без отпускания', () => {
+    it.each([
+      { width: 375, direction: 1 },
+      { width: 375, direction: -1 },
+      { width: 424, direction: 1 },
+      { width: 424, direction: -1 },
+    ])('сохраняет покрытие и положение слайдов: $width px, направление $direction', ({ width, direction }) => {
+      fixture.cleanup()
+      fixture = createSliderFixture({ slidesCount: 6, width })
+      slider = new Tvist(fixture.root, { loop: true, drag: true, perPage: 2, gap: 16, speed: 0 })
+      const engine = getRuntime(slider).engine
+      const step = engine.getSlidePosition(1) - engine.getSlidePosition(0)
+      const cycle = step * 6
+      const startX = 500
+      fixture.root.dispatchEvent(createPointerOrMouseEvent('down', { clientX: startX, clientY: 100 }))
+      document.dispatchEvent(createPointerOrMouseEvent('move', { clientX: startX + direction * 10, clientY: 100 }))
+
+      // Проверяем до pointerup: между редкими move пользователь может держать мышь неподвижно.
+      for (const distance of [800, 801, 801.25, 850, 1600, 5500, 5400, 100, -800]) {
+        document.dispatchEvent(createPointerOrMouseEvent('move', { clientX: startX + direction * distance, clientY: 100 }))
+        const position = engine.location.get()
+        const last = slider.slides.length - 1
+        expect(engine.getSlidePosition(0) + position).toBeLessThanOrEqual(0)
+        expect(engine.getSlidePosition(last) + engine.getSlideSize(last) + position).toBeGreaterThanOrEqual(width)
+        slider.slides.forEach((slide, index) => {
+          const realIndex = Number(slide.getAttribute('data-tvist-slide-index'))
+          const expectedPosition = realIndex * step + direction * (distance - 10)
+          const actualPosition = engine.getSlidePosition(index) + position
+          // Перестановка меняет координату только на целое число оборотов.
+          // Слайды продолжают двигаться за указателем, без скачка к activeIndex.
+          const turns = (actualPosition - expectedPosition) / cycle
+          expect(turns).toBeCloseTo(Math.round(turns), 8)
+        })
+      }
+
+      document.dispatchEvent(createPointerOrMouseEvent('up', { clientX: startX - direction * 800, clientY: 100 }))
+      expect(Number.isFinite(engine.location.get())).toBe(true)
+    })
+  })
+
   describe('Snap после drag в loop-режиме не ведёт себя как rewind', () => {
     it('drag вперёд на 1 слайд переходит на следующий, а не на первый', async () => {
       // slideSize=1000, threshold=max(1000*0.2, 80)=200px
