@@ -26,7 +26,7 @@ const groupSlider = new TvistV1(demo.querySelector('.stories-groups'), {
   drag: true,
   autoplay: false,
   effect: 'slide',
-  speed: 0,
+  speed: reducedMotion.matches ? 0 : 300,
   breakpoints: {
     767: {
       effect: 'cube',
@@ -95,7 +95,7 @@ function finishGroup(groupIndex) {
 const innerSliders = innerRoots.map((root, groupIndex) => new TvistV1(root, {
   perPage: 1,
   gap: 0,
-  speed: 0,
+  speed: reducedMotion.matches ? 0 : 300,
   loop: false,
   drag: true,
   // Видимость всего примера отслеживает внешний слайдер. Группами управляем здесь.

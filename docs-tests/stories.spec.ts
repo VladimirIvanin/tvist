@@ -1,5 +1,42 @@
 import { test, expect } from '@playwright/test'
 
+for (const width of [1000, 375]) {
+  test(`свайп истории плавно доводится после отпускания при ширине ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 })
+    await page.emulateMedia({ reducedMotion: 'no-preference' })
+    await page.goto('preview.html?id=stories')
+    await expect(page.locator('.stories-status')).toHaveText('Маша · история 1 из 3')
+    await page.locator('.demo-motion-toggle').click()
+
+    const card = page.locator('.stories-inner').first()
+    const container = card.locator('.tvist-v1__container')
+    const box = (await card.boundingBox())!
+    const x = box.x + box.width * .8
+    const y = box.y + box.height / 2
+    const position = () => container.evaluate(element => new DOMMatrixReadOnly(getComputedStyle(element).transform).m41)
+
+    // Короткий drag возвращается к текущей истории, длинный — завершает переход.
+    for (const [distance, target] of [[.15, 0], [.55, -box.width]]) {
+      await page.mouse.move(x, y)
+      await page.mouse.down()
+      await page.mouse.move(x - 10, y)
+      await page.mouse.move(x - box.width * distance, y, { steps: 8 })
+      // Обнуляем скорость: выбор истории зависит только от расстояния жеста.
+      await page.waitForTimeout(250)
+      const before = await position()
+      expect(Math.abs(before - target)).toBeGreaterThan(box.width * .1)
+      await page.mouse.up()
+      const after = await position()
+      expect(Math.abs(after - before)).toBeLessThan(box.width * .1)
+      await expect.poll(position).toBeCloseTo(target, 0)
+    }
+
+    await expect(page.locator('.stories-status')).toHaveText('Маша · история 2 из 3')
+    await expect(page.locator('[data-story-group="0"]')).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.locator('.demo-motion-toggle')).toHaveText('Воспроизвести')
+  })
+}
+
 test('истории переключаются тапом, а удержание по краю ставит прогресс на паузу', async ({ page }) => {
   await page.clock.install()
   await page.goto('preview.html?id=stories')
