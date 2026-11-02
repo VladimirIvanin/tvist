@@ -387,7 +387,9 @@ describe('VisibilityModule', () => {
   })
 
   describe('Блокировка переключения слайдов при скрытии', () => {
-    it('не должен переключать слайды через scrollTo() когда слайдер скрыт', async () => {
+    // Проверяем интеграцию синхронно через visibility.check();
+    // автоматическое отслеживание CSS проверяется отдельно выше.
+    it('не должен переключать слайды через scrollTo() когда слайдер скрыт', () => {
       slider = new Tvist(root, {
         visibility: true,
       })
@@ -396,7 +398,7 @@ describe('VisibilityModule', () => {
 
       // Скрываем слайдер
       root.style.display = 'none'
-      await new Promise(resolve => setTimeout(resolve, 600))
+      expect(slider.visibility?.check()).toBe(false)
 
       // Пытаемся переключить слайд
       slider.scrollTo(1)
@@ -405,7 +407,7 @@ describe('VisibilityModule', () => {
       expect(slider.activeIndex).toBe(0)
     })
 
-    it('не должен переключать слайды через next() когда слайдер скрыт', async () => {
+    it('не должен переключать слайды через next() когда слайдер скрыт', () => {
       slider = new Tvist(root, {
         visibility: true,
       })
@@ -414,7 +416,7 @@ describe('VisibilityModule', () => {
 
       // Скрываем слайдер
       root.style.display = 'none'
-      await new Promise(resolve => setTimeout(resolve, 600))
+      expect(slider.visibility?.check()).toBe(false)
 
       // Пытаемся переключить на следующий слайд
       slider.next()
@@ -423,7 +425,7 @@ describe('VisibilityModule', () => {
       expect(slider.activeIndex).toBe(0)
     })
 
-    it('не должен переключать слайды через prev() когда слайдер скрыт', async () => {
+    it('не должен переключать слайды через prev() когда слайдер скрыт', () => {
       slider = new Tvist(root, {
         visibility: true,
       })
@@ -433,7 +435,7 @@ describe('VisibilityModule', () => {
 
       // Скрываем слайдер
       root.style.display = 'none'
-      await new Promise(resolve => setTimeout(resolve, 600))
+      expect(slider.visibility?.check()).toBe(false)
 
       // Пытаемся переключить на предыдущий слайд
       slider.prev()
@@ -442,7 +444,7 @@ describe('VisibilityModule', () => {
       expect(slider.activeIndex).toBe(1)
     })
 
-    it('должен возобновить переключение слайдов после появления', async () => {
+    it('должен возобновить переключение слайдов после появления', () => {
       slider = new Tvist(root, {
         visibility: true,
       })
@@ -451,7 +453,7 @@ describe('VisibilityModule', () => {
 
       // Скрываем слайдер
       root.style.display = 'none'
-      await new Promise(resolve => setTimeout(resolve, 600))
+      expect(slider.visibility?.check()).toBe(false)
 
       // Пытаемся переключить слайд (не должно сработать)
       slider.scrollTo(1)
@@ -459,21 +461,18 @@ describe('VisibilityModule', () => {
 
       // Показываем слайдер
       root.style.display = 'block'
-      await new Promise(resolve => setTimeout(resolve, 600))
+      expect(slider.visibility?.check()).toBe(true)
 
       // Теперь переключение должно работать
       slider.scrollTo(1)
       expect(slider.activeIndex).toBe(1)
     })
 
-    it('не должен обновлять активные буллеты пагинации когда слайдер скрыт', async () => {
+    it('не должен обновлять активные буллеты пагинации когда слайдер скрыт', () => {
       slider = new Tvist(root, {
         visibility: true,
         pagination: true,
       })
-
-      // Ждём инициализации пагинации
-      await new Promise(resolve => setTimeout(resolve, 100))
 
       const pagination = root.querySelector('.tvist-v1__pagination')
 
@@ -484,7 +483,7 @@ describe('VisibilityModule', () => {
 
       // Скрываем слайдер
       root.style.display = 'none'
-      await new Promise(resolve => setTimeout(resolve, 600))
+      expect(slider.visibility?.check()).toBe(false)
 
       // Пытаемся переключить слайд
       slider.scrollTo(1)
@@ -494,49 +493,51 @@ describe('VisibilityModule', () => {
       expect(bullets[1].classList.contains('tvist-v1__bullet--active')).toBe(false)
     })
 
-    it('должен обновить буллеты пагинации после появления слайдера', async () => {
-      slider = new Tvist(root, {
-        visibility: true,
-        pagination: true,
-      })
+    it.each([false, true])(
+      'должен обновить буллеты пагинации после появления слайдера (instant: %s)',
+      instant => {
+        slider = new Tvist(root, {
+          visibility: true,
+          pagination: true,
+        })
 
-      // Ждём инициализации пагинации
-      await new Promise(resolve => setTimeout(resolve, 100))
+        const pagination = root.querySelector('.tvist-v1__pagination')
 
-      const pagination = root.querySelector('.tvist-v1__pagination')
+        expect(pagination).not.toBeNull()
 
-      expect(pagination).not.toBeNull()
+        const bullets = pagination!.querySelectorAll('.tvist-v1__bullet')
+        expect(bullets).toHaveLength(3)
+        expect(bullets[0].classList.contains('tvist-v1__bullet--active')).toBe(true)
 
-      const bullets = pagination!.querySelectorAll('.tvist-v1__bullet')
+        // Скрываем слайдер
+        root.style.display = 'none'
+        expect(slider.visibility?.check()).toBe(false)
 
-      // Скрываем слайдер
-      root.style.display = 'none'
-      await new Promise(resolve => setTimeout(resolve, 600))
+        // Пытаемся переключить слайд (не должно сработать)
+        slider.scrollTo(1, instant)
+        expect(slider.activeIndex).toBe(0)
+        expect(bullets[0].classList.contains('tvist-v1__bullet--active')).toBe(true)
+        expect(bullets[1].classList.contains('tvist-v1__bullet--active')).toBe(false)
 
-      // Пытаемся переключить слайд (не должно сработать)
-      slider.scrollTo(1)
-      expect(bullets[0].classList.contains('tvist-v1__bullet--active')).toBe(true)
+        // Показываем слайдер
+        root.style.display = 'block'
+        expect(slider.visibility?.check()).toBe(true)
 
-      // Показываем слайдер
-      root.style.display = 'block'
-      await new Promise(resolve => setTimeout(resolve, 600))
+        // Теперь переключаем слайд
+        slider.scrollTo(1, instant)
+        expect(slider.activeIndex).toBe(1)
 
-      // Теперь переключаем слайд
-      slider.scrollTo(1)
+        // Буллеты должны обновиться
+        expect(bullets[0].classList.contains('tvist-v1__bullet--active')).toBe(false)
+        expect(bullets[1].classList.contains('tvist-v1__bullet--active')).toBe(true)
+      }
+    )
 
-      // Буллеты должны обновиться
-      expect(bullets[0].classList.contains('tvist-v1__bullet--active')).toBe(false)
-      expect(bullets[1].classList.contains('tvist-v1__bullet--active')).toBe(true)
-    })
-
-    it('не должен переключать слайды при клике на буллет пагинации когда слайдер скрыт', async () => {
+    it('не должен переключать слайды при клике на буллет пагинации когда слайдер скрыт', () => {
       slider = new Tvist(root, {
         visibility: true,
         pagination: { clickable: true },
       })
-
-      // Ждём инициализации пагинации
-      await new Promise(resolve => setTimeout(resolve, 100))
 
       const pagination = root.querySelector('.tvist-v1__pagination')
 
@@ -548,7 +549,7 @@ describe('VisibilityModule', () => {
 
       // Скрываем слайдер
       root.style.display = 'none'
-      await new Promise(resolve => setTimeout(resolve, 600))
+      expect(slider.visibility?.check()).toBe(false)
 
       // Кликаем на второй буллет
       bullets[1].click()
@@ -557,7 +558,7 @@ describe('VisibilityModule', () => {
       expect(slider.activeIndex).toBe(0)
     })
 
-    it('не должен эмитить события переключения слайдов когда слайдер скрыт', async () => {
+    it('не должен эмитить события переключения слайдов когда слайдер скрыт', () => {
       const onSlideChange = vi.fn()
 
       slider = new Tvist(root, {
@@ -569,7 +570,7 @@ describe('VisibilityModule', () => {
 
       // Скрываем слайдер
       root.style.display = 'none'
-      await new Promise(resolve => setTimeout(resolve, 600))
+      expect(slider.visibility?.check()).toBe(false)
 
       // Пытаемся переключить слайд
       slider.scrollTo(1)
